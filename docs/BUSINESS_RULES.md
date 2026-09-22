@@ -1,16 +1,14 @@
 # DiscipleTrack Business Rules
 
-This document defines important domain rules that DiscipleTrack must
-preserve regardless of UI or implementation details.
+*Document Status:* MVP Baseline  
+*Last Updated:* September 2026
 
-These rules will evolve as the church workflow is refined.
+This document defines domain rules that DiscipleTrack must preserve
+regardless of UI implementation.
 
 ---
 
-## BR-001 — System Roles and D Group Responsibilities Are Different
-
-DiscipleTrack distinguishes between system/church roles and contextual
-D Group responsibilities.
+## BR-001 — System Roles and D Group Responsibilities Are Separate
 
 System/church roles:
 
@@ -24,188 +22,217 @@ D Group responsibilities:
 - Discipler
 - Disciple
 
-A D Group responsibility must not automatically grant unrelated
+A D Group responsibility does not automatically grant unrelated
 church-wide system authority.
 
 ---
 
-## BR-002 — Privileged System Role Assignment
+## BR-002 — Multiple Types of Responsibility May Coexist
 
-Users cannot grant privileged system roles to themselves.
+A person may hold a system responsibility and a D Group responsibility
+at the same time.
 
-Admin and Discipleship Coordinator access must be assigned through an
-authorized process.
+Example:
 
----
+System Role:
+Coordinator
 
-## BR-003 — D Group Responsibility Assignment
+D Group Responsibility:
+D Group Leader
 
-A Member cannot arbitrarily make themselves a:
-
-- D Group Leader
-- Discipler
-
-These responsibilities must be assigned through an authorized ministry
-workflow.
+Authorization must evaluate the relevant context.
 
 ---
 
-## BR-004 — Church Membership
+## BR-003 — Privileged System Roles Cannot Be Self-Assigned
 
-A user must belong to or be appropriately authorized for a church before
-accessing that church's protected information.
+Users cannot assign themselves Admin or Coordinator access.
 
-Joining a church does not automatically grant privileged access.
+Privileged system roles require an authorized assignment process.
+
+---
+
+## BR-004 — D Group Responsibilities Cannot Be Self-Assigned
+
+A Member cannot make themselves a D Group Leader or Discipler.
+
+These responsibilities require an authorized ministry assignment.
+
+---
+
+## BR-005 — Church Membership Is Required
+
+A user must belong to or be appropriately authorized for the church
+before accessing protected church information.
+
+Entering a church join code does not itself grant privileged access.
 
 Membership may require approval.
 
 ---
 
-## BR-005 — Church Data Isolation
+## BR-006 — Registered Users Only for MVP
 
-Protected information belonging to one church must not be accessible to
-unauthorized users from another church.
+The MVP tracks active participants through registered DiscipleTrack
+accounts.
 
-Backend/database authorization must enforce this rule.
+Creating separate offline member records for people who have never
+registered is outside the MVP.
 
 ---
 
-## BR-006 — Admin Responsibility
+## BR-007 — Church Data Isolation
+
+Protected church information must not be accessible to unauthorized
+users outside the church context.
+
+Backend/database controls must enforce this rule.
+
+---
+
+## BR-008 — Admin Responsibility
 
 Admin is primarily responsible for:
 
-- church/system configuration
+- system configuration
 - accounts
 - memberships
 - privileged system roles
 - access/security administration
 
-Admin is not intended to be the primary operator of everyday discipleship
-workflows.
+Admin is not automatically a ministry-care role.
 
 ---
 
-## BR-007 — Coordinator Responsibility
+## BR-009 — Admin Does Not Automatically Access Ministry-Care Data
 
-The Discipleship Coordinator is responsible for ministry-wide
-discipleship operations.
+System administration privileges alone do not automatically grant access
+to private follow-up notes or equivalent ministry-care information.
 
-This includes oversight of:
+Additional ministry responsibility is required where appropriate.
+
+---
+
+## BR-010 — Coordinator Responsibility
+
+The Coordinator oversees church-wide discipleship operations including:
 
 - D Groups
-- D Group Leaders
+- Leaders
 - Disciplers
 - Disciples
+- assignments
 - curriculum
-- attendance
+- attendance oversight
 - progress
 - follow-ups
+- promotion review
 
 ---
 
-## BR-008 — D Group Leader Scope
+## BR-011 — One Active D Group Leader
 
-A D Group Leader is responsible for their assigned D Group.
+Each active D Group has one primary active D Group Leader.
 
-Being a D Group Leader does not automatically grant access to unrelated
-D Groups.
+A person may lead only one active D Group at a time.
 
----
-
-## BR-009 — One Primary D Group Leader
-
-Each active D Group should have one primary active D Group Leader.
-
-Changes in leadership should preserve meaningful leadership history.
+Leadership changes must preserve meaningful history.
 
 ---
 
-## BR-010 — Multiple Disciplers
+## BR-012 — One Active D Group for a Disciple
+
+A Disciple belongs to only one active D Group at a time.
+
+Transfers must preserve historical D Group membership.
+
+---
+
+## BR-013 — Multiple Disciplers per D Group
 
 A D Group may contain multiple Disciplers.
 
-Disciplers operate within the scope of their authorized D Group and
-disciple assignments.
+Each Discipler operates only within authorized scope.
 
 ---
 
-## BR-011 — Multiple Disciples
+## BR-014 — One Primary Discipler per Disciple
 
-A D Group may contain multiple Disciples.
+A Disciple may have at most one active primary Discipler.
 
-Disciple membership should preserve meaningful assignment history.
+A Disciple may temporarily have no assigned Discipler.
 
----
+A Discipler may be responsible for multiple Disciples.
 
-## BR-012 — Discipler-to-Disciple Responsibility
-
-The system must eventually be able to determine which Discipler is
-responsible for which Disciple when individual responsibility is used.
-
-The exact cardinality and reassignment rules will be finalized during
-database/domain design.
+Changes in assignment must preserve historical records.
 
 ---
 
-## BR-013 — Historical Assignment Integrity
+## BR-015 — Disciple and Discipler Are Mutually Exclusive Active Responsibilities
 
-Changing a person's:
+A person cannot simultaneously be an active Disciple and active
+Discipler.
 
-- D Group
-- D Group responsibility
+Promotion changes the person's active ministry responsibility while
+preserving historical discipleship records.
+
+---
+
+## BR-016 — D Group Gathering and Discipleship Meeting Are Different
+
+A D Group Gathering represents the overall group's meeting.
+
+A Discipleship Meeting represents lesson work between a Discipler and
+assigned Disciple(s).
+
+They must remain distinct domain concepts.
+
+---
+
+## BR-017 — D Group Gatherings Have Flexible Scheduling
+
+D Groups are not required to maintain a fixed recurring meeting schedule.
+
+Each actual gathering records its own date/time.
+
+---
+
+## BR-018 — Gathering Attendance Includes D Group Participants
+
+Attendance may be recorded for:
+
 - D Group Leader
-- Discipler
-- membership status
+- Disciplers
+- Disciples
 
-must not unintentionally destroy historical ministry records.
-
----
-
-## BR-014 — Curriculum Is Church-Owned Data
-
-Church-specific curricula, stages, and lessons must not be hard-coded
-into Flutter.
-
-They are configurable church-owned data.
+according to their active participation in the D Group.
 
 ---
 
-## BR-015 — Curriculum Structure
-
-A curriculum contains ordered stages.
-
-Stages contain ordered lessons.
-
-Progress should reference actual curriculum/lesson records.
-
----
-
-## BR-016 — Attendance Uniqueness
+## BR-019 — Attendance Uniqueness
 
 A person can have at most one attendance record for a particular
-session.
+D Group Gathering.
 
-This should be enforced at the database level where possible.
+This invariant should be enforced at the database level.
 
 ---
 
-## BR-017 — Attendance Source of Truth
+## BR-020 — Attendance Source of Truth
 
 Individual attendance records are authoritative.
 
-Values such as:
+Derived information includes:
 
 - attendance percentage
 - sessions attended
 - sessions missed
 - consecutive absences
-- last attendance
-
-are derived from underlying records or safely maintained derived data.
+- last attendance date
 
 ---
 
-## BR-018 — Attendance States
+## BR-021 — Attendance States
 
 MVP attendance states are:
 
@@ -214,202 +241,385 @@ MVP attendance states are:
 - Late
 - Excused
 
-The statistical treatment of Late and Excused must be explicitly
-defined before attendance analytics are finalized.
+---
+
+## BR-022 — Late Counts as Attended
+
+Late attendance counts as attendance for consecutive-absence monitoring.
+
+It must not increment an absence streak.
 
 ---
 
-## BR-019 — Attendance and Progress Are Separate
+## BR-023 — Excused Breaks the Absence Streak
 
-Attending a D Group session does not automatically complete a
-discipleship lesson.
+An Excused attendance state does not count as an unexplained absence.
 
-Lesson progress is managed separately.
+It resets/breaks the consecutive unexplained absence streak.
 
----
+Example:
 
-## BR-020 — Session Authorization
+Absent
+Absent
+Excused
+Absent
 
-Only appropriately authorized users may create or modify sessions for a
-D Group.
-
-Authorization depends on the user's church and D Group responsibilities.
-
----
-
-## BR-021 — Session Lifecycle
-
-MVP sessions support:
-
-- Draft
-- Finalized
-
-A finalized session represents an official completed session record.
-
-Post-finalization modification must be controlled rather than
-unrestricted.
+results in a current consecutive unexplained absence streak of 1.
 
 ---
 
-## BR-022 — Monitoring Uses Finalized Data
+## BR-024 — Members Cannot Modify Their Own Attendance
 
-Attendance monitoring should operate using appropriate finalized session
-data.
+Members may view their own attendance history.
 
-Draft/incomplete session records should not incorrectly trigger
-discipleship follow-ups.
-
----
-
-## BR-023 — Consecutive Absence Monitoring
-
-DiscipleTrack must be capable of determining consecutive absences from
-relevant attendance history.
-
-When the configured threshold is reached, the Disciple becomes eligible
-for follow-up attention.
+They cannot create, modify, or delete their own official attendance
+records unless a future explicitly authorized workflow is introduced.
 
 ---
 
-## BR-024 — Deterministic Monitoring
+## BR-025 — Attendance Recording Authorization
 
-Core monitoring rules must be deterministic.
+Authorized D Group Leaders and Disciplers may record D Group attendance.
 
-AI must not determine whether basic attendance conditions occurred.
+The Coordinator may oversee/correct attendance according to defined
+permissions.
 
----
-
-## BR-025 — Follow-up Responsibility
-
-A follow-up must identify:
-
-- Disciple
-- reason
-- D Group/context
-- responsible person
-- status
-- actions/history
-
-Responsibility should be explicit rather than assumed.
+Exact edit/finalization permissions will be enforced by the authorization
+model.
 
 ---
 
-## BR-026 — Follow-up Assignment
+## BR-026 — Monitoring Uses Finalized Gatherings
 
-Where an individual Discipler is responsible for a Disciple, follow-up
-should normally be assignable to that Discipler.
+Attendance monitoring should use finalized official D Group Gathering
+records.
 
-A D Group Leader must be able to oversee relevant D Group follow-ups.
-
-A Coordinator must be able to oversee ministry-wide follow-ups.
-
-Exact escalation rules will be defined during follow-up feature design.
+Draft/incomplete gatherings must not incorrectly trigger follow-ups.
 
 ---
 
-## BR-027 — Follow-up Deduplication
+## BR-027 — Consecutive Absence Monitoring
 
-Repeated monitoring must not generate unnecessary duplicate unresolved
-follow-ups for the same Disciple and equivalent active condition.
+The MVP monitors consecutive unexplained absences.
+
+The initial/default threshold is 3.
+
+The threshold should be configurable rather than permanently hard-coded.
 
 ---
 
-## BR-028 — Follow-up History
+## BR-028 — Monitoring Is Deterministic
 
-Resolved follow-ups must remain part of the Disciple's historical care
-record.
+Core attendance monitoring must use deterministic business rules.
+
+AI does not determine whether the absence threshold was reached.
+
+---
+
+## BR-029 — Curriculum Contains 12 Ordered Lessons
+
+The church's MVP discipleship curriculum consists of 12 ordered lessons.
+
+The curriculum is represented as data and must not be hard-coded into
+Flutter UI/business logic.
+
+---
+
+## BR-030 — Each Lesson Requires Four Discipleship Meetings
+
+Each lesson requires four recorded meetings specifically working through
+that lesson.
+
+A meeting for another lesson does not count toward the current lesson's
+four-meeting requirement.
+
+---
+
+## BR-031 — Discipler Records Discipleship Meetings
+
+The responsible Discipler records each completed Discipleship Meeting.
+
+The Disciple does not need to separately confirm each meeting in the MVP.
+
+---
+
+## BR-032 — Four Meetings Do Not Automatically Complete a Lesson
+
+When the fourth required meeting is recorded:
+
+Lesson
+→ Ready for Completion
+
+The lesson does not automatically become Completed.
+
+---
+
+## BR-033 — D Group Leader Confirms Lesson Completion
+
+The relevant D Group Leader reviews a lesson that has reached 4/4 and
+confirms completion.
+
+Only after confirmation is the lesson considered Completed.
+
+---
+
+## BR-034 — Attendance and Discipleship Progress Are Separate
+
+D Group attendance and lesson progress represent different concepts.
+
+A Disciple may miss a D Group Gathering while continuing individual
+Discipleship Meetings.
+
+Likewise, attending a D Group Gathering does not count as one of the
+four required lesson meetings unless explicitly represented as a valid
+Discipleship Meeting under the discipleship workflow.
+
+---
+
+## BR-035 — Progress Source of Truth
+
+Discipleship Meeting and lesson-completion records are authoritative.
+
+Overall progress percentages and current-stage indicators are derived
+from these underlying records.
+
+---
+
+## BR-036 — Curriculum Completion Creates Promotion Eligibility
+
+Completing all 12 lessons makes a Disciple eligible for Discipler review.
+
+It does not automatically promote them.
+
+---
+
+## BR-037 — Coordinator Approves Discipler Promotion
+
+Promotion from Disciple to Discipler requires an explicit Coordinator
+decision.
+
+The system must preserve the person's completed discipleship history
+after promotion.
+
+---
+
+## BR-038 — Follow-up Represents Intentional Care
+
+A follow-up is not merely an alert.
+
+It represents an intentional care workflow:
+
+Concern Detected
+→ Responsibility Assigned
+→ Human Action
+→ Outcome Recorded
+→ Resolution
+
+---
+
+## BR-039 — Attendance Follow-up Assignment
+
+When an attendance-based follow-up is created:
+
+If the Disciple has an active primary Discipler:
+→ assign responsibility to that Discipler.
+
+If no primary Discipler exists:
+→ responsibility falls back to the D Group Leader.
+
+---
+
+## BR-040 — Follow-up Oversight
+
+A D Group Leader may oversee appropriate follow-ups within their D Group.
+
+The Coordinator may oversee appropriate follow-ups across the
+discipleship ministry.
+
+---
+
+## BR-041 — Follow-up Deduplication
+
+Repeated monitoring must not create unnecessary duplicate unresolved
+follow-ups for the same person and equivalent active condition.
+
+---
+
+## BR-042 — Follow-up History Is Preserved
 
 Resolving a follow-up must not delete it.
 
----
-
-## BR-029 — Follow-up Resolution
-
-Viewing a follow-up does not resolve it.
-
-Resolution requires an intentional completion of the follow-up workflow.
-
-Required resolution information will be finalized during feature design.
+Resolved follow-ups remain part of the historical ministry-care record.
 
 ---
 
-## BR-030 — Progress Source of Truth
+## BR-043 — Viewing Does Not Resolve a Follow-up
 
-Progress should be represented using individual lesson-progress records.
+Opening or reading a follow-up does not mark it resolved.
 
-Overall percentages and stages are derived from those records where
-appropriate.
+Resolution requires an intentional completion action.
 
 ---
 
-## BR-031 — Membership Status and Engagement Are Different
+## BR-044 — Follow-ups May Become Overdue
 
-Administrative church membership and discipleship engagement are
+An unresolved follow-up may have a due date.
+
+If the due date passes while it remains unresolved, it becomes overdue.
+
+The MVP does not require automatic multi-level escalation.
+
+---
+
+## BR-045 — Follow-up Notes Are Restricted Ministry Information
+
+Follow-up information may be available to appropriately authorized:
+
+- assigned Discipler
+- D Group Leader
+- Coordinator
+
+The Disciple does not automatically see internal follow-up notes.
+
+Admin does not automatically receive access solely through system
+administration authority.
+
+---
+
+## BR-046 — Announcement Scope Is Explicit
+
+MVP announcements have one of two scopes:
+
+- Church
+- D Group
+
+Church announcements are visible according to church membership.
+
+D Group announcements are visible only within the relevant D Group
+context.
+
+---
+
+## BR-047 — Announcement Publishing Authority
+
+The Coordinator may create church-wide ministry announcements.
+
+A D Group Leader may create announcements for their own D Group.
+
+Disciplers and Disciples do not publish announcements in the MVP.
+
+---
+
+## BR-048 — Every Registered User Has a Profile
+
+Every registered DiscipleTrack user has a profile.
+
+Profile information shown to a viewer depends on authorization and
+context.
+
+---
+
+## BR-049 — Profiles Do Not Bypass Authorization
+
+The existence of a profile does not make all information about that
+person publicly available.
+
+Attendance, progress, assignments and ministry-care information must
+respect authorization rules.
+
+---
+
+## BR-050 — Membership Status and Engagement Are Different
+
+Administrative membership status and discipleship engagement are
 different concepts.
 
-A church Member may remain administratively active while their
-discipleship participation is declining.
-
-Future engagement/health monitoring must preserve this distinction.
+A Member may remain administratively Active while showing declining
+discipleship participation.
 
 ---
 
-## BR-032 — Contextual Authorization
+## BR-051 — Member Records Use Lifecycle States
 
-Authorization may depend on:
+Normal workflows should use appropriate states such as:
 
-- authenticated user
-- church membership
-- system role
-- D Group membership
-- D Group responsibility
-- Disciple assignment
+- Active
+- Inactive
+- Transferred
+- Archived
 
-Role alone is not always sufficient.
+rather than casually deleting historical members.
 
 ---
 
-## BR-033 — Client Is Not Trusted
+## BR-052 — Historical Assignment Integrity
 
-Flutter must not be the sole enforcement mechanism for sensitive access.
+Changing:
 
-A modified client must not be capable of bypassing backend authorization.
+- D Group
+- D Group Leader
+- Discipler
+- responsibility
+- membership status
+
+must not unintentionally destroy historical records.
 
 ---
 
-## BR-034 — Auditability
+## BR-053 — Auditability
 
-Important actions should retain appropriate information about:
+Important actions should retain enough information to identify who
+performed them and when.
 
-- what occurred
-- who performed it
-- when it occurred
+Examples include:
 
-Particularly important actions include:
-
-- role changes
-- D Group assignments
+- role assignment
+- D Group assignment
+- Discipler assignment
 - attendance changes
-- progress changes
+- Discipleship Meeting creation
+- lesson confirmation
+- promotion
 - follow-up actions
 
 ---
 
-## BR-035 — Historical Records Should Not Be Casually Deleted
+## BR-054 — Client Is Not Trusted
 
-Records required for meaningful discipleship history should not be
-destructively deleted during normal workflows.
+Flutter is not the security boundary.
 
-Archival/lifecycle approaches should be used where appropriate.
+Sensitive permissions must be enforced by backend/database controls.
 
-Exact retention rules will be defined during database design.
+A modified client must not be capable of bypassing authorization simply
+by issuing backend requests directly.
 
 ---
 
-## BR-036 — MVP Scope Protection
+## BR-055 — Database Constraints Protect Important Invariants
 
-Post-MVP functionality must not be introduced accidentally during MVP
-development.
+Important invariants should be enforced in PostgreSQL where practical,
+rather than relying entirely on client logic.
 
-Features should be added through intentional scope decisions after the
-core discipleship workflow is stable.
+Examples include:
+
+- attendance uniqueness
+- valid relationships
+- referential integrity
+- constrained state values
+
+---
+
+## BR-056 — MVP Scope Protection
+
+Post-MVP functionality must not be introduced accidentally.
+
+Features such as:
+
+- QR attendance
+- AI insights
+- SMS
+- automated escalation
+- chat
+- advanced analytics
+
+require an intentional future scope decision.
