@@ -1,0 +1,1436 @@
+// ============================================================
+// DiscipleTrack
+// MVP Database ERD — Version 2
+// ============================================================
+//
+// Source of truth for the proposed DiscipleTrack PostgreSQL schema.
+//
+// This is a database design artifact, not the final Supabase migration.
+//
+// ERD v2 incorporates findings from:
+// - Identity / Church / D Group review
+// - Gathering / Attendance review
+// - Discipleship Progress review
+// - Monitoring / Follow-up review
+//
+// ============================================================
+
+
+// ============================================================
+// IDENTITY / FOREIGN KEY CONVENTION
+// ============================================================
+//
+// DiscipleTrack intentionally uses three identity levels.
+//
+// ------------------------------------------------------------
+// 1. profiles.id
+// ------------------------------------------------------------
+//
+// Represents the authenticated application user.
+//
+// Used for actor fields:
+//
+// created_by
+// recorded_by
+// assigned_by
+// approved_by
+// confirmed_by
+// performed_by
+// resolved_by
+// voided_by
+// actor_user_id
+//
+// These answer:
+//
+// "Which authenticated user performed this action?"
+//
+//
+// ------------------------------------------------------------
+// 2. church_memberships.id
+// ------------------------------------------------------------
+//
+// Represents a person's long-lived identity inside a church.
+//
+// Used when domain information belongs to the person within
+// that church.
+//
+// Examples:
+//
+// attendance
+// discipleship progress
+// meeting participation
+// attention conditions
+// follow-ups
+//
+// These records survive:
+//
+// - D Group transfers
+// - Discipler reassignment
+// - D Group leadership changes
+//
+//
+// ------------------------------------------------------------
+// 3. d_group_memberships.id
+// ------------------------------------------------------------
+//
+// Represents historical D Group membership and responsibility.
+//
+// Used when a relationship specifically depends on the person's
+// contextual responsibility inside a D Group.
+//
+// Examples:
+//
+// - Discipler → Disciple assignment
+// - responsible Discipler on a discipleship meeting
+//
+//
+// ------------------------------------------------------------
+// GENERAL NAMING RULE
+// ------------------------------------------------------------
+//
+// *_by / *_user_id
+//     → profiles.id
+//
+// church_membership_id
+//     → church_memberships.id
+//
+// *_d_group_membership_id
+//     → d_group_memberships.id
+//
+// These identity levels must not be interchanged simply because
+// they ultimately represent the same human being.
+//
+// ============================================================
+
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+Enum church_status {
+  ACTIVE
+  ARCHIVED
+}
+
+
+Enum membership_status {
+  PENDING
+  ACTIVE
+  INACTIVE
+  TRANSFERRED
+  ARCHIVED
+}
+
+
+Enum church_role {
+  ADMIN
+  COORDINATOR
+}
+
+
+Enum d_group_status {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+
+Enum d_group_responsibility {
+  LEADER
+  DISCIPLER
+  DISCIPLE
+}
+
+
+Enum gathering_status {
+  DRAFT
+  FINALIZED
+  CANCELLED
+}
+
+
+Enum attendance_status {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+
+Enum curriculum_status {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+
+Enum discipleship_meeting_status {
+  RECORDED
+  VOIDED
+}
+
+
+Enum meeting_participation_status {
+  COUNTED
+  VOIDED
+}
+
+
+Enum lesson_progress_status {
+  NOT_STARTED
+  IN_PROGRESS
+  READY_FOR_COMPLETION
+  COMPLETED
+}
+
+
+Enum attention_condition_status {
+  ACTIVE
+  RESOLVED
+}
+
+
+Enum attention_condition_type {
+  CONSECUTIVE_ABSENCE
+}
+
+
+Enum follow_up_status {
+  REQUIRED
+  IN_PROGRESS
+  RESOLVED
+}
+
+
+Enum follow_up_reason {
+  CONSECUTIVE_ABSENCE
+}
+
+
+Enum follow_up_action_type {
+  CONTACTED
+  SENT_MESSAGE
+  CALLED
+  PERSONAL_CONVERSATION
+  SCHEDULED_VISIT
+  OTHER
+}
+
+
+Enum follow_up_resolution_type {
+  CARE_COMPLETED
+  CONDITION_CORRECTED
+  ADMINISTRATIVE_CORRECTION
+}
+
+
+Enum announcement_scope {
+  CHURCH
+  D_GROUP
+}
+
+
+// ============================================================
+// 1. IDENTITY
+// ============================================================
+//
+// Supabase manages auth.users.
+//
+// profiles.id conceptually references auth.users.id.
+//
+// The Supabase auth table is not fully recreated in this ERD.
+// ============================================================
+
+Table profiles {
+  id uuid [pk, note: 'Same UUID as Supabase auth.users.id']
+
+  full_name varchar [not null]
+
+  phone varchar
+  avatar_url varchar
+
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+
+  Note: '''
+  Application-level profile for an authenticated user.
+
+  Authentication credentials remain managed by Supabase Auth.
+
+  This table intentionally does NOT store:
+
+  - church system role
+  - D Group responsibility
+  - D Group assignment
+  - attendance percentage
+  - absence streak
+  - current lesson
+  - discipleship percentage
+
+  Those belong to their respective domains.
+  '''
+}
+
+
+// ============================================================
+// 2. CHURCH
+// ============================================================
+
+Table churches {
+  id uuid [pk]
+
+  name varchar [not null]
+
+  join_code varchar [not null, unique]
+  join_code_updated_at timestamptz
+
+  status church_status [not null, default: 'ACTIVE']
+
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+
+  Note: '''
+  Represents a church workspace.
+
+  The MVP initially launches for one local church.
+
+  Church ownership remains explicit so the database does not
+  permanently assume that only one church can ever exist.
+
+  A join code allows users to request membership in the church.
+
+  A join code must never grant privileged roles automatically.
+  '''
+}
+
+
+// ============================================================
+// 3. CHURCH MEMBERSHIP
+// ============================================================
+
+Table church_memberships {
+  id uuid [pk]
+
+  church_id uuid [not null]
+  user_id uuid [not null]
+
+  status membership_status [not null, default: 'PENDING']
+
+  joined_at timestamptz
+
+  approved_by uuid
+  approved_at timestamptz
+
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+
+  indexes {
+    (church_id, user_id) [unique]
+  }
+
+  Note: '''
+  Represents a user's long-lived membership in a church.
+
+  This becomes the stable ministry identity used by domains such as:
+
+  - attendance
+  - discipleship progress
+  - meeting participation
+  - monitoring
+  - follow-ups
+
+  D Group membership is intentionally separate.
+
+  A person's church identity therefore survives D Group transfers.
+  '''
+}
+
+
+// ============================================================
+// 4. SYSTEM / CHURCH ROLES
+// ============================================================
+
+Table church_role_assignments {
+  id uuid [pk]
+
+  church_membership_id uuid [not null]
+
+  role church_role [not null]
+
+  assigned_by uuid [not null]
+
+  started_at timestamptz [not null]
+  ended_at timestamptz
+
+  created_at timestamptz [not null]
+
+  Note: '''
+  Stores privileged church-level roles.
+
+  MVP roles:
+
+  ADMIN
+  COORDINATOR
+
+  Normal church membership does not require a MEMBER role row.
+
+  Church/system roles are intentionally separate from D Group
+  responsibilities.
+
+  Example:
+
+  Sarah may be:
+
+  COORDINATOR at church level
+
+  AND
+
+  LEADER of Young Adults A.
+
+  Active-role uniqueness will be implemented through PostgreSQL
+  constraints / partial indexes where appropriate.
+  '''
+}
+
+
+// ============================================================
+// 5. D GROUPS
+// ============================================================
+
+Table d_groups {
+  id uuid [pk]
+
+  church_id uuid [not null]
+
+  name varchar [not null]
+  description text
+
+  status d_group_status [not null, default: 'ACTIVE']
+
+  created_by uuid [not null]
+
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+
+  archived_at timestamptz
+
+  Note: '''
+  Represents one D Group.
+
+  D Groups do not require a fixed recurring meeting schedule.
+
+  Actual gatherings are stored separately because meetings depend
+  on member availability.
+  '''
+}
+
+
+// ============================================================
+// 6. D GROUP MEMBERSHIP / RESPONSIBILITY
+// ============================================================
+
+Table d_group_memberships {
+  id uuid [pk]
+
+  d_group_id uuid [not null]
+  church_membership_id uuid [not null]
+
+  responsibility d_group_responsibility [not null]
+
+  started_at timestamptz [not null]
+  ended_at timestamptz
+
+  assigned_by uuid [not null]
+
+  created_at timestamptz [not null]
+
+  Note: '''
+  Represents historical membership AND responsibility inside a D Group.
+
+  Responsibilities:
+
+  LEADER
+  DISCIPLER
+  DISCIPLE
+
+  ended_at = NULL means the assignment is active.
+
+  Historical records are normally ended rather than overwritten
+  or deleted.
+
+  Example:
+
+  James
+  Young Adults A
+  DISCIPLE
+  January → September
+
+  James
+  Young Adults A
+  DISCIPLER
+  September → Present
+
+  PostgreSQL must later enforce important active-state invariants such as:
+
+  - one active Leader per D Group
+  - one active D Group led per person
+  - one active Disciple D Group per person
+  - DISCIPLE and DISCIPLER cannot be active simultaneously
+  '''
+}
+
+
+// ============================================================
+// 7. DISCIPLER → DISCIPLE ASSIGNMENT
+// ============================================================
+
+Table discipler_assignments {
+  id uuid [pk]
+
+  d_group_id uuid [not null]
+
+  discipler_d_group_membership_id uuid [not null]
+  disciple_d_group_membership_id uuid [not null]
+
+  assigned_by uuid [not null]
+
+  started_at timestamptz [not null]
+  ended_at timestamptz
+
+  created_at timestamptz [not null]
+
+  Note: '''
+  Represents direct discipleship-care responsibility.
+
+  Both referenced D Group membership records must belong to the
+  same D Group.
+
+  discipler_d_group_membership_id must represent DISCIPLER.
+
+  disciple_d_group_membership_id must represent DISCIPLE.
+
+  One Disciple may have at most one active primary Discipler.
+
+  One Discipler may care for multiple Disciples.
+
+  Reassignment ends the previous relationship and creates a new one.
+
+  Historical assignments are preserved.
+  '''
+}
+
+
+// ============================================================
+// 8. D GROUP GATHERINGS
+// ============================================================
+
+Table d_group_gatherings {
+  id uuid [pk]
+
+  d_group_id uuid [not null]
+
+  title varchar
+  topic varchar
+  notes text
+
+  starts_at timestamptz [not null]
+
+  status gathering_status [not null, default: 'DRAFT']
+
+  created_by uuid [not null]
+
+  finalized_by uuid
+  finalized_at timestamptz
+
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+
+  Note: '''
+  Represents an actual overall D Group gathering.
+
+  This is separate from a Discipleship Meeting.
+
+  Lifecycle:
+
+  DRAFT
+  → attendance may be prepared/edited
+  → does not affect official monitoring
+
+  FINALIZED
+  → gathering occurred
+  → attendance becomes official
+  → participates in attendance statistics and monitoring
+
+  CANCELLED
+  → gathering did not occur
+  → excluded from attendance calculations and monitoring
+
+  Finalization is an important business boundary.
+  '''
+}
+
+
+// ============================================================
+// 9. GATHERING ATTENDANCE
+// ============================================================
+
+Table gathering_attendance {
+  id uuid [pk]
+
+  gathering_id uuid [not null]
+  church_membership_id uuid [not null]
+
+  status attendance_status [not null]
+
+  recorded_by uuid [not null]
+  recorded_at timestamptz [not null]
+
+  updated_at timestamptz [not null]
+
+  indexes {
+    (gathering_id, church_membership_id) [unique]
+  }
+
+  Note: '''
+  Official attendance record for one church member at one
+  D Group gathering.
+
+  Semantics:
+
+  PRESENT
+  → attended
+  → breaks unexplained absence streak
+
+  LATE
+  → attended
+  → breaks unexplained absence streak
+
+  ABSENT
+  → unexplained absence
+  → contributes to consecutive absence monitoring
+
+  EXCUSED
+  → does not count as unexplained absence
+  → breaks unexplained absence streak
+
+  Attendance percentages and absence streaks are derived.
+
+  Eligibility should be based on whether the member belonged to
+  the D Group at gathering.starts_at.
+
+  Corrections after finalization must be controlled and audited.
+  '''
+}
+
+
+// ============================================================
+// 10. CURRICULUM
+// ============================================================
+
+Table curricula {
+  id uuid [pk]
+
+  church_id uuid [not null]
+
+  name varchar [not null]
+  description text
+
+  status curriculum_status [not null, default: 'ACTIVE']
+
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+
+  Note: '''
+  Represents a church-owned discipleship curriculum.
+
+  The MVP uses one active fixed curriculum.
+
+  Curriculum content is stored in PostgreSQL rather than being
+  permanently hard-coded into Flutter.
+  '''
+}
+
+
+// ============================================================
+// 11. CURRICULUM LESSONS
+// ============================================================
+
+Table curriculum_lessons {
+  id uuid [pk]
+
+  curriculum_id uuid [not null]
+
+  lesson_number integer [not null]
+
+  title varchar [not null]
+  description text
+
+  required_meetings integer [not null, default: 4]
+
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+
+  indexes {
+    (curriculum_id, lesson_number) [unique]
+  }
+
+  Note: '''
+  Represents one ordered lesson in the curriculum.
+
+  MVP:
+
+  12 lessons
+  4 required meetings per lesson
+
+  required_meetings exists as domain data rather than being
+  scattered throughout Flutter as a magic number.
+
+  Lesson progression is sequential.
+  '''
+}
+
+
+// ============================================================
+// 12. DISCIPLESHIP MEETINGS
+// ============================================================
+
+Table discipleship_meetings {
+  id uuid [pk]
+
+  d_group_id uuid [not null]
+
+  discipler_d_group_membership_id uuid [not null]
+
+  lesson_id uuid [not null]
+
+  occurred_at timestamptz [not null]
+
+  status discipleship_meeting_status [not null, default: 'RECORDED']
+
+  notes text
+
+  recorded_by uuid [not null]
+
+  voided_by uuid
+  voided_at timestamptz
+
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+
+  Note: '''
+  Represents one actual discipleship meeting.
+
+  The meeting may be:
+
+  - one-on-one
+  - small group
+
+  Each meeting has:
+
+  - one responsible Discipler
+  - one lesson
+  - one or more participating Disciples
+
+  RECORDED:
+  → meeting is valid
+  → COUNTED participants may contribute toward progress
+
+  VOIDED:
+  → meeting remains historically preserved
+  → contributes nothing toward lesson progress
+
+  Historical validity should use occurred_at rather than the date
+  on which the record was entered.
+
+  This allows legitimate backdated meeting entry.
+
+  The Discipler must have held the appropriate responsibility when
+  the meeting actually occurred.
+  '''
+}
+
+
+// ============================================================
+// 13. DISCIPLESHIP MEETING PARTICIPANTS
+// ============================================================
+
+Table discipleship_meeting_participants {
+  id uuid [pk]
+
+  meeting_id uuid [not null]
+
+  church_membership_id uuid [not null]
+
+  status meeting_participation_status [not null, default: 'COUNTED']
+
+  voided_by uuid
+  voided_at timestamptz
+
+  created_at timestamptz [not null]
+
+  indexes {
+    (meeting_id, church_membership_id) [unique]
+  }
+
+  Note: '''
+  Records exactly which Disciples participated in a meeting.
+
+  COUNTED:
+  → contributes one valid meeting toward that Disciple's lesson
+
+  VOIDED:
+  → remains historically preserved
+  → does not contribute toward progress
+
+  Participant identity references church_membership_id rather than
+  temporary D Group membership.
+
+  This allows progress to survive:
+
+  - D Group transfer
+  - Discipler reassignment
+
+  Example:
+
+  Mark teaches James and Anna Lesson 4.
+
+  Before:
+
+  James = 2/4
+  Anna  = 1/4
+
+  After:
+
+  James = 3/4
+  Anna  = 2/4
+
+  Their progress remains independent.
+  '''
+}
+
+
+// ============================================================
+// 14. DISCIPLE LESSON PROGRESS
+// ============================================================
+
+Table disciple_lesson_progress {
+  id uuid [pk]
+
+  church_membership_id uuid [not null]
+
+  lesson_id uuid [not null]
+
+  status lesson_progress_status [not null, default: 'NOT_STARTED']
+
+  started_at timestamptz
+  ready_at timestamptz
+
+  completed_at timestamptz
+  confirmed_by uuid
+
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+
+  indexes {
+    (church_membership_id, lesson_id) [unique]
+  }
+
+  Note: '''
+  Represents the individual Disciple's lesson lifecycle.
+
+  IMPORTANT:
+
+  Progress belongs to the person's church journey.
+
+  It does NOT belong to their temporary D Group assignment.
+
+  Therefore progress survives:
+
+  - D Group transfer
+  - Discipler reassignment
+  - Leader changes
+
+  Expected lifecycle:
+
+  NOT_STARTED
+      ↓ first valid counted meeting
+
+  IN_PROGRESS
+      ↓ required meeting count reached
+
+  READY_FOR_COMPLETION
+      ↓ current D Group Leader confirms
+
+  COMPLETED
+
+  Meeting count itself is derived from valid meeting participation.
+
+  A missing progress row may also be interpreted as NOT_STARTED
+  during implementation, avoiding unnecessary empty rows.
+
+  LOCKED is a derived UI/domain state and is not stored here.
+  '''
+}
+
+
+// ============================================================
+// 15. MINISTRY ROLE TRANSITIONS
+// ============================================================
+
+Table ministry_role_transitions {
+  id uuid [pk]
+
+  church_membership_id uuid [not null]
+  d_group_id uuid [not null]
+
+  from_responsibility d_group_responsibility [not null]
+  to_responsibility d_group_responsibility [not null]
+
+  approved_by uuid [not null]
+  approved_at timestamptz [not null]
+
+  notes text
+
+  created_at timestamptz [not null]
+
+  Note: '''
+  Historical record of significant D Group responsibility changes.
+
+  MVP primary use:
+
+  DISCIPLE
+      ↓
+  DISCIPLER
+
+  Promotion requires:
+
+  - all 12 lessons COMPLETED
+  - Coordinator approval
+
+  Eligibility does not automatically cause promotion.
+
+  d_group_id preserves the organizational context in which the
+  transition occurred.
+
+  The actual D Group responsibility transition must happen
+  transactionally:
+
+  validate eligibility
+      ↓
+  end DISCIPLE responsibility
+      ↓
+  create DISCIPLER responsibility
+      ↓
+  record transition
+
+  All succeed or all fail.
+  '''
+}
+
+
+// ============================================================
+// 16. ATTENTION CONDITIONS
+// ============================================================
+
+Table attention_conditions {
+  id uuid [pk]
+
+  church_membership_id uuid [not null]
+
+  d_group_id uuid
+
+  condition_type attention_condition_type [not null]
+
+  status attention_condition_status [not null, default: 'ACTIVE']
+
+  detected_at timestamptz [not null]
+  resolved_at timestamptz
+
+  metadata jsonb
+
+  created_at timestamptz [not null]
+
+  Note: '''
+  Represents a system-detected condition requiring possible
+  human attention.
+
+  Initial MVP condition:
+
+  CONSECUTIVE_ABSENCE
+
+  This table answers:
+
+  "What condition did the system detect?"
+
+  It does NOT represent the human care workflow itself.
+
+  Example:
+
+  James has 3 consecutive unexplained absences.
+
+  Monitoring creates:
+
+  CONSECUTIVE_ABSENCE
+  ACTIVE
+
+  When attendance later breaks the streak:
+
+  ACTIVE
+      ↓
+  RESOLVED
+
+  If another absence episode occurs later, a NEW condition is
+  created rather than reopening the historical condition.
+
+  metadata may contain supporting detection context, but must not
+  replace normalized source records.
+  '''
+}
+
+
+// ============================================================
+// 17. FOLLOW-UPS
+// ============================================================
+
+Table follow_ups {
+  id uuid [pk]
+
+  attention_condition_id uuid
+
+  church_membership_id uuid [not null]
+  d_group_id uuid
+
+  assigned_to uuid [not null]
+
+  reason_type follow_up_reason [not null]
+
+  status follow_up_status [not null, default: 'REQUIRED']
+
+  due_at timestamptz
+
+  resolved_at timestamptz
+  resolved_by uuid
+
+  resolution_type follow_up_resolution_type
+  resolution_note text
+
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+
+  Note: '''
+  Represents a human ministry-care case.
+
+  This table answers:
+
+  "Who is responsible for responding to this concern?"
+
+  Typical assignment:
+
+  active primary Discipler exists
+      ↓
+  assign to Discipler
+
+  otherwise
+      ↓
+  assign to D Group Leader
+
+  Lifecycle:
+
+  REQUIRED
+      ↓ first real follow-up action
+  IN_PROGRESS
+      ↓ resolution
+  RESOLVED
+
+  OVERDUE is derived rather than stored:
+
+  status != RESOLVED
+  AND due_at < now()
+
+  Resolving a follow-up does NOT automatically mean the underlying
+  attendance condition disappeared.
+
+  The condition and human care workflow have independent lifecycles.
+
+  resolution_type provides structured resolution semantics.
+
+  Existing assignments should not silently change when the Disciple's
+  Discipler changes. Reassignment of an open follow-up should be
+  deliberate and auditable.
+  '''
+}
+
+
+// ============================================================
+// 18. FOLLOW-UP ACTIONS
+// ============================================================
+
+Table follow_up_actions {
+  id uuid [pk]
+
+  follow_up_id uuid [not null]
+
+  action_type follow_up_action_type [not null]
+
+  note text
+
+  performed_by uuid [not null]
+  performed_at timestamptz [not null]
+
+  created_at timestamptz [not null]
+
+  Note: '''
+  Stores historical care actions performed during a follow-up.
+
+  Examples:
+
+  SENT_MESSAGE
+  CALLED
+  PERSONAL_CONVERSATION
+  SCHEDULED_VISIT
+
+  Example history:
+
+  Sep 19
+  SENT_MESSAGE
+  "Asked James how he is doing."
+
+  Sep 20
+  CALLED
+  "Work schedule has been difficult."
+
+  Sep 22
+  PERSONAL_CONVERSATION
+  "Plans to return next gathering."
+
+  Actions remain historically preserved after the follow-up is
+  resolved.
+
+  Sensitive care notes require strict RLS authorization.
+  '''
+}
+
+
+// ============================================================
+// 19. ANNOUNCEMENTS
+// ============================================================
+
+Table announcements {
+  id uuid [pk]
+
+  church_id uuid [not null]
+
+  d_group_id uuid
+
+  author_id uuid [not null]
+
+  scope announcement_scope [not null]
+
+  title varchar [not null]
+  body text [not null]
+
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+
+  Note: '''
+  Lightweight church and D Group communication.
+
+  CHURCH:
+
+  d_group_id must be NULL.
+
+  Normal publishing authority:
+  Coordinator.
+
+  D_GROUP:
+
+  d_group_id must be present.
+
+  Normal publishing authority:
+  relevant D Group Leader.
+
+  MVP intentionally does NOT include:
+
+  - comments
+  - reactions
+  - likes
+  - chat
+  - read receipts
+
+  Announcements are communication, not a social network.
+  '''
+}
+
+
+// ============================================================
+// 20. CHURCH SETTINGS
+// ============================================================
+
+Table church_settings {
+  church_id uuid [pk]
+
+  consecutive_absence_threshold integer [not null, default: 3]
+
+  follow_up_due_days integer
+
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+
+  Note: '''
+  Stores church-level configurable business behavior.
+
+  Initial MVP default:
+
+  consecutive_absence_threshold = 3
+
+  This prevents important business thresholds from being permanently
+  hard-coded into Flutter.
+  '''
+}
+
+
+// ============================================================
+// 21. AUDIT EVENTS
+// ============================================================
+
+Table audit_events {
+  id uuid [pk]
+
+  church_id uuid
+
+  actor_user_id uuid [not null]
+
+  action varchar [not null]
+
+  entity_type varchar [not null]
+  entity_id uuid
+
+  metadata jsonb
+
+  created_at timestamptz [not null]
+
+  Note: '''
+  Supplemental audit log for important operations.
+
+  Useful examples:
+
+  - finalized attendance correction
+  - meeting void
+  - participant void
+  - follow-up reassignment
+  - administrative correction
+  - privileged configuration change
+
+  Do NOT duplicate every domain record into this table.
+
+  Domain tables already preserve fields such as:
+
+  created_by
+  recorded_by
+  assigned_by
+  approved_by
+  confirmed_by
+  performed_by
+  resolved_by
+  voided_by
+
+  Audit events supplement domain history rather than replacing it.
+  '''
+}
+
+
+// ============================================================
+// RELATIONSHIPS
+// ============================================================
+
+
+// ============================================================
+// Identity / Church
+// ============================================================
+
+Ref: church_memberships.user_id > profiles.id
+
+Ref: church_memberships.church_id > churches.id
+
+Ref: church_memberships.approved_by > profiles.id
+
+
+// ============================================================
+// System Roles
+// ============================================================
+
+Ref: church_role_assignments.church_membership_id > church_memberships.id
+
+Ref: church_role_assignments.assigned_by > profiles.id
+
+
+// ============================================================
+// D Groups
+// ============================================================
+
+Ref: d_groups.church_id > churches.id
+
+Ref: d_groups.created_by > profiles.id
+
+
+// ============================================================
+// D Group Membership
+// ============================================================
+
+Ref: d_group_memberships.d_group_id > d_groups.id
+
+Ref: d_group_memberships.church_membership_id > church_memberships.id
+
+Ref: d_group_memberships.assigned_by > profiles.id
+
+
+// ============================================================
+// Discipler Assignment
+// ============================================================
+
+Ref: discipler_assignments.d_group_id > d_groups.id
+
+Ref: discipler_assignments.discipler_d_group_membership_id > d_group_memberships.id
+
+Ref: discipler_assignments.disciple_d_group_membership_id > d_group_memberships.id
+
+Ref: discipler_assignments.assigned_by > profiles.id
+
+
+// ============================================================
+// D Group Gatherings
+// ============================================================
+
+Ref: d_group_gatherings.d_group_id > d_groups.id
+
+Ref: d_group_gatherings.created_by > profiles.id
+
+Ref: d_group_gatherings.finalized_by > profiles.id
+
+
+// ============================================================
+// Attendance
+// ============================================================
+
+Ref: gathering_attendance.gathering_id > d_group_gatherings.id
+
+Ref: gathering_attendance.church_membership_id > church_memberships.id
+
+Ref: gathering_attendance.recorded_by > profiles.id
+
+
+// ============================================================
+// Curriculum
+// ============================================================
+
+Ref: curricula.church_id > churches.id
+
+Ref: curriculum_lessons.curriculum_id > curricula.id
+
+
+// ============================================================
+// Discipleship Meetings
+// ============================================================
+
+Ref: discipleship_meetings.d_group_id > d_groups.id
+
+Ref: discipleship_meetings.discipler_d_group_membership_id > d_group_memberships.id
+
+Ref: discipleship_meetings.lesson_id > curriculum_lessons.id
+
+Ref: discipleship_meetings.recorded_by > profiles.id
+
+Ref: discipleship_meetings.voided_by > profiles.id
+
+
+// ============================================================
+// Discipleship Meeting Participants
+// ============================================================
+
+Ref: discipleship_meeting_participants.meeting_id > discipleship_meetings.id
+
+Ref: discipleship_meeting_participants.church_membership_id > church_memberships.id
+
+Ref: discipleship_meeting_participants.voided_by > profiles.id
+
+
+// ============================================================
+// Lesson Progress
+// ============================================================
+
+Ref: disciple_lesson_progress.church_membership_id > church_memberships.id
+
+Ref: disciple_lesson_progress.lesson_id > curriculum_lessons.id
+
+Ref: disciple_lesson_progress.confirmed_by > profiles.id
+
+
+// ============================================================
+// Ministry Role Transitions
+// ============================================================
+
+Ref: ministry_role_transitions.church_membership_id > church_memberships.id
+
+Ref: ministry_role_transitions.d_group_id > d_groups.id
+
+Ref: ministry_role_transitions.approved_by > profiles.id
+
+
+// ============================================================
+// Attention Conditions
+// ============================================================
+
+Ref: attention_conditions.church_membership_id > church_memberships.id
+
+Ref: attention_conditions.d_group_id > d_groups.id
+
+
+// ============================================================
+// Follow-ups
+// ============================================================
+
+Ref: follow_ups.attention_condition_id > attention_conditions.id
+
+Ref: follow_ups.church_membership_id > church_memberships.id
+
+Ref: follow_ups.d_group_id > d_groups.id
+
+Ref: follow_ups.assigned_to > profiles.id
+
+Ref: follow_ups.resolved_by > profiles.id
+
+
+// ============================================================
+// Follow-up Actions
+// ============================================================
+
+Ref: follow_up_actions.follow_up_id > follow_ups.id
+
+Ref: follow_up_actions.performed_by > profiles.id
+
+
+// ============================================================
+// Announcements
+// ============================================================
+
+Ref: announcements.church_id > churches.id
+
+Ref: announcements.d_group_id > d_groups.id
+
+Ref: announcements.author_id > profiles.id
+
+
+// ============================================================
+// Church Settings
+// ============================================================
+
+Ref: church_settings.church_id - churches.id
+
+
+// ============================================================
+// Audit Events
+// ============================================================
+
+Ref: audit_events.church_id > churches.id
+
+Ref: audit_events.actor_user_id > profiles.id
