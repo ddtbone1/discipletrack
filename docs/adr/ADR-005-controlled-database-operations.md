@@ -59,3 +59,5 @@ Simple safe CRUD operations may still interact directly with tables when permitt
 Not every operation requires an RPC.
 
 Use controlled operations when business invariants or multiple writes require them.
+
+The same mechanism also protects invariants that span tables and cannot be expressed as ordinary constraints, including same-church integrity. See the Same-Church Integrity section of DATABASE_CONSTRAINTS.md.

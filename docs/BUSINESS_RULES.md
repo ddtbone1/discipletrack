@@ -154,6 +154,10 @@ A D Group may contain multiple Disciplers.
 
 Each Discipler operates only within authorized scope.
 
+A person may hold active LEADER and DISCIPLER responsibilities at the
+same time. A D Group Leader who personally disciples members must hold
+the DISCIPLER responsibility in order to receive discipler assignments.
+
 ---
 
 ## BR-014 — One Primary Discipler per Disciple
@@ -172,6 +176,9 @@ Changes in assignment must preserve historical records.
 
 A person cannot simultaneously be an active Disciple and active
 Discipler.
+
+Only this pair is mutually exclusive. LEADER and DISCIPLER may coexist
+for the same person, as described in BR-013.
 
 Promotion changes the person's active ministry responsibility while
 preserving historical discipleship records.
@@ -230,6 +237,15 @@ Derived information includes:
 - consecutive absences
 - last attendance date
 
+Each of these has exactly one authoritative definition, recorded in
+DATABASE_CONSTRAINTS.md under Derived Metric Definitions. Excused
+attendance is excluded from the attendance-percentage denominator.
+
+Historical attendance metrics survive D Group transfer. The current
+consecutive-absence streak is scoped to the current D Group membership
+episode and resets on transfer, while the underlying attendance history
+is never reset or discarded.
+
 ---
 
 ## BR-021 — Attendance States
@@ -268,12 +284,20 @@ results in a current consecutive unexplained absence streak of 1.
 
 ---
 
-## BR-024 — Members Cannot Modify Their Own Attendance
+## BR-024 — Nobody Modifies Their Own Attendance
 
-Members may view their own attendance history.
+A person may view their own attendance history.
 
-They cannot create, modify, or delete their own official attendance
-records unless a future explicitly authorized workflow is introduced.
+No person may create, modify or delete their own official attendance
+record. This applies in every role, including Coordinator, D Group
+Leader and Discipler, not only to ordinary members.
+
+Recording authority always means recording for other eligible members
+within the recorder's authorized scope.
+
+Where a D Group's only authorized recorder is its Leader, another
+Discipler in that D Group or the Coordinator records the Leader's
+attendance. No additional recorder role exists in the MVP.
 
 ---
 
@@ -335,6 +359,29 @@ four-meeting requirement.
 
 ---
 
+## BR-030a — Lesson Progression Is Sequential
+
+A Disciple may work through lesson N only when lesson N-1 is COMPLETED.
+
+Lesson 1 is exempt.
+
+Because a Discipleship Meeting records exactly one lesson, every counted
+participant in that meeting must be eligible for that same lesson.
+
+Disciples who are on different lessons therefore require separate
+Discipleship Meeting records. This is an intentional ministry
+constraint rather than a modelling limitation.
+
+Sequential eligibility is enforced server-side. There is no Coordinator
+sequencing override in the MVP.
+
+A meeting only credits a participant when that person was an active
+Disciple of the meeting's D Group and was assigned to the meeting's
+Discipler at the time the meeting occurred. A Disciple with no assigned
+Discipler cannot receive progress credit until an assignment exists.
+
+---
+
 ## BR-031 — Discipler Records Discipleship Meetings
 
 The responsible Discipler records each completed Discipleship Meeting.
@@ -360,6 +407,29 @@ The relevant D Group Leader reviews a lesson that has reached 4/4 and
 confirms completion.
 
 Only after confirmation is the lesson considered Completed.
+
+The Coordinator may also confirm completion as a ministry-oversight
+fallback, for example where a D Group currently has no active Leader.
+Without this, a leadership gap would block progression for every
+Disciple in that group. Coordinator confirmation is attributable through
+confirmed_by and is audited.
+
+---
+
+## BR-033a — Completed Lessons Are Protected
+
+A confirmed Completed lesson must not be silently invalidated.
+
+Voiding a meeting or participation record that would reduce valid
+counted meetings below the requirement for a Completed lesson must be
+rejected.
+
+Correcting such a case requires an explicit authorized reopen operation
+first.
+
+Progress that has not been confirmed may recompute freely. A lesson at
+Ready for Completion may return to In Progress when valid meeting count
+falls below the requirement.
 
 ---
 
@@ -387,7 +457,12 @@ from these underlying records.
 
 ## BR-036 — Curriculum Completion Creates Promotion Eligibility
 
-Completing all 12 lessons makes a Disciple eligible for Discipler review.
+Completing every lesson of the church's active curriculum makes a
+Disciple eligible for Discipler review.
+
+The MVP curriculum contains twelve lessons, but that count is seed data
+rather than a rule. Eligibility is evaluated against the active
+curriculum, never against a hard-coded number.
 
 It does not automatically promote them.
 
@@ -419,13 +494,35 @@ Concern Detected
 
 ## BR-039 — Attendance Follow-up Assignment
 
-When an attendance-based follow-up is created:
+Absence monitoring applies to Leaders, Disciplers and Disciples alike.
+All three may reach the absence threshold.
 
-If the Disciple has an active primary Discipler:
-→ assign responsibility to that Discipler.
+When an attendance-based follow-up is created, responsibility is
+assigned using the following chain, evaluated on distinct people:
 
-If no primary Discipler exists:
-→ responsibility falls back to the D Group Leader.
+Subject is a Disciple:
+→ active primary Discipler
+→ otherwise the D Group Leader
+→ otherwise the Coordinator
+
+Subject is a Discipler:
+→ the D Group Leader
+→ otherwise the Coordinator
+
+Subject is a D Group Leader:
+→ the Coordinator
+
+A follow-up is never assigned to the person it concerns. Where one
+person holds several responsibilities, the chain continues until a
+different person is reached.
+
+Because the chain terminates at the Coordinator, the church must
+preserve at least one active Coordinator. The last active Coordinator
+cannot be removed or deactivated until another exists.
+
+Where several Coordinators exist, automatic routing selects the
+longest-serving active Coordinator deterministically. A follow-up may
+afterwards be reassigned through the normal reassignment workflow.
 
 ---
 
@@ -440,8 +537,17 @@ discipleship ministry.
 
 ## BR-041 — Follow-up Deduplication
 
-Repeated monitoring must not create unnecessary duplicate unresolved
-follow-ups for the same person and equivalent active condition.
+Repeated monitoring must not create a duplicate follow-up for a
+condition it has already handled.
+
+Deduplication is episode-scoped. A detected condition represents one
+absence episode and produces at most one follow-up, enforced structurally
+so that retried operations remain idempotent without relying on
+monitoring logic alone.
+
+A later absence episode is a different condition and may create a new
+follow-up even while an earlier follow-up remains unresolved. A person
+may therefore have several open follow-ups, one per episode.
 
 ---
 
@@ -463,11 +569,29 @@ Resolution requires an intentional completion action.
 
 ## BR-044 — Follow-ups May Become Overdue
 
-An unresolved follow-up may have a due date.
+An unresolved follow-up may have a due date, derived from the church's
+configured follow-up due days.
 
 If the due date passes while it remains unresolved, it becomes overdue.
 
+Where no due-day setting is configured, a follow-up has no due date and
+cannot become overdue.
+
 The MVP does not require automatic multi-level escalation.
+
+---
+
+## BR-044a — Condition Resolution Does Not Resolve Care
+
+When monitoring resolves an attention condition because the person has
+resumed attending, the related follow-up is not automatically closed.
+
+The human care obligation remains until someone resolves it
+deliberately, normally recording that the underlying condition has
+already corrected itself.
+
+Views should distinguish an open follow-up with an active condition from
+an open follow-up whose condition has already resolved.
 
 ---
 
@@ -506,6 +630,10 @@ The Coordinator may create church-wide ministry announcements.
 
 A D Group Leader may create announcements for their own D Group.
 
+The Coordinator may also create D Group announcements as ministry
+oversight, for example where a D Group currently has no active Leader.
+The Leader remains the normal author for their own D Group.
+
 Disciplers and Disciples do not publish announcements in the MVP.
 
 ---
@@ -543,12 +671,32 @@ discipleship participation.
 
 Normal workflows should use appropriate states such as:
 
+- Pending
 - Active
 - Inactive
 - Transferred
 - Archived
 
 rather than casually deleting historical members.
+
+A person has exactly one church membership record per church. A
+returning member reactivates that record rather than receiving a second
+one, so their attendance, discipleship progress and care history remain
+continuous.
+
+Transferred means the person transferred out of this church. Moving a
+Disciple between D Groups is a different concept and does not change
+church membership status.
+
+Reactivating a membership does not restore previous D Group
+responsibilities or assignments.
+
+When a membership leaves Active, its D Group responsibilities and
+discipler assignments end, active attention conditions where that person
+is the subject are resolved, and open follow-ups assigned to that person
+are reassigned so no care case is left with someone who no longer has
+ministry access. Attendance, meetings, progress and resolved care
+records are preserved as history.
 
 ---
 
@@ -606,6 +754,25 @@ Examples include:
 - valid relationships
 - referential integrity
 - constrained state values
+
+---
+
+## BR-055a — Same-Church Integrity
+
+A record must never relate information belonging to different churches.
+
+Examples that must be rejected include a D Group membership referencing
+a church membership from another church, attendance referencing a
+gathering outside the member's church, and lesson progress referencing
+another church's curriculum.
+
+This must be enforced inside PostgreSQL. Ordinary foreign keys are used
+where the relationship is naturally expressible; trusted database
+functions or constraint triggers are used where it spans tables and
+cannot be expressed cleanly.
+
+Flutter and application code must not be the only place this rule
+exists.
 
 ---
 

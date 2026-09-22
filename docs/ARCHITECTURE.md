@@ -94,6 +94,16 @@ MVP.
 
 Do not build unnecessary multi-tenant infrastructure before it is needed.
 
+Same-church integrity is nevertheless a database invariant today. A row
+must never relate records belonging to different churches. The MVP keeps
+the normalized hierarchy and enforces this with ordinary foreign keys
+where expressible, and with trusted database functions or constraint
+triggers where the relationship spans tables. church_id is not
+duplicated across domain tables purely to enable composite foreign keys.
+
+Denormalized tenant keys are deferred, not rejected on principle. They
+may be justified by future multi-church scale.
+
 ---
 
 ## 5. Domain Terminology
@@ -217,11 +227,12 @@ The D Group Leader performs final completion confirmation.
 
 ## 9. Promotion Model
 
-Completing all 12 lessons creates eligibility for Discipler review.
+Completing every lesson of the church's active curriculum creates
+eligibility for Discipler review.
 
 Conceptually:
 
-12 Lessons Completed
+Active Curriculum Completed
 → Eligible for Review
 → Coordinator Decision
 → Discipler Responsibility
@@ -422,6 +433,11 @@ For example:
 
 A member/session attendance combination should not be duplicated merely
 because Flutter accidentally submits the operation twice.
+
+Some invariants span several tables and cannot be expressed as ordinary
+constraints. Those use constraint triggers or trusted database
+functions. DATABASE_CONSTRAINTS.md is the authoritative record of which
+mechanism protects which invariant.
 
 ---
 
@@ -676,6 +692,10 @@ Migrations provide:
 - reviewability
 - environment consistency
 - deployment history
+
+Initial church provisioning is deployment-time seed work rather than a
+runtime operation. It is specified in DATABASE_CONSTRAINTS.md section 0
+and is never reachable from the Flutter client.
 
 ---
 

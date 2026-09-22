@@ -14,8 +14,12 @@ The application requires:
 - reusable components
 - Android/iOS support
 - persistent authentication
-- push notification support
+- a platform able to support push notifications in future scope
 - maintainable feature-based architecture
+
+Push notification workflows are explicitly out of scope for the MVP.
+They are listed here only as a platform capability the choice should not
+foreclose.
 
 ## Decision
 

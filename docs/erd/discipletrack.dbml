@@ -92,6 +92,7 @@
 //     → profiles.id
 //
 // church_membership_id
+// *_church_membership_id
 //     → church_memberships.id
 //
 // *_d_group_membership_id
@@ -99,6 +100,33 @@
 //
 // These identity levels must not be interchanged simply because
 // they ultimately represent the same human being.
+//
+//
+// ------------------------------------------------------------
+// ACTOR vs RESPONSIBILITY
+// ------------------------------------------------------------
+//
+// A third class of field records ongoing responsibility rather
+// than a completed action.
+//
+// Example:
+//
+// follow_ups.assignee_church_membership_id
+//
+// This answers:
+//
+// "Who is currently responsible for this care?"
+//
+// It does NOT answer:
+//
+// "Who performed this action?"
+//
+// Responsibility fields use church_memberships.id because the
+// responsibility belongs to a person within a church, must remain
+// inside that church, and must stay visible when that person's
+// membership becomes INACTIVE, TRANSFERRED or ARCHIVED.
+//
+// Actor fields (*_by) continue to use profiles.id.
 //
 // ============================================================
 
@@ -257,6 +285,11 @@ Table profiles {
 
   Authentication credentials remain managed by Supabase Auth.
 
+  full_name is required. Registration collects it and supplies it
+  through Supabase Auth user metadata, which a trusted trigger uses
+  when creating this row. A missing or blank value is rejected rather
+  than replaced with a placeholder.
+
   This table intentionally does NOT store:
 
   - church system role
@@ -300,6 +333,10 @@ Table churches {
   A join code allows users to request membership in the church.
 
   A join code must never grant privileged roles automatically.
+
+  status ACTIVE → ARCHIVED is the only transition. ARCHIVED is terminal
+  in the MVP and means the workspace is closed; it is not a normal
+  single-church operation.
   '''
 }
 
@@ -342,6 +379,27 @@ Table church_memberships {
   D Group membership is intentionally separate.
 
   A person's church identity therefore survives D Group transfers.
+
+  One person has exactly one membership row per church, enforced by
+  UNIQUE(church_id, user_id). A returning member reactivates the
+  existing row rather than receiving a second one, so their
+  attendance, progress and care history remain continuous.
+
+  Lifecycle:
+
+  PENDING     → ACTIVE (approval) | ARCHIVED (rejection)
+  ACTIVE      → INACTIVE | TRANSFERRED | ARCHIVED
+  INACTIVE    → ACTIVE
+  TRANSFERRED → ACTIVE
+  ARCHIVED    → ACTIVE (reinstatement, controlled and audited)
+
+  TRANSFERRED means the person transferred out of this CHURCH.
+
+  Moving a Disciple between D Groups is a different concept and must
+  not alter church_memberships.status.
+
+  Reactivation does not restore previous D Group responsibilities.
+  Those live in d_group_memberships and are already ended.
   '''
 }
 
@@ -421,6 +479,19 @@ Table d_groups {
 
   Actual gatherings are stored separately because meetings depend
   on member availability.
+
+  Lifecycle, Coordinator-controlled:
+
+  ACTIVE   → INACTIVE | ARCHIVED
+  INACTIVE → ACTIVE | ARCHIVED
+  ARCHIVED → terminal in the MVP
+
+  INACTIVE prevents new gatherings and preserves existing data.
+
+  ARCHIVED is rejected while active DISCIPLE memberships or DRAFT
+  gatherings remain. Disciples are never transferred automatically.
+
+  See DATABASE_CONSTRAINTS.md section 2.
   '''
 }
 
@@ -476,6 +547,18 @@ Table d_group_memberships {
   - one active D Group led per person
   - one active Disciple D Group per person
   - DISCIPLE and DISCIPLER cannot be active simultaneously
+  - ended_at IS NULL OR ended_at > started_at
+  - no ambiguous overlapping periods for the same person,
+    D Group and responsibility
+
+  LEADER and DISCIPLER MAY be active simultaneously for the same
+  person. A D Group Leader who personally disciples members must hold
+  the DISCIPLER responsibility in order to receive discipler
+  assignments. Only DISCIPLE and DISCIPLER are mutually exclusive.
+
+  Overlap prevention matters because attendance eligibility is
+  resolved as of gathering.starts_at. Ambiguous overlapping periods
+  would make "was this person a member at time T" undecidable.
   '''
 }
 
@@ -542,6 +625,9 @@ Table d_group_gatherings {
   finalized_by uuid
   finalized_at timestamptz
 
+  cancelled_by uuid
+  cancelled_at timestamptz
+
   created_at timestamptz [not null]
   updated_at timestamptz [not null]
 
@@ -564,6 +650,40 @@ Table d_group_gatherings {
   CANCELLED
   → gathering did not occur
   → excluded from attendance calculations and monitoring
+
+  Allowed transitions:
+
+  DRAFT → FINALIZED
+  DRAFT → CANCELLED
+
+  FINALIZED and CANCELLED are terminal in the MVP.
+
+  FINALIZED → CANCELLED is NOT permitted. Retracting an already
+  finalized gathering would silently withdraw official attendance
+  from monitoring. If that capability is ever required it must be
+  designed as its own controlled operation with explicit attendance
+  and monitoring recalculation.
+
+  CANCELLED → DRAFT and CANCELLED → FINALIZED are NOT permitted.
+
+  State consistency:
+
+  DRAFT
+  → finalized_by / finalized_at NULL
+  → cancelled_by / cancelled_at NULL
+
+  FINALIZED
+  → finalized_by / finalized_at NOT NULL
+  → cancelled_by / cancelled_at NULL
+
+  CANCELLED
+  → cancelled_by / cancelled_at NOT NULL
+  → finalized_by / finalized_at NULL
+
+  Attendance recorded while the gathering was DRAFT is preserved
+  when the gathering is cancelled. It is excluded from attendance
+  metrics, absence monitoring and follow-up generation because the
+  parent gathering status determines whether attendance is official.
 
   Finalization is an important business boundary.
   '''
@@ -618,6 +738,11 @@ Table gathering_attendance {
   Eligibility should be based on whether the member belonged to
   the D Group at gathering.starts_at.
 
+  No person may create or modify their own attendance row. The person
+  identified by recorded_by must never be the person identified by
+  church_membership_id. This applies to every role, including
+  Coordinator, Leader and Discipler.
+
   Corrections after finalization must be controlled and audited.
   '''
 }
@@ -645,8 +770,13 @@ Table curricula {
 
   The MVP uses one active fixed curriculum.
 
-  Curriculum content is stored in PostgreSQL rather than being
-  permanently hard-coded into Flutter.
+  A church has at most one ACTIVE curriculum, enforced by a partial
+  unique index. Promotion eligibility and sequential progression both
+  depend on "the active curriculum" being singular.
+
+  Curriculum data is stored in PostgreSQL rather than being permanently
+  hard-coded into Flutter. DiscipleTrack tracks progress through the
+  curriculum; it does not store or deliver lesson content.
   '''
 }
 
@@ -744,8 +874,20 @@ Table discipleship_meetings {
 
   This allows legitimate backdated meeting entry.
 
+  occurred_at is immutable after creation. Every participant validity
+  check is evaluated as of occurred_at, so editing it would silently
+  invalidate checks already performed. Corrections use void and
+  re-record rather than changing the timestamp.
+
   The Discipler must have held the appropriate responsibility when
   the meeting actually occurred.
+
+  A meeting records exactly one lesson, so every COUNTED participant
+  must be eligible for that same lesson under sequential progression.
+
+  Disciples who are on different lessons therefore require separate
+  discipleship meeting records. This is an intentional ministry
+  constraint, not a modelling limitation.
   '''
 }
 
@@ -789,6 +931,16 @@ Table discipleship_meeting_participants {
 
   - D Group transfer
   - Discipler reassignment
+
+  COUNTED participation is only valid when, as of the meeting's
+  occurred_at, the participant held an active DISCIPLE responsibility
+  in the meeting's D Group and an active discipler assignment to the
+  meeting's Discipler.
+
+  A Disciple with no assigned Discipler therefore cannot receive
+  progress credit until an assignment exists.
+
+  See DATABASE_CONSTRAINTS.md section 4 for the exact rules.
 
   Example:
 
@@ -869,6 +1021,36 @@ Table disciple_lesson_progress {
   during implementation, avoiding unnecessary empty rows.
 
   LOCKED is a derived UI/domain state and is not stored here.
+
+  Timestamp semantics:
+
+  started_at
+  → occurred_at of the earliest valid COUNTED participation for
+    this lesson
+
+  ready_at
+  → the point at which the required valid meeting count is reached
+    according to the authoritative progression calculation
+
+  Both are recomputed when backdated participation changes the
+  chronology.
+
+  COMPLETED is protected. An ordinary void must not retroactively
+  invalidate a confirmed COMPLETED lesson. A void that would drop
+  valid COUNTED participation below required_meetings for a COMPLETED
+  lesson is rejected; an explicit controlled reopen operation must
+  run first.
+
+  Reopening never cascades. It is permitted only when no later lesson
+  is COMPLETED for the same church membership and the person has not
+  been promoted. completed_at and confirmed_by are cleared, and the
+  prior confirmation stays recoverable through audit_events.
+
+  READY_FOR_COMPLETION may recompute back to IN_PROGRESS when valid
+  participation falls below the requirement.
+
+  Progression is sequential: lesson N requires lesson N-1 COMPLETED.
+  Lesson 1 is exempt.
   '''
 }
 
@@ -904,7 +1086,7 @@ Table ministry_role_transitions {
 
   Promotion requires:
 
-  - all 12 lessons COMPLETED
+  - every lesson of the church's ACTIVE curriculum COMPLETED
   - Coordinator approval
 
   Eligibility does not automatically cause promotion.
@@ -982,6 +1164,14 @@ Table attention_conditions {
   If another absence episode occurs later, a NEW condition is
   created rather than reopening the historical condition.
 
+  Each condition is one episode and produces at most one follow-up.
+  A new episode may therefore generate a new follow-up even while an
+  earlier follow-up is still unresolved.
+
+  A D Group transfer resolves any ACTIVE condition belonging to the
+  old episode, as part of the transfer transaction. The new episode
+  starts with a fresh streak.
+
   metadata may contain supporting detection context, but must not
   replace normalized source records.
   '''
@@ -995,12 +1185,12 @@ Table attention_conditions {
 Table follow_ups {
   id uuid [pk]
 
-  attention_condition_id uuid
+  attention_condition_id uuid [not null]
 
   church_membership_id uuid [not null]
   d_group_id uuid
 
-  assigned_to uuid [not null]
+  assignee_church_membership_id uuid [not null]
 
   reason_type follow_up_reason [not null]
 
@@ -1024,15 +1214,49 @@ Table follow_ups {
 
   "Who is responsible for responding to this concern?"
 
-  Typical assignment:
+  assignee_church_membership_id is a responsibility field, not an
+  actor field. It records the person currently accountable for the
+  care, so it uses church_memberships.id rather than profiles.id.
 
-  active primary Discipler exists
-      ↓
-  assign to Discipler
+  Episode identity:
 
-  otherwise
-      ↓
-  assign to D Group Leader
+  An attention_condition represents one absence episode. A follow-up
+  is the care case for exactly one episode.
+
+  attention_condition_id is NOT NULL and UNIQUE, so one detected
+  condition produces at most one follow-up. Retrying creation for the
+  same condition cannot create a second case, which is what makes
+  monitoring idempotent.
+
+  A new episode creates a new condition and therefore may create a new
+  follow-up even while an earlier follow-up remains unresolved. A
+  person may consequently have several simultaneously open follow-ups,
+  one per episode. This is intended.
+
+  reason_type is retained for read and query convenience. Monitoring
+  must keep it consistent with the originating condition's
+  condition_type.
+
+  Assignment escalation, evaluated on distinct people:
+
+  Subject is DISCIPLE
+  → active primary Discipler
+  → otherwise D Group Leader
+  → otherwise Coordinator
+
+  Subject is DISCIPLER
+  → D Group Leader
+  → otherwise Coordinator
+
+  Subject is LEADER
+  → Coordinator
+
+  A follow-up is never assigned to its own subject. Where one person
+  holds several responsibilities, the chain continues until a
+  different person is reached.
+
+  The escalation chain terminates at Coordinator, so the church must
+  preserve at least one active COORDINATOR.
 
   Lifecycle:
 
@@ -1051,6 +1275,16 @@ Table follow_ups {
   attendance condition disappeared.
 
   The condition and human care workflow have independent lifecycles.
+
+  The reverse also holds: when monitoring resolves the underlying
+  attention condition because attendance resumed, the follow-up is
+  NOT auto-closed. The care obligation remains until someone resolves
+  it deliberately, normally with resolution_type CONDITION_CORRECTED.
+
+  Queries and UI should distinguish:
+
+  - open follow-up with an ACTIVE condition
+  - open follow-up whose condition is already RESOLVED
 
   resolution_type provides structured resolution semantics.
 
@@ -1307,6 +1541,8 @@ Ref: d_group_gatherings.created_by > profiles.id
 
 Ref: d_group_gatherings.finalized_by > profiles.id
 
+Ref: d_group_gatherings.cancelled_by > profiles.id
+
 
 // ============================================================
 // Attendance
@@ -1395,7 +1631,7 @@ Ref: follow_ups.church_membership_id > church_memberships.id
 
 Ref: follow_ups.d_group_id > d_groups.id
 
-Ref: follow_ups.assigned_to > profiles.id
+Ref: follow_ups.assignee_church_membership_id > church_memberships.id
 
 Ref: follow_ups.resolved_by > profiles.id
 

@@ -880,18 +880,44 @@ Secondary/destructive actions may use overflow menus where appropriate.
 DiscipleTrack should visually distinguish items requiring human
 attention.
 
-Examples:
+Two different things share this visual treatment, and they must not be
+confused in code.
+
+### Stored Attention Conditions
+
+Detected by server-side monitoring and persisted as records. They drive
+follow-up creation and have their own lifecycle.
+
+MVP condition type:
 
 - consecutive absences
-- overdue follow-up
+
+Do not invent additional stored condition types. New types require an
+intentional scope decision.
+
+### Derived Attention Indicators
+
+Computed by query. No stored row, no follow-up.
+
+Examples:
+
 - unassigned Disciple
 - lesson awaiting Leader confirmation
+- overdue follow-up
+
+Both may use the same components and semantic styling. Only the first
+category represents a monitoring condition.
 
 Attention UI should communicate:
 
 - who/what needs attention
 - why
 - what action is available
+
+Where a follow-up is still open but its underlying condition has already
+resolved, for example the member has resumed attending, the UI should
+show that distinction rather than presenting it identically to an
+actively deteriorating case. The care action is still owed.
 
 Avoid alarming visual treatment for routine ministry follow-up.
 

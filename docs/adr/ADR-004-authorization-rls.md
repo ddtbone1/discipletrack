@@ -59,6 +59,6 @@ Policies must consider:
 - Discipler assignments
 - record ownership/scope
 
-ADMIN does not automatically receive unrestricted access to sensitive discipleship care information.
+ADMIN does not receive ministry-care access by default. In the MVP this is absolute rather than merely limited: ADMIN has no access to attendance, discipleship progress, attention conditions or follow-up notes. Where one person needs both kinds of authority, COORDINATOR is assigned separately.
 
 Technical authority and ministry-care authority remain separate.

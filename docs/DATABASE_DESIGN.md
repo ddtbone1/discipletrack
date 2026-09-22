@@ -1,14 +1,34 @@
 # DiscipleTrack Database Design
 
-*Document Status:* MVP Baseline  
+*Document Status:* Rationale — NOT NORMATIVE for schema structure  
 *Last Updated:* September 2026
+
+---
+
+## 0. Authority of This Document
+
+This document explains **why** the DiscipleTrack data model looks the way
+it does. It is not the schema specification.
+
+Authoritative artifacts:
+
+- `docs/erd/discipletrack.dbml` — concrete schema structure
+- `docs/database/DATABASE_CONSTRAINTS.md` — invariants and enforcement
+- `docs/security/RBAC_RLS_MATRIX.md` — authorization
+
+Where this document and the ERD appear to disagree about a column name,
+type, enum value or relationship, the ERD is correct. Any field-level
+detail that remains here is illustrative context for the reasoning, not
+a specification. Do not implement a table from this document.
+
+See ADR-008 for the full precedence model.
 
 ---
 
 ## 1. Purpose
 
-This document defines the proposed PostgreSQL data model for the
-DiscipleTrack MVP.
+This document records the design reasoning behind the PostgreSQL data
+model for the DiscipleTrack MVP.
 
 It translates the requirements from:
 
@@ -17,9 +37,7 @@ It translates the requirements from:
 - BUSINESS_RULES.md
 - UI_DESIGN_SYSTEM.md
 
-into persistent domain entities and relationships.
-
-This document is intentionally written before SQL migrations.
+into persistent domain concepts and explains the trade-offs chosen.
 
 The goals are to:
 
@@ -230,10 +248,15 @@ Possible statuses:
 
 Constraint:
 
-A user should not have duplicate equivalent membership records for the
-same church.
+A user has exactly one membership record per church, enforced by a
+unique constraint on church and user.
 
-For MVP, only one active membership in the church is expected.
+A returning member reactivates that record. A second record is never
+created, so their attendance, discipleship progress and care history
+remain one continuous journey.
+
+See DATABASE_CONSTRAINTS.md for the status lifecycle and for what
+TRANSFERRED means.
 
 ---
 
@@ -400,16 +423,9 @@ Represents direct care responsibility between a Discipler and Disciple.
 
 This is separate from D Group membership.
 
-Proposed fields:
-
-- id UUID PK
-- d_group_id UUID FK
-- discipler_membership_id UUID FK
-- disciple_membership_id UUID FK
-- assigned_by UUID
-- started_at TIMESTAMPTZ
-- ended_at TIMESTAMPTZ nullable
-- created_at TIMESTAMPTZ
+Both sides are referenced at D Group membership level, because the
+relationship depends on the contextual responsibility each person holds
+inside that D Group. See the ERD for exact fields.
 
 Rules:
 
@@ -432,27 +448,16 @@ Represents an actual gathering of the overall D Group.
 
 This is separate from a Discipleship Meeting.
 
-Proposed fields:
-
-- id UUID PK
-- d_group_id UUID FK
-- title TEXT nullable
-- topic TEXT nullable
-- notes TEXT nullable
-- starts_at TIMESTAMPTZ
-- status TEXT
-- created_by UUID
-- finalized_by UUID nullable
-- finalized_at TIMESTAMPTZ nullable
-- created_at TIMESTAMPTZ
-- updated_at TIMESTAMPTZ
-
-Statuses:
-
-- DRAFT
-- FINALIZED
+A gathering moves from DRAFT to either FINALIZED or CANCELLED, and both
+of those are final states. See the ERD for fields and
+DATABASE_CONSTRAINTS.md for the transition and state-consistency rules.
 
 Only finalized gatherings participate in official attendance monitoring.
+
+Cancellation exists so that a gathering which did not happen can be
+closed out without deleting the record or leaving it misleadingly in
+DRAFT. Attendance prepared while the gathering was DRAFT is kept as
+history but never becomes official.
 
 ---
 
@@ -581,17 +586,8 @@ Purpose:
 
 Represents an actual one-on-one or small discipleship meeting.
 
-Proposed fields:
-
-- id UUID PK
-- d_group_id UUID FK
-- discipler_membership_id UUID FK
-- lesson_id UUID FK
-- occurred_at TIMESTAMPTZ
-- notes TEXT nullable
-- recorded_by UUID
-- created_at TIMESTAMPTZ
-- updated_at TIMESTAMPTZ
+See the ERD for fields, including the RECORDED/VOIDED status and its
+void metadata.
 
 A meeting has:
 
@@ -612,24 +608,15 @@ Purpose:
 
 Records exactly which Disciples participated in a Discipleship Meeting.
 
-Proposed fields:
+Participants are referenced at church membership level so that credited
+progress survives D Group transfer and Discipler reassignment. See the
+ERD for fields and uniqueness.
 
-- id UUID PK
-- meeting_id UUID FK
-- disciple_membership_id UUID FK
-- created_at TIMESTAMPTZ
-
-Constraint:
-
-UNIQUE(meeting_id, disciple_membership_id)
-
-Rules:
-
-- participant must be an active/valid Disciple for the relevant context
-- participant must be assigned to the meeting's Discipler according to
-  the allowed ministry workflow
-- participant must belong to the relevant D Group
-- only actual participants receive progress
+Participant validity is normative and is specified in
+DATABASE_CONSTRAINTS.md section 4 as rules P1 to P3. In summary, a
+counted participant must have been an active Disciple of the meeting's
+D Group and assigned to the meeting's Discipler at the time the meeting
+occurred. Only actual participants receive progress.
 
 Example:
 
@@ -688,29 +675,12 @@ Purpose:
 Represents the lifecycle of a Disciple's progress through a specific
 lesson.
 
-Proposed fields:
+Progress is keyed to church membership, not to the person's current
+D Group assignment, so a Disciple's journey survives transfer,
+reassignment and leadership change. This is the single most consequential
+identity decision in the schema.
 
-- id UUID PK
-- disciple_membership_id UUID FK
-- lesson_id UUID FK
-- status TEXT
-- started_at TIMESTAMPTZ nullable
-- ready_at TIMESTAMPTZ nullable
-- completed_at TIMESTAMPTZ nullable
-- confirmed_by UUID nullable
-- created_at TIMESTAMPTZ
-- updated_at TIMESTAMPTZ
-
-Statuses:
-
-- NOT_STARTED
-- IN_PROGRESS
-- READY_FOR_COMPLETION
-- COMPLETED
-
-Constraint:
-
-UNIQUE(disciple_membership_id, lesson_id)
+See the ERD for fields, statuses and uniqueness.
 
 ---
 
@@ -792,12 +762,20 @@ Lesson 1
 → ...
 → Lesson 12
 
-The system should prevent unintended progression that bypasses required
-previous lesson completion unless an explicitly authorized correction or
-migration workflow exists.
+The system prevents progression that bypasses required previous lesson
+completion. Lesson N requires lesson N-1 COMPLETED, and lesson 1 is
+exempt.
 
-The exact enforcement mechanism will be finalized before SQL migration
-implementation.
+Enforcement happens inside record_discipleship_meeting(). It is an
+order-dependent check across the curriculum and the participant's
+progress, which makes it a controlled operation rather than a row
+constraint, and lets the operation return a usable error.
+
+Because a meeting records exactly one lesson, this also means every
+counted participant in a meeting must be on that same lesson.
+
+There is no Coordinator sequencing override in the MVP. A correction or
+migration workflow is documented future scope.
 
 ---
 
@@ -805,11 +783,12 @@ implementation.
 
 Curriculum completion is derived when all required lessons are completed.
 
-For the MVP:
-
-12 / 12 lessons COMPLETED
+Every lesson of the church's ACTIVE curriculum COMPLETED
 
 → Eligible for Discipler Review
+
+The MVP curriculum holds twelve lessons, but that is seed data. No rule
+hard-codes the count.
 
 Eligibility itself should normally be derived rather than manually
 entered.
@@ -825,24 +804,19 @@ Purpose:
 Records important ministry responsibility transitions such as
 Disciple → Discipler.
 
-Proposed fields:
-
-- id UUID PK
-- church_membership_id UUID FK
-- from_responsibility TEXT
-- to_responsibility TEXT
-- approved_by UUID
-- approved_at TIMESTAMPTZ
-- notes TEXT nullable
-- created_at TIMESTAMPTZ
+The record also preserves the D Group context in which the transition
+occurred. See the ERD for fields.
 
 For Disciple → Discipler:
 
-- all 12 lessons must be completed
+- every lesson of the church's active curriculum must be completed
 - Coordinator approval is required
 
-Promotion should also update/end/create the appropriate D Group
-responsibility records transactionally.
+Promotion runs transactionally and must also end the promotee's active
+discipler assignment where they are the Disciple, before ending the
+DISCIPLE responsibility and creating the DISCIPLER responsibility.
+Otherwise that assignment would survive while pointing at an ended
+responsibility. See DATABASE_CONSTRAINTS.md for the full sequence.
 
 Historical progress remains preserved.
 
@@ -913,27 +887,10 @@ Purpose:
 Represents a ministry-care case created because a person requires
 attention.
 
-Proposed fields:
-
-- id UUID PK
-- attention_condition_id UUID FK nullable
-- church_membership_id UUID FK
-- d_group_id UUID FK nullable
-- assigned_to UUID
-- reason_type TEXT
-- status TEXT
-- due_at TIMESTAMPTZ nullable
-- resolved_at TIMESTAMPTZ nullable
-- resolved_by UUID nullable
-- resolution_note TEXT nullable
-- created_at TIMESTAMPTZ
-- updated_at TIMESTAMPTZ
-
-Statuses:
-
-- REQUIRED
-- IN_PROGRESS
-- RESOLVED
+The assignee is recorded at church membership level, because it
+represents ongoing care responsibility within the church rather than a
+completed action. See the ERD for fields, statuses and resolution
+semantics.
 
 "Overdue" should normally be derived:
 
@@ -946,21 +903,20 @@ rather than requiring an independently synchronized OVERDUE state.
 
 # 24. Follow-up Assignment
 
-For attendance-generated follow-ups:
+Monitoring covers Leaders, Disciplers and Disciples, so the assignment
+rule needs more than one rung. Responsibility is resolved through an
+escalation chain that always lands on someone other than the person the
+follow-up concerns, terminating at the Coordinator.
 
-If an active primary Discipler exists:
-
-assigned_to = Primary Discipler
-
-Otherwise:
-
-assigned_to = D Group Leader
+The exact chain is in BUSINESS_RULES.md BR-039 and
+DATABASE_CONSTRAINTS.md section 7.
 
 The assignment should reflect the responsible person at the time the
 follow-up is created.
 
 Later assignment changes must not silently rewrite historical
-responsibility.
+responsibility. Reassignment is deliberate and is recorded through
+audit_events rather than additional columns.
 
 ---
 
@@ -1020,8 +976,10 @@ consecutive-absence condition.
 
 Running monitoring again must not create another identical case.
 
-The exact database constraint/function will be designed during migration
-implementation.
+This is enforced structurally with partial unique indexes on the active
+attention condition and on the unresolved follow-up, so that retried
+monitoring stays idempotent without depending on function logic alone.
+See DATABASE_CONSTRAINTS.md for the exact indexes.
 
 ---
 
@@ -1193,7 +1151,7 @@ d_groups
     └──────────────► discipleship_meetings
                          │
                          ▼
-               meeting_participants
+               discipleship_meeting_participants
                          │
                          ▼
                disciple_lesson_progress
