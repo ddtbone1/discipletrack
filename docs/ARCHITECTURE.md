@@ -1,26 +1,30 @@
+
 # DiscipleTrack Architecture
 
 ## 1. Architecture Goal
 
-DiscipleTrack should be engineered as a maintainable production application while keeping the MVP technically simple.
+DiscipleTrack should be engineered as a maintainable production mobile
+application while keeping the MVP technically understandable.
 
-The architecture should prioritize:
+The architecture prioritizes:
 
 - clear separation of concerns
 - security
 - testability
 - maintainability
 - understandable business logic
-- reliable data
+- historical data integrity
+- reliable authorization
 - ability to evolve
 
-The project should not introduce complexity simply to appear sophisticated.
+The system should not introduce unnecessary infrastructure simply to
+appear sophisticated.
 
 ---
 
 ## 2. High-Level Architecture
 
-DiscipleTrack MVP consists of:
+DiscipleTrack MVP uses:
 
 Flutter Mobile Application
 → Application / Domain Logic
@@ -28,14 +32,16 @@ Flutter Mobile Application
 → Supabase
 → PostgreSQL
 
-Supabase provides backend capabilities including:
+Primary technologies:
 
-- authentication
-- PostgreSQL database
-- Row Level Security
-- storage
-- database functions
-- backend/Edge Functions where appropriate
+- Flutter
+- Dart
+- Riverpod
+- GoRouter
+- Supabase
+- PostgreSQL
+- Supabase Auth
+- PostgreSQL Row Level Security
 
 ---
 
@@ -43,14 +49,16 @@ Supabase provides backend capabilities including:
 
 DiscipleTrack uses a modular monolithic architecture.
 
-Business capabilities are separated into logical domains without deploying each domain as an independent microservice.
+Business capabilities are logically separated without deploying each
+domain as an independent microservice.
 
 Initial domains include:
 
 - Authentication
-- Churches / Organizations
+- Churches
 - Membership
-- Groups
+- D Groups
+- D Group Assignments
 - Curriculum
 - Sessions
 - Attendance
@@ -59,127 +67,269 @@ Initial domains include:
 - Follow-ups
 - Dashboard / Reporting
 
-Domain boundaries should be respected even though they belong to one application/system.
+---
+
+## 4. Domain Terminology
+
+DiscipleTrack distinguishes between system/church authority and D Group
+responsibility.
+
+System/church roles include:
+
+- Admin
+- Discipleship Coordinator
+- Member
+
+D Group responsibilities include:
+
+- D Group Leader
+- Discipler
+- Disciple
+
+These should not be represented as one global role hierarchy.
+
+For example:
+
+A Member may become a Discipler within D Group A without receiving
+church-wide administrative authority.
+
+Authorization therefore depends on both:
+
+- church/system role
+- contextual D Group assignment
 
 ---
 
-## 4. Mobile Client
-
-Flutter and Dart are used for the Android and iOS application.
-
-The Flutter application is responsible for:
-
-- presentation
-- navigation
-- client-side state
-- user interaction
-- appropriate client-side validation
-- communication with backend services
-- local device functionality
-
-Flutter widgets must not contain core business rules.
-
-The mobile client must be treated as an untrusted client for security purposes.
-
----
-
-## 5. State Management
-
-Riverpod is the intended state-management and dependency-composition solution.
-
-State management should coordinate application behavior without becoming the location for every business rule.
-
-Core business logic should remain independently testable.
-
----
-
-## 6. Navigation
-
-GoRouter is the intended navigation solution.
-
-Navigation must account for application state such as:
-
-- authentication
-- onboarding
-- church membership
-- membership approval
-- appropriate role/access state
-
-Navigation restrictions improve user experience but do not replace backend authorization.
-
----
-
-## 7. Backend Platform
-
-Supabase is the backend platform for the MVP.
-
-PostgreSQL is the authoritative system of record.
-
-Supabase capabilities may be used for:
-
-- Auth
-- PostgreSQL
-- Row Level Security
-- Storage
-- Realtime where justified
-- database functions
-- Edge Functions where justified
-- scheduled/background processing where required
-
-Not every operation requires an Edge Function.
-
-The simplest secure implementation appropriate to the business requirement should be preferred.
-
----
-
-## 8. Data Access
-
-Flutter presentation components should not contain arbitrary direct database operations.
-
-Data access should occur through clearly defined repository/data-access boundaries.
+## 5. Ministry Hierarchy
 
 Conceptually:
 
-UI
-→ Application/Domain Logic
+Church
+└── D Groups
+    └── D Group
+        ├── D Group Leader
+        ├── Disciplers
+        └── Disciples
+
+A D Group has one primary active D Group Leader.
+
+A D Group can contain multiple Disciplers and Disciples.
+
+The domain model must support determining who is responsible for whom.
+
+---
+
+## 6. Flutter Client
+
+Flutter/Dart provides the Android and iOS client.
+
+Flutter is responsible for:
+
+- presentation
+- navigation
+- local UI state
+- user interaction
+- client validation
+- device functionality
+- communication with backend services
+
+Flutter widgets must not contain core ministry business rules.
+
+The mobile application is treated as an untrusted client for security
+purposes.
+
+---
+
+## 7. State Management
+
+Riverpod is the intended state-management and dependency-composition
+solution.
+
+Riverpod may coordinate:
+
+- authentication state
+- current church context
+- current user/member information
+- D Group state
+- application workflows
+
+Core business rules should remain independently testable rather than
+being embedded inside UI providers.
+
+---
+
+## 8. Navigation
+
+GoRouter is the intended navigation solution.
+
+Navigation may depend on:
+
+- authentication state
+- onboarding state
+- church membership state
+- approval state
+- system role
+- D Group responsibility
+
+Navigation restrictions are for application behavior and usability.
+
+They do not replace backend authorization.
+
+---
+
+## 9. Role-Aware UI
+
+The mobile application should adapt navigation and functionality to the
+user's responsibilities.
+
+Example Coordinator experience:
+
+Home
+D Groups
+Members
+Follow-ups
+Curriculum
+Profile
+
+Example D Group Leader experience:
+
+Home
+My D Group
+Sessions
+Follow-ups
+Progress
+Profile
+
+Example Discipler experience:
+
+Home
+My D Group
+My Disciples
+Follow-ups
+Progress
+Profile
+
+Example Disciple experience:
+
+Home
+My D Group
+My Progress
+Profile
+
+Exact navigation will be refined during UI design.
+
+The UI must not assume that visibility equals authorization.
+
+---
+
+## 10. Backend
+
+Supabase provides the MVP backend platform.
+
+Capabilities include:
+
+- authentication
+- PostgreSQL
+- Row Level Security
+- storage
+- database functions
+- Edge Functions where justified
+- scheduled/background processing where justified
+
+PostgreSQL is the authoritative system of record.
+
+Not every operation requires an Edge Function.
+
+Use the simplest secure backend mechanism appropriate to the
+requirement.
+
+---
+
+## 11. Data Access
+
+Flutter presentation code should not contain arbitrary direct database
+queries.
+
+Conceptually:
+
+Presentation
+→ Application / Domain
 → Repository
 → Supabase/PostgreSQL
+
+Repositories provide clear boundaries for backend/data operations.
 
 This improves:
 
 - testability
 - separation of concerns
-- error handling
+- consistent error handling
 - maintainability
-- ability to change backend implementation details
+- reduced coupling to Supabase APIs
 
-Abstraction should remain proportional to actual project complexity.
+Do not create unnecessary abstraction layers solely for architectural
+appearance.
 
 ---
 
-## 9. Business Logic
+## 12. Business Logic
 
-Core business rules must not depend on Flutter widgets.
+Core business rules must be independently testable.
 
-Examples include:
+Examples:
 
+- D Group assignment rules
+- Leader responsibility
 - attendance calculations
 - consecutive absence detection
 - follow-up eligibility
 - duplicate follow-up prevention
-- session lifecycle rules
+- session finalization
 - discipleship progression
-- permission-related domain rules
+- contextual authorization decisions
 
-These rules should be independently testable.
+Business rules must not depend on widget rendering.
 
 ---
 
-## 10. Database
+## 13. Authorization Model
+
+Authorization is contextual.
+
+Access may depend on:
+
+Authenticated User
++
+Church Membership
++
+System Role
++
+D Group Membership
++
+D Group Responsibility
++
+Disciple Assignment
+
+For example:
+
+A Coordinator may view ministry-wide D Group information.
+
+A D Group Leader may view their D Group.
+
+A Discipler may view the Disciples assigned to their care.
+
+A Disciple may view their own permitted information.
+
+Being assigned responsibility in one D Group must not automatically grant
+access to unrelated D Groups.
+
+---
+
+## 14. Database
 
 PostgreSQL is the system of record.
 
-The database should use appropriate:
+Database design should use appropriate:
 
 - primary keys
 - foreign keys
@@ -189,208 +339,218 @@ The database should use appropriate:
 - transactions
 - Row Level Security
 
-Database design should preserve meaningful historical information.
+Historical assignments should be modeled explicitly where history matters.
 
-Derived values should not unnecessarily become authoritative stored state.
-
-For example, individual attendance records are authoritative while attendance percentages are calculated from those records.
-
----
-
-## 11. Database Changes
-
-Database schema changes must eventually be represented by version-controlled migrations.
-
-The project should not depend on undocumented manual production database modifications.
-
-This allows the database structure to be:
-
-- reproducible
-- reviewable
-- testable
-- deployable across environments
-
----
-
-## 12. Authentication
-
-Supabase Auth is used for authentication.
-
-Authentication sessions should persist securely across normal application restarts.
-
-The application must correctly handle:
-
-- initial authentication
-- session restoration
-- token/session refresh
-- logout
-- invalid sessions
-- revoked access
-- temporary network failures
-
-Authentication answers:
-
-"Who is this user?"
-
-Authorization is treated separately.
-
----
-
-## 13. Authorization
-
-Authorization must be enforced on the backend/database side.
-
-Authorization may depend on:
-
-- authenticated user
-- church membership
-- role
-- group assignment
-- leader/member relationship
-- ownership of a resource
-
-PostgreSQL Row Level Security will be used where appropriate.
+Avoid storing only current relationships if doing so would destroy useful
+ministry history.
 
 Example:
 
-A Leader may be allowed to access members belonging to groups they lead.
+Instead of only storing a current D Group ID directly on a Member,
+D Group membership may require a historical relationship containing
+joined/left dates and responsibility.
 
-Being a Leader must not automatically grant access to every church member.
-
-Flutter may hide unauthorized functionality for usability, but client-side visibility is not considered a security mechanism.
-
----
-
-## 14. Church Data Isolation
-
-Church-owned information must be scoped appropriately.
-
-Users from one church must not gain unauthorized access to another church's protected data.
-
-The exact organization/church tenancy model will be defined during database design.
+The final model will be determined during database design.
 
 ---
 
-## 15. Error Handling
+## 15. Derived Data
 
-Expected failures should be handled intentionally.
+Authoritative events/records should be preserved.
 
-Examples include:
+Examples:
 
-- no network connection
+Attendance Records
+→ Attendance Percentage
+
+Lesson Progress Records
+→ Overall Progress Percentage
+
+Session History
+→ Consecutive Absence Calculation
+
+Follow-up Records
+→ Unresolved Follow-up Count
+
+Derived statistics should not unnecessarily replace their underlying
+source records.
+
+---
+
+## 16. Authentication
+
+Supabase Auth is used for authentication.
+
+Authentication should persist securely across normal app restarts.
+
+The application must handle:
+
+- registration
+- login
+- session restoration
+- token refresh
+- logout
+- invalid session
+- revoked access
+- temporary network failure
+
+Authentication identifies the user.
+
+Authorization determines what that user may access.
+
+---
+
+## 17. Row Level Security
+
+PostgreSQL Row Level Security will enforce sensitive data access where
+appropriate.
+
+RLS design must consider:
+
+- church isolation
+- system roles
+- D Group membership
+- D Group leadership
+- Discipler assignments
+- ownership/context
+
+RLS policies must be tested.
+
+Flutter UI restrictions are not substitutes for RLS/backend controls.
+
+---
+
+## 18. Monitoring Architecture
+
+Monitoring should use deterministic domain rules.
+
+Conceptually:
+
+Finalized Session
+→ Attendance Records
+→ Monitoring Logic
+→ Attention Condition
+→ Follow-up
+→ Responsible Person
+→ Resolution
+
+Initial monitoring focuses on consecutive absences.
+
+Future monitoring may include:
+
+- attendance decline
+- long-term inactivity
+- stalled progress
+- unresolved follow-ups
+
+These future rules should not complicate the MVP unnecessarily.
+
+---
+
+## 19. Error Handling
+
+Expected failures must be intentionally handled.
+
+Examples:
+
+- offline/network failure
 - authentication failure
-- session expiration
 - authorization denied
+- invalid membership
 - validation errors
-- duplicate operations
+- duplicate attendance
 - database constraint violations
-- backend failure
+- backend failures
 
-Users should receive understandable feedback.
-
-Internal implementation details and sensitive information should not be exposed through user-facing errors.
+User-facing errors should be understandable without exposing sensitive
+internal information.
 
 ---
 
-## 16. Testing
+## 20. Testing
 
-DiscipleTrack should use multiple levels of automated testing.
+DiscipleTrack uses multiple testing levels.
 
 ### Unit Tests
 
-Used for isolated business logic such as:
+Examples:
 
-- attendance calculations
-- absence detection
-- follow-up rules
-- progression rules
+- absence calculations
+- follow-up eligibility
+- progress calculations
+- domain rules
 
 ### Widget Tests
 
-Used for important Flutter UI/component behavior.
+Important Flutter UI behavior.
 
 ### Integration Tests
 
-Used for interactions between:
+Examples:
 
-- application services
 - repositories
-- Supabase
-- PostgreSQL
-- RLS/authorization
+- Supabase interaction
+- PostgreSQL behavior
+- RLS policies
+- authentication flows
 
 ### End-to-End Tests
 
-Used for critical workflows such as:
+Critical workflows such as:
 
 Login
-→ Open Group
+→ Open D Group
 → Create Session
 → Record Attendance
 → Trigger Follow-up
+→ Record Follow-up Action
 → Resolve Follow-up
 
-AI-generated implementation is not considered correct simply because it compiles.
+AI-generated code is not considered verified merely because it compiles.
 
 ---
 
-## 17. CI/CD
-
-The repository should eventually use automated quality gates.
-
-Pull requests should run appropriate checks such as:
-
-- formatting
-- static analysis
-- unit tests
-- integration tests where applicable
-- dependency/security checks where appropriate
-
-Code should not be considered complete when required quality checks fail.
-
----
-
-## 18. AI-Assisted Development
+## 21. AI-Assisted Engineering
 
 AI coding agents may assist with:
 
 - implementation
-- testing
-- code review
+- test generation
 - edge-case discovery
+- code review
+- security review
 - documentation
 - refactoring
-- security review
 
-Agents must follow the project's specifications, business rules, and architectural decisions.
+Agents must follow project requirements and business rules.
 
-AI output is not automatically trusted.
+Deterministic tools remain quality gates:
 
-Deterministic tools such as:
-
-- compilers
-- static analyzers
+- compiler
+- formatter
+- static analyzer
 - tests
 - database constraints
-- CI checks
-
-remain authoritative quality gates.
+- RLS tests
+- CI
 
 ---
 
-## 19. Engineering Principle
+## 22. Engineering Principle
 
-DiscipleTrack should introduce technology because it solves an identified engineering problem.
+DiscipleTrack should introduce technology because it solves a real
+engineering requirement.
 
-Do not introduce technologies such as:
+Do not introduce infrastructure such as:
 
 - microservices
-- Kubernetes
 - Kafka
 - RabbitMQ
+- Kubernetes
 - Redis
-- complex distributed infrastructure
+- complex distributed architecture
 
-unless actual system requirements justify them.
+without an identified requirement.
 
-The MVP should remain simple enough to understand while still following strong engineering practices.
+The MVP should be professionally engineered without becoming
+unnecessarily complex.

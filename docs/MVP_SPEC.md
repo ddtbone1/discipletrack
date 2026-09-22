@@ -2,44 +2,113 @@
 
 ## 1. Product Overview
 
-*DiscipleTrack* is a mobile-first discipleship, attendance, and member growth monitoring system for churches.
+*DiscipleTrack* is a mobile-first discipleship, attendance, and member
+growth monitoring system for churches.
 
 DiscipleTrack is not intended to be only an attendance tracker.
 
-Its primary purpose is to help church leaders understand:
+Its primary purpose is to help a church understand:
 
-- Who is participating?
-- Who is progressing through discipleship?
+- Who is participating in discipleship?
+- Who is responsible for discipling whom?
+- Who is progressing through the discipleship process?
 - Who is becoming inactive?
 - Who needs follow-up?
 - Who is responsible for that follow-up?
 - Has appropriate discipleship care actually happened?
 
-The system should help prevent members from quietly becoming inactive without leaders noticing or responding.
+The system should help prevent disciples from quietly becoming inactive
+without their Discipler, D Group Leader, or Discipleship Coordinator
+noticing and responding.
 
 ---
 
-## 2. MVP Goal
+## 2. Core Ministry Structure
+
+DiscipleTrack models the church's discipleship ministry using D Groups.
+
+Conceptually:
+
+Church
+└── D Groups
+    ├── D Group A
+    │   ├── D Group Leader
+    │   ├── Disciplers
+    │   └── Disciples
+    │
+    ├── D Group B
+    │   ├── D Group Leader
+    │   ├── Disciplers
+    │   └── Disciples
+    │
+    └── D Group C
+        ├── D Group Leader
+        ├── Disciplers
+        └── Disciples
+
+A D Group represents an active discipleship community within a church.
+
+Each active D Group has one primary D Group Leader.
+
+A D Group may contain multiple Disciplers and multiple Disciples.
+
+The exact relationship between individual Disciplers and the Disciples
+they personally care for will be finalized during domain/database design.
+
+---
+
+## 3. System Roles vs D Group Responsibilities
+
+DiscipleTrack distinguishes between church/system authority and
+responsibility inside a D Group.
+
+### System / Church Roles
+
+- Admin
+- Discipleship Coordinator
+- Member
+
+### D Group Responsibilities
+
+- D Group Leader
+- Discipler
+- Disciple
+
+These concepts must not be treated as identical.
+
+For example, a church Member may be assigned as a Discipler inside a
+specific D Group without receiving church-wide administrative authority.
+
+Likewise, becoming a D Group Leader does not automatically make the
+person an Admin or Discipleship Coordinator.
+
+---
+
+## 4. MVP Goal
 
 The MVP must support one complete discipleship workflow:
 
 Church Setup
-→ Member Registration
+→ User Registration
 → Church Membership Approval
-→ Group Assignment
-→ Leader Assignment
-→ Discipleship Curriculum
-→ Session
+→ D Group Creation
+→ D Group Leader Assignment
+→ Discipler / Disciple Assignment
+→ Curriculum Setup
+→ D Group Session
 → Attendance
 → Discipleship Progress
+→ Attendance Monitoring
 → Follow-up
-→ Basic Ministry Dashboard
+→ Ministry Oversight
 
-The goal of the MVP is to prove that DiscipleTrack can support the church's core discipleship monitoring workflow before advanced features are introduced.
+The MVP is successful when a church can manage its basic D Group
+discipleship workflow and identify disciples requiring attention without
+depending on spreadsheets for its core monitoring process.
 
 ---
 
-## 3. Platform
+## 5. Platform
 
 DiscipleTrack MVP is a mobile application.
 
@@ -57,186 +126,246 @@ A separate web administration application is not part of the MVP.
 
 ---
 
-## 4. User Roles
+## 6. Admin
 
-The MVP contains four primary roles:
+The Admin is responsible primarily for system administration and access.
 
-- Admin
-- Discipleship Coordinator
-- Leader / Mentor
-- Member / Disciple
+Typical responsibilities include:
 
-### Admin
-
-Responsible for church-level system administration.
-
-An Admin can:
-
-- manage church information
+- configure church information
+- manage user accounts
 - manage church memberships
-- manage users and roles
-- manage discipleship groups
-- manage leaders
-- manage curriculum
-- view church-wide information
+- approve membership registrations where authorized
+- assign or revoke privileged system roles
+- manage Admin and Coordinator access
+- disable or revoke account access
+- manage system-level church settings
+- access appropriate audit/security information
 
-### Discipleship Coordinator
+An Admin may technically have broad system access, but routine
+discipleship operations should normally be performed by the
+Discipleship Coordinator.
 
-Responsible for the church's discipleship operations.
-
-A Coordinator can:
-
-- manage members
-- manage groups
-- assign members to groups
-- assign leaders
-- manage discipleship curriculum
-- review attendance
-- review discipleship progress
-- manage and review follow-ups
-- view ministry-level dashboard information
-
-### Leader / Mentor
-
-Responsible for assigned groups and disciples.
-
-A Leader can:
-
-- view authorized groups
-- view assigned members
-- create sessions for authorized groups
-- record attendance
-- record discipleship progress
-- receive follow-up responsibilities
-- record follow-up actions and notes
-
-Being a Leader does not automatically grant access to every member in the church.
-
-### Member / Disciple
-
-A Member can:
-
-- access their own account
-- view appropriate personal information
-- view their assigned group
-- view their discipleship progress
-- view appropriate session/group information
-
-Members cannot grant themselves additional roles or permissions.
+The Admin should not need to manage everyday attendance or follow-ups.
 
 ---
 
-## 5. Church Onboarding
+## 7. Discipleship Coordinator
+
+The Discipleship Coordinator is responsible for church-wide discipleship
+operations.
+
+Typical responsibilities include:
+
+- oversee all D Groups
+- create and manage D Groups
+- assign D Group Leaders
+- oversee Disciplers and Disciples
+- manage D Group membership assignments
+- manage discipleship curriculum
+- review D Group sessions
+- monitor attendance
+- monitor discipleship progress
+- identify disciples requiring attention
+- review unresolved follow-ups
+- oversee follow-up accountability
+- reassign responsibilities when appropriate
+- view ministry-level dashboard information
+
+The Coordinator is an operational ministry role rather than primarily a
+technical/system administration role.
+
+---
+
+## 8. D Group Leader
+
+A D Group Leader is responsible for a specific D Group.
+
+Typical responsibilities include:
+
+- view their D Group
+- view the Disciplers and Disciples within their authorized D Group
+- oversee D Group sessions
+- create/manage sessions where permitted
+- record or review attendance
+- monitor discipleship progress
+- monitor disciples requiring attention
+- oversee follow-up work within the D Group
+- record appropriate notes/actions
+
+Being a D Group Leader does not automatically grant access to unrelated
+D Groups.
+
+---
+
+## 9. Discipler
+
+A Discipler is a church Member who has discipleship responsibility within
+a D Group.
+
+A Discipler may:
+
+- view their D Group
+- view disciples they are authorized to care for
+- view appropriate discipleship progress
+- participate in attendance/session workflows where permitted
+- receive follow-up responsibilities
+- record follow-up actions and notes
+- monitor the disciples assigned to their care
+
+A Discipler is not automatically a church-wide privileged system user.
+
+Authorization should depend on their actual D Group and disciple
+assignments.
+
+---
+
+## 10. Disciple
+
+A Disciple participates in the discipleship process.
+
+A Disciple may:
+
+- access their own account
+- view appropriate personal profile information
+- view their D Group
+- view their discipleship progress
+- view appropriate curriculum information
+- view appropriate session/group information
+
+A Disciple cannot assign themselves as:
+
+- Admin
+- Coordinator
+- D Group Leader
+- Discipler
+
+Such responsibilities require an authorized assignment process.
+
+---
+
+## 11. Church Onboarding
 
 A church is initially created by an authorized Admin.
 
-Users must be able to join the correct church rather than registering into a global unscoped account.
+Users must join a specific church.
 
-The intended onboarding mechanisms are:
+Intended joining methods include:
 
 - church invitation code
 - invitation link
 - QR invitation
 
-The MVP may initially implement a church invitation code while keeping the architecture compatible with invitation links and QR invitations later.
+The MVP may initially implement a short church invitation code while
+keeping the architecture compatible with invitation links and QR
+invitations later.
 
-A normal registration does not grant privileged roles.
+Normal registration does not grant privileged access.
 
-New users join as Members and may require approval from an authorized church user.
+A typical flow is:
 
-Roles such as:
+Install DiscipleTrack
+→ Register
+→ Enter Church Code
+→ Confirm Church
+→ Request Membership
+→ Approval
+→ Enter Church Workspace
 
-- Admin
-- Coordinator
-- Leader
-
-must be assigned or invited by an authorized user.
+Privileged responsibilities must be assigned by authorized users.
 
 ---
 
-## 6. Authentication
+## 12. Persistent Authentication
 
-DiscipleTrack must support persistent authentication.
+DiscipleTrack must behave like a modern mobile application.
 
 ### First Use
 
 Open App
-→ Register or Login
+→ Register/Login
 → Join Church
 → Complete Required Onboarding
 → Enter App
 
-### Normal Subsequent Use
+### Normal App Open
 
 Open App
 → Restore Existing Session
 → Enter App
 
-Users should not have to repeatedly log in every time the application opens.
+Users should not repeatedly log in whenever the application starts.
 
-Re-authentication may be required when:
+Re-authentication may occur when:
 
-- the user explicitly logs out
-- the authentication session cannot be refreshed
-- account access has been revoked
+- the user logs out
+- the session can no longer be refreshed
+- access has been revoked
 - another security condition requires authentication
+
+Push notification/device registration will be introduced when
+notification functionality is implemented.
 
 ---
 
-## 7. Member Management
+## 13. Member Management
 
-Authorized users can manage disciple/member profiles.
+A church Member represents a person belonging to the church workspace.
 
-Basic MVP member information may include:
+Basic information may include:
 
 - full name
 - contact information
-- church membership
 - date joined
 - age group
 - baptism status
 - membership status
 
-Discipleship-related information includes:
+Discipleship information may include:
 
-- assigned group
-- assigned leader/mentor
+- D Group
+- D Group responsibility
+- assigned Discipler where applicable
+- curriculum
 - current discipleship stage
-- curriculum progress
+- progress
 - attendance history
 - follow-up history
 
-Historical ministry information should not be destroyed simply because a member changes group, leader, or status.
+Historical ministry information should remain meaningful when
+assignments change.
 
 ---
 
-## 8. Discipleship Groups
+## 14. D Group Management
 
-Authorized users can create and manage discipleship groups.
+Authorized users can create and manage D Groups.
 
-A group may contain:
+A D Group may contain:
 
-- group name
-- leader
-- assistant leader where applicable
-- members
+- name
+- primary D Group Leader
+- Disciplers
+- Disciples
 - meeting schedule
 - meeting location
-- group status
+- status
 
-Members can be assigned to groups.
+Each active D Group should have one primary D Group Leader.
 
-The system should preserve meaningful membership history when a member moves between groups.
+D Group membership and responsibility should be represented in a way
+that allows historical assignments to be preserved.
 
 ---
 
-## 9. Discipleship Curriculum
+## 15. Discipleship Curriculum
 
-Church-specific discipleship curriculum must not be hard-coded into the Flutter application.
+Church-specific discipleship curriculum must not be hard-coded into
+Flutter.
 
-Authorized Admins and Coordinators can configure curriculum through the system.
+Authorized users can configure curriculum through DiscipleTrack.
 
-The basic structure is:
+Basic structure:
 
 Curriculum
 → Stage
@@ -260,39 +389,39 @@ Leadership
 - Mentoring
 - Small Group Leadership
 
-The application provides the curriculum management and progress-tracking engine.
+The application provides the curriculum engine.
 
-The actual church curriculum is stored as church-owned data.
+The church provides and manages its actual discipleship content.
 
 ---
 
-## 10. Session Management
+## 16. Session Management
 
-Leaders can create discipleship sessions for groups they are authorized to manage.
+D Group sessions represent actual discipleship meetings.
 
-A session includes:
+A session may include:
 
-- group
-- date and time
+- D Group
+- date/time
 - topic
 - optional curriculum lesson
 - notes
 - status
 
-The MVP should support a simple session lifecycle:
+MVP lifecycle:
 
 Draft
 → Finalized
 
-A finalized session represents an official completed session record.
+A finalized session represents an official completed D Group session.
 
-Attendance editing rules around finalized sessions will be defined by the business rules.
+Only appropriately authorized users may manage sessions for a D Group.
 
 ---
 
-## 11. Attendance
+## 17. Attendance
 
-Authorized Leaders can record attendance for applicable members.
+Attendance is recorded against D Group sessions.
 
 Supported MVP attendance states:
 
@@ -303,57 +432,55 @@ Supported MVP attendance states:
 
 The system must:
 
-- prevent duplicate attendance for the same member and session
+- prevent duplicate attendance for the same person/session
 - preserve attendance history
-- record relevant audit information
-- calculate attendance statistics from attendance records
-- support monitoring of attendance patterns
+- identify who recorded relevant changes where appropriate
+- calculate attendance information from underlying records
+- support attendance-pattern monitoring
 
 Individual attendance records are the source of truth.
 
-Attendance percentages and statistics are derived information.
+Attendance percentages are derived information.
 
 ---
 
-## 12. Discipleship Progress
+## 18. Discipleship Progress
 
-Discipleship progress must be tracked separately from attendance.
+Progress is separate from attendance.
 
-Basic lesson progress states:
+MVP lesson states:
 
 - Not Started
 - In Progress
 - Completed
 
-Attending a session does not automatically mean that a member completed the associated lesson.
+Attending a session does not automatically complete a lesson.
 
-Progress must be associated with the relevant:
+Progress must relate the Disciple to the appropriate curriculum lesson.
 
-- member
-- curriculum
-- stage
-- lesson
-
-The system should be able to determine a member's current discipleship progress from these records.
+The system should be able to determine the Disciple's overall progress
+from underlying lesson-progress records.
 
 ---
 
-## 13. Follow-up Monitoring
+## 19. Follow-up Monitoring
 
-Follow-up monitoring is a core DiscipleTrack capability.
+Follow-up is a core DiscipleTrack capability.
 
-A follow-up represents a situation where a member requires intentional attention from a Leader or Coordinator.
+A follow-up represents intentional discipleship care required because
+a Disciple needs attention.
 
-A follow-up should contain:
+A follow-up should identify:
 
-- member
+- Disciple
 - reason
-- responsible user
+- responsible person
+- D Group
 - status
 - priority where applicable
-- date created
+- creation date
 - actions/notes
-- resolution information
+- resolution
 
 Basic lifecycle:
 
@@ -361,106 +488,99 @@ Required
 → In Progress
 → Resolved
 
-Resolved follow-ups must remain available as historical records.
+Follow-up responsibility should normally be assigned to the appropriate
+Discipler or D Group Leader according to ministry rules.
+
+The Coordinator can oversee unresolved follow-ups across the ministry.
+
+Resolved follow-ups remain part of the historical record.
 
 ---
 
-## 14. Attendance Monitoring
+## 20. Attendance Monitoring
 
-The MVP must support deterministic monitoring of attendance patterns.
+The MVP must support deterministic attendance monitoring.
 
-At minimum, the system should detect consecutive absences.
+At minimum:
+
+Repeated consecutive absence
+→ Disciple Requires Attention
+→ Follow-up Required
 
 Example:
 
 Present
-→ Present
-→ Absent
-→ Absent
-→ Absent
+Present
+Absent
+Absent
+Absent
 
-Once the configured absence threshold is reached, the member should be identified as requiring attention.
+When the configured threshold is reached, the system identifies the
+Disciple as requiring attention.
 
-The monitoring process must avoid creating unnecessary duplicate unresolved follow-ups for the same condition.
+Monitoring must avoid generating duplicate unresolved follow-ups for the
+same equivalent condition.
 
-Monitoring rules must be deterministic business logic.
-
-AI is not responsible for determining core attendance facts or deciding whether the fundamental MVP attendance rule has been triggered.
+AI must not determine whether basic attendance rules have been triggered.
 
 ---
 
-## 15. Dashboard
+## 21. Ministry Oversight
 
-The MVP dashboard should prioritize actionable ministry information.
+The dashboard should prioritize actionable ministry information.
 
-Basic information may include:
+Coordinator-level information may include:
 
-- total active members
-- active groups
-- recent attendance rate
-- members requiring follow-up
+- active D Groups
+- active Disciples
+- active Disciplers
+- D Group attendance
+- Disciples requiring attention
 - unresolved follow-ups
-- members without group assignments
-- members without leader assignments
+- Disciples without appropriate assignments
+- D Groups requiring attention
 
-The dashboard should answer questions such as:
+D Group Leaders should receive information scoped to their D Group.
 
-- Who currently needs attention?
-- Which follow-ups remain unresolved?
-- Are members participating?
-- Are members properly assigned?
+Disciplers should receive information scoped to the Disciples for whom
+they are responsible.
 
-Advanced analytics are outside the MVP.
+The dashboard should answer:
+
+- Who needs attention?
+- Who is responsible for them?
+- Has follow-up happened?
+- Which D Groups are struggling?
+- Are Disciples progressing?
 
 ---
 
-## 16. Security
+## 22. Security
 
-The MVP must enforce:
+DiscipleTrack must enforce:
 
 - authentication
-- church data isolation
+- church isolation
 - role-based authorization
-- assignment/group-based authorization where necessary
+- D Group-based authorization
+- assignment-based authorization
 - backend/database-side authorization
 - input validation
 - database integrity constraints
 
-The mobile application must not be treated as a trusted security boundary.
+Flutter is not a trusted authorization boundary.
 
-Hiding a button or screen in Flutter is not sufficient authorization.
-
-A user manipulating the client must not be able to bypass server/database access controls.
+Hiding a screen or button does not constitute security.
 
 ---
 
-## 17. Auditability
-
-Important operations should retain enough information to determine:
-
-- what happened
-- when it happened
-- who performed the action
-
-This is especially relevant to:
-
-- attendance
-- role changes
-- group/leader assignments
-- discipleship progress
-- follow-ups
-
-The exact audit implementation will be determined during database design.
-
----
-
-## 18. Out of Scope for MVP
+## 23. Out of Scope for MVP
 
 The following are intentionally postponed:
 
 - QR attendance
 - automated push notifications
-- SMS notifications
+- SMS
 - email automation
 - AI-generated ministry insights
 - predictive inactivity scoring
@@ -468,32 +588,32 @@ The following are intentionally postponed:
 - advanced reporting
 - full offline synchronization
 - web administration portal
-- social/community features
+- social/community functionality
 - complex multi-church administration
 - microservices
 - distributed infrastructure
 
-These features may be introduced incrementally after the core workflow is proven.
-
 ---
 
-## 19. MVP Success Scenario
+## 24. MVP Success Scenario
 
-The MVP must successfully support this end-to-end scenario:
+The MVP must support this scenario:
 
-1. An Admin creates/configures a church.
-2. A Member registers and joins that church.
-3. An authorized user approves the membership.
-4. A Coordinator assigns the Member to a discipleship group.
-5. A Leader is assigned responsibility for the group/member.
-6. An authorized user configures a discipleship curriculum.
-7. The Leader creates a group session.
-8. The Leader records attendance.
-9. The Leader records relevant discipleship progress.
-10. Repeated absence triggers the attendance monitoring rule.
-11. A follow-up becomes visible to the responsible Leader.
-12. The Leader records follow-up actions.
-13. The follow-up is resolved.
-14. The Coordinator can see relevant ministry information on the dashboard.
+1. Admin creates/configures the church workspace.
+2. A user registers and joins the church.
+3. Membership is approved.
+4. Coordinator creates a D Group.
+5. Coordinator assigns a D Group Leader.
+6. Disciplers and Disciples are assigned to the D Group.
+7. Curriculum is configured.
+8. An authorized user creates a D Group session.
+9. Attendance is recorded.
+10. Discipleship progress is recorded.
+11. A Disciple reaches the consecutive-absence threshold.
+12. DiscipleTrack identifies that Disciple as requiring attention.
+13. A responsible Discipler or D Group Leader receives the follow-up.
+14. Follow-up actions are recorded.
+15. The follow-up is resolved.
+16. The D Group Leader and Coordinator can see the appropriate outcome.
 
-This is the primary acceptance scenario for the DiscipleTrack MVP.
+This is the primary MVP acceptance workflow.
