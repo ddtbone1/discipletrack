@@ -102,9 +102,11 @@ church_memberships.status = 'ACTIVE'
 Status effects:
 
 PENDING
-→ may access only the minimum onboarding state required, including their
-  own pending membership row
-→ no church data, no announcements, no curriculum, no member visibility
+→ may access only the minimum onboarding state required: their own
+  pending membership row and the id, name and status of the church they
+  requested
+→ no other church data, no announcements, no curriculum, no member
+  visibility
 
 ACTIVE
 → normal access according to role, responsibility and assignment
@@ -299,6 +301,11 @@ SELECT:
 - Discipler → assigned Disciples
 - Admin → profiles required for system/member administration
 
+Implemented so far: own profile, and for ADMIN and COORDINATOR the
+profiles of anyone holding a membership row (any status) in a church
+they administer, which is what the membership-request list needs.
+Leader and Discipler scopes arrive with the D Group slice.
+
 INSERT:
 
 - Not permitted for clients. A profile row is created automatically from auth.users through a trusted database trigger.
@@ -322,6 +329,11 @@ Sensitive role or membership changes must not be performed by updating profiles.
 SELECT:
 
 - Active church members → own church
+- PENDING members → own requested church (section 1a: id, name, status)
+
+Column-level: authenticated may SELECT only id, name and status.
+join_code is not readable by any client role, and `select=*` is refused.
+anon holds no grant.
 
 Lookup by join code is NOT available as a direct client SELECT. An
 unapproved user must use lookup_church_by_join_code(), a trusted
@@ -354,6 +366,13 @@ Membership approval and status transitions should use controlled operations.
 
 Direct arbitrary client updates should not be allowed.
 
+Implemented: request_join_church() (INSERT as PENDING),
+approve_church_membership(), reject_church_membership() and
+complete_onboarding(). Clients hold no INSERT or UPDATE policy on the
+table. The pending-request list for approvers is a plain SELECT under
+the ADMIN / COORDINATOR own-church scope, embedding the applicant's
+profile through the user_id foreign key.
+
 ---
 
 ## church_role_assignments
@@ -362,7 +381,9 @@ SELECT:
 
 - ADMIN → own church
 - COORDINATOR → role information needed for ministry operation
-- User → own roles where needed
+- User → own roles where needed (implemented: own active and ended
+  roles, so the client can show approver entry points; authority is
+  still decided server-side on every operation)
 
 WRITE:
 
@@ -796,6 +817,8 @@ Recommended operations:
 - lookup_church_by_join_code()
 - request_join_church()
 - approve_church_membership()
+- reject_church_membership()
+- complete_onboarding()
 - assign_church_role()
 - regenerate_join_code()
 - create_d_group()
@@ -825,13 +848,26 @@ Operation notes:
 lookup_church_by_join_code()
 → SECURITY DEFINER
 → requires an authenticated caller
-→ returns only minimal church confirmation information
-→ rate limited
+→ returns only minimal church confirmation information (id and name)
+→ rate limited; a miss returns an empty result rather than raising
+  (DATABASE_CONSTRAINTS.md section 1, Join Code Format and Rate Limiting)
 
 request_join_church()
-→ takes the church identifier returned by the prior lookup
-→ creates a PENDING membership
+→ takes the church identifier returned by the prior lookup, together
+  with the join code, which must resolve to that church
+→ creates a PENDING membership; returns REQUESTED, ALREADY_PENDING,
+  ALREADY_ACTIVE, NOT_REQUESTABLE or INVALID_CODE
 → rate limited
+→ writes no role and no D Group responsibility
+
+reject_church_membership()
+→ ADMIN or COORDINATOR of the same church, own membership ACTIVE
+→ PENDING → ARCHIVED, audited as MEMBERSHIP_REJECTED
+→ approved_by / approved_at stay NULL
+
+complete_onboarding()
+→ the caller's own ACTIVE membership only
+→ sets onboarding_completed_at once; idempotent
 
 cancel_gathering()
 → verifies COORDINATOR or own-D-Group LEADER authority
@@ -909,6 +945,12 @@ reassign_discipler() and promote_disciple_to_discipler()
 → end the Disciple's discipler assignment
 → resolve the ACTIVE CONSECUTIVE_MISSED_MEETINGS condition belonging to
   the ended assignment
+
+approve_church_membership()
+→ ADMIN or COORDINATOR of the same church, own membership ACTIVE
+→ PENDING → ACTIVE; sets approved_by, approved_at and joined_at
+  (first activation only); audited as MEMBERSHIP_APPROVED
+→ never the caller's own row
 
 approve_church_membership() and membership status transitions
 → apply the effects listed in DATABASE_CONSTRAINTS.md section 1,

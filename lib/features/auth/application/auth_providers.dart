@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/auth_repository.dart';
 
-/// Drives registration, sign-in and sign-out.
+/// Drives registration, sign-in, email verification and sign-out.
 ///
 /// Holds no session state of its own. The session lives in Supabase and is
 /// observed through `authStateChangesProvider`, so there is one source of
@@ -16,7 +16,8 @@ class AuthController extends Notifier<AsyncValue<void>> {
   @override
   AsyncValue<void> build() => const AsyncValue.data(null);
 
-  Future<bool> signUp({
+  /// Null on failure; the failure is exposed through [state].
+  Future<SignUpOutcome?> signUp({
     required String email,
     required String password,
     required String fullName,
@@ -27,29 +28,70 @@ class AuthController extends Notifier<AsyncValue<void>> {
   );
 
   Future<bool> signIn({required String email, required String password}) =>
-      _run(
+      _succeeds(
         () => ref
             .read(authRepositoryProvider)
             .signIn(email: email, password: password),
       );
 
-  Future<bool> signOut() =>
-      _run(() => ref.read(authRepositoryProvider).signOut());
+  Future<bool> verifyEmailCode({required String email, required String code}) =>
+      _succeeds(
+        () => ref
+            .read(authRepositoryProvider)
+            .verifyEmailCode(email: email, code: code),
+      );
 
-  /// Returns true on success. Failures surface through [state] so forms can
-  /// show them inline without discarding what the person typed.
-  Future<bool> _run(Future<void> Function() action) async {
+  Future<bool> resendVerificationCode(String email) => _succeeds(
+    () => ref.read(authRepositoryProvider).resendVerificationCode(email),
+  );
+
+  Future<bool> signOut() =>
+      _succeeds(() => ref.read(authRepositoryProvider).signOut());
+
+  /// Clears a shown failure, for example when the person edits the form.
+  void clearError() {
+    if (state.hasError) state = const AsyncValue.data(null);
+  }
+
+  Future<bool> _succeeds(Future<void> Function() action) async =>
+      await _run(() async {
+        await action();
+        return true;
+      }) ??
+      false;
+
+  /// Failures surface through [state] so forms can show them inline without
+  /// discarding what the person typed.
+  Future<T?> _run<T>(Future<T> Function() action) async {
     state = const AsyncValue.loading();
     try {
-      await action();
+      final result = await action();
       state = const AsyncValue.data(null);
-      return true;
+      return result;
     } on AuthFailure catch (e, st) {
       state = AsyncValue.error(e, st);
-      return false;
+      return null;
     }
   }
 }
 
 final authControllerProvider =
     NotifierProvider<AuthController, AsyncValue<void>>(AuthController.new);
+
+/// The email address awaiting verification, or null.
+///
+/// Set by sign-up when no session is issued, and by a sign-in that fails with
+/// `email_not_confirmed`. In-memory only: an unverified account has no
+/// session, so after a cold start the person simply signs in again and is
+/// routed back here with the address they typed.
+class PendingVerification extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void set(String email) => state = email.trim();
+
+  void clear() => state = null;
+}
+
+final pendingVerificationProvider =
+    NotifierProvider<PendingVerification, String?>(PendingVerification.new);

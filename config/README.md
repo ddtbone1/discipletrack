@@ -15,6 +15,38 @@ Networking differs by execution environment:
 | `local.json` | The app on web or desktop | `http://127.0.0.1:54321` | Runs on the host, where Supabase is genuinely on loopback. |
 | `test.json` | Integration tests on the host Dart VM | `http://127.0.0.1:54321` | Same reason. |
 
+## Local stack
+
+Start the stack with Mailpit included; it captures the verification emails
+that Supabase Auth sends with `enable_confirmations = true`:
+
+```powershell
+npx supabase start -x studio,realtime,storage-api,imgproxy,edge-runtime,logflare,vector,supavisor
+```
+
+Then provision the local church. This applies every migration and runs
+`supabase/seed.sql`, and it **wipes local data**:
+
+```powershell
+npx supabase db reset
+```
+
+The seed creates one church and its initial Admin + Coordinator:
+
+| | |
+|---|---|
+| Church | Bankal Seventh-day Adventist Church |
+| Admin email | `admin@discipletrack.local` |
+| Admin password | `dev-password-123` |
+| Join code | `7QK4MZP2XR` |
+| Mailpit (verification emails) | http://127.0.0.1:54324 |
+
+Register a new account in the app, read its 6-digit code from Mailpit, verify,
+enter the join code, and approve the request while signed in as the admin.
+
+The join code is local-development-only. Real deployments let bootstrap
+generate one cryptographically; see `tool/bootstrap_church.ps1`.
+
 ## The service-role key is deliberately not committed
 
 Integration tests need it for setup and teardown, because it bypasses RLS in
@@ -44,7 +76,7 @@ $env:SUPABASE_SERVICE_ROLE_KEY = (npx supabase status -o json | ConvertFrom-Json
 export SUPABASE_SERVICE_ROLE_KEY=$(npx supabase status -o json | jq -r .SERVICE_ROLE_KEY)
 ```
 
-The test reads it from the environment at runtime and fails with that command
+The tests read it from the environment at runtime and fail with that command
 in the error message if it is absent.
 
 ## Are the other keys secrets?
@@ -62,5 +94,12 @@ never belong in this directory under version control.
 ```
 flutter run  -d chrome     --dart-define-from-file=config/local.json
 flutter run  -d <emulator> --dart-define-from-file=config/dev.json
+flutter test                                                  # unit + widget
 flutter test --dart-define-from-file=config/test.json test/integration
 ```
+
+The integration suite needs the stack running, `db reset` applied at least
+once, Mailpit up, and the service-role key in the environment. Each test
+creates and removes its own users and churches; only `bootstrap_test.dart`
+reads the seeded church. `MAILPIT_URL` may be passed as a define if Mailpit is
+not on port 54324.

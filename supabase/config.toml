@@ -222,7 +222,11 @@ enable_signup = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
-enable_confirmations = false
+# DiscipleTrack requires this: ownership of the email is verified before a
+# person can request church membership. Verification uses the 6-digit code
+# ({{ .Token }}) from the confirmation template below, so no deep links are
+# needed on mobile. The link stays in the email as a secondary path.
+enable_confirmations = true
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
@@ -246,6 +250,12 @@ otp_expiry = 3600
 # [auth.email.template.invite]
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"
+
+# Signup confirmation. The default template carries only the link; this one
+# also renders the OTP so the app can verify with a typed code.
+[auth.email.template.confirmation]
+subject = "Your DiscipleTrack verification code"
+content_path = "./supabase/templates/confirmation.html"
 
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]

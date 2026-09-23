@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show TextInputFormatter;
 
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
@@ -21,7 +22,11 @@ class AppTextField extends StatelessWidget {
     this.autofillHints,
     this.enabled = true,
     this.onSubmitted,
+    this.onChanged,
     this.trailing,
+    this.inputFormatters,
+    this.textCapitalization = TextCapitalization.none,
+    this.textStyle,
     super.key,
   });
 
@@ -37,7 +42,16 @@ class AppTextField extends StatelessWidget {
   final Iterable<String>? autofillHints;
   final bool enabled;
   final ValueChanged<String>? onSubmitted;
+  final ValueChanged<String>? onChanged;
   final Widget? trailing;
+
+  /// For constrained inputs such as a join code or a numeric verification
+  /// code. The database and Supabase Auth still validate independently.
+  final List<TextInputFormatter>? inputFormatters;
+  final TextCapitalization textCapitalization;
+
+  /// Overrides the body style, for example wider letter spacing on a code.
+  final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +70,10 @@ class AppTextField extends StatelessWidget {
           autofillHints: autofillHints,
           enabled: enabled,
           onSubmitted: onSubmitted,
-          style: AppTypography.body,
+          onChanged: onChanged,
+          inputFormatters: inputFormatters,
+          textCapitalization: textCapitalization,
+          style: textStyle ?? AppTypography.body,
           decoration: InputDecoration(
             hintText: hint,
             suffixIcon: trailing,

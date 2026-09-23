@@ -2,22 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/supabase/supabase_providers.dart';
 import '../core/theme/app_theme.dart';
 import '../features/appearance/application/theme_mode_provider.dart';
+import '../features/auth/application/auth_providers.dart';
 import '../features/auth/presentation/sign_in_page.dart';
 import '../features/auth/presentation/sign_up_page.dart';
 import '../features/auth/presentation/splash_page.dart';
+import '../features/auth/presentation/verify_email_page.dart';
 import '../features/home/presentation/home_page.dart';
 import '../features/membership/application/membership_providers.dart';
 import '../features/membership/domain/church_membership.dart';
+import '../features/membership_review/application/membership_review_providers.dart';
+import '../features/membership_review/domain/membership_request.dart';
+import '../features/membership_review/presentation/pending_members_page.dart';
 import '../features/onboarding/presentation/join_church_page.dart';
+import '../features/onboarding/presentation/no_access_page.dart';
 import '../features/onboarding/presentation/pending_approval_page.dart';
+import '../features/onboarding/presentation/welcome_page.dart';
 import '../features/profile/application/profile_providers.dart';
 import '../features/profile/domain/profile.dart';
 import '../features/profile/presentation/edit_profile_page.dart';
 import '../features/profile/presentation/profile_page.dart';
 
-/// Previews of every screen in the Auth + Profile slice.
+/// Previews of every screen in the Auth + Profile and Church Join slices.
 ///
 /// Run with: flutter widget-preview start
 ///
@@ -45,13 +53,42 @@ final _longNameProfile = Profile(
   updatedAt: DateTime(2026, 9, 21),
 );
 
-ChurchMembership _membership(MembershipStatus status) => ChurchMembership(
+const _church = ChurchSummary(
+  id: '44444444-4444-4444-4444-444444444444',
+  name: 'Bankal Seventh-day Adventist Church',
+);
+
+ChurchMembership _membership(
+  MembershipStatus status, {
+  bool onboardingCompleted = true,
+}) => ChurchMembership(
   id: '33333333-3333-3333-3333-333333333333',
-  churchId: '44444444-4444-4444-4444-444444444444',
+  churchId: _church.id,
   userId: _profile.id,
   status: status,
   joinedAt: DateTime(2026, 3, 20),
+  requestedAt: DateTime(2026, 3, 18),
+  onboardingCompletedAt: onboardingCompleted ? DateTime(2026, 3, 20) : null,
 );
+
+final _requests = [
+  MembershipRequest(
+    membershipId: 'r1',
+    fullName: 'Juan Dela Cruz',
+    requestedAt: DateTime(2026, 9, 25),
+  ),
+  MembershipRequest(
+    membershipId: 'r2',
+    fullName: 'Maria Cristina Villanueva-Santos',
+    requestedAt: DateTime(2026, 9, 26),
+  ),
+];
+
+/// A known address, so the verification preview shows the normal copy.
+class _PreviewPendingVerification extends PendingVerification {
+  @override
+  String? build() => 'james@example.com';
+}
 
 /// Holds the toggle in its dark state so dark previews show the right icon.
 class _PreviewDarkMode extends ThemeModeController {
@@ -65,12 +102,23 @@ Widget _wrap(
   Widget page, {
   Profile? profile,
   ChurchMembership? membership,
+  Set<ChurchRole> roles = const {},
+  List<MembershipRequest> requests = const [],
   bool dark = false,
 }) {
   return ProviderScope(
     overrides: [
+      currentUserIdProvider.overrideWithValue(profile?.id),
       myProfileProvider.overrideWith((ref) async => profile),
-      myMembershipProvider.overrideWith((ref) async => membership),
+      myMembershipProvider.overrideWithBuild(
+        (ref, notifier) async => membership,
+      ),
+      myChurchProvider.overrideWith(
+        (ref) async => membership == null ? null : _church,
+      ),
+      myChurchRolesProvider.overrideWith((ref) async => roles),
+      pendingMembershipRequestsProvider.overrideWith((ref) async => requests),
+      pendingVerificationProvider.overrideWith(_PreviewPendingVerification.new),
       if (dark) themeModeProvider.overrideWith(_PreviewDarkMode.new),
     ],
     child: MaterialApp(
@@ -96,6 +144,9 @@ Widget signIn() => _wrap(const SignInPage());
 @Preview(name: '3. Sign up', group: 'Auth flow', size: Size(390, 844))
 Widget signUp() => _wrap(const SignUpPage());
 
+@Preview(name: '3b. Verify email', group: 'Auth flow', size: Size(390, 844))
+Widget verifyEmail() => _wrap(const VerifyEmailPage());
+
 // ---------------------------------------------------------------------------
 // Onboarding and home, one per membership state
 // ---------------------------------------------------------------------------
@@ -110,11 +161,63 @@ Widget pendingApproval() => _wrap(
   membership: _membership(MembershipStatus.pending),
 );
 
+@Preview(name: '5b. Not approved', group: 'Onboarding', size: Size(390, 844))
+Widget noAccess() => _wrap(
+  const NoAccessPage(),
+  profile: _profile,
+  membership: _membership(MembershipStatus.archived),
+);
+
+@Preview(
+  name: '5c. Welcome (first entry)',
+  group: 'Onboarding',
+  size: Size(390, 844),
+)
+Widget welcome() => _wrap(
+  const WelcomePage(),
+  profile: _profile,
+  membership: _membership(MembershipStatus.active, onboardingCompleted: false),
+);
+
 @Preview(name: '6. Home (active)', group: 'Onboarding', size: Size(390, 844))
 Widget home() => _wrap(
   const HomePage(),
   profile: _profile,
   membership: _membership(MembershipStatus.active),
+);
+
+@Preview(name: '6b. Home (approver)', group: 'Onboarding', size: Size(390, 844))
+Widget homeApprover() => _wrap(
+  const HomePage(),
+  profile: _profile,
+  membership: _membership(MembershipStatus.active),
+  roles: const {ChurchRole.admin, ChurchRole.coordinator},
+  requests: _requests,
+);
+
+@Preview(
+  name: '6c. Membership requests',
+  group: 'Onboarding',
+  size: Size(390, 844),
+)
+Widget pendingMembers() => _wrap(
+  const PendingMembersPage(),
+  profile: _profile,
+  membership: _membership(MembershipStatus.active),
+  roles: const {ChurchRole.coordinator},
+  requests: _requests,
+);
+
+@Preview(
+  name: '6d. Membership requests, empty',
+  group: 'Onboarding',
+  size: Size(390, 844),
+)
+Widget pendingMembersEmpty() => _wrap(
+  const PendingMembersPage(),
+  profile: _profile,
+  membership: _membership(MembershipStatus.active),
+  roles: const {ChurchRole.coordinator},
 );
 
 // ---------------------------------------------------------------------------

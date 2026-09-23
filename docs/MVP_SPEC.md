@@ -341,9 +341,21 @@ DiscipleTrack should behave like a modern mobile application.
 
 Open App
 → Register/Login
+→ Verify Email
 → Join Church
 → Complete Onboarding
 → Enter App
+
+Verify Email confirms ownership of the address with the code Supabase
+Auth sends; no session exists until then. It is separate from the church
+join code, which identifies the church.
+
+Complete Onboarding is the one-time first-entry welcome shown when a
+membership first becomes ACTIVE. Completing it is recorded on the
+membership itself (church_memberships.onboarding_completed_at), so a
+reinstall or another device never shows it again. It is distinct from
+the splash screen, which appears on every launch while the session is
+restored.
 
 ### Normal Subsequent Use
 

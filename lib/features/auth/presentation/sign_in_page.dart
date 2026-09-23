@@ -53,10 +53,21 @@ class _SignInPageState extends ConsumerState<SignInPage> {
   Future<void> _submit() async {
     if (!_validate()) return;
     FocusScope.of(context).unfocus();
-    await ref
+    final ok = await ref
         .read(authControllerProvider.notifier)
         .signIn(email: _email.text, password: _password.text);
+    if (ok || !mounted) return;
     // On success the router redirects automatically; no imperative navigation.
+
+    // An account whose email was never verified has no session yet. Send the
+    // person to finish verification instead of leaving them at a dead end.
+    final failure = ref.read(authControllerProvider).error;
+    if (failure is AuthFailure &&
+        failure.code == AuthFailureCode.emailNotConfirmed) {
+      ref.read(pendingVerificationProvider.notifier).set(_email.text);
+      ref.read(authControllerProvider.notifier).clearError();
+      context.go(Routes.verifyEmail);
+    }
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -10,27 +11,57 @@ import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_page_header.dart';
 import '../../../core/widgets/app_scaffold.dart';
-import '../../../core/widgets/step_list.dart';
+import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/error_state.dart';
 import '../../appearance/presentation/theme_mode_toggle.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../profile/application/profile_providers.dart';
+import '../application/join_church_controller.dart';
+import '../domain/join_code.dart';
+import '../domain/onboarding_steps.dart';
+import 'onboarding_timeline.dart';
 
 /// Where an authenticated user without a church membership lands.
 ///
-/// Answers "what do I do next?" by laying out the MVP_SPEC section 11 flow,
-/// Register -> Enter Join Code -> Confirm Church -> Request Membership, with
-/// the person's position in it.
-///
-/// The join-code steps need `lookup_church_by_join_code()` and
-/// `request_join_church()`, which are controlled operations arriving in a later
-/// slice. The entry point is shown disabled rather than faked.
-class JoinChurchPage extends ConsumerWidget {
+/// MVP_SPEC section 11: Enter Join Code -> Confirm Church -> Request
+/// Membership. The code identifies the church the person wants to join; it
+/// grants nothing by itself. The church's name is shown and confirmed before
+/// any request is created, and the request lands as PENDING for the church to
+/// review.
+class JoinChurchPage extends ConsumerStatefulWidget {
   const JoinChurchPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<JoinChurchPage> createState() => _JoinChurchPageState();
+}
+
+class _JoinChurchPageState extends ConsumerState<JoinChurchPage> {
+  final _code = TextEditingController();
+
+  @override
+  void dispose() {
+    _code.dispose();
+    super.dispose();
+  }
+
+  Future<void> _find() async {
+    FocusScope.of(context).unfocus();
+    await ref.read(joinChurchControllerProvider.notifier).lookup(_code.text);
+  }
+
+  Future<void> _join() =>
+      ref.read(joinChurchControllerProvider.notifier).confirm();
+
+  void _notMyChurch() =>
+      ref.read(joinChurchControllerProvider.notifier).reset();
+
+  @override
+  Widget build(BuildContext context) {
     final profile = ref.watch(myProfileProvider).value;
     final signingOut = ref.watch(authControllerProvider).isLoading;
+    final join = ref.watch(joinChurchControllerProvider);
+
+    final steps = onboardingSteps(OnboardingStage.join);
 
     return AppScaffold(
       child: Column(
@@ -48,36 +79,31 @@ class JoinChurchPage extends ConsumerWidget {
           Text('Join your church', style: AppTypography.pageTitle),
           const SizedBox(height: AppSpacing.xxs),
           Text(
-            'Your Discipleship Coordinator gives you a join code. Once they '
-            'approve you, your D Group, lessons and gatherings appear here.',
+            'Your church gives you a join code. Once your request is '
+            'approved, your D Group, lessons and gatherings appear here.',
             style: context.supportingStyle,
           ),
           const SizedBox(height: AppSpacing.lg),
 
-          const StepList(
-            steps: [
-              StepItem(
-                title: 'Create your account',
-                subtitle: 'Done',
-                state: StepProgress.done,
-              ),
-              StepItem(
-                title: 'Enter your join code',
-                subtitle: 'Ask your Coordinator for your church code.',
-                state: StepProgress.current,
-                detail: _JoinCodeCard(),
-              ),
-              StepItem(
-                title: 'Confirm your church',
-                subtitle: 'Check the church name before you send a request.',
-                state: StepProgress.upcoming,
-              ),
-              StepItem(
-                title: 'Coordinator approval',
-                subtitle: 'You get full access once your request is approved.',
-                state: StepProgress.upcoming,
-              ),
-            ],
+          OnboardingTimeline(
+            steps: steps,
+            detailFor: (step) => step.title == 'Join church'
+                ? (join.phase == JoinPhase.found ||
+                          join.phase == JoinPhase.submitting
+                      ? _ChurchFoundCard(
+                          churchName: join.church!.name,
+                          error: join.error,
+                          isSubmitting: join.phase == JoinPhase.submitting,
+                          onJoin: _join,
+                          onNotMyChurch: _notMyChurch,
+                        )
+                      : _JoinCodeCard(
+                          controller: _code,
+                          error: join.error,
+                          isLookingUp: join.phase == JoinPhase.lookingUp,
+                          onFind: _find,
+                        ))
+                : null,
           ),
 
           const SizedBox(height: AppSpacing.xl),
@@ -95,10 +121,104 @@ class JoinChurchPage extends ConsumerWidget {
   }
 }
 
-/// The current step's action. Disabled, with the reason stated, until the
-/// join-code operations exist.
+/// Uppercases as you type and drops anything outside the code alphabet or a
+/// separator, so what is shown is what will be sent.
+class _JoinCodeFormatter extends TextInputFormatter {
+  const _JoinCodeFormatter();
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final buffer = StringBuffer();
+    for (final rune in newValue.text.runes) {
+      final char = String.fromCharCode(rune);
+      if (isJoinCodeCharacter(char)) {
+        buffer.write(char.toUpperCase());
+      } else if (char == ' ' || char == '-') {
+        buffer.write(char);
+      }
+    }
+    final text = buffer.toString();
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+  }
+}
+
+/// Step 3's action while no church has been found yet.
 class _JoinCodeCard extends StatelessWidget {
-  const _JoinCodeCard();
+  const _JoinCodeCard({
+    required this.controller,
+    required this.error,
+    required this.isLookingUp,
+    required this.onFind,
+  });
+
+  final TextEditingController controller;
+  final String? error;
+  final bool isLookingUp;
+  final VoidCallback onFind;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      fill: AppCardFill.plain,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (error != null) ...[
+            InlineError(message: error!),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+          AppTextField(
+            label: 'JOIN CODE',
+            controller: controller,
+            hint: 'e.g. ABCD2EFGH3',
+            enabled: !isLookingUp,
+            keyboardType: TextInputType.visiblePassword,
+            textInputAction: TextInputAction.search,
+            textCapitalization: TextCapitalization.characters,
+            autofillHints: const [],
+            inputFormatters: const [_JoinCodeFormatter()],
+            textStyle: AppTypography.body.copyWith(
+              fontSize: 20,
+              letterSpacing: 3,
+              fontWeight: FontWeight.w600,
+            ),
+            onSubmitted: (_) => onFind(),
+          ),
+          AppButton(
+            label: 'Find church',
+            icon: Icons.search_rounded,
+            isLoading: isLookingUp,
+            onPressed: isLookingUp ? null : onFind,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Step 3's confirmation once the code resolved. The person confirms the
+/// church by name before any request exists.
+class _ChurchFoundCard extends StatelessWidget {
+  const _ChurchFoundCard({
+    required this.churchName,
+    required this.error,
+    required this.isSubmitting,
+    required this.onJoin,
+    required this.onNotMyChurch,
+  });
+
+  final String churchName;
+  final String? error;
+  final bool isSubmitting;
+  final VoidCallback onJoin;
+  final VoidCallback onNotMyChurch;
 
   @override
   Widget build(BuildContext context) {
@@ -111,25 +231,58 @@ class _JoinCodeCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (error != null) ...[
+            InlineError(message: error!),
+            const SizedBox(height: AppSpacing.sm),
+          ],
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.key_outlined, size: 20),
-              const SizedBox(width: AppSpacing.xs),
+              const Icon(Icons.church_outlined, size: 22),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Text(
-                  'Joining by code is not available in this build yet.',
-                  style: AppTypography.supporting.copyWith(
-                    color: fill.foreground(p),
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Church found',
+                      style: AppTypography.caption.copyWith(
+                        color: fill.foregroundMuted(p),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      churchName,
+                      style: AppTypography.sectionTitle.copyWith(
+                        color: fill.foreground(p),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          const AppButton(
-            label: 'Enter join code',
-            icon: Icons.lock_outline,
-            onPressed: null,
+          Text(
+            'Is this your church? Your request goes to its leaders for '
+            'approval.',
+            style: AppTypography.supporting.copyWith(
+              color: fill.foregroundMuted(p),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          AppButton(
+            label: 'Join church',
+            icon: Icons.check_rounded,
+            isLoading: isSubmitting,
+            onPressed: isSubmitting ? null : onJoin,
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          AppButton(
+            label: 'Not my church',
+            variant: AppButtonVariant.text,
+            onPressed: isSubmitting ? null : onNotMyChurch,
           ),
         ],
       ),

@@ -10,6 +10,11 @@ import '../../profile/application/profile_providers.dart';
 /// Combining auth, profile and membership here keeps the redirect logic a pure
 /// function of a single enum, which makes it directly unit-testable and keeps
 /// the router free of async handling.
+///
+/// Email verification is deliberately not a state here. Supabase issues no
+/// session until the email is confirmed, so an unverified person is
+/// [signedOut]; the verification screen is a sign-out-side flow reached from
+/// sign-up or sign-in.
 enum SessionState {
   /// Still resolving. The router shows the splash and **never** the sign-in
   /// screen, which is what prevents a wrong-screen flash during restoration.
@@ -17,12 +22,16 @@ enum SessionState {
 
   signedOut,
 
-  /// Authenticated but has not joined a church. Every user is here in this
-  /// milestone, since joining arrives in a later slice.
+  /// Authenticated but has not joined a church. MVP_SPEC section 11: enter the
+  /// join code, confirm the church, request membership.
   noMembership,
 
   /// RBAC section 1a: onboarding state only.
   pending,
+
+  /// ACTIVE for the first time and the one-time welcome has not been
+  /// completed. `church_memberships.onboarding_completed_at` is null.
+  activeFirstEntry,
 
   /// RBAC section 1a: normal access.
   active,
@@ -41,6 +50,7 @@ SessionState resolveSessionState({
   required bool isLoading,
   required bool hasError,
   required MembershipStatus? membershipStatus,
+  bool onboardingCompleted = false,
 }) {
   if (!hasSession) return SessionState.signedOut;
 
@@ -51,7 +61,8 @@ SessionState resolveSessionState({
   return switch (membershipStatus) {
     null => SessionState.noMembership,
     MembershipStatus.pending => SessionState.pending,
-    MembershipStatus.active => SessionState.active,
+    MembershipStatus.active =>
+      onboardingCompleted ? SessionState.active : SessionState.activeFirstEntry,
     MembershipStatus.inactive ||
     MembershipStatus.transferred ||
     MembershipStatus.archived => SessionState.noAccess,
@@ -70,5 +81,6 @@ final sessionStateProvider = Provider<SessionState>((ref) {
     isLoading: profile.isLoading || membership.isLoading,
     hasError: profile.hasError || membership.hasError,
     membershipStatus: membership.value?.status,
+    onboardingCompleted: membership.value?.onboardingCompletedAt != null,
   );
 });

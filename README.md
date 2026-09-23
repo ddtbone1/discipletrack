@@ -8,7 +8,7 @@ The system is designed so that a member cannot disengage without a named person 
 
 ## Status
 
-Pre-implementation. The repository currently contains the engineering specification and a default Flutter scaffold. Application code, database migrations, RLS policies and RPCs have not been written.
+Implementation in vertical slices. Auth + Profile is complete; Church Join + Membership Approval + First Entry is implemented and under review. Local setup is described in `config/README.md`.
 
 ## Platform
 

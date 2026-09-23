@@ -4,7 +4,9 @@ Instructions for anyone working in this repository, human or AI agent.
 
 ## Current phase
 
-Pre-implementation. Application code, Supabase migrations, RLS policies and RPCs have not been written yet.
+Implementation, in vertical slices. Completed: Auth + Profile (migrations 001 to 003). In review: Church Join + Membership Approval + First Entry (migrations 004 and 005, bootstrap, seed). Not started: D Groups, discipleship meetings, attendance, progress, monitoring, follow-ups, announcements.
+
+Applied migrations are immutable. Any schema change goes in a new migration.
 
 The specification has been through audit and resolution passes, but treat it as reviewable rather than infallible. If you find a contradiction, report it instead of choosing a side. See the rules below.
 

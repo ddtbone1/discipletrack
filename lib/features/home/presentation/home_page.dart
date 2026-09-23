@@ -13,8 +13,10 @@ import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/info_group.dart';
 import '../../appearance/presentation/theme_mode_toggle.dart';
 import '../../auth/application/auth_providers.dart';
+import '../../membership/application/membership_providers.dart';
 import '../../membership/domain/church_membership.dart';
 import '../../membership/presentation/membership_status_pill.dart';
+import '../../membership_review/application/membership_review_providers.dart';
 import '../../profile/application/profile_providers.dart';
 
 /// Home for an ACTIVE church member.
@@ -24,13 +26,23 @@ import '../../profile/application/profile_providers.dart';
 /// arrive with the features that produce the data. This screen shows only
 /// facts that actually exist, rather than placeholder metrics standing in for
 /// information the database does not yet hold.
+///
+/// Admins and Coordinators additionally see the membership-request entry
+/// point. Showing it is presentation; the database checks the same authority
+/// on every approval call.
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(myProfileProvider).value;
+    final church = ref.watch(myChurchProvider).value;
+    final canReview = ref.watch(canReviewMembershipsProvider);
     final signingOut = ref.watch(authControllerProvider).isLoading;
+
+    final pendingCount = canReview
+        ? ref.watch(pendingMembershipRequestsProvider).value?.length
+        : null;
 
     return AppScaffold(
       child: Column(
@@ -39,7 +51,9 @@ class HomePage extends ConsumerWidget {
           const SizedBox(height: AppSpacing.md),
           AppPageHeader(
             greeting: 'Hello, ${profile?.firstName ?? 'friend'}',
-            subtitle: 'Welcome to your church workspace',
+            subtitle: church == null
+                ? 'Welcome to your church workspace'
+                : 'Welcome to ${church.name}',
             onAvatarTap: () => context.go(Routes.profile),
             actions: const [ThemeModeToggle()],
             // The router only sends ACTIVE memberships here.
@@ -49,6 +63,25 @@ class HomePage extends ConsumerWidget {
 
           const _JourneyCard(),
           const SizedBox(height: AppSpacing.xl),
+
+          if (canReview) ...[
+            InfoGroup(
+              title: 'Church',
+              rows: [
+                InfoRow(
+                  label: 'Membership requests',
+                  value: pendingCount == null
+                      ? null
+                      : (pendingCount == 0
+                            ? 'None waiting'
+                            : '$pendingCount waiting'),
+                  icon: Icons.how_to_reg_outlined,
+                  onTap: () => context.push(Routes.pendingMembers),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+          ],
 
           InfoGroup(
             title: 'Account',

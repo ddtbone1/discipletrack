@@ -360,6 +360,29 @@ Table churches {
 
   A join code must never grant privileged roles automatically.
 
+  join_code format (DATABASE_CONSTRAINTS.md section 1):
+
+  ^[A-HJ-NP-Z2-9]{10}$
+
+  Ten characters from a 32-symbol alphabet that excludes I, O, 0 and 1.
+  Enforced by CHECK churches_join_code_format_check. Generated
+  cryptographically by private.generate_join_code(); bootstrap and
+  future regeneration validate any supplied code against the same
+  pattern.
+
+  join_code is never readable by a client. Column-level SELECT for
+  authenticated covers id, name and status only; anon has no grant.
+  Lookup happens inside lookup_church_by_join_code(), which returns
+  only id and name.
+
+  join_code_updated_at records when the current code was set, at
+  bootstrap or by a later regeneration.
+
+  Row visibility: a person sees their own church only, while their
+  membership there is PENDING or ACTIVE (RBAC section 1a). A PENDING
+  member reads the name of the church they requested and nothing
+  else about it.
+
   status ACTIVE → ARCHIVED is the only transition. ARCHIVED is terminal
   in the MVP and means the workspace is closed; it is not a normal
   single-church operation.
@@ -384,6 +407,8 @@ Table church_memberships {
   approved_by uuid
   approved_at timestamptz
 
+  onboarding_completed_at timestamptz
+
   created_at timestamptz [not null]
   updated_at timestamptz [not null]
 
@@ -393,6 +418,32 @@ Table church_memberships {
 
   Note: '''
   Represents a user's long-lived membership in a church.
+
+  Field semantics (DATABASE_CONSTRAINTS.md section 1):
+
+  created_at
+  → when the join request was made
+
+  joined_at
+  → the first time the membership became ACTIVE; never overwritten
+    by a later reactivation or reinstatement
+
+  approved_by / approved_at
+  → the approver and the moment of approval, written only by
+    approve_church_membership(); NULL on rejection and on the
+    bootstrap membership, which is provisioned rather than approved
+
+  onboarding_completed_at
+  → when the member completed the one-time first-entry welcome, set
+    once by complete_onboarding(); NULL until then. Server-backed so a
+    reinstall or another device never replays the welcome. Not reset
+    by reactivation.
+
+  Writes happen only through controlled operations:
+  request_join_church(), approve_church_membership(),
+  reject_church_membership(), complete_onboarding() and the future
+  membership-management operations. Clients have no INSERT or UPDATE
+  path.
 
   This becomes the stable ministry identity used by domains such as:
 
@@ -1626,6 +1677,46 @@ Table audit_events {
   voided_by
 
   Audit events supplement domain history rather than replacing it.
+  '''
+}
+
+
+// ============================================================
+// 22. PRIVATE SCHEMA: JOIN CODE ATTEMPTS
+// ============================================================
+//
+// The `private` schema holds database objects that must never have
+// a PostgREST endpoint: bootstrap, RLS helper functions and the
+// rate-limit state below. It is not listed in the API schemas.
+// ============================================================
+
+Table private.join_code_attempts {
+  id uuid [pk]
+
+  user_id uuid [not null]
+
+  kind varchar [not null, note: 'LOOKUP or REQUEST']
+
+  attempted_at timestamptz [not null]
+
+  indexes {
+    (user_id, attempted_at)
+  }
+
+  Note: '''
+  Security infrastructure, not domain data.
+
+  One row per join-code lookup or join request by an authenticated
+  user. lookup_church_by_join_code() and request_join_church() refuse
+  with PT429 when the caller has 5 attempts of any kind in the last
+  10 minutes, or 3 REQUEST attempts in the last hour
+  (DATABASE_CONSTRAINTS.md section 1).
+
+  user_id is the auth user id with no foreign key, so the log never
+  blocks account deletion. Rows older than 24 hours are pruned
+  opportunistically on each call.
+
+  RLS is enabled with no policies and no client role holds any grant.
   '''
 }
 

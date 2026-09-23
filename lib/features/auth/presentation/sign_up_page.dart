@@ -20,6 +20,10 @@ import '../data/auth_repository.dart';
 /// `handle_new_user` trigger reads it to create the profiles row. This screen
 /// never inserts into `profiles`, and the database rejects a blank name
 /// independently of the validation below.
+///
+/// With email confirmation on, a successful sign-up issues no session. The
+/// person is taken to the verification screen with their address, and the
+/// router only admits them once the code is accepted.
 class SignUpPage extends ConsumerStatefulWidget {
   const SignUpPage({super.key});
 
@@ -35,6 +39,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   String? _nameError;
   String? _emailError;
   String? _passwordError;
+  String? _notice;
   bool _obscure = true;
 
   /// Matches `auth.minimum_password_length` in supabase/config.toml.
@@ -60,6 +65,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
       _passwordError = password.length < _minPasswordLength
           ? 'Use at least $_minPasswordLength characters'
           : null;
+      _notice = null;
     });
     return _nameError == null && _emailError == null && _passwordError == null;
   }
@@ -67,14 +73,31 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   Future<void> _submit() async {
     if (!_validate()) return;
     FocusScope.of(context).unfocus();
-    await ref
+    final outcome = await ref
         .read(authControllerProvider.notifier)
         .signUp(
           email: _email.text,
           password: _password.text,
           fullName: _fullName.text,
         );
-    // The router redirects on success.
+    if (!mounted) return;
+
+    switch (outcome) {
+      case SignUpVerificationRequired(:final email):
+        ref.read(pendingVerificationProvider.notifier).set(email);
+        context.go(Routes.verifyEmail);
+      case SignUpAlreadyRegistered():
+        setState(() {
+          _notice =
+              'An account with that email already exists. Sign in instead, '
+              'or verify it if you never finished.';
+        });
+      case SignUpSignedIn():
+      case null:
+        // A session appeared (the router redirects) or the controller holds
+        // the failure for the banner below.
+        break;
+    }
   }
 
   @override
@@ -104,6 +127,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                   ? failure.message
                   : 'Something went wrong. Please try again.',
             ),
+            const SizedBox(height: AppSpacing.md),
+          ] else if (_notice != null) ...[
+            InlineError(message: _notice!),
             const SizedBox(height: AppSpacing.md),
           ],
 
