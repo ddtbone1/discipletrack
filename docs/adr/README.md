@@ -20,8 +20,9 @@ ADRs explain why a decision exists so future developers and AI coding agents can
 | ADR-004 | RBAC and Row Level Security | Accepted |
 | ADR-005 | Controlled Database Operations | Accepted |
 | ADR-006 | Historical Record Strategy | Accepted |
-| ADR-007 | Server-Side Monitoring | Accepted |
+| ADR-007 | Server-Side Monitoring | Superseded by ADR-009 |
 | ADR-008 | Documentation Precedence and Schema Source of Truth | Accepted |
+| ADR-009 | Discipleship Meeting Attendance and Role-Specific Monitoring | Accepted |
 
 ## Rule
 

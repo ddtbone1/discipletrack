@@ -522,9 +522,11 @@ SUN  MON  TUE  WED  THU  FRI  SAT
 The selected day may display:
 
 - gatherings
-- discipleship meetings
+- recorded discipleship meetings
 - activity
-- relevant scheduled items
+
+DiscipleTrack does not schedule discipleship meetings. A date strip
+shows what was recorded, not planned meetups.
 
 Do not display a date strip merely because it is visually attractive.
 
@@ -622,7 +624,8 @@ The Disciple Home should emphasize:
 - current discipleship journey
 - current lesson
 - meeting progress
-- attendance
+- meeting history
+- gathering attendance, as secondary information
 - D Group
 - Discipler
 - announcements
@@ -641,11 +644,12 @@ Greeting
 
 ## 25. Discipler Home
 
-The Discipler Home should emphasize:
+The Discipler experience is action-oriented. The Discipler Home should
+emphasize:
 
-- assigned Disciples
+- assigned Disciples, each with current lesson and meeting progress
+- Record Meeting
 - members requiring attention
-- current lesson progress
 - follow-ups
 - recent activity
 - D Group context
@@ -655,20 +659,71 @@ The screen should help answer:
 
 "Who needs me today?"
 
+Workflow:
+
+My Disciples
+→ Disciple Detail
+→ Current Lesson
+→ Record Meeting
+→ Meeting History
+→ Progress
+
+Record Meeting records what happened after a meetup the Discipler and
+Disciple arranged themselves. It is not a scheduling or calendar
+feature. Do not expose database terminology. A simple form is:
+
+Record Meeting
+
+What happened?
+- Meeting held
+- Meetup missed
+
+followed by the lesson (prefilled from the current lesson), the date
+(not in the future), the expected Disciple(s), each person's outcome
+(Present, Late, Absent or Excused), and optional shared notes.
+
+Use "Record Meeting" as the primary action, not "Add Attendance".
+
 ---
 
 ## 26. D Group Leader Home
 
-The D Group Leader experience should emphasize:
+The D Group Leader experience is oversight-oriented. It is not an
+attendance-entry workspace. It should emphasize:
 
 - D Group health
-- Disciplers
-- Disciples
-- attendance
+- discipleship progress per Disciple
+- meeting consistency: last meeting, missed meetups
+- Disciplers, and how recently their Disciples met
 - members requiring attention
 - lessons awaiting confirmation
 - follow-ups
-- recent activity
+- recent discipleship activity
+- gathering attendance, as secondary information
+
+Example Disciple summary:
+
+Juan Dela Cruz
+Lesson 4
+3 / 4 meetings
+Last meeting: Sep 20
+1 missed meetup
+Needs attention: No
+
+Workflow:
+
+Dashboard / D Group
+→ Progress overview
+→ Meeting consistency
+→ Needs attention
+→ Member detail
+  → Journey
+  → Current Lesson
+  → Meeting History
+  → Follow-up / care
+
+Fallback meeting recording, where a Leader records on behalf of a
+Discipler, belongs inside Member detail, not on the dashboard.
 
 ---
 
@@ -681,9 +736,16 @@ The Coordinator experience should emphasize:
 - members requiring attention
 - unresolved/overdue follow-ups
 - unassigned members
-- discipleship progress
+- discipleship progress and meeting consistency
 - promotion eligibility
 - announcements
+
+Workflow:
+
+Oversight
+→ Groups / people needing attention
+→ Progress
+→ Follow-ups
 
 Avoid turning the Coordinator screen into a dense desktop-style
 analytics dashboard.
@@ -742,6 +804,7 @@ Progress must clearly communicate:
 - lessons completed
 - current lesson
 - meetings completed
+- missed meetups, as consistency information rather than progress
 - lessons not started
 - lesson ready for completion
 - overall journey progress
@@ -806,7 +869,8 @@ The timeline should make the journey feel sequential and understandable.
 
 ## 33. Meeting Progress
 
-The four required meetings should use a consistent visual component.
+The required meetings should use a consistent visual component. The
+number comes from the lesson's required_meetings, not a hard-coded four.
 
 Example:
 
@@ -820,6 +884,23 @@ Completed
 Current
 Remaining
 
+Missed meetups are not progress. They never fill a meeting marker. Show
+them in meeting history, for example:
+
+Lesson 1
+Meeting 1       Present   Counted
+Meeting 2       Present   Counted
+Missed meetup   Absent    Not counted
+Meeting 3       Present   Counted
+Meeting 4       Present   Counted
+
+Once the requirement is reached, more meetings may be recorded while the
+lesson awaits confirmation. Do not display counts such as "5/4". Prefer:
+
+Requirement reached
+5 meetings recorded
+Awaiting Leader confirmation
+
 The same component should be reused wherever meeting progress appears.
 
 ---
@@ -831,6 +912,7 @@ Activity timelines are an important DiscipleTrack pattern.
 They may represent events such as:
 
 - lesson meeting recorded
+- missed meetup recorded
 - lesson completed
 - D Group attendance
 - follow-up created
@@ -842,6 +924,9 @@ Example:
 
 Today
 ● Lesson 6 — Meeting 3/4 recorded
+│
+Sep 21
+● Lesson 6: Missed meetup
 │
 Sep 20
 ● Follow-up resolved

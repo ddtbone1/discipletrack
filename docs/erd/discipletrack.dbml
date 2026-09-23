@@ -13,6 +13,13 @@
 // - Discipleship Progress review
 // - Monitoring / Follow-up review
 //
+// Revised by the Discipleship Meeting Attendance revision
+// (ADR-009): meeting participant attendance outcomes, the
+// RECORDED participation state, role-specific monitoring sources
+// and CONSECUTIVE_MISSED_MEETINGS. Applied migrations are not
+// rewritten; the revision reaches the database through a new
+// migration in the Discipleship Meeting + Progress slice.
+//
 // ============================================================
 
 
@@ -177,6 +184,9 @@ Enum gathering_status {
 }
 
 
+// Shared by gathering_attendance and discipleship_meeting_participants.
+// The values mean the same thing in both domains. See
+// DATABASE_CONSTRAINTS.md section 11 for how each domain uses them.
 Enum attendance_status {
   PRESENT
   ABSENT
@@ -198,8 +208,15 @@ Enum discipleship_meeting_status {
 }
 
 
+// Record validity only, mirroring discipleship_meeting_status.
+// Whether a participation earns progress credit is derived from this
+// state together with attendance_status; see
+// discipleship_meeting_participants.
+//
+// RECORDED was named COUNTED in ERD v2 and in Migration 001. The rename
+// happens in a new migration; Migration 001 is not rewritten.
 Enum meeting_participation_status {
-  COUNTED
+  RECORDED
   VOIDED
 }
 
@@ -218,8 +235,16 @@ Enum attention_condition_status {
 }
 
 
+// Monitoring sources are role-specific (ADR-009):
+//
+// CONSECUTIVE_ABSENCE
+// → D Group gathering attendance, LEADER and DISCIPLER subjects only
+//
+// CONSECUTIVE_MISSED_MEETINGS
+// → discipleship meeting participant outcomes, DISCIPLE subjects only
 Enum attention_condition_type {
   CONSECUTIVE_ABSENCE
+  CONSECUTIVE_MISSED_MEETINGS
 }
 
 
@@ -232,6 +257,7 @@ Enum follow_up_status {
 
 Enum follow_up_reason {
   CONSECUTIVE_ABSENCE
+  CONSECUTIVE_MISSED_MEETINGS
 }
 
 
@@ -636,6 +662,15 @@ Table d_group_gatherings {
 
   This is separate from a Discipleship Meeting.
 
+  Real-world meaning: the D Group meeting together as a group. Gathering
+  attendance records the participation of ministry workers and group
+  members in that group context.
+
+  Gatherings are secondary to the core discipleship workflow. They do
+  not drive lesson progress, and they are not the discipleship
+  consistency signal for Disciples. Gathering-based absence monitoring
+  applies to LEADER and DISCIPLER responsibilities only (ADR-009).
+
   Lifecycle:
 
   DRAFT
@@ -727,11 +762,18 @@ Table gathering_attendance {
 
   ABSENT
   → unexplained absence
-  → contributes to consecutive absence monitoring
+  → contributes to consecutive absence monitoring where the member held
+    LEADER or DISCIPLER responsibility at the gathering
 
   EXCUSED
   → does not count as unexplained absence
   → breaks unexplained absence streak
+
+  Attendance is recorded for every eligible member, Disciples included,
+  and remains part of their attendance history. Gatherings at which the
+  member held DISCIPLE responsibility never create gathering-based
+  attention conditions. Disciples are monitored through discipleship
+  meeting outcomes instead.
 
   Attendance percentages and absence streaks are derived.
 
@@ -848,7 +890,13 @@ Table discipleship_meetings {
   updated_at timestamptz [not null]
 
   Note: '''
-  Represents one actual discipleship meeting.
+  Represents one discipleship meetup reported by the Discipler after
+  the fact, whether the meetup was held or missed.
+
+  Real-world meaning: the Discipler and assigned Disciple(s) arrange
+  their meetups themselves, outside the app. DiscipleTrack records what
+  actually happened. It does not schedule meetings, and no record exists
+  before the meetup.
 
   The meeting may be:
 
@@ -859,20 +907,46 @@ Table discipleship_meetings {
 
   - one responsible Discipler
   - one lesson
-  - one or more participating Disciples
+  - one or more expected Disciples, each with an attendance outcome
+    recorded in discipleship_meeting_participants
+
+  Held and missed are derived, not stored:
+
+  held meetup
+  → RECORDED meeting with at least one credited participant
+
+  missed meetup
+  → RECORDED meeting with no credited participant, for example a
+    one-on-one whose only participant is ABSENT or EXCUSED
 
   RECORDED:
   → meeting is valid
-  → COUNTED participants may contribute toward progress
+  → credited participants contribute toward progress
 
   VOIDED:
   → meeting remains historically preserved
-  → contributes nothing toward lesson progress
+  → contributes nothing toward lesson progress or monitoring
+
+  occurred_at is when the meetup took place, or for a missed meetup
+  when it was arranged to take place. It must not be in the future.
 
   Historical validity should use occurred_at rather than the date
   on which the record was entered.
 
   This allows legitimate backdated meeting entry.
+
+  The Discipler is the normal recorder. A Leader or Coordinator may
+  record on behalf of the responsible Discipler as a fallback;
+  recorded_by distinguishes who entered the record.
+
+  d_group_id, discipler_d_group_membership_id, lesson_id, occurred_at
+  and recorded_by are immutable. The only status transition is
+  RECORDED → VOIDED, which is terminal. Corrections use void and
+  re-record. See DATABASE_CONSTRAINTS.md section 4.
+
+  notes are shared meeting notes, visible to the meeting's
+  participants. Pastoral care observations belong in
+  follow_up_actions.
 
   occurred_at is immutable after creation. Every participant validity
   check is evaluated as of occurred_at, so editing it would silently
@@ -882,8 +956,9 @@ Table discipleship_meetings {
   The Discipler must have held the appropriate responsibility when
   the meeting actually occurred.
 
-  A meeting records exactly one lesson, so every COUNTED participant
-  must be eligible for that same lesson under sequential progression.
+  A meeting records exactly one lesson, so every RECORDED participant,
+  whatever their attendance outcome, must be eligible for that same
+  lesson under sequential progression.
 
   Disciples who are on different lessons therefore require separate
   discipleship meeting records. This is an intentional ministry
@@ -903,7 +978,9 @@ Table discipleship_meeting_participants {
 
   church_membership_id uuid [not null]
 
-  status meeting_participation_status [not null, default: 'COUNTED']
+  status meeting_participation_status [not null, default: 'RECORDED']
+
+  attendance_status attendance_status [not null, note: 'Explicit outcome; no default']
 
   voided_by uuid
   voided_at timestamptz
@@ -915,14 +992,52 @@ Table discipleship_meeting_participants {
   }
 
   Note: '''
-  Records exactly which Disciples participated in a meeting.
+  Records each Disciple who was expected at a meetup, and what
+  happened for that Disciple.
 
-  COUNTED:
-  → contributes one valid meeting toward that Disciple's lesson
+  "Expected" means listed by the recorder when the meetup is recorded.
+  There is no prior schedule.
+
+  Real-world meaning: discipleship meeting attendance records the
+  participation and consistency of Disciples in their lesson-based
+  discipleship meetings. It is separate from D Group gathering
+  attendance.
+
+  status is record validity only:
+
+  RECORDED:
+  → valid participant record
 
   VOIDED:
   → remains historically preserved
-  → does not contribute toward progress
+  → contributes nothing toward progress or monitoring
+
+  attendance_status is the outcome, supplied explicitly by the recorder:
+
+  PRESENT → credited
+  LATE    → credited
+  ABSENT  → not credited
+  EXCUSED → not credited
+
+  A participation is CREDITED, and contributes one meeting toward the
+  Disciple's lesson, only when:
+
+  - the meeting status is RECORDED
+  - the participant status is RECORDED
+  - attendance_status is PRESENT or LATE
+
+  An absence never increments progress. It remains visible in the
+  Disciple's meeting history and drives missed-meeting monitoring.
+
+  The meeting ordinal shown to users, such as "Meeting 3", is derived by
+  ordering credited participations for the lesson by
+  (occurred_at, meeting id). Uncredited rows are not numbered.
+
+  church_membership_id, attendance_status and the parent context are
+  immutable. The only transition is RECORDED → VOIDED. An incorrect
+  outcome is corrected by voiding and re-recording the meeting. Because
+  (meeting_id, church_membership_id) is unique including VOIDED rows, a
+  voided participant is never re-added to the same meeting.
 
   Participant identity references church_membership_id rather than
   temporary D Group membership.
@@ -932,29 +1047,35 @@ Table discipleship_meeting_participants {
   - D Group transfer
   - Discipler reassignment
 
-  COUNTED participation is only valid when, as of the meeting's
-  occurred_at, the participant held an active DISCIPLE responsibility
-  in the meeting's D Group and an active discipler assignment to the
-  meeting's Discipler.
+  A RECORDED participant, whatever the outcome, is only valid when, as
+  of the meeting's occurred_at, the participant held an active DISCIPLE
+  responsibility in the meeting's D Group and an active discipler
+  assignment to the meeting's Discipler.
 
   A Disciple with no assigned Discipler therefore cannot receive
-  progress credit until an assignment exists.
+  progress credit, or have a missed meetup recorded, until an
+  assignment exists.
 
   See DATABASE_CONSTRAINTS.md section 4 for the exact rules.
 
   Example:
 
-  Mark teaches James and Anna Lesson 4.
+  Mark meets James and Anna for Lesson 4. James attends; Anna does not.
 
   Before:
 
   James = 2/4
   Anna  = 1/4
 
+  Recorded:
+
+  James PRESENT → credited
+  Anna  ABSENT  → not credited
+
   After:
 
   James = 3/4
-  Anna  = 2/4
+  Anna  = 1/4, one missed meetup in her history
 
   Their progress remains independent.
   '''
@@ -1005,7 +1126,7 @@ Table disciple_lesson_progress {
   Expected lifecycle:
 
   NOT_STARTED
-      ↓ first valid counted meeting
+      ↓ first credited participation
 
   IN_PROGRESS
       ↓ required meeting count reached
@@ -1015,7 +1136,14 @@ Table disciple_lesson_progress {
 
   COMPLETED
 
-  Meeting count itself is derived from valid meeting participation.
+  Meeting count itself is derived from credited meeting participation.
+  Missed meetups (ABSENT or EXCUSED) never advance progress.
+
+  Legitimate meetings may continue to be recorded for a lesson that is
+  READY_FOR_COMPLETION and awaiting confirmation. The credited count may
+  then exceed required_meetings, for example 5 credited against a
+  requirement of 4. The extra meeting is neither clamped nor discarded,
+  and the status remains READY_FOR_COMPLETION.
 
   A missing progress row may also be interpreted as NOT_STARTED
   during implementation, avoiding unnecessary empty rows.
@@ -1025,11 +1153,11 @@ Table disciple_lesson_progress {
   Timestamp semantics:
 
   started_at
-  → occurred_at of the earliest valid COUNTED participation for
+  → occurred_at of the earliest credited participation for
     this lesson
 
   ready_at
-  → the point at which the required valid meeting count is reached
+  → the point at which the required credited meeting count is reached
     according to the authoritative progression calculation
 
   Both are recomputed when backdated participation changes the
@@ -1037,16 +1165,17 @@ Table disciple_lesson_progress {
 
   COMPLETED is protected. An ordinary void must not retroactively
   invalidate a confirmed COMPLETED lesson. A void that would drop
-  valid COUNTED participation below required_meetings for a COMPLETED
+  credited participation below required_meetings for a COMPLETED
   lesson is rejected; an explicit controlled reopen operation must
-  run first.
+  run first. Voiding an uncredited (ABSENT or EXCUSED) row never
+  affects progress.
 
   Reopening never cascades. It is permitted only when no later lesson
   is COMPLETED for the same church membership and the person has not
   been promoted. completed_at and confirmed_by are cleared, and the
   prior confirmation stays recoverable through audit_events.
 
-  READY_FOR_COMPLETION may recompute back to IN_PROGRESS when valid
+  READY_FOR_COMPLETION may recompute back to IN_PROGRESS when credited
   participation falls below the requirement.
 
   Progression is sequential: lesson N requires lesson N-1 COMPLETED.
@@ -1136,9 +1265,20 @@ Table attention_conditions {
   Represents a system-detected condition requiring possible
   human attention.
 
-  Initial MVP condition:
+  MVP conditions, with role-specific sources (ADR-009):
 
   CONSECUTIVE_ABSENCE
+  → source: FINALIZED D Group gathering attendance
+  → subjects: LEADER and DISCIPLER responsibilities only
+  → episode: the current D Group membership episode
+
+  CONSECUTIVE_MISSED_MEETINGS
+  → source: discipleship meeting participant outcomes
+  → subjects: DISCIPLE responsibilities only
+  → episode: the current discipler assignment
+
+  Gathering attendance never creates a condition for a DISCIPLE
+  responsibility, so a Disciple has a single absence-condition stream.
 
   This table answers:
 
@@ -1148,14 +1288,15 @@ Table attention_conditions {
 
   Example:
 
-  James has 3 consecutive unexplained absences.
+  Juan, a Disciple, has 3 consecutive ABSENT meetup outcomes with his
+  Discipler.
 
   Monitoring creates:
 
-  CONSECUTIVE_ABSENCE
+  CONSECUTIVE_MISSED_MEETINGS
   ACTIVE
 
-  When attendance later breaks the streak:
+  When a later outcome breaks the streak:
 
   ACTIVE
       ↓
@@ -1168,9 +1309,12 @@ Table attention_conditions {
   A new episode may therefore generate a new follow-up even while an
   earlier follow-up is still unresolved.
 
-  A D Group transfer resolves any ACTIVE condition belonging to the
-  old episode, as part of the transfer transaction. The new episode
-  starts with a fresh streak.
+  Ending an episode resolves any ACTIVE condition belonging to it, in
+  the same transaction. For CONSECUTIVE_MISSED_MEETINGS that happens
+  when the discipler assignment ends, including through Discipler
+  reassignment, D Group transfer and promotion. For
+  CONSECUTIVE_ABSENCE it happens when the D Group membership episode
+  closes. The new episode starts with a fresh streak.
 
   metadata may contain supporting detection context, but must not
   replace normalized source records.
@@ -1250,6 +1394,10 @@ Table follow_ups {
 
   Subject is LEADER
   → Coordinator
+
+  Because monitoring sources are role-specific, the DISCIPLE branch is
+  reached by CONSECUTIVE_MISSED_MEETINGS and the DISCIPLER and LEADER
+  branches by CONSECUTIVE_ABSENCE.
 
   A follow-up is never assigned to its own subject. Where one person
   holds several responsibilities, the chain continues until a
@@ -1405,6 +1553,8 @@ Table church_settings {
 
   consecutive_absence_threshold integer [not null, default: 3]
 
+  consecutive_missed_meeting_threshold integer [not null, default: 3]
+
   follow_up_due_days integer
 
   created_at timestamptz [not null]
@@ -1413,9 +1563,16 @@ Table church_settings {
   Note: '''
   Stores church-level configurable business behavior.
 
-  Initial MVP default:
+  Initial MVP defaults:
 
   consecutive_absence_threshold = 3
+  → gathering-based CONSECUTIVE_ABSENCE (LEADER, DISCIPLER)
+
+  consecutive_missed_meeting_threshold = 3
+  → meeting-based CONSECUTIVE_MISSED_MEETINGS (DISCIPLE)
+
+  The two thresholds are independent because gatherings and
+  discipleship meetups have unrelated cadences.
 
   This prevents important business thresholds from being permanently
   hard-coded into Flutter.

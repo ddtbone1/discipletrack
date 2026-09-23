@@ -65,9 +65,9 @@ Initial domains include:
 - D Groups
 - D Group Assignments
 - D Group Gatherings
-- Attendance
+- Gathering Attendance
 - Curriculum
-- Discipleship Meetings
+- Discipleship Meetings and Meeting Attendance
 - Progress
 - Monitoring
 - Follow-ups
@@ -173,8 +173,8 @@ DiscipleTrack contains two distinct meeting concepts.
 Purpose:
 
 - overall group gathering
-- group participation
-- attendance monitoring
+- group participation of ministry workers and group members
+- absence monitoring for D Group Leaders and Disciplers
 
 Typical participants:
 
@@ -182,17 +182,29 @@ Typical participants:
 - Disciplers
 - Disciples
 
+Gatherings are secondary to the core discipleship workflow. They do not
+drive lesson progress, and gathering attendance never creates an
+attention condition for a Disciple.
+
 ### Discipleship Meeting
 
 Purpose:
 
 - work through a specific curriculum lesson
 - record individual discipleship progression
+- record Disciple attendance and consistency, including missed meetups
+- absence monitoring for Disciples
 
 Typical participants:
 
 - Discipler
 - assigned Disciple or small set of assigned Disciples
+
+The Discipler and Disciple arrange meetups themselves. DiscipleTrack
+records what happened afterwards and does not schedule meetings. A
+missed meetup is a recorded meeting whose participants were Absent or
+Excused; only Present or Late participation is credited toward the
+lesson.
 
 These concepts must not be merged simply because both are meetings.
 
@@ -204,20 +216,25 @@ Their lifecycle, permissions, data and business meaning differ.
 
 The church curriculum contains 12 ordered lessons.
 
-Each lesson requires four recorded Discipleship Meetings.
+Each lesson requires four credited Discipleship Meetings. The number is
+the lesson's required_meetings data, seeded as four.
 
 Conceptually:
 
 Lesson
-→ Meeting 1
-→ Meeting 2
-→ Meeting 3
-→ Meeting 4
+→ Meeting 1       Present   credited
+→ Meeting 2       Present   credited
+→ Missed meetup   Absent    not credited
+→ Meeting 3       Late      credited
+→ Meeting 4       Present   credited
 → Ready for Completion
 → Leader Confirmation
 → Completed
 
 The four meetings are specifically meetings working through that lesson.
+Missed meetups stay in the Disciple's history as consistency information
+but never advance progress. Additional meetings recorded while the lesson
+awaits confirmation are credited and not clamped.
 
 Reaching four meetings does not automatically complete the lesson.
 
@@ -332,14 +349,17 @@ Examples:
 
 - journey
 - current lesson
-- meeting progress
-- attendance
+- meeting progress and meeting history
+- gathering attendance
 - D Group
 - announcements
 
 ### Discipler
 
+Action-oriented:
+
 - assigned Disciples
+- Record Meeting
 - progress
 - follow-ups
 - attention states
@@ -347,20 +367,25 @@ Examples:
 
 ### D Group Leader
 
+Oversight-oriented, not an attendance-entry workspace:
+
 - D Group health
-- Disciplers
-- attendance
+- discipleship progress
+- meeting consistency
+- members needing attention
 - completion approvals
 - follow-ups
+- gathering attendance, as secondary information
 
 ### Coordinator
 
 - ministry-wide D Groups
-- attendance
-- progress
+- progress and meeting consistency
+- members needing attention
 - follow-ups
 - assignments
 - promotion eligibility
+- gathering attendance, as secondary information
 
 Role-aware presentation does not replace backend authorization.
 
@@ -473,10 +498,14 @@ Attendance Records
 → Attendance Percentage
 
 Gathering History
-→ Consecutive Absence Streak
+→ Consecutive Absence Streak (Leaders and Disciplers)
 
 Discipleship Meetings
 → Meeting 3/4
+
+Meeting Participant Outcomes
+→ Meeting Consistency, Last Meeting Date
+→ Consecutive Missed-Meeting Streak (Disciples)
 
 Lesson Completion Records
 → Curriculum Progress
@@ -493,22 +522,41 @@ their authoritative source must remain clear.
 
 Core monitoring is deterministic.
 
-Conceptually:
+Monitoring sources are role-specific (ADR-009).
 
-Finalized D Group Gathering
-→ Attendance Records
-→ Monitoring Rule
-→ Attention Condition
+Disciples:
+
+Recorded Discipleship Meeting
+→ Participant Outcomes
+→ Missed-Meeting Rule
+→ Attention Condition (CONSECUTIVE_MISSED_MEETINGS)
 → Follow-up
 → Responsible Person
 → Actions
 → Resolution
 
-Initial rule:
+D Group Leaders and Disciplers:
 
-Configured consecutive unexplained absence threshold
+Finalized D Group Gathering
+→ Attendance Records
+→ Absence Rule
+→ Attention Condition (CONSECUTIVE_ABSENCE)
+→ Follow-up
+→ Responsible Person
+→ Actions
+→ Resolution
+
+Gathering attendance never creates a condition for a Disciple.
+
+Initial rules:
+
+Configured consecutive threshold for each source
 (default 3)
 → Follow-up eligibility
+
+Monitoring only sees recorded meetups. Oversight views surface each
+Disciple's last meeting date, derived at read time, so that meetings
+which stop without being recorded are still visible.
 
 AI is not the source of truth for deterministic attendance conditions.
 
@@ -756,8 +804,8 @@ For critical journeys such as:
 Register
 → Join Church
 → Assignment
-→ D Group Gathering
-→ Attendance
+→ Discipleship Meetings with missed meetups
+→ Missed-Meeting Condition
 → Follow-up
 
 and:
@@ -766,6 +814,13 @@ Discipleship Meeting
 → 4/4
 → Leader Confirmation
 → Lesson Completion
+
+and:
+
+D Group Gathering
+→ Attendance
+→ Leader or Discipler Absence Condition
+→ Follow-up
 
 AI-generated implementation is not considered correct merely because it
 compiles.

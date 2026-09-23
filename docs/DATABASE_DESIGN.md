@@ -453,6 +453,8 @@ of those are final states. See the ERD for fields and
 DATABASE_CONSTRAINTS.md for the transition and state-consistency rules.
 
 Only finalized gatherings participate in official attendance monitoring.
+Gathering-based absence monitoring applies to Leaders and Disciplers only;
+Disciples are monitored through discipleship meeting outcomes (ADR-009).
 
 Cancellation exists so that a gathering which did not happen can be
 closed out without deleting the record or leaving it misleadingly in
@@ -497,7 +499,7 @@ gathering.
 
 ## 10.2 Attendance Semantics
 
-For monitoring:
+For gathering monitoring of Leaders and Disciplers:
 
 PRESENT
 → attended
@@ -584,7 +586,14 @@ scattered as magic numbers throughout Flutter.
 
 Purpose:
 
-Represents an actual one-on-one or small discipleship meeting.
+Represents one one-on-one or small-group discipleship meetup, reported
+by the Discipler after the fact, whether it was held or missed.
+DiscipleTrack does not schedule meetings (ADR-009).
+
+A missed meetup reuses this record rather than a separate table, because
+it has the same context as a held one: Discipler, D Group, lesson, time,
+validity rules and history. Held and missed are derived from participant
+outcomes.
 
 See the ERD for fields, including the RECORDED/VOIDED status and its
 void metadata.
@@ -606,17 +615,21 @@ meeting may involve a small group.
 
 Purpose:
 
-Records exactly which Disciples participated in a Discipleship Meeting.
+Records each Disciple expected at a Discipleship Meeting, with an
+explicit attendance outcome: Present, Late, Absent or Excused. Only
+Present and Late are credited toward the lesson. Participant status
+(RECORDED/VOIDED) is record validity only.
 
 Participants are referenced at church membership level so that credited
 progress survives D Group transfer and Discipler reassignment. See the
 ERD for fields and uniqueness.
 
 Participant validity is normative and is specified in
-DATABASE_CONSTRAINTS.md section 4 as rules P1 to P3. In summary, a
-counted participant must have been an active Disciple of the meeting's
-D Group and assigned to the meeting's Discipler at the time the meeting
-occurred. Only actual participants receive progress.
+DATABASE_CONSTRAINTS.md section 4 as rules P1 to P3. In summary, every
+listed participant, whatever the outcome, must have been an active
+Disciple of the meeting's D Group and assigned to the meeting's Discipler
+at the time the meeting occurred. Only credited participants receive
+progress.
 
 Example:
 
@@ -632,8 +645,9 @@ Participants:
 James
 Anna
 
-This creates one meeting but contributes one Lesson 4 meeting toward
-James and one toward Anna.
+If both are Present, this creates one meeting but contributes one
+Lesson 4 meeting toward James and one toward Anna. If Anna is Absent,
+only James is credited, and Anna's missed meetup remains in her history.
 
 ---
 
@@ -645,11 +659,11 @@ Example before a shared meeting:
 
 James
 Lesson 4
-2 valid meetings
+2 credited meetings
 
 Anna
 Lesson 4
-1 valid meeting
+1 credited meeting
 
 Mark conducts one Lesson 4 meeting with both.
 
@@ -689,7 +703,7 @@ See the ERD for fields, statuses and uniqueness.
 Expected lifecycle:
 
 NOT_STARTED
-    ↓ first valid meeting
+    ↓ first credited meeting
 
 IN_PROGRESS
     ↓ required meeting count reached
@@ -714,11 +728,12 @@ for:
 
 - the Disciple
 - the lesson
-- valid meeting records
+- credited participation: RECORDED meeting, RECORDED participant,
+  outcome Present or Late
 
 Example:
 
-COUNT(valid Lesson 4 participation records) = 3
+COUNT(credited Lesson 4 participation records) = 3
 
 UI:
 
@@ -772,7 +787,8 @@ progress, which makes it a controlled operation rather than a row
 constraint, and lets the operation return a usable error.
 
 Because a meeting records exactly one lesson, this also means every
-counted participant in a meeting must be on that same lesson.
+participant listed in a meeting, whatever the outcome, must be on that
+same lesson.
 
 There is no Coordinator sequencing override in the MVP. A correction or
 migration workflow is documented future scope.
@@ -851,9 +867,12 @@ Proposed fields:
 - metadata JSONB nullable
 - created_at TIMESTAMPTZ
 
-Initial condition type:
+MVP condition types, with role-specific sources (ADR-009):
 
-- CONSECUTIVE_ABSENCE
+- CONSECUTIVE_ABSENCE, from gathering attendance, for Leaders and
+  Disciplers
+- CONSECUTIVE_MISSED_MEETINGS, from discipleship meeting outcomes, for
+  Disciples
 
 Possible future types:
 
@@ -903,7 +922,8 @@ rather than requiring an independently synchronized OVERDUE state.
 
 # 24. Follow-up Assignment
 
-Monitoring covers Leaders, Disciplers and Disciples, so the assignment
+Monitoring covers Leaders and Disciplers through gathering attendance
+and Disciples through discipleship meeting outcomes, so the assignment
 rule needs more than one rung. Responsibility is resolved through an
 escalation chain that always lands on someone other than the person the
 follow-up concerns, terminating at the Coordinator.
@@ -1038,13 +1058,15 @@ Proposed fields:
 
 - church_id UUID PK/FK
 - consecutive_absence_threshold INTEGER
+- consecutive_missed_meeting_threshold INTEGER
 - follow_up_due_days INTEGER nullable
 - created_at TIMESTAMPTZ
 - updated_at TIMESTAMPTZ
 
-Initial default:
+Initial defaults:
 
 consecutive_absence_threshold = 3
+consecutive_missed_meeting_threshold = 3
 
 This prevents important business thresholds from being permanently
 hard-coded into Flutter.

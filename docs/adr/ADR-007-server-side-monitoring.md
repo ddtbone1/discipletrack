@@ -2,7 +2,14 @@
 
 ## Status
 
-Accepted
+Superseded by [ADR-009](ADR-009-discipleship-meeting-attendance-monitoring.md)
+
+ADR-009 carries forward this ADR's server-side, deterministic,
+idempotent and episode-scoped monitoring principles. It replaces the
+gathering-only monitoring source below with role-specific sources:
+gathering attendance for Leaders and Disciplers, discipleship meeting
+outcomes for Disciples. The text below is preserved as historical
+record and is no longer authoritative.
 
 ## Context
 

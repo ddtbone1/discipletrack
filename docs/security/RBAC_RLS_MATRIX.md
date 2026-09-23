@@ -148,7 +148,9 @@ D Group responsibility. This is a valid state, not a stored role.
 | Finalize attendance | No | Yes | Own D Group | No | No | No |
 | Cancel gathering | No | Yes | Own D Group | No | No | No |
 | View attendance | No | Church-wide | Own D Group | Own D Group | Self | No |
-| Log discipleship meeting | No | Yes | Own D Group | Assigned Disciples | No | No |
+| Record discipleship meeting, held or missed | No | Fallback | Fallback, own D Group | Assigned Disciples | No | No |
+| Void discipleship meeting or participant | No | Yes | Own D Group | Self-recorded | No | No |
+| View discipleship meeting history | No | Church-wide | Own D Group | Own Discipler meetings | Self | No |
 | View progress | No | Church-wide | Own D Group | Assigned Disciples | Self | No |
 | Confirm lesson completion | No | Oversight | Own D Group | No | No | No |
 | Reopen lesson completion | No | Yes | No | No | No | No |
@@ -166,9 +168,31 @@ Notes on specific cells:
 *Manage church configuration* covers church identity, join code and
 system-level configuration. *Manage ministry settings* covers
 church_settings values that govern ministry behaviour, currently
-consecutive_absence_threshold and follow_up_due_days. Ministry setting
+consecutive_absence_threshold, consecutive_missed_meeting_threshold and
+follow_up_due_days. Ministry setting
 changes are audited. ADMIN retains read access to church_settings where
 operationally necessary.
+
+*Record discipleship meeting* covers held meetups and missed meetups,
+including each participant's attendance outcome. The Discipler is the
+normal recorder. COORDINATOR and LEADER may record on behalf of the
+responsible Discipler as a fallback; recorded_by shows who entered it.
+DiscipleTrack does not schedule meetings, so there is no capability to
+create a meeting before it happens.
+
+*Void discipleship meeting or participant* shows "Self-recorded" for
+DISCIPLER: a Discipler may void a meeting, or a participant outcome,
+whose recorded_by is themselves and whose
+discipler_d_group_membership_id is their own active DISCIPLER
+membership. LEADER and COORDINATOR retain oversight and fallback void
+authority. Every void is audited and remains subject to COMPLETED
+protection. Corrections are void and re-record; meeting and outcome
+history is never edited.
+
+*View discipleship meeting history* shows "Self" for DISCIPLE: a
+Disciple sees the meetings in which they are a participant, including
+their own missed-meetup outcomes. No Disciple may record, confirm or
+change their own meeting outcome.
 
 *Confirm lesson completion* and *Create D Group announcement* show
 "Oversight" for COORDINATOR. The D Group Leader is the normal authority
@@ -517,13 +541,15 @@ SELECT:
 - COORDINATOR → church-wide
 - LEADER → meetings whose d_group_id is own D Group
 - DISCIPLER → meetings recorded under own D Group membership
-- DISCIPLE → meetings in which they participated
+- DISCIPLE → meetings in which they are a participant, whatever the
+  outcome, so a Disciple sees their own missed meetups
 
-INSERT:
+INSERT (record_discipleship_meeting(), held or missed):
 
-- COORDINATOR
-- LEADER for own D Group
-- DISCIPLER for assigned Disciples
+- DISCIPLER for assigned Disciples, the normal recorder
+- LEADER for own D Group, as fallback on behalf of the responsible
+  Discipler
+- COORDINATOR, as fallback on behalf of the responsible Discipler
 
 Meeting creation must pass server-side business validation.
 
@@ -531,8 +557,19 @@ VOID:
 
 - COORDINATOR
 - LEADER for own D Group where authorized
+- DISCIPLER for meetings they recorded themselves (recorded_by = self)
+  under their own active DISCIPLER membership
 
-Voiding must be audited.
+Voiding must be audited and is subject to COMPLETED protection.
+
+UPDATE:
+
+No other update path. Meeting context and participant outcomes are
+immutable; corrections are void and re-record.
+
+notes are shared meeting notes and are visible to every viewer of the
+meeting, including participating Disciples. Pastoral care observations
+belong in follow_up_actions.
 
 ---
 
@@ -544,7 +581,12 @@ Follow the visibility of the parent discipleship meeting.
 
 WRITE:
 
-Participant creation/voiding should occur through controlled meeting operations.
+Participant creation, including the attendance outcome, occurs only
+through record_discipleship_meeting().
+
+Participant voiding occurs only through void_meeting_participant(), with
+the same void authority as the parent meeting, including DISCIPLER
+self-recorded voids.
 
 ---
 
@@ -701,7 +743,8 @@ Prefer controlled removal rather than unrestricted deletion.
 ## church_settings
 
 church_settings holds ministry configuration, currently
-consecutive_absence_threshold and follow_up_due_days.
+consecutive_absence_threshold, consecutive_missed_meeting_threshold and
+follow_up_due_days.
 
 SELECT:
 
@@ -808,16 +851,26 @@ save_draft_attendance() / correct_finalized_attendance()
 → rejects any attempt to write the caller's own attendance row
 
 record_discipleship_meeting()
+→ records a held or missed meetup after the fact; there is no
+  scheduling operation
+→ requires an explicit attendance_status for every participant
+→ rejects an occurred_at in the future
 → enforces sequential lesson eligibility
-→ requires every COUNTED participant to be eligible for the meeting's
-  lesson
+→ requires every RECORDED participant, whatever the outcome, to be
+  eligible for the meeting's lesson
 → validates participant rules P1 to P3 as of occurred_at
+→ accepts additional meetings for a lesson that is READY_FOR_COMPLETION
 → occurred_at is immutable after creation; corrections use void and
   re-record
+→ triggers CONSECUTIVE_MISSED_MEETINGS recalculation
 
 void_discipleship_meeting() / void_meeting_participant()
-→ reject any void that would reduce valid COUNTED participation below
+→ COORDINATOR, own-D-Group LEADER, or the DISCIPLER who recorded it
+  under their own active DISCIPLER membership
+→ reject any void that would reduce credited participation below
   required_meetings for a COMPLETED lesson
+→ audited
+→ trigger CONSECUTIVE_MISSED_MEETINGS recalculation
 
 reopen_lesson_completion()
 → COORDINATOR only for the MVP
@@ -846,10 +899,16 @@ set_d_group_status()
   active discipler assignments, sets archived_at, audits
 
 transfer_disciple()
-→ closes the old D Group episode
-→ resolves ACTIVE attention conditions of that episode
-→ establishes the new episode and recomputes its absence streak
-→ the new streak never carries the previous group's streak forward
+→ closes the old D Group episode and ends the discipler assignment
+→ resolves the ACTIVE CONSECUTIVE_MISSED_MEETINGS condition belonging
+  to the ended assignment
+→ the next assignment's missed-meeting streak never carries the
+  previous streak forward
+
+reassign_discipler() and promote_disciple_to_discipler()
+→ end the Disciple's discipler assignment
+→ resolve the ACTIVE CONSECUTIVE_MISSED_MEETINGS condition belonging to
+  the ended assignment
 
 approve_church_membership() and membership status transitions
 → apply the effects listed in DATABASE_CONSTRAINTS.md section 1,
@@ -857,6 +916,11 @@ approve_church_membership() and membership status transitions
   the assignee
 
 Monitoring and follow-up creation
+→ uses role-specific sources: gathering attendance for LEADER and
+  DISCIPLER subjects (CONSECUTIVE_ABSENCE), meeting outcomes for
+  DISCIPLE subjects (CONSECUTIVE_MISSED_MEETINGS)
+→ never creates a gathering-based condition for a DISCIPLE
+  responsibility
 → applies the escalation chain
 → never assigns a follow-up to its own subject
 → evaluates distinct people when one person holds several
