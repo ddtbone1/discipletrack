@@ -46,3 +46,7 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Environment configuration containing real project keys.
+# Local dev/test defaults in config/ are published constants and ARE committed.
+config/prod.json

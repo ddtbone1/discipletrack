@@ -145,8 +145,30 @@ Semantic Colors
 → error
 → informational
 
-Exact design tokens will be finalized during Flutter theme
-implementation.
+Palette (tokens in `lib/core/theme/app_colors.dart`):
+
+| Token | Light | Use |
+|---|---|---|
+| background | `#FFFFFF` | page |
+| mint | `#C8E9CA` | primary accent surface |
+| sky | `#87DCFB` | secondary accent surface |
+| ink | `#201F1F` | text, primary buttons |
+
+Dark mode uses a near-black page, dark grey raised cards and white
+text. Mint and sky carry across unchanged.
+
+Both accents are light colours, so they always carry dark text, never
+white, in either mode.
+
+Light mode is the default. A signed-in person switches to dark mode
+with the toggle beside the profile avatar in the top-right corner; the
+device setting is not followed, and signing out returns the app to
+light. Widgets read colours from the active palette
+(`context.palette`), never from the raw token constants, so every
+screen works in both modes.
+
+The profile placeholder is a person icon on the neutral surface, not
+initials, so it blends into the page in either mode.
 
 Avoid using many unrelated accent colors.
 
@@ -267,6 +289,12 @@ Content that may remain directly on the page background includes:
 
 Avoid "card inside card" layouts unless there is a strong structural
 reason.
+
+There is no fixed per-screen card arrangement. Whether a screen uses
+cards, which fills they carry and how many there are is decided by
+that screen's content and the question it answers (section 4). Flat
+page sections, grouped rows, timelines and tabs are all valid
+structures.
 
 ---
 

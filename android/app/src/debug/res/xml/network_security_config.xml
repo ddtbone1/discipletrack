@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug builds only.
+
+  Local Supabase serves plain HTTP on port 54321. Android blocks cleartext by
+  default, so the two loopback addresses used during development are allowed
+  explicitly rather than switching cleartext on for every host.
+
+    10.0.2.2  the Android emulator's alias for the host machine's loopback
+    127.0.0.1 the emulator itself, for tooling
+
+  This file does not exist in release builds, so a release APK keeps Android's
+  default cleartext ban.
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">10.0.2.2</domain>
+        <domain includeSubdomains="false">127.0.0.1</domain>
+        <domain includeSubdomains="false">localhost</domain>
+    </domain-config>
+</network-security-config>
