@@ -39,8 +39,12 @@ Get-Process -Name "qemu*", "emulator*" -ErrorAction SilentlyContinue |
 Start-Sleep -Seconds 3
 Write-Host "   done"
 
-Write-Host "`n=== 3. Starting emulator (host GPU, detached) ===" -ForegroundColor Cyan
-cmd.exe /c start "" /B "$emu" -avd discipletrack -gpu host -no-boot-anim
+Write-Host "`n=== 3. Starting emulator (detached) ===" -ForegroundColor Cyan
+# No -gpu flag: the AVD's own "Graphics acceleration" setting (set to
+# Software in Android Studio's Device Manager) decides. -gpu host forced the
+# host OpenGL driver, which on this machine's Intel UHD driver floods the log
+# with gfxstream "error 0x501" and renders the screen washed out.
+cmd.exe /c start "" /B "$emu" -avd discipletrack -no-boot-anim
 Write-Host "   launched, waiting for boot (up to 5 minutes)..."
 
 $booted = $false
@@ -76,8 +80,9 @@ $pidOut = (& $adb shell pidof com.discipletrack.discipletrack 2>$null) -replace 
 
 if ($pidOut) {
     Write-Host "`n   RUNNING (pid $pidOut)" -ForegroundColor Green
-    Write-Host "`n   Sign in with:  user@dev.com" -ForegroundColor White
-    Write-Host "   (or register a new account)" -ForegroundColor DarkGray
+    Write-Host "`n   Sign in with:  admin@discipletrack.local / dev-password-123" -ForegroundColor White
+    Write-Host "   (or register a new account: code at http://127.0.0.1:54324," -ForegroundColor DarkGray
+    Write-Host "    church join code 7QK4MZP2XR)" -ForegroundColor DarkGray
     Write-Host "`n   You can reopen VS Code now." -ForegroundColor White
 } else {
     Write-Host "`n   App did not start. Reopen VS Code and check with Claude." -ForegroundColor Red
