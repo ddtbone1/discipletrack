@@ -147,25 +147,37 @@ Semantic Colors
 
 Palette (tokens in `lib/core/theme/app_colors.dart`):
 
+The palette is lime, white, black and greys only. The logo's forest green
+(`#022306`) belongs to the launcher icon and store listing and is never
+used inside the app. The only other colours are the semantic warning and
+error colours of section 7.
+
+Light mode: every page (including the welcome page and the splash) is
+`#F2F3F4`, and every component on it (cards, fields, the dock, buttons,
+round icon buttons) is `#FFFFFF`. Icons, back buttons and text are black;
+sub text is grey. Dark
+mode is pure black with charcoal cards and a brighter lime.
+
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| background | `#F5F7F8` | `#121517` | page, the 60% |
-| surface | `#FBFCFC` | `#1C2023` | cards |
-| mint | `#CFE4D2` | `#AFCBB4` | major elements, the 30% |
-| sky | `#7DBFD9` | `#6FAFC8` | primary actions and highlights, the 10% |
-| skyPressed | `#68ABC6` | `#5C9BB4` | pressed primary action |
-| ink | `#201F1F` | `#E8ECEE` | text, snackbar |
+| background | `#F2F3F4` | `#000000` | page |
+| surface | `#FFFFFF` | `#1C1C1E` | cards, fields, dock, icon buttons |
+| border | `#E5E7EB` | `#2C2C2E` | separates surfaces |
+| brand / lime | `#9BFC28` | `#9BFC28` | the one lime (the icon logo's): primary action, active dock item, active pills, highlights, the 10% |
+| brandPressed | `#8BE324` | `#8BE324` | the same lime one step darker, only while pressed |
+| dock | `#F1F2F4` | `#1C1C1E` | the floating dock |
+| mint | `#F3F4F6` | `#1C1C1E` | neutral fill for positive cards (no lime tints) |
+| ink, textPrimary | `#0A0A0A` | `#FFFFFF` | text and high-emphasis neutrals |
 
-Neither mode uses pure white (`#FFFFFF`) or pure black (`#000000`),
-and both accents are desaturated, a step further in dark mode.
-
-Both accents are light colours, so they always carry dark text in
-either mode.
+There is exactly one lime in the app, the icon logo's `#9BFC28`, in both
+modes; no other green shade or lime tint is used. Lime always carries
+black text.
 
 Light mode is the default. A signed-in person switches to dark mode
 with the toggle beside the profile avatar in the top-right corner; the
-device setting is not followed, and signing out returns the app to
-light. Widgets read colours from the active palette
+device setting is not followed. The choice is remembered on the device,
+so the app (from the welcome page on) opens in it and it survives
+signing out. Widgets read colours from the active palette
 (`context.palette`), never from the raw token constants, so every
 screen works in both modes.
 
@@ -214,13 +226,14 @@ Proportion follows 60-30-10:
 
 - 60%: the cool off-white neutral (background, surface)
 - 30%: mint on major elements such as cards that carry the main content
-- 10%: sky, reserved for the primary action and small highlights
+- 10%: lime, reserved for the primary action, the active dock item and
+  small highlights
 
-Sky is never a card fill, so the primary action stays the most
+Lime is never a large card fill, so the primary action stays the most
 prominent element on every screen.
 
 Interactive states are mobile states; there is no hover. Active is the
-resting colour, pressed is one shade step darker (`skyPressed` for the
+resting colour, pressed is one shade step darker (`brandPressed` for the
 primary action), and disabled is the muted grey of `surfaceAlt` with
 `disabled` text.
 
@@ -500,7 +513,12 @@ Do not wrap every section in another large container.
 
 ## 19. Headers
 
-Primary screens should use a consistent header system.
+Primary screens should use a consistent header system. The signed-in
+header is: the avatar on the left, then two lines beside it (the
+person's name, bold and larger, over the church name, lighter, smaller and
+thinner), and round white icon buttons on the right. The time-of-day
+greeting ("Good morning, James") is the title of the Home body, not part
+of the header. Home shows no membership badge.
 
 A Home header may contain:
 
@@ -1112,7 +1130,18 @@ Destructive Action
 
 Avoid screens containing several equally prominent primary buttons.
 
-The primary button is filled with `sky` and carries an `ink` label.
+The primary button is a lime pill with a near-black label in both modes.
+Every button is fully rounded (pill). The dock is a small pill centred at
+the bottom: white in light mode, charcoal in dark. The active destination
+is a soft grey pill holding its filled icon and name (a lighter charcoal
+in dark mode); the others are thin grey outline icons. Its width is fixed: each
+destination has a fixed slot and the active one a fixed wider slot, so
+switching only glides the pill across while the names cross-fade. Home uses a rounded house glyph.
+
+Cards are white with a soft, faint outline and a low, wide shadow, so
+they lift off the grey page without hard lines. Home components are full width:
+church figures are stacked stat tiles, each an icon chip, its label over
+the figure, and a chevron.
 It replaces the earlier ink-filled primary button. Where a screen has a
 main action, it is placed before the content it acts on, so it is the
 first thing seen.
@@ -1382,3 +1411,48 @@ Clear enough for daily use.
 Informative enough for leadership.  
 Personal enough for discipleship.  
 Consistent enough to feel professionally engineered.**
+
+---
+
+## 56. Launch, Welcome and Sign-in
+
+- **Splash.** The lime logo and the "DiscipleTrack" wordmark on the page
+  colour. The logo springs in with a slight overshoot and turn while one
+  soft lime ring ripples out behind it; then the wordmark writes itself in
+  letter by letter, each letter fading up into place. It starts just after the first frame, plays once per launch,
+  and not at all with reduced motion. The native launch screens are white
+  with the lime mark.
+- **Welcome.** On the page colour like every screen: the illustration
+  (`assets/brand/login_icon.png`) centred just above a large left-aligned
+  hero line, a short supporting line, then Sign up (outlined pill) and Log
+  in (lime pill) side by side.
+- **Login and Sign up.** Full-screen pages with a back arrow to the welcome
+  page: the bare lime logo, a centred title and subtitle, then the form,
+  centred vertically when it fits. Fields are pills with a leading icon and
+  a label that floats inside the field, so a visible label is kept
+  (section 41). Third-party sign-in is not offered.
+
+
+---
+
+## 57. The Standard: Welcome and Login
+
+The welcome page and the login and sign-up pages set the standard for
+every screen:
+
+- **Page and components.** The page colour (`#F2F3F4` light, black dark)
+  with white components (charcoal in dark mode) that have a soft outline
+  and a low, wide shadow.
+- **Type.** Large, tightly tracked bold titles; grey supporting text
+  underneath; black body text.
+- **Fields.** Pills with a leading icon and a label that sits inside the
+  field and floats above the text when typing starts. Labels are in
+  sentence case. This is the default for every text field.
+- **Buttons.** Pills. The one primary action is lime with black text;
+  secondary actions are white pills with a soft outline.
+- **Structure.** One clear title, centred forms on focused tasks, the
+  primary action last, and a back arrow on every page reached by
+  navigating.
+
+Light or dark is the person's choice, remembered on the device: the app
+opens in it, from the welcome page on, and it survives signing out.

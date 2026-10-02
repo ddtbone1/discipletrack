@@ -10,6 +10,7 @@ import 'package:discipletrack/features/session/application/session_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'support/fakes.dart';
 
@@ -46,6 +47,7 @@ void main() {
   late ProviderContainer container;
 
   setUp(() {
+    SharedPreferences.setMockInitialValues({});
     container = ProviderContainer(
       overrides: [
         sessionStateProvider.overrideWith((ref) => ref.watch(_fakeSession)),
@@ -94,15 +96,38 @@ void main() {
     expect(_brightness(tester), Brightness.light);
   });
 
-  test('signing out returns the app to light mode', () {
-    // Keep the provider alive so its session listener is active.
+  test('the choice survives signing out', () {
     final sub = container.listen(themeModeProvider, (_, _) {});
     container.read(themeModeProvider.notifier).toggle();
     expect(container.read(themeModeProvider), ThemeMode.dark);
 
     container.read(_fakeSession.notifier).set(SessionState.signedOut);
     container.read(sessionStateProvider);
-    expect(container.read(themeModeProvider), ThemeMode.light);
+    expect(container.read(themeModeProvider), ThemeMode.dark);
     sub.close();
+  });
+
+  test('the app starts in the mode saved on the device, and saves each '
+      'change', () async {
+    SharedPreferences.setMockInitialValues({'theme_mode': 'dark'});
+    const store = ThemeModeStore();
+    expect(await store.read(), ThemeMode.dark);
+
+    final c = ProviderContainer(
+      overrides: [
+        initialThemeModeProvider.overrideWithValue(await store.read()),
+      ],
+    );
+    addTearDown(c.dispose);
+    expect(c.read(themeModeProvider), ThemeMode.dark);
+
+    c.read(themeModeProvider.notifier).toggle();
+    await Future<void>.delayed(Duration.zero);
+    expect(await store.read(), ThemeMode.light);
+  });
+
+  test('nothing saved means light', () async {
+    SharedPreferences.setMockInitialValues({});
+    expect(await const ThemeModeStore().read(), ThemeMode.light);
   });
 }

@@ -5,15 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../../../app/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
-import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/app_text_link.dart';
-import '../../../core/widgets/brand_mark.dart';
 import '../../../core/widgets/error_state.dart';
 import '../application/auth_providers.dart';
 import '../data/auth_repository.dart';
+import 'auth_form_layout.dart';
 
 class SignInPage extends ConsumerStatefulWidget {
   const SignInPage({super.key});
@@ -77,21 +75,12 @@ class _SignInPageState extends ConsumerState<SignInPage> {
     final isLoading = auth.isLoading;
     final failure = auth.error;
 
-    return AppScaffold(
+    return AuthFormLayout(
+      title: 'Login',
+      subtitle: 'Welcome back. Sign in to continue.',
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: AppSpacing.xxl),
-          const BrandMark(),
-          const SizedBox(height: AppSpacing.lg),
-          Text('Welcome back', style: AppTypography.display),
-          const SizedBox(height: AppSpacing.xxs),
-          Text(
-            'Sign in to continue your discipleship journey.',
-            style: context.supportingStyle,
-          ),
-          const SizedBox(height: AppSpacing.xl),
-
           if (failure != null) ...[
             InlineError(
               message: failure is AuthFailure
@@ -102,7 +91,9 @@ class _SignInPageState extends ConsumerState<SignInPage> {
           ],
 
           AppTextField(
-            label: 'EMAIL',
+            label: 'Email',
+            pill: true,
+            leadingIcon: Icons.mail_outline_rounded,
             controller: _email,
             hint: 'you@example.com',
             errorText: _emailError,
@@ -112,7 +103,9 @@ class _SignInPageState extends ConsumerState<SignInPage> {
             enabled: !isLoading,
           ),
           AppTextField(
-            label: 'PASSWORD',
+            label: 'Password',
+            pill: true,
+            leadingIcon: Icons.lock_outline_rounded,
             controller: _password,
             hint: 'Your password',
             errorText: _passwordError,
@@ -134,17 +127,21 @@ class _SignInPageState extends ConsumerState<SignInPage> {
           ),
 
           const SizedBox(height: AppSpacing.xs),
-          AppButton(label: 'Sign in', isLoading: isLoading, onPressed: _submit),
-          const SizedBox(height: AppSpacing.md),
+          AppButton(
+            label: 'Login',
+            pill: true,
+            isLoading: isLoading,
+            onPressed: _submit,
+          ),
+          const SizedBox(height: AppSpacing.lg),
 
           Center(
             child: AppTextLink(
-              prefix: 'New here?',
-              label: 'Create an account',
+              prefix: 'Need an account?',
+              label: 'Sign up',
               onTap: isLoading ? null : () => context.go(Routes.signUp),
             ),
           ),
-          const SizedBox(height: AppSpacing.xl),
         ],
       ),
     );

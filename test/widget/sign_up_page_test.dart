@@ -1,5 +1,6 @@
 import 'package:discipletrack/app/routes.dart';
 import 'package:discipletrack/core/theme/app_theme.dart';
+import 'package:discipletrack/core/widgets/app_button.dart';
 import 'package:discipletrack/core/widgets/app_text_link.dart';
 import 'package:discipletrack/features/auth/application/auth_providers.dart';
 import 'package:discipletrack/features/auth/data/auth_repository.dart';
@@ -156,9 +157,7 @@ void main() {
       await fill(tester);
 
       expect(
-        find.text(
-          'An account with this email already exists. Sign in instead.',
-        ),
+        find.text('An account with this email already exists. Login instead.'),
         findsOneWidget,
       );
       expect(find.byType(SignUpPage), findsOneWidget);
@@ -211,7 +210,7 @@ void main() {
           'juan@example.test',
         );
         await tester.enterText(find.byType(TextField).at(1), 'password123');
-        await tester.tap(find.text('Sign in'));
+        await tester.tap(find.widgetWithText(AppButton, 'Login'));
         await tester.pumpAndSettle();
 
         expect(
@@ -234,7 +233,7 @@ void main() {
 
       await tester.enterText(find.byType(TextField).at(0), 'juan@example.test');
       await tester.enterText(find.byType(TextField).at(1), 'password123');
-      await tester.tap(find.text('Sign in'));
+      await tester.tap(find.widgetWithText(AppButton, 'Login'));
       await tester.pumpAndSettle();
 
       expect(

@@ -7,10 +7,9 @@ import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 
 enum AppButtonVariant {
-  /// Sky fill with a near-black label, the 10% accent of the 60-30-10 rule
-  /// (UI_DESIGN_SYSTEM section 40). The default for primary actions, and the
-  /// only place the sky accent is used as a fill, so the one primary action
-  /// on a screen is always the most prominent element.
+  /// Brand forest fill (lime in dark mode), the 10% accent of the 60-30-10
+  /// rule (UI_DESIGN_SYSTEM section 40). The default for primary actions, so
+  /// the one primary action on a screen is always the most prominent element.
   primary,
 
   /// Bordered, transparent fill. Secondary actions.
@@ -34,6 +33,7 @@ class AppButton extends StatelessWidget {
     this.icon,
     this.expand = true,
     this.requiresConnection = false,
+    this.pill = true,
     super.key,
   });
 
@@ -45,6 +45,10 @@ class AppButton extends StatelessWidget {
   /// The action changes data. While offline it is disabled, because the
   /// app is view-only then (Slice 4 plan); the banner says why.
   final bool requiresConnection;
+
+  /// Fully rounded ends, the app-wide default. False gives the squarer
+  /// control radius.
+  final bool pill;
   final AppButtonVariant variant;
   final bool isLoading;
   final IconData? icon;
@@ -57,16 +61,18 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final blocked = requiresConnection && ConnectionScope.isOffline(context);
     final enabled = onPressed != null && !isLoading && !blocked;
+    final radius = pill ? AppRadius.pill : AppRadius.control;
     final p = context.palette;
 
     final (bg, fg, border) = switch (variant) {
       AppButtonVariant.primary => (
-        enabled ? p.sky : p.surfaceAlt,
-        enabled ? p.onSky : p.disabled,
+        enabled ? p.brand : p.surfaceAlt,
+        enabled ? p.onBrand : p.disabled,
         null,
       ),
+      // A component: white on the grey page (charcoal in dark mode).
       AppButtonVariant.secondary => (
-        Colors.transparent,
+        enabled ? p.surface : Colors.transparent,
         enabled ? p.textPrimary : p.disabled,
         p.border,
       ),
@@ -83,11 +89,11 @@ class AppButton extends StatelessWidget {
       label: label,
       child: Material(
         color: bg,
-        borderRadius: AppRadius.control,
+        borderRadius: radius,
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: enabled ? onPressed : null,
-          borderRadius: AppRadius.control,
+          borderRadius: radius,
           // Mobile states only (no hover): pressed is one shade step from the
           // resting fill. The overlay is drawn under the label, so a fully
           // opaque pressed colour still leaves the label readable.
@@ -95,7 +101,7 @@ class AppButton extends StatelessWidget {
           overlayColor: WidgetStateProperty.resolveWith(
             (states) => states.contains(WidgetState.pressed)
                 ? (variant == AppButtonVariant.primary
-                      ? p.skyPressed
+                      ? p.brandPressed
                       : p.border.withValues(alpha: 0.6))
                 : Colors.transparent,
           ),
@@ -106,7 +112,7 @@ class AppButton extends StatelessWidget {
             decoration: border == null
                 ? null
                 : BoxDecoration(
-                    borderRadius: AppRadius.control,
+                    borderRadius: radius,
                     border: Border.all(color: border),
                   ),
             child: Center(

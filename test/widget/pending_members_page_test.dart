@@ -110,7 +110,7 @@ void main() {
   });
 
   group('HomePage approver entry', () {
-    testWidgets('an Admin or Coordinator sees Membership requests', (
+    testWidgets('an Admin or Coordinator sees the Requests tile', (
       tester,
     ) async {
       final review = FakeMembershipReviewRepository()..pending = _requests;
@@ -123,15 +123,16 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Membership requests'), findsOneWidget);
-      expect(find.text('2 waiting'), findsOneWidget);
+      expect(find.text('Requests'), findsOneWidget);
+      // The tile shows the number waiting.
+      expect(find.bySemanticsLabel('Requests: 2'), findsOneWidget);
     });
 
     testWidgets('an ordinary member does not', (tester) async {
       await pumpPage(tester, const HomePage(), membership: _approver);
       await tester.pumpAndSettle();
 
-      expect(find.text('Membership requests'), findsNothing);
+      expect(find.text('Requests'), findsNothing);
     });
   });
 }

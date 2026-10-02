@@ -5,61 +5,96 @@ import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 
-/// The greeting row at the top of every signed-in page: a two-line greeting on
-/// the left, then any [actions] and the avatar on the right.
+/// "Good morning", "Good afternoon" or "Good evening" for the local time.
+String greetingFor(DateTime now) {
+  final h = now.hour;
+  if (h < 12) return 'Good morning';
+  if (h < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
+/// The row at the top of every signed-in page: the avatar on the left, then
+/// two lines beside it (the person's [name], bold and larger, over a
+/// lighter, smaller [subtitle] such as the church name), and round icon
+/// buttons ([actions]) on the right. An optional [status] sits underneath.
 ///
-/// Extracted because three screens already use it identically, which is the
+/// The time-of-day greeting is not part of it; pages that greet show it as
+/// a title in their body (see [greetingFor]).
+///
+/// Extracted because several screens use it identically, which is the
 /// threshold UI_DESIGN_SYSTEM section 15 sets for a component.
 class AppPageHeader extends StatelessWidget {
   const AppPageHeader({
-    required this.greeting,
-    required this.subtitle,
+    required this.name,
+    this.subtitle,
     this.onAvatarTap,
     this.status,
     this.actions = const [],
     super.key,
   });
 
-  final String greeting;
-  final String subtitle;
+  /// The first line, bold and larger, usually the person's full name.
+  final String name;
+
+  /// The second line, lighter, smaller and thinner.
+  final String? subtitle;
   final VoidCallback? onAvatarTap;
 
-  /// Optional status line under the subtitle, typically a [StatusPill].
+  /// Optional status under the header row, such as a [StatusPill].
   final Widget? status;
 
-  /// Controls shown immediately left of the avatar, such as the theme toggle.
+  /// Round icon buttons on the right, such as the theme toggle.
   final List<Widget> actions;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final p = context.palette;
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                greeting,
-                style: AppTypography.display,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+        Row(
+          children: [
+            AppAvatar(size: 48, onTap: onAvatarTap),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    name,
+                    style: AppTypography.sectionTitle.copyWith(
+                      color: p.textPrimary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle!,
+                      style: AppTypography.caption.copyWith(
+                        color: p.muted,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                        letterSpacing: 0,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
               ),
-              const SizedBox(height: AppSpacing.xxs),
-              Text(subtitle, style: context.supportingStyle),
-              if (status != null) ...[
-                const SizedBox(height: AppSpacing.sm),
-                status!,
-              ],
+            ),
+            for (final action in actions) ...[
+              const SizedBox(width: AppSpacing.xs),
+              action,
             ],
-          ),
+          ],
         ),
-        const SizedBox(width: AppSpacing.sm),
-        for (final action in actions) ...[
-          action,
-          const SizedBox(width: AppSpacing.xs),
-        ],
-        AppAvatar(onTap: onAvatarTap),
+        if (status != null) ...[const SizedBox(height: AppSpacing.md), status!],
       ],
     );
   }
@@ -84,7 +119,7 @@ class AppAvatar extends StatelessWidget {
       height: size,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: p.surfaceAlt,
+        color: p.surface,
         shape: BoxShape.circle,
         border: Border.all(color: p.border),
       ),

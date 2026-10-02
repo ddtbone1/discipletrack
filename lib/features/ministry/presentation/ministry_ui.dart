@@ -195,7 +195,7 @@ class PairingProgress extends StatelessWidget {
                 value: total == 0 ? 0 : paired / total,
                 minHeight: 6,
                 backgroundColor: p.surfaceAlt,
-                valueColor: AlwaysStoppedAnimation(done ? p.success : p.sky),
+                valueColor: AlwaysStoppedAnimation(done ? p.success : p.brand),
               ),
             ),
           ),

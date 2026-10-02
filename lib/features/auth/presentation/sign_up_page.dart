@@ -5,15 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../../../app/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
-import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/app_text_link.dart';
-import '../../../core/widgets/brand_mark.dart';
 import '../../../core/widgets/error_state.dart';
 import '../application/auth_providers.dart';
 import '../data/auth_repository.dart';
+import 'auth_form_layout.dart';
 
 /// Registration.
 ///
@@ -106,21 +104,12 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     final isLoading = auth.isLoading;
     final failure = auth.error;
 
-    return AppScaffold(
+    return AuthFormLayout(
+      title: 'Sign up',
+      subtitle: 'Your name is how your D Group will know you.',
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: AppSpacing.xxl),
-          const BrandMark(),
-          const SizedBox(height: AppSpacing.lg),
-          Text('Create your account', style: AppTypography.display),
-          const SizedBox(height: AppSpacing.xxs),
-          Text(
-            'Your name is how your D Group will know you.',
-            style: context.supportingStyle,
-          ),
-          const SizedBox(height: AppSpacing.xl),
-
           if (failure != null) ...[
             InlineError(
               message: failure is AuthFailure
@@ -131,13 +120,13 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
           ] else if (_alreadyRegistered) ...[
             const InlineError(
               message:
-                  'An account with this email already exists. Sign in '
+                  'An account with this email already exists. Login '
                   'instead.',
             ),
             Align(
               alignment: Alignment.centerLeft,
               child: AppTextLink(
-                label: 'Sign in',
+                label: 'Login',
                 onTap: isLoading ? null : () => context.go(Routes.signIn),
               ),
             ),
@@ -145,7 +134,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
           ],
 
           AppTextField(
-            label: 'FULL NAME',
+            label: 'Full name',
+            pill: true,
+            leadingIcon: Icons.person_outline_rounded,
             controller: _fullName,
             hint: 'Juan dela Cruz',
             errorText: _nameError,
@@ -155,7 +146,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
             enabled: !isLoading,
           ),
           AppTextField(
-            label: 'EMAIL',
+            label: 'Email',
+            pill: true,
+            leadingIcon: Icons.mail_outline_rounded,
             controller: _email,
             hint: 'you@example.com',
             errorText: _emailError,
@@ -165,7 +158,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
             enabled: !isLoading,
           ),
           AppTextField(
-            label: 'PASSWORD',
+            label: 'Password',
+            pill: true,
+            leadingIcon: Icons.lock_outline_rounded,
             controller: _password,
             hint: 'Create a password',
             errorText: _passwordError,
@@ -189,19 +184,19 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
           const SizedBox(height: AppSpacing.xs),
           AppButton(
             label: 'Create account',
+            pill: true,
             isLoading: isLoading,
             onPressed: _submit,
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.lg),
 
           Center(
             child: AppTextLink(
               prefix: 'Already have an account?',
-              label: 'Sign in',
+              label: 'Login',
               onTap: isLoading ? null : () => context.go(Routes.signIn),
             ),
           ),
-          const SizedBox(height: AppSpacing.xl),
         ],
       ),
     );

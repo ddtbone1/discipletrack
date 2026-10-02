@@ -94,7 +94,8 @@ class _MemberPickerPageState extends ConsumerState<MemberPickerPage> {
             const SizedBox(height: AppSpacing.md),
           ],
           AppTextField(
-            label: 'SEARCH',
+            label: 'Search',
+            leadingIcon: Icons.search_rounded,
             controller: _search,
             hint: 'Search by name, e.g. Maria',
             textInputAction: TextInputAction.search,

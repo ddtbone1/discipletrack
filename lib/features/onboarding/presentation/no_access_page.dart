@@ -65,7 +65,7 @@ class NoAccessPage extends ConsumerWidget {
         children: [
           const SizedBox(height: AppSpacing.md),
           AppPageHeader(
-            greeting: 'Hello, ${profile?.firstName ?? 'friend'}',
+            name: profile?.fullName ?? 'Friend',
             subtitle: 'Your access needs attention',
             onAvatarTap: () => context.go(Routes.profile),
             actions: const [ThemeModeToggle()],

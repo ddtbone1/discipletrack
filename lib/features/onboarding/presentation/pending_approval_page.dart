@@ -94,7 +94,7 @@ class _PendingApprovalPageState extends ConsumerState<PendingApprovalPage> {
         children: [
           const SizedBox(height: AppSpacing.md),
           AppPageHeader(
-            greeting: 'Hello, ${profile?.firstName ?? 'friend'}',
+            name: profile?.fullName ?? 'Friend',
             subtitle: 'Your request is being reviewed',
             onAvatarTap: () => context.go(Routes.profile),
             actions: const [ThemeModeToggle()],

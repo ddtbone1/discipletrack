@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/presentation/sign_in_page.dart';
 import '../features/auth/presentation/sign_up_page.dart';
+import '../features/auth/application/intro_state.dart';
 import '../features/auth/presentation/splash_page.dart';
+import '../features/auth/presentation/start_page.dart';
 import '../features/auth/presentation/verify_email_page.dart';
 import '../features/home/presentation/home_page.dart';
 import '../features/membership_review/presentation/pending_members_page.dart';
@@ -31,7 +33,7 @@ import 'transitions.dart';
 /// a container or a network.
 String destinationFor(SessionState state) => switch (state) {
   SessionState.unknown => Routes.splash,
-  SessionState.signedOut => Routes.signIn,
+  SessionState.signedOut => Routes.start,
   SessionState.noMembership => Routes.joinChurch,
   SessionState.pending => Routes.pendingApproval,
   SessionState.activeFirstEntry => Routes.welcome,
@@ -46,7 +48,11 @@ Set<String> allowedFor(SessionState state) => switch (state) {
   // Sign-in, sign-up and email verification are interchangeable while
   // signed out. Verification lives here because Supabase issues no session
   // before the email is confirmed.
-  SessionState.signedOut => const {Routes.signUp, Routes.verifyEmail},
+  SessionState.signedOut => const {
+    Routes.signIn,
+    Routes.signUp,
+    Routes.verifyEmail,
+  },
   SessionState.noMembership ||
   SessionState.pending ||
   SessionState.noAccess => Routes.profileRoutes,
@@ -78,25 +84,39 @@ final routerProvider = Provider<GoRouter>((ref) {
   // something changed, and the redirect re-reads the state itself.
   final refresh = ValueNotifier<int>(0);
   ref.listen(sessionStateProvider, (_, _) => refresh.value++);
+  ref.listen(introCompleteProvider, (_, _) => refresh.value++);
   ref.onDispose(refresh.dispose);
 
   return GoRouter(
     initialLocation: Routes.splash,
     refreshListenable: refresh,
-    redirect: (context, state) =>
-        redirectFor(ref.read(sessionStateProvider), state.fullPath ?? ''),
+    redirect: (context, state) {
+      // The launch animation plays to the end before anything else shows.
+      if (!ref.read(introCompleteProvider)) {
+        return state.matchedLocation == Routes.splash ? null : Routes.splash;
+      }
+      return redirectFor(ref.read(sessionStateProvider), state.fullPath ?? '');
+    },
     routes: [
       GoRoute(
         path: Routes.splash,
         pageBuilder: (c, s) => buildPage(state: s, child: const SplashPage()),
       ),
       GoRoute(
-        path: Routes.signIn,
-        pageBuilder: (c, s) => buildPage(state: s, child: const SignInPage()),
-      ),
-      GoRoute(
-        path: Routes.signUp,
-        pageBuilder: (c, s) => buildPage(state: s, child: const SignUpPage()),
+        path: Routes.start,
+        pageBuilder: (c, s) => buildPage(state: s, child: const StartPage()),
+        routes: [
+          GoRoute(
+            path: 'sign-in',
+            pageBuilder: (c, s) =>
+                buildPage(state: s, child: const SignInPage()),
+          ),
+          GoRoute(
+            path: 'sign-up',
+            pageBuilder: (c, s) =>
+                buildPage(state: s, child: const SignUpPage()),
+          ),
+        ],
       ),
       GoRoute(
         path: Routes.verifyEmail,

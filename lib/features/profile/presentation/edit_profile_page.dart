@@ -148,7 +148,8 @@ class _EditFormState extends ConsumerState<_EditForm> {
           ],
 
           AppTextField(
-            label: 'FULL NAME',
+            label: 'Full name',
+            leadingIcon: Icons.person_outline_rounded,
             controller: _fullName,
             errorText: _nameError,
             keyboardType: TextInputType.name,
@@ -156,7 +157,8 @@ class _EditFormState extends ConsumerState<_EditForm> {
             enabled: !isSaving,
           ),
           AppTextField(
-            label: 'PHONE (OPTIONAL)',
+            label: 'Phone (optional)',
+            leadingIcon: Icons.phone_outlined,
             controller: _phone,
             hint: '+63 900 000 0000',
             keyboardType: TextInputType.phone,

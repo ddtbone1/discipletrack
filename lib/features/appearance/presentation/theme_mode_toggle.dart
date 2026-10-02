@@ -9,7 +9,7 @@ import '../application/theme_mode_provider.dart';
 /// The icon shows the mode the tap switches to, and the tooltip and semantics
 /// say it in words.
 class ThemeModeToggle extends ConsumerWidget {
-  const ThemeModeToggle({this.size = 46, super.key});
+  const ThemeModeToggle({this.size = 44, super.key});
 
   /// Matches the avatar it sits beside.
   final double size;
@@ -27,7 +27,7 @@ class ThemeModeToggle extends ConsumerWidget {
         label: label,
         excludeSemantics: true,
         child: Material(
-          color: p.surfaceAlt,
+          color: p.surface,
           shape: CircleBorder(side: BorderSide(color: p.border)),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
@@ -37,7 +37,7 @@ class ThemeModeToggle extends ConsumerWidget {
               height: size,
               child: Icon(
                 isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-                size: size * 0.45,
+                size: size * 0.48,
                 color: p.textPrimary,
               ),
             ),

@@ -133,6 +133,14 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Sign out'), findsNothing);
+      // No membership badge; the church sits under the name; the greeting
+      // is the body's title.
+      expect(find.text('Active member'), findsNothing);
+      expect(find.text(sampleChurch.name), findsOneWidget);
+      expect(
+        find.textContaining(RegExp(r'^Good (morning|afternoon|evening), ')),
+        findsOneWidget,
+      );
     });
   });
 

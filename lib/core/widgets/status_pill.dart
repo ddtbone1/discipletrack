@@ -30,7 +30,7 @@ class StatusPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = context.palette;
     final (bg, fg, border) = switch (tone) {
-      StatusTone.positive => (p.mint, p.onMint, null),
+      StatusTone.positive => (p.brand, p.onBrand, null),
       StatusTone.waiting => (p.sky, p.onSky, null),
       StatusTone.neutral => (p.surfaceAlt, p.textPrimary, p.border),
     };

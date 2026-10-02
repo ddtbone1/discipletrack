@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Modify this file to customize your launch splash screen -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="?android:colorBackground" />
+    <!-- White, as the app's light mode, so the first frame flows into the Flutter splash. -->
+    <item>
+        <color android:color="#FFFFFFFF" />
+    </item>
 
     <!-- You can insert your own image assets here -->
     <!-- <item>

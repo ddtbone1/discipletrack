@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app/app.dart';
+import 'features/appearance/application/theme_mode_provider.dart';
 import 'core/config/app_config.dart';
 
 Future<void> main() async {
@@ -19,5 +20,14 @@ Future<void> main() async {
     publishableKey: config.supabasePublishableKey,
   );
 
-  runApp(const ProviderScope(child: DiscipleTrackApp()));
+  // Read before the first frame, so the welcome page and every screen
+  // after it open in the mode last chosen.
+  final themeMode = await const ThemeModeStore().read();
+
+  runApp(
+    ProviderScope(
+      overrides: [initialThemeModeProvider.overrideWithValue(themeMode)],
+      child: const DiscipleTrackApp(),
+    ),
+  );
 }

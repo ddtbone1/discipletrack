@@ -161,6 +161,45 @@ void main() {
     });
   });
 
+  testWidgets('the dock renders and slides without a Scaffold above it, as '
+      'in the app', (tester) async {
+    final items = dockItemsFor(
+      isCoordinator: true,
+      canReview: true,
+      ministry: null,
+    );
+    Widget dock(int active) => MaterialApp(
+      theme: AppTheme.light(),
+      home: Align(
+        alignment: Alignment.bottomCenter,
+        child: FloatingDock(
+          items: items,
+          activeIndex: active,
+          onSelected: (_) {},
+        ),
+      ),
+    );
+    await tester.pumpWidget(dock(0));
+    expect(tester.takeException(), isNull);
+
+    // Only the active destination shows its name, in the white pill.
+    expect(find.text('Home'), findsOneWidget);
+    expect(find.text('D Groups'), findsNothing);
+
+    final widthBefore = tester.getSize(find.byType(FloatingDock)).width;
+
+    await tester.pumpWidget(dock(1));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(tester.takeException(), isNull, reason: 'mid-slide');
+    // The width is fixed: switching moves the pill, never the dock's edges.
+    expect(tester.getSize(find.byType(FloatingDock)).width, widthBefore);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.text('D Groups'), findsOneWidget);
+    expect(find.text('Home'), findsNothing);
+    expect(tester.getSize(find.byType(FloatingDock)).width, widthBefore);
+  });
+
   testWidgets('the dock marks the active destination', (tester) async {
     final items = dockItemsFor(
       isCoordinator: true,

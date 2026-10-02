@@ -24,16 +24,13 @@ Future<void> _pump(WidgetTester tester, Widget page) async {
 void main() {
   testWidgets('sign-in links to sign-up with a text link', (tester) async {
     await _pump(tester, const SignInPage());
-    expect(
-      find.widgetWithText(AppTextLink, 'Create an account'),
-      findsOneWidget,
-    );
-    expect(find.text('New here?'), findsOneWidget);
+    expect(find.widgetWithText(AppTextLink, 'Sign up'), findsOneWidget);
+    expect(find.text('Need an account?'), findsOneWidget);
   });
 
   testWidgets('sign-up links to sign-in with a text link', (tester) async {
     await _pump(tester, const SignUpPage());
-    expect(find.widgetWithText(AppTextLink, 'Sign in'), findsOneWidget);
+    expect(find.widgetWithText(AppTextLink, 'Login'), findsOneWidget);
     expect(find.text('Already have an account?'), findsOneWidget);
   });
 

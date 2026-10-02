@@ -1,8 +1,12 @@
 /// Route paths, in one place so no string is typed twice.
 abstract final class Routes {
   static const splash = '/splash';
-  static const signIn = '/sign-in';
-  static const signUp = '/sign-up';
+
+  /// The welcome page for someone signed out. Login and Sign Up open as
+  /// sheets over it, so they are nested under it.
+  static const start = '/start';
+  static const signIn = '/start/sign-in';
+  static const signUp = '/start/sign-up';
 
   /// Reached from sign-up (no session is issued until the email is confirmed)
   /// or from a sign-in that failed with `email_not_confirmed`.

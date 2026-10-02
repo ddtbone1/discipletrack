@@ -20,8 +20,8 @@ abstract final class AppTheme {
   static ThemeData _build(AppPalette p, Brightness brightness) {
     final scheme = ColorScheme(
       brightness: brightness,
-      primary: p.sky,
-      onPrimary: p.onSky,
+      primary: p.brand,
+      onPrimary: p.onBrand,
       secondary: p.mint,
       onSecondary: p.onMint,
       tertiary: p.sky,

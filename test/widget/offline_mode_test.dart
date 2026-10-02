@@ -124,7 +124,10 @@ void main() {
         child: MaterialApp(theme: AppTheme.light(), home: const SplashPage()),
       ),
     );
-    await tester.pumpAndSettle();
+    // Past the launch animation; the message shows once it has played.
+    for (var i = 0; i < 25; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     expect(find.text("You're offline"), findsOneWidget);
     expect(find.textContaining('Connect to sign in'), findsOneWidget);

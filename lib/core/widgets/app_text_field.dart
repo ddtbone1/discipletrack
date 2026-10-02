@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show TextInputFormatter;
 
 import '../theme/app_colors.dart';
+import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 
@@ -27,6 +28,8 @@ class AppTextField extends StatelessWidget {
     this.inputFormatters,
     this.textCapitalization = TextCapitalization.none,
     this.textStyle,
+    this.leadingIcon,
+    this.pill = true,
     super.key,
   });
 
@@ -53,15 +56,34 @@ class AppTextField extends StatelessWidget {
   /// Overrides the body style, for example wider letter spacing on a code.
   final TextStyle? textStyle;
 
+  /// Shown inside the field before the text, for example a mail icon.
+  final IconData? leadingIcon;
+
+  /// The app-wide entry style, set by the login and sign-up pages: a pill
+  /// with the label inside it, floating above the text once typing starts,
+  /// so the field always has a visible label (UI_DESIGN_SYSTEM section 41)
+  /// without a separate caption above it. False gives the older boxed field
+  /// with its label above.
+  final bool pill;
+
   @override
   Widget build(BuildContext context) {
     final hasError = errorText != null && errorText!.isNotEmpty;
 
+    final p = context.palette;
+    OutlineInputBorder pillBorder(Color color, [double width = 1]) =>
+        OutlineInputBorder(
+          borderRadius: AppRadius.pill,
+          borderSide: BorderSide(color: color, width: width),
+        );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: context.captionStyle),
-        const SizedBox(height: AppSpacing.xxs),
+        if (!pill) ...[
+          Text(label, style: context.captionStyle),
+          const SizedBox(height: AppSpacing.xxs),
+        ],
         TextField(
           controller: controller,
           obscureText: obscureText,
@@ -77,6 +99,26 @@ class AppTextField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hint,
             suffixIcon: trailing,
+            labelText: pill ? label : null,
+            floatingLabelStyle: AppTypography.caption.copyWith(
+              color: p.textPrimary,
+            ),
+            prefixIcon: leadingIcon == null
+                ? null
+                : Icon(leadingIcon, size: 20, color: p.muted),
+            fillColor: pill ? p.surface : null,
+            contentPadding: pill
+                ? const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.md,
+                  )
+                : null,
+            border: pill ? pillBorder(p.border) : null,
+            enabledBorder: pill ? pillBorder(p.border) : null,
+            disabledBorder: pill ? pillBorder(p.border) : null,
+            focusedBorder: pill ? pillBorder(p.brand, 1.5) : null,
+            errorBorder: pill ? pillBorder(p.error) : null,
+            focusedErrorBorder: pill ? pillBorder(p.error, 1.5) : null,
             // Drives the themed error border without emitting layout-shifting
             // helper text.
             errorText: hasError ? '' : null,
@@ -86,9 +128,9 @@ class AppTextField extends StatelessWidget {
           height: AppSpacing.errorSlot,
           child: hasError
               ? Padding(
-                  padding: const EdgeInsets.only(
+                  padding: EdgeInsets.only(
                     top: AppSpacing.xxs,
-                    left: AppSpacing.xxs,
+                    left: pill ? AppSpacing.lg : AppSpacing.xxs,
                   ),
                   child: Text(
                     errorText!,

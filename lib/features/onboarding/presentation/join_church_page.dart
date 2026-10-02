@@ -69,7 +69,7 @@ class _JoinChurchPageState extends ConsumerState<JoinChurchPage> {
         children: [
           const SizedBox(height: AppSpacing.md),
           AppPageHeader(
-            greeting: 'Hello, ${profile?.firstName ?? 'friend'}',
+            name: profile?.fullName ?? 'Friend',
             subtitle: 'One step left before you begin',
             onAvatarTap: () => context.go(Routes.profile),
             actions: const [ThemeModeToggle()],
@@ -175,7 +175,8 @@ class _JoinCodeCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
           ],
           AppTextField(
-            label: 'JOIN CODE',
+            label: 'Join code',
+            leadingIcon: Icons.key_outlined,
             controller: controller,
             hint: 'e.g. ABCD2EFGH3',
             enabled: !isLookingUp,

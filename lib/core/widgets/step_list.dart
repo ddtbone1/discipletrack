@@ -167,14 +167,14 @@ class _Indicator extends StatelessWidget {
         height: size,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: p.mint,
+          color: p.brand,
           shape: BoxShape.circle,
           border: Border.all(color: p.textPrimary, width: 2),
         ),
         child: Text(
           '$number',
           style: AppTypography.caption.copyWith(
-            color: p.onMint,
+            color: p.onBrand,
             fontWeight: FontWeight.w700,
           ),
         ),

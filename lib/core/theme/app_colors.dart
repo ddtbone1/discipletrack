@@ -4,100 +4,133 @@ import 'package:flutter/material.dart';
 /// widgets read the active [AppPalette] through `context.palette`, so every
 /// screen follows the system light or dark setting.
 ///
-/// 60-30-10 (UI_DESIGN_SYSTEM section 7): about 60% cool off-white neutral,
-/// 30% desaturated mint on major elements, 10% desaturated sky for the call
-/// to action. Neither mode uses pure white or pure black.
+/// The palette is lime, white, black and greys, and nothing else
+/// (UI_DESIGN_SYSTEM section 6). The only exceptions are the semantic
+/// warning and error colours, which carry meaning (section 7). The logo's
+/// forest green belongs to the launcher icon and store listing only.
 ///
-/// Light palette:
+/// Light mode: pages (including the welcome page and the splash) are
+/// #F2F3F4 and every component on them (cards, fields, the dock, buttons,
+/// icon buttons) is #FFFFFF. Icons, back buttons and text are black; sub
+/// text is grey. Dark mode is pure black with charcoal cards, after the
+/// reference colourway. Lime is the primary in both.
 ///
-///   #F5F7F8  background  page
-///   #FBFCFC  surface     cards
-///   #CFE4D2  mint        major elements, the 30%
-///   #7DBFD9  sky         primary action, the 10%
-///   #201F1F  ink         near-black text
+/// 60-30-10: about 60% white (or black), 30% greys on major elements, 10%
+/// lime for the primary action and active states.
 ///
-/// Both accents are light, so they always carry dark text.
+/// There is exactly one lime, #9BFC28, the icon logo's own, in both modes;
+/// no other green shade appears anywhere in the app. [brandPressed] is that
+/// lime one step darker, shown only while a button is held down.
 abstract final class AppColors {
-  static const background = Color(0xFFF5F7F8);
-  static const surface = Color(0xFFFBFCFC);
-  static const surfaceAlt = Color(0xFFEDF1F2); // fields, quiet panels
-  static const border = Color(0xFFDFE5E7); // soft, low contrast
+  static const background = Color(0xFFF2F3F4);
+  static const surface = Color(0xFFFFFFFF);
+  static const surfaceAlt = Color(0xFFFFFFFF); // fields, quiet panels
+  static const border = Color(0xFFE5E7EB); // separates white on white
 
-  /// Near-black. High-emphasis fills such as the snackbar.
-  static const ink = Color(0xFF201F1F);
+  /// Black. Text and the highest-emphasis neutral fills.
+  static const ink = Color(0xFF0A0A0A);
 
-  /// The 30%: desaturated mint for major elements.
-  static const mint = Color(0xFFCFE4D2);
+  /// Neutral fill for major positive elements (a placed member's group
+  /// card). Grey, not a lime tint: the app has one lime only.
+  static const mint = Color(0xFFFFFFFF);
 
-  /// The 10%: desaturated sky. Primary buttons and highlights.
-  static const sky = Color(0xFF7DBFD9);
+  /// Neutral grey for informational accents (a "waiting" pill).
+  static const sky = Color(0xFFFFFFFF);
+  static const skyPressed = Color(0xFFF2F3F4);
 
-  /// [sky] one step darker, for the pressed state.
-  static const skyPressed = Color(0xFF68ABC6);
+  /// The 10%: lime. Primary buttons, the active dock item, highlights.
+  /// Always carries black text.
+  static const brand = Color(0xFF9BFC28);
+  static const brandPressed = Color(0xFF8BE324);
+  static const onBrand = Color(0xFF0A0A0A);
+  static const lime = Color(0xFF9BFC28);
+  static const onLime = Color(0xFF0A0A0A);
 
-  /// Quiet fill for notices and list rows, a paler mint.
-  static const pastel = Color(0xFFE9F1EA);
+  /// The splash and welcome page background: the page itself, so they
+  /// follow the theme like every other screen.
+  static const brandDeep = Color(0xFFF2F3F4);
+  static const onBrandDeep = Color(0xFF0A0A0A);
 
-  static const textPrimary = Color(0xFF201F1F);
-  static const muted = Color(0xFF6B706B);
-  static const disabled = Color(0xFFA6ADA6);
+  /// The dock: a white pill, its active item a soft grey pill with black
+  /// text, natural rather than loud.
+  static const dock = Color(0xFFFFFFFF);
+  static const dockIcon = Color(0xFF8E8E93);
+  static const dockActive = Color(0xFFEEEFF1);
+  static const dockActiveForeground = Color(0xFF0A0A0A);
 
-  static const onInk = Color(0xFFFBFCFC);
-  static const onInkMuted = Color(0xB3FBFCFC); // off-white at 70%
+  /// Quiet grey fill for notices and list rows.
+  static const pastel = Color(0xFFFFFFFF);
 
-  /// On [mint], [sky] and [pastel]. Always the dark ink, never white.
-  static const onMint = Color(0xFF201F1F);
-  static const onSky = Color(0xFF201F1F);
-  static const onPastel = Color(0xFF201F1F);
+  static const textPrimary = Color(0xFF0A0A0A);
+  static const muted = Color(0xFF6B7178);
+  static const disabled = Color(0xFFA9AEB3);
 
-  // Section 7: these communicate meaning and are never decoration.
-  // success is a deeper green than [mint] so a "completed" state is never
-  // confused with an ordinary accent surface.
-  static const success = Color(0xFF2F7D4F);
+  static const onInk = Color(0xFFFFFFFF);
+  static const onInkMuted = Color(0xB3FFFFFF); // white at 70%
+
+  static const onMint = Color(0xFF0A0A0A);
+  static const onSky = Color(0xFF0A0A0A);
+  static const onPastel = Color(0xFF0A0A0A);
+
+  // Section 7: these communicate meaning and are never decoration. Success
+  // is the one lime.
+  static const success = Color(0xFF9BFC28);
   static const warning = Color(0xFFB57A18);
   static const error = Color(0xFFCE3B3B);
-  static const info = Color(0xFF2B87B8);
+  static const info = Color(0xFF6B7178);
 
-  static const successSurface = Color(0xFFE6F3EA);
+  static const successSurface = Color(0xFFFFFFFF);
   static const warningSurface = Color(0xFFFBF2E1);
   static const errorSurface = Color(0xFFFBEBEB);
 }
 
-/// Dark scheme: a cool near-black page with raised charcoal cards and
-/// off-white text. The accents are desaturated a step further than in light
-/// mode and still carry dark text, so the product reads as one system.
+/// Dark scheme, after the reference colourway: a pure black page, charcoal
+/// cards, white text and a bright lime with black text.
 abstract final class AppColorsDark {
-  static const background = Color(0xFF121517);
-  static const surface = Color(0xFF1C2023); // raised card
-  static const surfaceAlt = Color(0xFF252A2D); // fields, quiet panels
-  static const border = Color(0xFF30363A);
+  static const background = Color(0xFF000000);
+  static const surface = Color(0xFF1C1C1E); // raised card
+  static const surfaceAlt = Color(0xFF2A2A2C); // fields, quiet panels
+  static const border = Color(0xFF2C2C2E);
 
-  /// The high-emphasis fill inverts to near-white so a primary button still
-  /// stands out most against a dark page.
-  static const ink = Color(0xFFE8ECEE);
+  /// The high-emphasis neutral inverts to white.
+  static const ink = Color(0xFFFFFFFF);
 
-  static const mint = Color(0xFFAFCBB4);
-  static const sky = Color(0xFF6FAFC8);
-  static const skyPressed = Color(0xFF5C9BB4);
-  static const pastel = Color(0xFF212A25);
+  static const mint = Color(0xFF1C1C1E);
+  static const sky = Color(0xFF2C2C2E);
+  static const skyPressed = Color(0xFF3A3A3C);
 
-  static const textPrimary = Color(0xFFE8ECEE);
-  static const muted = Color(0xFF9BA09B);
-  static const disabled = Color(0xFF5E635E);
+  static const brand = Color(0xFF9BFC28);
+  static const brandPressed = Color(0xFF8BE324);
+  static const onBrand = Color(0xFF0A0A0A);
+  static const lime = Color(0xFF9BFC28);
+  static const onLime = Color(0xFF0A0A0A);
+  static const brandDeep = Color(0xFF000000);
+  static const onBrandDeep = Color(0xFFFFFFFF);
 
-  static const onInk = Color(0xFF201F1F);
-  static const onInkMuted = Color(0xB3201F1F);
+  static const dock = Color(0xFF1C1C1E);
+  static const dockIcon = Color(0xFF8E8E93);
+  static const dockActive = Color(0xFF3A3A3C);
+  static const dockActiveForeground = Color(0xFFFFFFFF);
 
-  static const onMint = Color(0xFF201F1F);
-  static const onSky = Color(0xFF201F1F);
-  static const onPastel = Color(0xFFE8F0E9);
+  static const pastel = Color(0xFF1C1C1E);
 
-  static const success = Color(0xFF5FC98A);
+  static const textPrimary = Color(0xFFFFFFFF);
+  static const muted = Color(0xFF8E8E93);
+  static const disabled = Color(0xFF5A5A5E);
+
+  static const onInk = Color(0xFF0A0A0A);
+  static const onInkMuted = Color(0xB30A0A0A);
+
+  static const onMint = Color(0xFFFFFFFF);
+  static const onSky = Color(0xFFFFFFFF);
+  static const onPastel = Color(0xFFFFFFFF);
+
+  static const success = Color(0xFF9BFC28);
   static const warning = Color(0xFFE0A93F);
   static const error = Color(0xFFF07070);
-  static const info = Color(0xFF6BC2EC);
+  static const info = Color(0xFF8E8E93);
 
-  static const successSurface = Color(0xFF17291E);
+  static const successSurface = Color(0xFF1C1C1E);
   static const warningSurface = Color(0xFF2B2415);
   static const errorSurface = Color(0xFF2E1A1A);
 }
@@ -114,6 +147,17 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.mint,
     required this.sky,
     required this.skyPressed,
+    required this.brand,
+    required this.brandPressed,
+    required this.onBrand,
+    required this.lime,
+    required this.onLime,
+    required this.brandDeep,
+    required this.onBrandDeep,
+    required this.dock,
+    required this.dockIcon,
+    required this.dockActive,
+    required this.dockActiveForeground,
     required this.pastel,
     required this.textPrimary,
     required this.muted,
@@ -141,6 +185,17 @@ class AppPalette extends ThemeExtension<AppPalette> {
     mint: AppColors.mint,
     sky: AppColors.sky,
     skyPressed: AppColors.skyPressed,
+    brand: AppColors.brand,
+    brandPressed: AppColors.brandPressed,
+    onBrand: AppColors.onBrand,
+    lime: AppColors.lime,
+    onLime: AppColors.onLime,
+    brandDeep: AppColors.brandDeep,
+    onBrandDeep: AppColors.onBrandDeep,
+    dock: AppColors.dock,
+    dockIcon: AppColors.dockIcon,
+    dockActive: AppColors.dockActive,
+    dockActiveForeground: AppColors.dockActiveForeground,
     pastel: AppColors.pastel,
     textPrimary: AppColors.textPrimary,
     muted: AppColors.muted,
@@ -168,6 +223,17 @@ class AppPalette extends ThemeExtension<AppPalette> {
     mint: AppColorsDark.mint,
     sky: AppColorsDark.sky,
     skyPressed: AppColorsDark.skyPressed,
+    brand: AppColorsDark.brand,
+    brandPressed: AppColorsDark.brandPressed,
+    onBrand: AppColorsDark.onBrand,
+    lime: AppColorsDark.lime,
+    onLime: AppColorsDark.onLime,
+    brandDeep: AppColorsDark.brandDeep,
+    onBrandDeep: AppColorsDark.onBrandDeep,
+    dock: AppColorsDark.dock,
+    dockIcon: AppColorsDark.dockIcon,
+    dockActive: AppColorsDark.dockActive,
+    dockActiveForeground: AppColorsDark.dockActiveForeground,
     pastel: AppColorsDark.pastel,
     textPrimary: AppColorsDark.textPrimary,
     muted: AppColorsDark.muted,
@@ -194,6 +260,17 @@ class AppPalette extends ThemeExtension<AppPalette> {
   final Color mint;
   final Color sky;
   final Color skyPressed;
+  final Color brand;
+  final Color brandPressed;
+  final Color onBrand;
+  final Color lime;
+  final Color onLime;
+  final Color brandDeep;
+  final Color onBrandDeep;
+  final Color dock;
+  final Color dockIcon;
+  final Color dockActive;
+  final Color dockActiveForeground;
   final Color pastel;
   final Color textPrimary;
   final Color muted;
@@ -221,6 +298,17 @@ class AppPalette extends ThemeExtension<AppPalette> {
     Color? mint,
     Color? sky,
     Color? skyPressed,
+    Color? brand,
+    Color? brandPressed,
+    Color? onBrand,
+    Color? lime,
+    Color? onLime,
+    Color? brandDeep,
+    Color? onBrandDeep,
+    Color? dock,
+    Color? dockIcon,
+    Color? dockActive,
+    Color? dockActiveForeground,
     Color? pastel,
     Color? textPrimary,
     Color? muted,
@@ -247,6 +335,17 @@ class AppPalette extends ThemeExtension<AppPalette> {
       mint: mint ?? this.mint,
       sky: sky ?? this.sky,
       skyPressed: skyPressed ?? this.skyPressed,
+      brand: brand ?? this.brand,
+      brandPressed: brandPressed ?? this.brandPressed,
+      onBrand: onBrand ?? this.onBrand,
+      lime: lime ?? this.lime,
+      onLime: onLime ?? this.onLime,
+      brandDeep: brandDeep ?? this.brandDeep,
+      onBrandDeep: onBrandDeep ?? this.onBrandDeep,
+      dock: dock ?? this.dock,
+      dockIcon: dockIcon ?? this.dockIcon,
+      dockActive: dockActive ?? this.dockActive,
+      dockActiveForeground: dockActiveForeground ?? this.dockActiveForeground,
       pastel: pastel ?? this.pastel,
       textPrimary: textPrimary ?? this.textPrimary,
       muted: muted ?? this.muted,
@@ -279,6 +378,17 @@ class AppPalette extends ThemeExtension<AppPalette> {
       mint: l(mint, other.mint),
       sky: l(sky, other.sky),
       skyPressed: l(skyPressed, other.skyPressed),
+      brand: l(brand, other.brand),
+      brandPressed: l(brandPressed, other.brandPressed),
+      onBrand: l(onBrand, other.onBrand),
+      lime: l(lime, other.lime),
+      onLime: l(onLime, other.onLime),
+      brandDeep: l(brandDeep, other.brandDeep),
+      onBrandDeep: l(onBrandDeep, other.onBrandDeep),
+      dock: l(dock, other.dock),
+      dockIcon: l(dockIcon, other.dockIcon),
+      dockActive: l(dockActive, other.dockActive),
+      dockActiveForeground: l(dockActiveForeground, other.dockActiveForeground),
       pastel: l(pastel, other.pastel),
       textPrimary: l(textPrimary, other.textPrimary),
       muted: l(muted, other.muted),

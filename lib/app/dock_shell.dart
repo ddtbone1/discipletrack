@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,22 +22,23 @@ List<DockItem> dockItemsFor({
 }) => [
   const DockItem(
     label: 'Home',
-    icon: Icons.home_outlined,
-    activeIcon: Icons.home_rounded,
+    icon: CupertinoIcons.house,
+    activeIcon: CupertinoIcons.house,
+    glyph: _house,
     path: Routes.home,
   ),
   if (isCoordinator)
     const DockItem(
       label: 'D Groups',
-      icon: Icons.groups_2_outlined,
-      activeIcon: Icons.groups_2_rounded,
+      icon: CupertinoIcons.person_2,
+      activeIcon: CupertinoIcons.person_2_fill,
       path: Routes.dGroups,
     )
   else if (ministry != null)
     DockItem(
       label: 'My Group',
-      icon: Icons.diversity_3_outlined,
-      activeIcon: Icons.diversity_3_rounded,
+      icon: CupertinoIcons.person_2,
+      activeIcon: CupertinoIcons.person_2_fill,
       path: ministry.isLeader
           ? Routes.dGroupDetailFor(ministry.dGroupId)
           : Routes.myGroup,
@@ -44,17 +46,20 @@ List<DockItem> dockItemsFor({
   if (canReview)
     const DockItem(
       label: 'Requests',
-      icon: Icons.how_to_reg_outlined,
-      activeIcon: Icons.how_to_reg_rounded,
+      icon: CupertinoIcons.envelope,
+      activeIcon: CupertinoIcons.envelope_fill,
       path: Routes.pendingMembers,
     ),
   const DockItem(
     label: 'Profile',
-    icon: Icons.person_outline_rounded,
-    activeIcon: Icons.person_rounded,
+    icon: CupertinoIcons.person_crop_circle,
+    activeIcon: CupertinoIcons.person_crop_circle_fill,
     path: Routes.profile,
   ),
 ];
+
+Widget _house(Color color, double size, bool active) =>
+    HouseOutline(color: color, size: size, filled: active);
 
 /// The item whose path is the longest prefix of [location], or -1.
 int activeDockIndex(List<DockItem> items, String location) {
@@ -110,13 +115,16 @@ class DockShell extends ConsumerWidget {
           ),
           if (!keyboardOpen)
             Positioned(
-              left: 16,
-              right: 16,
+              left: 0,
+              right: 0,
               bottom: media.padding.bottom + FloatingDock.gap,
-              child: FloatingDock(
-                items: items,
-                activeIndex: activeDockIndex(items, location),
-                onSelected: (i) => context.go(items[i].path),
+              // Only as wide as its contents, centred.
+              child: Center(
+                child: FloatingDock(
+                  items: items,
+                  activeIndex: activeDockIndex(items, location),
+                  onSelected: (i) => context.go(items[i].path),
+                ),
               ),
             ),
         ],

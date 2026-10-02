@@ -10,15 +10,13 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_page_header.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/info_group.dart';
+import '../../../core/widgets/stat_tile.dart';
 import '../../appearance/presentation/theme_mode_toggle.dart';
 import '../../membership/application/membership_providers.dart';
-import '../../membership/domain/church_membership.dart';
-import '../../membership/presentation/membership_status_pill.dart';
 import '../../membership_review/application/membership_review_providers.dart';
 import '../../ministry/application/ministry_providers.dart';
 import '../../ministry/domain/ministry_context.dart';
 import '../../ministry/presentation/invitation_card.dart';
-import '../../ministry/presentation/ministry_ui.dart';
 import '../../profile/application/profile_providers.dart';
 
 /// Home for an ACTIVE church member.
@@ -59,44 +57,66 @@ class HomePage extends ConsumerWidget {
         children: [
           const SizedBox(height: AppSpacing.md),
           AppPageHeader(
-            greeting: 'Hello, ${profile?.firstName ?? 'friend'}',
-            subtitle: church == null
-                ? 'Welcome to your church workspace'
-                : 'Welcome to ${church.name}',
+            name: profile?.fullName ?? 'Friend',
+            subtitle: church?.name ?? 'Your church workspace',
             onAvatarTap: () => context.go(Routes.profile),
             actions: const [ThemeModeToggle()],
-            // The router only sends ACTIVE memberships here.
-            status: const MembershipStatusPill(status: MembershipStatus.active),
           ),
           const SizedBox(height: AppSpacing.xl),
+
+          // The greeting is the body's title.
+          Semantics(
+            header: true,
+            child: Text(
+              '${greetingFor(DateTime.now())}, '
+              '${profile?.firstName ?? 'friend'}',
+              style: AppTypography.display.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.5,
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
 
           const _MinistryEntry(),
           const SizedBox(height: AppSpacing.xl),
 
           if (canReview || isCoordinator) ...[
-            InfoGroup(
-              title: 'Church',
-              rows: [
-                if (isCoordinator)
-                  InfoRow(
-                    label: 'D Groups',
-                    value: _groupsValue(groupCount, unplacedCount),
-                    icon: Icons.groups_2_outlined,
-                    onTap: () => context.push(Routes.dGroups),
-                  ),
-                if (canReview)
-                  InfoRow(
-                    label: 'Membership requests',
-                    value: pendingCount == null
-                        ? null
-                        : (pendingCount == 0
-                              ? 'None waiting'
-                              : '$pendingCount waiting'),
-                    icon: Icons.how_to_reg_outlined,
-                    onTap: () => context.push(Routes.pendingMembers),
-                  ),
-              ],
+            Semantics(
+              header: true,
+              child: Text(
+                'Church overview',
+                style: AppTypography.sectionTitle.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
+            const SizedBox(height: AppSpacing.sm),
+            // Full-width tiles, one figure each.
+            if (isCoordinator) ...[
+              StatTile(
+                icon: Icons.groups_2_outlined,
+                label: 'D Groups',
+                value: groupCount,
+                onTap: () => context.push(Routes.dGroups),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              StatTile(
+                icon: Icons.person_search_outlined,
+                label: 'Not in a group',
+                value: unplacedCount,
+                onTap: () => context.push(Routes.dGroups),
+              ),
+            ],
+            if (isCoordinator && canReview)
+              const SizedBox(height: AppSpacing.sm),
+            if (canReview)
+              StatTile(
+                icon: Icons.how_to_reg_outlined,
+                label: 'Requests',
+                value: pendingCount,
+                onTap: () => context.push(Routes.pendingMembers),
+              ),
             const SizedBox(height: AppSpacing.lg),
           ],
 
@@ -106,13 +126,6 @@ class HomePage extends ConsumerWidget {
       ),
     );
   }
-}
-
-String? _groupsValue(int? groups, int? unplaced) {
-  if (groups == null) return null;
-  final g = MinistryFormat.count(groups, 'group');
-  if (unplaced == null || unplaced == 0) return g;
-  return '$g · $unplaced unplaced';
 }
 
 /// Where the person stands in the ministry structure, as one entry:

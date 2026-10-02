@@ -122,21 +122,21 @@ void main() {
       expect(redirectFor(SessionState.signedOut, Routes.signIn), isNull);
     });
 
-    test('sign-up and email verification are allowed while signed out', () {
+    test('the welcome page is where a signed-out user lands', () {
+      expect(destinationFor(SessionState.signedOut), Routes.start);
+    });
+
+    test('login, sign-up and email verification are allowed while signed '
+        'out', () {
+      expect(redirectFor(SessionState.signedOut, Routes.signIn), isNull);
       expect(redirectFor(SessionState.signedOut, Routes.signUp), isNull);
       expect(redirectFor(SessionState.signedOut, Routes.verifyEmail), isNull);
     });
 
     test('a signed-out user is pushed off protected pages', () {
-      expect(redirectFor(SessionState.signedOut, Routes.home), Routes.signIn);
-      expect(
-        redirectFor(SessionState.signedOut, Routes.profile),
-        Routes.signIn,
-      );
-      expect(
-        redirectFor(SessionState.signedOut, Routes.welcome),
-        Routes.signIn,
-      );
+      expect(redirectFor(SessionState.signedOut, Routes.home), Routes.start);
+      expect(redirectFor(SessionState.signedOut, Routes.profile), Routes.start);
+      expect(redirectFor(SessionState.signedOut, Routes.welcome), Routes.start);
     });
 
     test('a signed-in user is pushed off the auth pages', () {
@@ -187,10 +187,7 @@ void main() {
 
     test('profile is NOT reachable while unknown or signed out', () {
       expect(redirectFor(SessionState.unknown, Routes.profile), Routes.splash);
-      expect(
-        redirectFor(SessionState.signedOut, Routes.profile),
-        Routes.signIn,
-      );
+      expect(redirectFor(SessionState.signedOut, Routes.profile), Routes.start);
     });
 
     test('an unresolved session is held on the splash', () {
@@ -278,7 +275,7 @@ void main() {
 
     test('an unmatched location goes to the state\'s destination', () {
       expect(redirectFor(SessionState.active, ''), Routes.home);
-      expect(redirectFor(SessionState.signedOut, ''), Routes.signIn);
+      expect(redirectFor(SessionState.signedOut, ''), Routes.start);
     });
   });
 }

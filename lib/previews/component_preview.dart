@@ -60,14 +60,14 @@ Widget textFields() => _Sheet(
   title: 'AppTextField',
   children: [
     _Label('Default'),
-    AppTextField(label: 'FULL NAME', controller: _c('Juan dela Cruz')),
+    AppTextField(label: 'Full name', controller: _c('Juan dela Cruz')),
 
     _Label('Empty with hint'),
-    AppTextField(label: 'EMAIL', controller: _c(''), hint: 'you@example.com'),
+    AppTextField(label: 'Email', controller: _c(''), hint: 'you@example.com'),
 
     _Label('With error (note the height does not change)'),
     AppTextField(
-      label: 'EMAIL',
+      label: 'Email',
       controller: _c('not-an-email'),
       errorText: 'Enter a valid email',
     ),
@@ -81,7 +81,7 @@ Widget textFields() => _Sheet(
 
     _Label('Disabled'),
     AppTextField(
-      label: 'FULL NAME',
+      label: 'Full name',
       controller: _c('Juan dela Cruz'),
       enabled: false,
     ),
@@ -129,7 +129,7 @@ Widget buttonsLargeText() => _Sheet(
     AppButton(label: 'Create account', onPressed: _noop),
     const SizedBox(height: AppSpacing.sm),
     AppTextField(
-      label: 'EMAIL',
+      label: 'Email',
       controller: _c(''),
       hint: 'you@example.com',
       errorText: 'Enter a valid email',

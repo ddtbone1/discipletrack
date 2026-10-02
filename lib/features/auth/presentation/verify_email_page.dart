@@ -185,7 +185,8 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
 
           if (pendingEmail == null)
             AppTextField(
-              label: 'EMAIL',
+              label: 'Email',
+              leadingIcon: Icons.mail_outline_rounded,
               controller: _email,
               hint: 'you@example.com',
               errorText: _emailError,
@@ -196,7 +197,8 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
             ),
 
           AppTextField(
-            label: 'VERIFICATION CODE',
+            label: 'Verification code',
+            leadingIcon: Icons.pin_outlined,
             controller: _code,
             hint: '6-digit code',
             errorText: _codeError,
@@ -285,7 +287,7 @@ class _Notice extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.mark_email_read_outlined, size: 18, color: p.success),
+          Icon(Icons.mark_email_read_outlined, size: 18, color: p.textPrimary),
           const SizedBox(width: AppSpacing.xs),
           Expanded(
             child: Text(

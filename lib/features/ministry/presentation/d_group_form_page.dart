@@ -104,7 +104,8 @@ class _DGroupFormPageState extends ConsumerState<DGroupFormPage> {
             const SizedBox(height: AppSpacing.md),
           ],
           AppTextField(
-            label: 'GROUP NAME',
+            label: 'Group name',
+            leadingIcon: Icons.groups_2_outlined,
             controller: _name,
             hint: 'e.g. Young Adults A',
             errorText: _nameError,
@@ -113,7 +114,8 @@ class _DGroupFormPageState extends ConsumerState<DGroupFormPage> {
             enabled: !busy,
           ),
           AppTextField(
-            label: 'DESCRIPTION (OPTIONAL)',
+            label: 'Description (optional)',
+            leadingIcon: Icons.notes_rounded,
             controller: _description,
             hint: 'e.g. Ages 18 to 30, Thursdays 7 PM at the fellowship hall',
             textCapitalization: TextCapitalization.sentences,

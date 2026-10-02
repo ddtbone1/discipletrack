@@ -91,14 +91,30 @@ class AppCard extends StatelessWidget {
       ),
     );
 
-    return Material(
-      color: fill.background(p),
-      shape: RoundedRectangleBorder(
+    // Soft edges: a faint outline and a low, wide shadow, so cards lift off
+    // the grey page without hard lines.
+    return DecoratedBox(
+      decoration: BoxDecoration(
         borderRadius: AppRadius.card,
-        side: fill.hasBorder ? BorderSide(color: p.border) : BorderSide.none,
+        boxShadow: [
+          BoxShadow(
+            color: p.textPrimary.withValues(alpha: 0.05),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      clipBehavior: Clip.antiAlias,
-      child: onTap == null ? content : InkWell(onTap: onTap, child: content),
+      child: Material(
+        color: fill.background(p),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadius.card,
+          side: fill.hasBorder
+              ? BorderSide(color: p.border.withValues(alpha: 0.6))
+              : BorderSide.none,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: onTap == null ? content : InkWell(onTap: onTap, child: content),
+      ),
     );
   }
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The logo's forest green (assets/brand/app_logo.png). -->
+    <color name="ic_launcher_background">#FF022306</color>
+    <!-- White, as the app's light mode. Launch screens only; the forest
+         green stays on the launcher icon. -->
+    <color name="splash_background">#FFFFFFFF</color>
+</resources>
