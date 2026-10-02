@@ -193,6 +193,7 @@ class _JoinCodeCard extends StatelessWidget {
           ),
           AppButton(
             label: 'Find church',
+            requiresConnection: true,
             icon: Icons.search_rounded,
             isLoading: isLookingUp,
             onPressed: isLookingUp ? null : onFind,
@@ -274,6 +275,7 @@ class _ChurchFoundCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           AppButton(
             label: 'Join church',
+            requiresConnection: true,
             icon: Icons.check_rounded,
             isLoading: isSubmitting,
             onPressed: isSubmitting ? null : onJoin,

@@ -1,31 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/connectivity/connection_status.dart';
+import '../../../core/supabase/postgrest_failure.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../domain/church_membership.dart';
 
-/// Why a membership operation failed, decided from the PostgREST error code
-/// rather than message text. Migration 005 raises the PTxxx SQLSTATEs.
-enum MembershipFailureCode {
-  /// `PT429`: the per-user join-code rate limit.
-  rateLimited,
+/// Why a membership operation failed. Migration 005 raises the PTxxx
+/// SQLSTATEs; the mapping is shared with every repository.
+typedef MembershipFailureCode = DbFailureCode;
 
-  /// `PT401`: no session.
-  unauthenticated,
-
-  /// `PT403` or `42501`: the caller may not do that.
-  forbidden,
-
-  /// `PT404`.
-  notFound,
-
-  /// `PT409`: the record is not in a state that allows the operation.
-  conflict,
-  network,
-  unknown,
-}
-
-class MembershipFailure implements Exception {
+class MembershipFailure implements Exception, NetworkAwareFailure {
   const MembershipFailure(
     this.message, {
     this.code = MembershipFailureCode.unknown,
@@ -33,6 +18,9 @@ class MembershipFailure implements Exception {
 
   final String message;
   final MembershipFailureCode code;
+
+  @override
+  bool get isNetwork => code == MembershipFailureCode.network;
 
   @override
   String toString() => message;
@@ -160,33 +148,22 @@ class MembershipRepository {
       throw MembershipFailure(friendlyMessage(e, fallback), code: codeOf(e));
     } on MembershipFailure {
       rethrow;
-    } catch (_) {
-      throw MembershipFailure(
-        'Could not reach DiscipleTrack. Check your connection and try again.',
+    } on Exception {
+      throw const MembershipFailure(
+        PostgrestFailure.networkMessage,
         code: MembershipFailureCode.network,
       );
+    } catch (_) {
+      throw MembershipFailure(fallback);
     }
   }
 
   /// Maps the PostgREST/SQLSTATE code. Exposed for tests.
-  static MembershipFailureCode codeOf(PostgrestException e) => switch (e.code) {
-    'PT429' => MembershipFailureCode.rateLimited,
-    'PT401' => MembershipFailureCode.unauthenticated,
-    'PT403' || '42501' => MembershipFailureCode.forbidden,
-    'PT404' => MembershipFailureCode.notFound,
-    'PT409' => MembershipFailureCode.conflict,
-    _ => MembershipFailureCode.unknown,
-  };
+  static MembershipFailureCode codeOf(PostgrestException e) =>
+      PostgrestFailure.codeOf(e);
 
   static String friendlyMessage(PostgrestException e, String fallback) =>
-      switch (codeOf(e)) {
-        MembershipFailureCode.rateLimited =>
-          'Too many attempts. Try again in a few minutes.',
-        MembershipFailureCode.unauthenticated =>
-          'Please sign in again to continue.',
-        MembershipFailureCode.forbidden => 'You are not allowed to do that.',
-        _ => fallback,
-      };
+      PostgrestFailure.friendlyMessage(e, fallback);
 }
 
 final membershipRepositoryProvider = Provider<MembershipRepository>((ref) {

@@ -16,6 +16,18 @@ import '../features/membership/domain/church_membership.dart';
 import '../features/membership_review/application/membership_review_providers.dart';
 import '../features/membership_review/domain/membership_request.dart';
 import '../features/membership_review/presentation/pending_members_page.dart';
+import '../features/ministry/application/ministry_providers.dart';
+import '../features/ministry/domain/d_group.dart';
+import '../features/ministry/domain/d_group_detail.dart';
+import '../features/ministry/domain/d_group_invitation.dart';
+import '../features/ministry/domain/d_group_member.dart';
+import '../features/ministry/domain/discipler_assignment.dart';
+import '../features/ministry/domain/member_option.dart';
+import '../features/ministry/domain/ministry_context.dart';
+import '../features/ministry/presentation/d_group_detail_page.dart';
+import '../features/ministry/presentation/d_groups_page.dart';
+import '../features/ministry/presentation/member_picker_page.dart';
+import '../features/ministry/presentation/my_group_page.dart';
 import '../features/onboarding/presentation/join_church_page.dart';
 import '../features/onboarding/presentation/no_access_page.dart';
 import '../features/onboarding/presentation/pending_approval_page.dart';
@@ -25,7 +37,8 @@ import '../features/profile/domain/profile.dart';
 import '../features/profile/presentation/edit_profile_page.dart';
 import '../features/profile/presentation/profile_page.dart';
 
-/// Previews of every screen in the Auth + Profile and Church Join slices.
+/// Previews of every screen in the Auth + Profile, Church Join and Ministry
+/// Structure slices.
 ///
 /// Run with: flutter widget-preview start
 ///
@@ -55,7 +68,7 @@ final _longNameProfile = Profile(
 
 const _church = ChurchSummary(
   id: '44444444-4444-4444-4444-444444444444',
-  name: 'Bankal Seventh-day Adventist Church',
+  name: 'Liberty Bible Baptist Church - Gensan',
 );
 
 ChurchMembership _membership(
@@ -84,6 +97,159 @@ final _requests = [
   ),
 ];
 
+const _groupId = '55555555-5555-5555-5555-555555555555';
+
+DGroupMember _dgm(
+  String id,
+  String name,
+  DGroupResponsibility r, [
+  String? phone,
+]) => DGroupMember(
+  dGroupMembershipId: id,
+  churchMembershipId: 'cm-$id',
+  fullName: name,
+  responsibility: r,
+  phone: phone,
+  startedAt: DateTime(2026, 9, 1),
+);
+
+final _groupDetail = DGroupDetail(
+  group: const DGroup(
+    id: _groupId,
+    name: 'Young Adults A',
+    description: 'Thursday evenings at the fellowship hall.',
+    status: DGroupStatus.active,
+  ),
+  members: [
+    _dgm('lea', 'Lea Santos', DGroupResponsibility.leader, '+63 917 555 0102'),
+    _dgm(
+      'dino',
+      'Dino Reyes',
+      DGroupResponsibility.discipler,
+      '+63 917 555 0103',
+    ),
+    _dgm('diana', 'Diana Cruz', DGroupResponsibility.disciple),
+    _dgm('daniel', 'Daniel Bautista', DGroupResponsibility.disciple),
+  ],
+  assignments: [
+    DisciplerAssignment(
+      id: 'a1',
+      disciplerDGroupMembershipId: 'dino',
+      discipleDGroupMembershipId: 'diana',
+      startedAt: DateTime(2026, 9, 2),
+    ),
+  ],
+  invitations: [
+    DGroupInvitation(
+      id: 'inv1',
+      dGroupId: _groupId,
+      churchMembershipId: 'cm-mara',
+      inviteeName: 'Mara Villanueva',
+      responsibility: DGroupResponsibility.disciple,
+      status: DGroupInvitationStatus.pending,
+      createdAt: DateTime.now().subtract(const Duration(days: 3)),
+      expiresAt: DateTime.now().add(const Duration(days: 11)),
+    ),
+  ],
+);
+
+RosterEntry _roster(
+  String id,
+  String name,
+  DGroupResponsibility r, {
+  String? phone,
+  bool me = false,
+  bool leader = false,
+  bool discipler = false,
+}) => RosterEntry(
+  dGroupMembershipId: id,
+  churchMembershipId: 'cm-$id',
+  fullName: name,
+  responsibility: r,
+  phone: phone,
+  isMe: me,
+  isMyLeader: leader,
+  isMyDiscipler: discipler,
+);
+
+final _discipleContext = MinistryContext(
+  dGroupId: _groupId,
+  dGroupName: 'Young Adults A',
+  roster: [
+    _roster(
+      'lea',
+      'Lea Santos',
+      DGroupResponsibility.leader,
+      phone: '+63 917 555 0102',
+      leader: true,
+    ),
+    _roster(
+      'dino',
+      'Dino Reyes',
+      DGroupResponsibility.discipler,
+      phone: '+63 917 555 0103',
+      discipler: true,
+    ),
+    _roster('me', 'James Mercado', DGroupResponsibility.disciple, me: true),
+    _roster('daniel', 'Daniel Bautista', DGroupResponsibility.disciple),
+  ],
+);
+
+final _leaderContext = MinistryContext(
+  dGroupId: _groupId,
+  dGroupName: 'Young Adults A',
+  roster: [
+    _roster('me', 'James Mercado', DGroupResponsibility.leader, me: true),
+  ],
+);
+
+final _invitation = DGroupInvitation(
+  id: 'inv1',
+  dGroupId: _groupId,
+  dGroupName: 'Young Adults A',
+  responsibility: DGroupResponsibility.disciple,
+  status: DGroupInvitationStatus.pending,
+  invitedByName: 'Lea Santos',
+  createdAt: DateTime.now().subtract(const Duration(days: 3)),
+  expiresAt: DateTime.now().add(const Duration(days: 11)),
+);
+
+final _groups = [
+  DGroupSummary(
+    group: _groupDetail.group,
+    leaderName: 'Lea Santos',
+    disciplerCount: 1,
+    discipleCount: 2,
+  ),
+  const DGroupSummary(
+    group: DGroup(id: 'g2', name: 'Men of Faith', status: DGroupStatus.active),
+    leaderName: 'Ramon Garcia',
+    disciplerCount: 2,
+    discipleCount: 5,
+  ),
+];
+
+const _placeable = [
+  MemberOption(
+    churchMembershipId: 'm1',
+    fullName: 'Mara Villanueva',
+    hasPendingInvitation: true,
+  ),
+  MemberOption(
+    churchMembershipId: 'm2',
+    fullName: 'Paolo Lim',
+    hasPendingInvitation: false,
+  ),
+  MemberOption(
+    churchMembershipId: 'm3',
+    fullName: 'Diana Cruz',
+    hasPendingInvitation: false,
+    currentDGroupId: _groupId,
+    currentDGroupName: 'Young Adults A',
+    currentResponsibilities: {DGroupResponsibility.disciple},
+  ),
+];
+
 /// A known address, so the verification preview shows the normal copy.
 class _PreviewPendingVerification extends PendingVerification {
   @override
@@ -104,6 +270,8 @@ Widget _wrap(
   ChurchMembership? membership,
   Set<ChurchRole> roles = const {},
   List<MembershipRequest> requests = const [],
+  MinistryContext? ministry,
+  DGroupInvitation? invitation,
   bool dark = false,
 }) {
   return ProviderScope(
@@ -118,6 +286,12 @@ Widget _wrap(
       ),
       myChurchRolesProvider.overrideWith((ref) async => roles),
       pendingMembershipRequestsProvider.overrideWith((ref) async => requests),
+      myMinistryContextProvider.overrideWith((ref) async => ministry),
+      myPendingInvitationProvider.overrideWith((ref) async => invitation),
+      dGroupsProvider.overrideWith((ref) async => _groups),
+      unplacedMemberCountProvider.overrideWith((ref) async => 3),
+      dGroupDetailProvider.overrideWith((ref, id) async => _groupDetail),
+      placeableMembersProvider.overrideWith((ref, id) async => _placeable),
       pendingVerificationProvider.overrideWith(_PreviewPendingVerification.new),
       if (dark) themeModeProvider.overrideWith(_PreviewDarkMode.new),
     ],
@@ -348,4 +522,73 @@ Widget profileLargeText() => _wrap(
   const ProfilePage(),
   profile: _longNameProfile,
   membership: _membership(MembershipStatus.active),
+);
+
+// ---------------------------------------------------------------------------
+// Ministry structure
+// ---------------------------------------------------------------------------
+
+@Preview(name: '12. Home (Leader)', group: 'Ministry', size: Size(390, 844))
+Widget homeLeader() => _wrap(
+  const HomePage(),
+  profile: _profile,
+  membership: _membership(MembershipStatus.active),
+  ministry: _leaderContext,
+);
+
+@Preview(name: '13. Home (Disciple)', group: 'Ministry', size: Size(390, 844))
+Widget homeDisciple() => _wrap(
+  const HomePage(),
+  profile: _profile,
+  membership: _membership(MembershipStatus.active),
+  ministry: _discipleContext,
+);
+
+@Preview(name: '14. Home (invited)', group: 'Ministry', size: Size(390, 844))
+Widget homeInvited() => _wrap(
+  const HomePage(),
+  profile: _profile,
+  membership: _membership(MembershipStatus.active),
+  invitation: _invitation,
+);
+
+@Preview(name: '15. D Groups', group: 'Ministry', size: Size(390, 844))
+Widget dGroups() => _wrap(
+  const DGroupsPage(),
+  profile: _profile,
+  membership: _membership(MembershipStatus.active),
+  roles: const {ChurchRole.coordinator},
+);
+
+@Preview(name: '16. Group detail', group: 'Ministry', size: Size(390, 844))
+Widget dGroupDetail() => _wrap(
+  const DGroupDetailPage(groupId: _groupId),
+  profile: _profile,
+  membership: _membership(MembershipStatus.active),
+  roles: const {ChurchRole.coordinator},
+);
+
+@Preview(name: '17. Invite a member', group: 'Ministry', size: Size(390, 844))
+Widget invitePicker() => _wrap(
+  const MemberPickerPage(purpose: MemberPickPurpose.invite, groupId: _groupId),
+  profile: _profile,
+  membership: _membership(MembershipStatus.active),
+  roles: const {ChurchRole.coordinator},
+);
+
+@Preview(name: '18. My group', group: 'Ministry', size: Size(390, 844))
+Widget myGroup() => _wrap(
+  const MyGroupPage(),
+  profile: _profile,
+  membership: _membership(MembershipStatus.active),
+  ministry: _discipleContext,
+);
+
+@Preview(name: 'Group detail, dark', group: 'Dark', size: Size(390, 844))
+Widget dGroupDetailDark() => _wrap(
+  const DGroupDetailPage(groupId: _groupId),
+  profile: _profile,
+  membership: _membership(MembershipStatus.active),
+  roles: const {ChurchRole.coordinator},
+  dark: true,
 );

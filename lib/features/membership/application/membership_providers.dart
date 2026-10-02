@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/connectivity/connection_status.dart';
 import '../../../core/supabase/supabase_providers.dart';
+import '../../offline/application/offline_providers.dart';
 import '../data/membership_repository.dart';
 import '../domain/church_membership.dart';
 
@@ -16,7 +18,12 @@ class MembershipController extends AsyncNotifier<ChurchMembership?> {
   Future<ChurchMembership?> build() async {
     final userId = ref.watch(currentUserIdProvider);
     if (userId == null) return null;
-    return ref.watch(membershipRepositoryProvider).fetchMyMembership(userId);
+    final repo = ref.watch(membershipRepositoryProvider);
+    return liveOrSaved(
+      ref,
+      live: () => repo.fetchMyMembership(userId),
+      saved: (s) => s.membership,
+    );
   }
 
   /// Re-reads the membership and swaps it in on success.
@@ -33,9 +40,11 @@ class MembershipController extends AsyncNotifier<ChurchMembership?> {
           .fetchMyMembership(userId);
       // The person may have signed out while the request was in flight.
       if (ref.read(currentUserIdProvider) != userId) return false;
+      ref.read(isOfflineProvider.notifier).markOnline();
       state = AsyncData(next);
       return true;
-    } on MembershipFailure {
+    } on MembershipFailure catch (e) {
+      if (e.isNetwork) ref.read(isOfflineProvider.notifier).markOffline();
       return false;
     }
   }
@@ -53,9 +62,12 @@ final myMembershipProvider =
 final myChurchProvider = FutureProvider<ChurchSummary?>((ref) async {
   final membership = ref.watch(myMembershipProvider).value;
   if (membership == null) return null;
-  return ref
-      .watch(membershipRepositoryProvider)
-      .fetchChurch(membership.churchId);
+  final repo = ref.watch(membershipRepositoryProvider);
+  return liveOrSaved(
+    ref,
+    live: () => repo.fetchChurch(membership.churchId),
+    saved: (s) => s.church,
+  );
 });
 
 /// The person's active church roles. Empty unless the membership is ACTIVE,
@@ -65,9 +77,12 @@ final myChurchRolesProvider = FutureProvider<Set<ChurchRole>>((ref) async {
   if (membership == null || !membership.status.grantsChurchAccess) {
     return const {};
   }
-  return ref
-      .watch(membershipRepositoryProvider)
-      .fetchMyChurchRoles(membership.id);
+  final repo = ref.watch(membershipRepositoryProvider);
+  return liveOrSaved(
+    ref,
+    live: () => repo.fetchMyChurchRoles(membership.id),
+    saved: (s) => s.roles,
+  );
 });
 
 /// Whether the person may review membership requests (RBAC section 2:

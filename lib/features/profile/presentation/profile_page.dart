@@ -12,6 +12,7 @@ import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/info_group.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../../appearance/presentation/theme_mode_toggle.dart';
+import '../../auth/application/auth_providers.dart';
 import '../../membership/application/membership_providers.dart';
 import '../../membership/presentation/membership_status_pill.dart';
 import '../application/profile_providers.dart';
@@ -91,7 +92,7 @@ class _ProfileBody extends ConsumerWidget {
             icon: Icons.edit_outlined,
             variant: AppButtonVariant.secondary,
             expand: false,
-            onPressed: () => context.go(Routes.editProfile),
+            onPressed: () => context.push(Routes.editProfile),
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
@@ -120,6 +121,16 @@ class _ProfileBody extends ConsumerWidget {
               value: _longDate(profile.createdAt),
             ),
           ],
+        ),
+        const SizedBox(height: AppSpacing.xl),
+
+        // Account actions belong with the account, not on Home.
+        AppButton(
+          label: 'Sign out',
+          icon: Icons.logout_rounded,
+          variant: AppButtonVariant.secondary,
+          isLoading: ref.watch(authControllerProvider).isLoading,
+          onPressed: () => ref.read(authControllerProvider.notifier).signOut(),
         ),
         const SizedBox(height: AppSpacing.xl),
       ],

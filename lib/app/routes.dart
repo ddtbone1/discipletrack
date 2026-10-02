@@ -24,6 +24,32 @@ abstract final class Routes {
   /// Membership-request review for Admins and Coordinators.
   static const pendingMembers = '/members/pending';
 
+  /// The Coordinator's list of D Groups.
+  static const dGroups = '/groups';
+  static const newDGroup = '/groups/new';
+
+  /// One D Group, for its Coordinator or Leader. A pattern: build a concrete
+  /// path with [dGroupDetailFor].
+  static const dGroupDetail = '/groups/:groupId';
+  static const dGroupInvite = '/groups/:groupId/invite';
+
+  /// The roster for a Discipler or Disciple.
+  static const myGroup = '/my-group';
+
+  static String dGroupDetailFor(String groupId) => '/groups/$groupId';
+  static String dGroupInviteFor(String groupId) => '/groups/$groupId/invite';
+
+  /// D Group screens. Reachable by any ACTIVE member; what each one shows is
+  /// decided by RLS and the controlled operations, so a deep link by someone
+  /// without authority opens an empty or refused screen, never data.
+  static const ministryRoutes = {
+    dGroups,
+    newDGroup,
+    dGroupDetail,
+    dGroupInvite,
+    myGroup,
+  };
+
   /// Reachable from every authenticated state that has resolved a membership.
   ///
   /// RBAC section 3 grants "User -> own profile" without gating it on

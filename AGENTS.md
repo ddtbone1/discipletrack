@@ -4,7 +4,7 @@ Instructions for anyone working in this repository, human or AI agent.
 
 ## Current phase
 
-Implementation, in vertical slices. Completed: Auth + Profile (migrations 001 to 003). In review: Church Join + Membership Approval + First Entry (migrations 004 and 005, bootstrap, seed). Not started: D Groups, discipleship meetings, attendance, progress, monitoring, follow-ups, announcements.
+Implementation, in vertical slices. Completed: Auth + Profile (migrations 001 to 003); Church Join + Membership Approval + First Entry (migrations 004 and 005, bootstrap, seed). In review: Ministry Structure, Vertical Slice 3 (migration 006: D Groups with a Leader, placement by invitation, pairing, removal, role-scoped reads); Offline read-only, Vertical Slice 4 (client only, no migration: a device snapshot of what the person may already see, view-only while offline). Not started: discipleship meetings, attendance, progress, monitoring, follow-ups, announcements.
 
 Applied migrations are immutable. Any schema change goes in a new migration.
 

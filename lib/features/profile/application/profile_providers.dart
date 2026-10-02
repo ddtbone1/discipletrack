@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/supabase/supabase_providers.dart';
+import '../../offline/application/offline_providers.dart';
 import '../data/profile_repository.dart';
 import '../domain/profile.dart';
 
@@ -11,7 +12,12 @@ import '../domain/profile.dart';
 final myProfileProvider = FutureProvider<Profile?>((ref) async {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return null;
-  return ref.watch(profileRepositoryProvider).fetchMyProfile(userId);
+  final repo = ref.watch(profileRepositoryProvider);
+  return liveOrSaved(
+    ref,
+    live: () => repo.fetchMyProfile(userId),
+    saved: (s) => s.profile,
+  );
 });
 
 /// Saves profile edits and refreshes [myProfileProvider] on success.

@@ -8,6 +8,12 @@ import '../features/auth/presentation/splash_page.dart';
 import '../features/auth/presentation/verify_email_page.dart';
 import '../features/home/presentation/home_page.dart';
 import '../features/membership_review/presentation/pending_members_page.dart';
+import '../features/ministry/domain/member_option.dart';
+import '../features/ministry/presentation/d_group_detail_page.dart';
+import '../features/ministry/presentation/d_group_form_page.dart';
+import '../features/ministry/presentation/d_groups_page.dart';
+import '../features/ministry/presentation/member_picker_page.dart';
+import '../features/ministry/presentation/my_group_page.dart';
 import '../features/onboarding/presentation/join_church_page.dart';
 import '../features/onboarding/presentation/no_access_page.dart';
 import '../features/onboarding/presentation/pending_approval_page.dart';
@@ -15,6 +21,7 @@ import '../features/onboarding/presentation/welcome_page.dart';
 import '../features/profile/presentation/edit_profile_page.dart';
 import '../features/profile/presentation/profile_page.dart';
 import '../features/session/application/session_state.dart';
+import 'dock_shell.dart';
 import 'routes.dart';
 import 'transitions.dart';
 
@@ -45,16 +52,24 @@ Set<String> allowedFor(SessionState state) => switch (state) {
   SessionState.noAccess => Routes.profileRoutes,
   // The welcome is shown exactly once and cannot be skipped by navigating.
   SessionState.activeFirstEntry => const {},
-  SessionState.active => const {...Routes.profileRoutes, Routes.pendingMembers},
+  SessionState.active => const {
+    ...Routes.profileRoutes,
+    Routes.pendingMembers,
+    ...Routes.ministryRoutes,
+  },
 };
 
-/// Whether [location] is allowed while in [state].
+/// Whether the route matched by [routePattern] is allowed while in [state].
+///
+/// [routePattern] is the matched route's full path with its parameters left
+/// in, for example `/groups/:groupId`, so one entry in [allowedFor] covers
+/// every group. An empty pattern (nothing matched) is never allowed.
 ///
 /// Returns null to stay put, or the path to redirect to.
-String? redirectFor(SessionState state, String location) {
+String? redirectFor(SessionState state, String routePattern) {
   final destination = destinationFor(state);
-  if (location == destination) return null;
-  if (allowedFor(state).contains(location)) return null;
+  if (routePattern == destination) return null;
+  if (allowedFor(state).contains(routePattern)) return null;
   return destination;
 }
 
@@ -69,7 +84,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: Routes.splash,
     refreshListenable: refresh,
     redirect: (context, state) =>
-        redirectFor(ref.read(sessionStateProvider), state.matchedLocation),
+        redirectFor(ref.read(sessionStateProvider), state.fullPath ?? ''),
     routes: [
       GoRoute(
         path: Routes.splash,
@@ -106,23 +121,72 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: Routes.welcome,
         pageBuilder: (c, s) => buildPage(state: s, child: const WelcomePage()),
       ),
-      GoRoute(
-        path: Routes.home,
-        pageBuilder: (c, s) => buildPage(state: s, child: const HomePage()),
-      ),
-      GoRoute(
-        path: Routes.profile,
-        pageBuilder: (c, s) => buildPage(state: s, child: const ProfilePage()),
-      ),
-      GoRoute(
-        path: Routes.editProfile,
-        pageBuilder: (c, s) =>
-            buildPage(state: s, child: const EditProfilePage()),
-      ),
-      GoRoute(
-        path: Routes.pendingMembers,
-        pageBuilder: (c, s) =>
-            buildPage(state: s, child: const PendingMembersPage()),
+      // Every screen of a signed-in member sits inside the dock shell. The
+      // shell only draws the dock for an ACTIVE session, so the profile
+      // screens reached while PENDING keep their plain back button.
+      ShellRoute(
+        builder: (c, s, child) => DockShell(location: s.uri.path, child: child),
+        routes: [
+          GoRoute(
+            path: Routes.home,
+            pageBuilder: (c, s) => buildPage(state: s, child: const HomePage()),
+          ),
+          GoRoute(
+            path: Routes.profile,
+            pageBuilder: (c, s) =>
+                buildPage(state: s, child: const ProfilePage()),
+          ),
+          GoRoute(
+            path: Routes.editProfile,
+            pageBuilder: (c, s) =>
+                buildPage(state: s, child: const EditProfilePage()),
+          ),
+          GoRoute(
+            path: Routes.pendingMembers,
+            pageBuilder: (c, s) =>
+                buildPage(state: s, child: const PendingMembersPage()),
+          ),
+          // Nested so the back stack follows the hierarchy. `new` is declared
+          // before `:groupId` so it is not read as a group id.
+          GoRoute(
+            path: Routes.dGroups,
+            pageBuilder: (c, s) =>
+                buildPage(state: s, child: const DGroupsPage()),
+            routes: [
+              GoRoute(
+                path: 'new',
+                pageBuilder: (c, s) =>
+                    buildPage(state: s, child: const DGroupFormPage()),
+              ),
+              GoRoute(
+                path: ':groupId',
+                pageBuilder: (c, s) => buildPage(
+                  state: s,
+                  child: DGroupDetailPage(
+                    groupId: s.pathParameters['groupId']!,
+                  ),
+                ),
+                routes: [
+                  GoRoute(
+                    path: 'invite',
+                    pageBuilder: (c, s) => buildPage(
+                      state: s,
+                      child: MemberPickerPage(
+                        purpose: MemberPickPurpose.invite,
+                        groupId: s.pathParameters['groupId'],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          GoRoute(
+            path: Routes.myGroup,
+            pageBuilder: (c, s) =>
+                buildPage(state: s, child: const MyGroupPage()),
+          ),
+        ],
       ),
     ],
   );

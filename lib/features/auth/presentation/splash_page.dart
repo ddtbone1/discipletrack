@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/connectivity/connection_status.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
@@ -28,6 +29,11 @@ class SplashPage extends ConsumerWidget {
     final profile = ref.watch(myProfileProvider);
     final membership = ref.watch(myMembershipProvider);
     final failed = profile.hasError || membership.hasError;
+    // Unreachable server and nothing saved on this phone yet (a first launch
+    // offline, or a new device): the Slice 4 plan's one offline message.
+    final offline = isNetworkFailure(
+      profile.error ?? membership.error ?? Object(),
+    );
 
     return Scaffold(
       backgroundColor: p.background,
@@ -37,10 +43,15 @@ class SplashPage extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ErrorState(
-                    title: 'Could not load your account',
-                    message:
-                        'DiscipleTrack could not reach the server. Check your '
-                        'connection and try again.',
+                    title: offline
+                        ? "You're offline"
+                        : 'Could not load your account',
+                    message: offline
+                        ? 'Connect to sign in. Once you have signed in with a '
+                              'connection, this phone keeps a copy to view '
+                              'offline.'
+                        : 'DiscipleTrack could not load your account. Try '
+                              'again in a moment.',
                     onRetry: () {
                       ref.invalidate(myProfileProvider);
                       ref.invalidate(myMembershipProvider);

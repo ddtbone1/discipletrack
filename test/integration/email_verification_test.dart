@@ -2,6 +2,7 @@
 /// `enable_confirmations = true` and Mailpit capturing the mail.
 library;
 
+import 'package:discipletrack/features/auth/data/auth_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -153,5 +154,43 @@ void main() {
 
     final users = await service.auth.admin.listUsers();
     expect(users.where((u) => u.email == unconfirmedEmail), hasLength(1));
+  });
+
+  test('the app reports a repeat registration of an unverified email as '
+      'already registered, and the original password still reaches '
+      'verification', () async {
+    final email = uniqueEmail('repeat');
+    addTearDown(() => cleanUpByEmail(email));
+
+    final first = await AuthRepository(anonClient())
+        .signUp(email: email, password: password, fullName: 'First Owner');
+    expect(first, isA<SignUpVerificationRequired>());
+    await fetchVerificationCode(email);
+
+    // Past AuthRepository.repeatSignUpGap, so the fresh code's timestamp is
+    // clearly later than the account's creation.
+    await Future<void>.delayed(
+      AuthRepository.repeatSignUpGap + const Duration(seconds: 1),
+    );
+
+    final repeat = await AuthRepository(
+      anonClient(),
+    ).signUp(email: email, password: 'a-different-password', fullName: 'Other');
+    expect(repeat, isA<SignUpAlreadyRegistered>());
+
+    // GoTrue kept the first password: the second one is not accepted, and the
+    // first one is refused only because the email is unverified, which is
+    // what routes the genuine owner to the verification screen.
+    await expectLater(
+      anonClient().auth.signInWithPassword(
+        email: email,
+        password: 'a-different-password',
+      ),
+      throwsAuthCode('invalid_credentials'),
+    );
+    await expectLater(
+      anonClient().auth.signInWithPassword(email: email, password: password),
+      throwsAuthCode('email_not_confirmed'),
+    );
   });
 }

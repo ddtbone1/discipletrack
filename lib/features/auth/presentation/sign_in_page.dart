@@ -9,6 +9,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/app_text_link.dart';
 import '../../../core/widgets/brand_mark.dart';
 import '../../../core/widgets/error_state.dart';
 import '../application/auth_providers.dart';
@@ -137,11 +138,10 @@ class _SignInPageState extends ConsumerState<SignInPage> {
           const SizedBox(height: AppSpacing.md),
 
           Center(
-            child: AppButton(
-              label: "New here? Create an account",
-              variant: AppButtonVariant.text,
-              expand: false,
-              onPressed: isLoading ? null : () => context.go(Routes.signUp),
+            child: AppTextLink(
+              prefix: 'New here?',
+              label: 'Create an account',
+              onTap: isLoading ? null : () => context.go(Routes.signUp),
             ),
           ),
           const SizedBox(height: AppSpacing.xl),

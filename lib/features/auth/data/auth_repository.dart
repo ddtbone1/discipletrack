@@ -47,15 +47,20 @@ final class SignUpSignedIn extends SignUpOutcome {
   const SignUpSignedIn();
 }
 
-/// The account exists but no session was issued: a verification code has
-/// been emailed to [email]. GoTrue also returns this for a repeat sign-up of
-/// an unconfirmed address, and resends the code.
+/// A new account was created but no session was issued: a verification code
+/// has been emailed to [email].
 final class SignUpVerificationRequired extends SignUpOutcome {
   const SignUpVerificationRequired(this.email);
   final String email;
 }
 
-/// A confirmed account already uses [email]. Nothing was sent.
+/// An account already uses [email], verified or not. Registration stops here.
+///
+/// For an unverified account GoTrue still emails a fresh code and keeps the
+/// original password and name, so continuing to verification would hand the
+/// account to whoever registered first. The owner completes an abandoned
+/// registration by signing in with the original password instead, which
+/// routes to verification through `email_not_confirmed`.
 final class SignUpAlreadyRegistered extends SignUpOutcome {
   const SignUpAlreadyRegistered(this.email);
   final String email;
@@ -78,9 +83,13 @@ class AuthRepository {
   /// Client-side validation exists only to give faster feedback.
   ///
   /// With `enable_confirmations` on, GoTrue returns the user without a
-  /// session and emails a code. A hosted project with enumeration protection
-  /// instead returns an obfuscated user with no identities for an address that
-  /// is already registered; that is reported as [SignUpAlreadyRegistered].
+  /// session and emails a code. Three responses mean the address is taken,
+  /// and all are reported as [SignUpAlreadyRegistered]:
+  ///
+  /// - `user_already_exists` / `email_exists` for a verified account;
+  /// - an obfuscated user with no identities, from a hosted project with
+  ///   enumeration protection;
+  /// - the existing unverified user, recognised by [isRepeatSignUp].
   Future<SignUpOutcome> signUp({
     required String email,
     required String password,
@@ -95,8 +104,16 @@ class AuthRepository {
           data: {'full_name': fullName.trim()},
         );
         if (res.session != null) return const SignUpSignedIn();
-        final identities = res.user?.identities;
+        final user = res.user;
+        final identities = user?.identities;
         if (identities != null && identities.isEmpty) {
+          return SignUpAlreadyRegistered(trimmed);
+        }
+        if (user != null &&
+            isRepeatSignUp(
+              createdAt: user.createdAt,
+              confirmationSentAt: user.confirmationSentAt,
+            )) {
           return SignUpAlreadyRegistered(trimmed);
         }
         return SignUpVerificationRequired(trimmed);
@@ -107,6 +124,29 @@ class AuthRepository {
         rethrow;
       }
     });
+  }
+
+  /// How far apart the account's creation and the code just sent must be for
+  /// the sign-up to count as a repeat. A new account has them milliseconds
+  /// apart, because GoTrue creates the user and sends the code in one request.
+  static const repeatSignUpGap = Duration(seconds: 10);
+
+  /// Whether a session-less sign-up response describes an account that
+  /// existed before this request.
+  ///
+  /// Both timestamps are written by the server, so the device clock plays no
+  /// part. A missing or unparseable timestamp is treated as a new account:
+  /// the verification screen is the safe default when nothing can be told.
+  static bool isRepeatSignUp({
+    required String createdAt,
+    required String? confirmationSentAt,
+  }) {
+    final created = DateTime.tryParse(createdAt);
+    final sent = confirmationSentAt == null
+        ? null
+        : DateTime.tryParse(confirmationSentAt);
+    if (created == null || sent == null) return false;
+    return sent.difference(created) > repeatSignUpGap;
   }
 
   Future<void> signIn({required String email, required String password}) {
@@ -137,7 +177,17 @@ class AuthRepository {
     });
   }
 
-  Future<void> signOut() => _guard(() => _client.auth.signOut());
+  /// gotrue removes the local session before it tells the server, so the
+  /// person is signed out on this device even when that call cannot get
+  /// through. Only that transport failure is ignored; an offline sign-out
+  /// must not surface as an error on the sign-in screen.
+  Future<void> signOut() async {
+    try {
+      await _guard(() => _client.auth.signOut());
+    } on AuthFailure catch (e) {
+      if (e.code != AuthFailureCode.network) rethrow;
+    }
+  }
 
   /// Translates transport and auth errors into messages worth showing.
   Future<T> _guard<T>(Future<T> Function() action) async {

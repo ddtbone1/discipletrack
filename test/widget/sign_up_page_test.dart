@@ -1,5 +1,6 @@
 import 'package:discipletrack/app/routes.dart';
 import 'package:discipletrack/core/theme/app_theme.dart';
+import 'package:discipletrack/core/widgets/app_text_link.dart';
 import 'package:discipletrack/features/auth/application/auth_providers.dart';
 import 'package:discipletrack/features/auth/data/auth_repository.dart';
 import 'package:discipletrack/features/auth/presentation/sign_in_page.dart';
@@ -142,17 +143,32 @@ void main() {
       expect(find.text('VERIFY PAGE'), findsOneWidget);
     });
 
-    testWidgets('already registered: explains and stays on the form', (
-      tester,
-    ) async {
+    testWidgets('already registered: explains, stays on the form and does not '
+        'start verification', (tester) async {
       final repo = FakeAuthRepository()
         ..signUpOutcome = const SignUpAlreadyRegistered('juan@example.test');
-      await pumpSignUp(tester, repo);
+      final container = await pumpWithRouter(
+        tester,
+        repo,
+        initialLocation: Routes.signUp,
+      );
 
       await fill(tester);
 
-      expect(find.textContaining('already exists'), findsOneWidget);
+      expect(
+        find.text(
+          'An account with this email already exists. Sign in instead.',
+        ),
+        findsOneWidget,
+      );
       expect(find.byType(SignUpPage), findsOneWidget);
+      expect(find.text('VERIFY PAGE'), findsNothing);
+      expect(container.read(pendingVerificationProvider), isNull);
+
+      // The link beside the message goes to sign-in.
+      await tester.tap(find.byType(AppTextLink).first);
+      await tester.pumpAndSettle();
+      expect(find.byType(SignInPage), findsOneWidget);
     });
 
     testWidgets('a failure is shown inline without clearing the form', (

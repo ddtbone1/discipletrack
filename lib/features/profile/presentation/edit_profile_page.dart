@@ -92,6 +92,10 @@ class _EditFormState extends ConsumerState<_EditForm> {
     return _nameError == null;
   }
 
+  /// Back to the profile: pop when it was pushed, otherwise go there.
+  void _leave() =>
+      context.canPop() ? context.pop() : context.go(Routes.profile);
+
   Future<void> _save() async {
     if (!_validate()) return;
     FocusScope.of(context).unfocus();
@@ -105,7 +109,7 @@ class _EditFormState extends ConsumerState<_EditForm> {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(const SnackBar(content: Text('Profile updated')));
-      context.go(Routes.profile);
+      _leave();
     }
   }
 
@@ -164,6 +168,7 @@ class _EditFormState extends ConsumerState<_EditForm> {
           const SizedBox(height: AppSpacing.xs),
           AppButton(
             label: 'Save changes',
+            requiresConnection: true,
             isLoading: isSaving,
             onPressed: _save,
           ),
@@ -171,7 +176,7 @@ class _EditFormState extends ConsumerState<_EditForm> {
           AppButton(
             label: 'Cancel',
             variant: AppButtonVariant.text,
-            onPressed: isSaving ? null : () => context.go(Routes.profile),
+            onPressed: isSaving ? null : _leave,
           ),
           const SizedBox(height: AppSpacing.lg),
         ],

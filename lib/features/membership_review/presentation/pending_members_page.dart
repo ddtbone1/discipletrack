@@ -178,6 +178,7 @@ class _RequestCard extends ConsumerWidget {
               Expanded(
                 child: AppButton(
                   label: 'Approve',
+                  requiresConnection: true,
                   icon: Icons.check_rounded,
                   isLoading: busy,
                   onPressed: anyBusy
@@ -189,6 +190,7 @@ class _RequestCard extends ConsumerWidget {
               Expanded(
                 child: AppButton(
                   label: 'Decline',
+                  requiresConnection: true,
                   variant: AppButtonVariant.secondary,
                   onPressed: anyBusy ? null : () => _decline(context, ref),
                 ),

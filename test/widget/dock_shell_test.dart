@@ -1,0 +1,190 @@
+import 'package:discipletrack/app/dock_shell.dart';
+import 'package:discipletrack/app/routes.dart';
+import 'package:discipletrack/core/theme/app_theme.dart';
+import 'package:discipletrack/core/widgets/app_scaffold.dart';
+import 'package:discipletrack/core/widgets/floating_dock.dart';
+import 'package:discipletrack/features/ministry/domain/d_group_member.dart';
+import 'package:discipletrack/features/ministry/domain/ministry_context.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+MinistryContext _context(DGroupResponsibility r) => MinistryContext(
+  dGroupId: 'g1',
+  dGroupName: 'Young Adults A',
+  roster: [
+    RosterEntry(
+      dGroupMembershipId: 'dgm1',
+      churchMembershipId: 'cm1',
+      fullName: 'Me',
+      responsibility: r,
+      isMe: true,
+    ),
+  ],
+);
+
+List<String> _labels(List<DockItem> items) => [for (final i in items) i.label];
+
+void main() {
+  group('dockItemsFor', () {
+    test('an unplaced member gets Home and Profile only', () {
+      final items = dockItemsFor(
+        isCoordinator: false,
+        canReview: false,
+        ministry: null,
+      );
+      expect(_labels(items), ['Home', 'Profile']);
+    });
+
+    test('the Coordinator gets D Groups and Requests', () {
+      final items = dockItemsFor(
+        isCoordinator: true,
+        canReview: true,
+        ministry: null,
+      );
+      expect(_labels(items), ['Home', 'D Groups', 'Requests', 'Profile']);
+      expect(items[1].path, Routes.dGroups);
+    });
+
+    test('a Leader\'s group goes to its detail page; a Disciple\'s to the '
+        'roster', () {
+      final leader = dockItemsFor(
+        isCoordinator: false,
+        canReview: false,
+        ministry: _context(DGroupResponsibility.leader),
+      );
+      expect(_labels(leader), ['Home', 'My Group', 'Profile']);
+      expect(leader[1].path, Routes.dGroupDetailFor('g1'));
+
+      final disciple = dockItemsFor(
+        isCoordinator: false,
+        canReview: false,
+        ministry: _context(DGroupResponsibility.disciple),
+      );
+      expect(disciple[1].path, Routes.myGroup);
+    });
+
+    test('an Admin who is not Coordinator gets Requests but no D Groups', () {
+      final items = dockItemsFor(
+        isCoordinator: false,
+        canReview: true,
+        ministry: null,
+      );
+      expect(_labels(items), ['Home', 'Requests', 'Profile']);
+    });
+  });
+
+  group('activeDockIndex', () {
+    final items = dockItemsFor(
+      isCoordinator: true,
+      canReview: true,
+      ministry: null,
+    );
+
+    test('matches the destination and the pages under it', () {
+      expect(activeDockIndex(items, Routes.home), 0);
+      expect(activeDockIndex(items, Routes.dGroups), 1);
+      expect(activeDockIndex(items, '/groups/g1/invite'), 1);
+      expect(activeDockIndex(items, Routes.editProfile), 3);
+    });
+
+    test('a path that only shares a prefix does not match', () {
+      expect(activeDockIndex(items, '/homepage'), -1);
+    });
+  });
+
+  group('AppScaffold back button', () {
+    Widget host(Widget child) =>
+        MaterialApp(theme: AppTheme.light(), home: child);
+
+    testWidgets('inside the dock, a top-level page has no back button', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          const DockScope(
+            child: AppScaffold(
+              title: 'D Groups',
+              showBackButton: true,
+              child: SizedBox(),
+            ),
+          ),
+        ),
+      );
+      expect(find.byType(BackButton), findsNothing);
+    });
+
+    testWidgets('a page navigated to always has a back button that pops', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          DockScope(
+            child: Builder(
+              builder: (context) => AppScaffold(
+                title: 'Home',
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) =>
+                          const AppScaffold(title: 'Detail', child: SizedBox()),
+                    ),
+                  ),
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      expect(find.byType(BackButton), findsOneWidget);
+
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.text('Detail'), findsNothing);
+    });
+
+    testWidgets('outside the dock, showBackButton always offers back', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          const AppScaffold(
+            title: 'My profile',
+            showBackButton: true,
+            child: SizedBox(),
+          ),
+        ),
+      );
+      expect(find.byType(BackButton), findsOneWidget);
+    });
+  });
+
+  testWidgets('the dock marks the active destination', (tester) async {
+    final items = dockItemsFor(
+      isCoordinator: true,
+      canReview: false,
+      ministry: null,
+    );
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light(),
+        home: Scaffold(
+          body: FloatingDock(items: items, activeIndex: 1, onSelected: (_) {}),
+        ),
+      ),
+    );
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('D Groups')),
+      matchesSemantics(
+        label: 'D Groups',
+        isButton: true,
+        isSelected: true,
+        hasSelectedState: true,
+      ),
+    );
+    handle.dispose();
+  });
+}

@@ -4,38 +4,46 @@ import 'package:flutter/material.dart';
 /// widgets read the active [AppPalette] through `context.palette`, so every
 /// screen follows the system light or dark setting.
 ///
+/// 60-30-10 (UI_DESIGN_SYSTEM section 7): about 60% cool off-white neutral,
+/// 30% desaturated mint on major elements, 10% desaturated sky for the call
+/// to action. Neither mode uses pure white or pure black.
+///
 /// Light palette:
 ///
-///   #C8E9CA  mint      primary accent surface
-///   #87DCFB  sky       secondary accent surface
-///   #201F1F  ink       near-black, text and high-emphasis fills
-///   #FFFFFF  white     page
+///   #F5F7F8  background  page
+///   #FBFCFC  surface     cards
+///   #CFE4D2  mint        major elements, the 30%
+///   #7DBFD9  sky         primary action, the 10%
+///   #201F1F  ink         near-black text
 ///
-/// Both accents are light, so they always carry dark text and never white.
+/// Both accents are light, so they always carry dark text.
 abstract final class AppColors {
-  static const background = Color(0xFFFFFFFF);
-  static const surface = Color(0xFFFFFFFF);
-  static const surfaceAlt = Color(0xFFF4F7F4); // fields, quiet panels
-  static const border = Color(0xFFE7EDE7); // soft, low contrast
+  static const background = Color(0xFFF5F7F8);
+  static const surface = Color(0xFFFBFCFC);
+  static const surfaceAlt = Color(0xFFEDF1F2); // fields, quiet panels
+  static const border = Color(0xFFDFE5E7); // soft, low contrast
 
-  /// Near-black. Primary buttons and other high-emphasis fills.
+  /// Near-black. High-emphasis fills such as the snackbar.
   static const ink = Color(0xFF201F1F);
 
-  /// Primary accent. Soft mint green.
-  static const mint = Color(0xFFC8E9CA);
+  /// The 30%: desaturated mint for major elements.
+  static const mint = Color(0xFFCFE4D2);
 
-  /// Secondary accent. Sky blue.
-  static const sky = Color(0xFF87DCFB);
+  /// The 10%: desaturated sky. Primary buttons and highlights.
+  static const sky = Color(0xFF7DBFD9);
 
-  /// Quiet fill for list rows, a paler mint.
-  static const pastel = Color(0xFFEDF6EE);
+  /// [sky] one step darker, for the pressed state.
+  static const skyPressed = Color(0xFF68ABC6);
+
+  /// Quiet fill for notices and list rows, a paler mint.
+  static const pastel = Color(0xFFE9F1EA);
 
   static const textPrimary = Color(0xFF201F1F);
   static const muted = Color(0xFF6B706B);
   static const disabled = Color(0xFFA6ADA6);
 
-  static const onInk = Color(0xFFFFFFFF);
-  static const onInkMuted = Color(0xB3FFFFFF); // white at 70%
+  static const onInk = Color(0xFFFBFCFC);
+  static const onInkMuted = Color(0xB3FBFCFC); // off-white at 70%
 
   /// On [mint], [sky] and [pastel]. Always the dark ink, never white.
   static const onMint = Color(0xFF201F1F);
@@ -55,24 +63,25 @@ abstract final class AppColors {
   static const errorSurface = Color(0xFFFBEBEB);
 }
 
-/// Dark scheme: a near-black page with raised charcoal cards and white text.
-/// The mint and sky accents carry across unchanged, still with dark text, so
-/// the product reads as one system in either mode.
+/// Dark scheme: a cool near-black page with raised charcoal cards and
+/// off-white text. The accents are desaturated a step further than in light
+/// mode and still carry dark text, so the product reads as one system.
 abstract final class AppColorsDark {
-  static const background = Color(0xFF0E0E0E);
-  static const surface = Color(0xFF1A1A1A); // raised card
-  static const surfaceAlt = Color(0xFF232323); // fields, quiet panels
-  static const border = Color(0xFF2E2E2E);
+  static const background = Color(0xFF121517);
+  static const surface = Color(0xFF1C2023); // raised card
+  static const surfaceAlt = Color(0xFF252A2D); // fields, quiet panels
+  static const border = Color(0xFF30363A);
 
   /// The high-emphasis fill inverts to near-white so a primary button still
   /// stands out most against a dark page.
-  static const ink = Color(0xFFF2F2F2);
+  static const ink = Color(0xFFE8ECEE);
 
-  static const mint = Color(0xFFC8E9CA);
-  static const sky = Color(0xFF87DCFB);
-  static const pastel = Color(0xFF232B24);
+  static const mint = Color(0xFFAFCBB4);
+  static const sky = Color(0xFF6FAFC8);
+  static const skyPressed = Color(0xFF5C9BB4);
+  static const pastel = Color(0xFF212A25);
 
-  static const textPrimary = Color(0xFFF5F5F5);
+  static const textPrimary = Color(0xFFE8ECEE);
   static const muted = Color(0xFF9BA09B);
   static const disabled = Color(0xFF5E635E);
 
@@ -104,6 +113,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.ink,
     required this.mint,
     required this.sky,
+    required this.skyPressed,
     required this.pastel,
     required this.textPrimary,
     required this.muted,
@@ -130,6 +140,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     ink: AppColors.ink,
     mint: AppColors.mint,
     sky: AppColors.sky,
+    skyPressed: AppColors.skyPressed,
     pastel: AppColors.pastel,
     textPrimary: AppColors.textPrimary,
     muted: AppColors.muted,
@@ -156,6 +167,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     ink: AppColorsDark.ink,
     mint: AppColorsDark.mint,
     sky: AppColorsDark.sky,
+    skyPressed: AppColorsDark.skyPressed,
     pastel: AppColorsDark.pastel,
     textPrimary: AppColorsDark.textPrimary,
     muted: AppColorsDark.muted,
@@ -181,6 +193,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
   final Color ink;
   final Color mint;
   final Color sky;
+  final Color skyPressed;
   final Color pastel;
   final Color textPrimary;
   final Color muted;
@@ -207,6 +220,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     Color? ink,
     Color? mint,
     Color? sky,
+    Color? skyPressed,
     Color? pastel,
     Color? textPrimary,
     Color? muted,
@@ -232,6 +246,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
       ink: ink ?? this.ink,
       mint: mint ?? this.mint,
       sky: sky ?? this.sky,
+      skyPressed: skyPressed ?? this.skyPressed,
       pastel: pastel ?? this.pastel,
       textPrimary: textPrimary ?? this.textPrimary,
       muted: muted ?? this.muted,
@@ -263,6 +278,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
       ink: l(ink, other.ink),
       mint: l(mint, other.mint),
       sky: l(sky, other.sky),
+      skyPressed: l(skyPressed, other.skyPressed),
       pastel: l(pastel, other.pastel),
       textPrimary: l(textPrimary, other.textPrimary),
       muted: l(muted, other.muted),

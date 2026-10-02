@@ -87,24 +87,52 @@ class InfoRow extends StatelessWidget {
               Icon(icon, size: 20, color: p.muted),
               const SizedBox(width: AppSpacing.sm),
             ],
-            Flexible(
-              child: Text(
-                label,
-                style: AppTypography.body.copyWith(color: p.textPrimary),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: value == null
-                  ? const SizedBox.shrink()
-                  : Text(
-                      value!,
-                      style: AppTypography.body.copyWith(color: p.muted),
-                      textAlign: TextAlign.right,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+            // A navigation row (one with a chevron) reads as a cell with a
+            // subtitle, so neither the label nor the value has to share the
+            // width and wrap. A plain key/value row keeps them side by side.
+            if (onTap != null)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: AppTypography.body.copyWith(color: p.textPrimary),
                     ),
-            ),
+                    if (value != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        value!,
+                        style: AppTypography.supporting.copyWith(
+                          color: p.muted,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
+                ),
+              )
+            else ...[
+              Flexible(
+                child: Text(
+                  label,
+                  style: AppTypography.body.copyWith(color: p.textPrimary),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: value == null
+                    ? const SizedBox.shrink()
+                    : Text(
+                        value!,
+                        style: AppTypography.body.copyWith(color: p.muted),
+                        textAlign: TextAlign.right,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+              ),
+            ],
             if (onTap != null) ...[
               const SizedBox(width: AppSpacing.xxs),
               Icon(Icons.chevron_right_rounded, size: 22, color: p.muted),

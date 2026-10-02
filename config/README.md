@@ -35,7 +35,7 @@ The seed creates one church and its initial Admin + Coordinator:
 
 | | |
 |---|---|
-| Church | Bankal Seventh-day Adventist Church |
+| Church | Liberty Bible Baptist Church - Gensan |
 | Admin email | `admin@discipletrack.local` |
 | Admin password | `dev-password-123` |
 | Join code | `7QK4MZP2XR` |
@@ -43,6 +43,22 @@ The seed creates one church and its initial Admin + Coordinator:
 
 Register a new account in the app, read its 6-digit code from Mailpit, verify,
 enter the join code, and approve the request while signed in as the admin.
+
+The seed also builds one D Group, "Young Adults A", through the real
+controlled operations. Every account below is ACTIVE with onboarding complete
+and uses the password `dev-password-123`:
+
+| Email | Name | Role |
+|---|---|---|
+| `admin@discipletrack.local` | Dev Admin | Admin and Coordinator, not in a group |
+| `leader@discipletrack.local` | Lea Santos | Leader of Young Adults A |
+| `discipler@discipletrack.local` | Dino Reyes | Discipler, paired with Diana |
+| `disciple1@discipletrack.local` | Diana Cruz | Disciple, paired with Dino |
+| `disciple2@discipletrack.local` | Daniel Bautista | Disciple, not paired |
+| `member@discipletrack.local` | Mara Villanueva | Not placed, with a pending invitation to accept |
+
+Use a separate browser profile per account to walk through the roles side by
+side.
 
 The join code is local-development-only. Real deployments let bootstrap
 generate one cryptographically; see `tool/bootstrap_church.ps1`.

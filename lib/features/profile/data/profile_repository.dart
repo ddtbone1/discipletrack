@@ -1,12 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/connectivity/connection_status.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../domain/profile.dart';
 
-class ProfileFailure implements Exception {
-  const ProfileFailure(this.message);
+class ProfileFailure implements Exception, NetworkAwareFailure {
+  const ProfileFailure(this.message, {this.isNetwork = false});
   final String message;
+
+  /// The server could not be reached. An exception (not an [Error]) other
+  /// than a PostgREST response is a transport failure.
+  @override
+  final bool isNetwork;
 
   @override
   String toString() => message;
@@ -39,6 +45,11 @@ class ProfileRepository {
       return row == null ? null : Profile.fromMap(row);
     } on PostgrestException catch (e) {
       throw ProfileFailure(_friendly(e));
+    } on Exception {
+      throw const ProfileFailure(
+        'Could not load your profile.',
+        isNetwork: true,
+      );
     } catch (_) {
       throw const ProfileFailure('Could not load your profile.');
     }
@@ -68,6 +79,11 @@ class ProfileRepository {
       return Profile.fromMap(row);
     } on PostgrestException catch (e) {
       throw ProfileFailure(_friendly(e));
+    } on Exception {
+      throw const ProfileFailure(
+        'Could not save your changes.',
+        isNetwork: true,
+      );
     } catch (_) {
       throw const ProfileFailure('Could not save your changes.');
     }

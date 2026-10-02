@@ -117,6 +117,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage>
               ],
               AppButton(
                 label: 'Continue',
+                requiresConnection: true,
                 icon: Icons.arrow_forward_rounded,
                 isLoading: entry.isLoading,
                 onPressed: entry.isLoading ? null : _continue,

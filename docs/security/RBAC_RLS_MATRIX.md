@@ -137,12 +137,15 @@ D Group responsibility. This is a valid state, not a stored role.
 | Manage ministry settings | No | Yes | No | No | No | No |
 | Approve church membership | Yes | Yes | No | No | No | No |
 | Manage church roles | Yes | No | No | No | No | No |
-| View church members | Yes | Yes | Own D Group | Assigned Disciples | Self | Self |
+| View church members | Yes | Yes | Own D Group | Assigned Disciples, own Leader | Self, own Leader and Discipler | Self |
+| View D Group roster by name | No | Church-wide | Own D Group | Own D Group | Own D Group | No |
 | Create/manage D Groups | No | Yes | No | No | No | No |
 | Assign Leader | No | Yes | No | No | No | No |
-| Assign Discipler | No | Yes | No | No | No | No |
-| Assign Disciple to D Group | No | Yes | No | No | No | No |
-| Assign Disciple to Discipler | No | Yes | No | No | No | No |
+| Invite to D Group as Discipler or Disciple | No | Yes | Own D Group | No | No | No |
+| Accept or decline a D Group invitation | Own | Own | Own | Own | Own | Own |
+| Add self as Discipler | No | If Leader | Own D Group | No | No | No |
+| Assign Disciple to Discipler | No | Yes | Own D Group | No | No | No |
+| Remove Discipler or Disciple from D Group | No | Yes | Own D Group | No | No | No |
 | Transfer Disciple | No | Yes | No | No | No | No |
 | Promote Disciple | No | Yes | No | No | No | No |
 | Create gathering | No | Yes | Own D Group | No | No | No |
@@ -166,6 +169,28 @@ D Group responsibility. This is a valid state, not a stored role.
 | View D Group announcement | No | Church-wide | Own D Group | Own D Group | Own D Group | No |
 
 Notes on specific cells:
+
+*D Group placement* (Vertical Slice 3, Plan decisions 2 to 8). The
+former single "Assign Discipler" and "Assign Disciple to D Group" rows
+are replaced by confirmed placement: a COORDINATOR (any group in the
+church) or the group's LEADER invites an unplaced ACTIVE member as
+DISCIPLER or DISCIPLE, and the member accepts or declines. Nobody is
+placed without their own acceptance, and a member cannot request to
+join or leave a group. LEADER is never invited; it is a direct
+COORDINATOR appointment, made when the group is created and changed
+only by replacement. The LEADER of a group also pairs, re-pairs,
+unpairs and removes its Disciplers and Disciples directly; a
+DISCIPLER can do none of these. A COORDINATOR may hold a D Group
+responsibility like anyone else, and gains Leader-only actions such as
+*Add self as Discipler* only by being that group's Leader.
+
+*View church members* and *View D Group roster by name*. A Discipler
+or Disciple sees everyone in their group by name only, through
+get_my_d_group_roster(). Profile rows, and therefore phone numbers,
+are readable only for the people in the *View church members* cell:
+for a Discipler their assigned Disciples and their own Leader, for a
+Disciple their own Leader and their own Discipler. ADMIN without
+COORDINATOR sees no D Group data.
 
 *Manage church configuration* covers church identity, join code and
 system-level configuration. *Manage ministry settings* covers
@@ -301,10 +326,15 @@ SELECT:
 - Discipler → assigned Disciples
 - Admin → profiles required for system/member administration
 
-Implemented so far: own profile, and for ADMIN and COORDINATOR the
-profiles of anyone holding a membership row (any status) in a church
-they administer, which is what the membership-request list needs.
-Leader and Discipler scopes arrive with the D Group slice.
+Implemented: own profile; for ADMIN and COORDINATOR the profiles of
+anyone holding a membership row (any status) in a church they
+administer, which is what the membership-request list needs; and,
+since Migration 006, the ministry scope
+(private.can_view_profile_in_ministry): a LEADER sees the people with
+an active responsibility in their group and the people invited to it;
+a DISCIPLER sees their assigned Disciples and their own Leader; a
+DISCIPLE sees their own Leader and their own Discipler. Other group
+mates are visible by name only, through get_my_d_group_roster().
 
 INSERT:
 
@@ -356,9 +386,13 @@ SELECT:
 
 - ADMIN → own church
 - COORDINATOR → own church
-- LEADER → members of own D Group
-- DISCIPLER → assigned Disciples
-- DISCIPLE → self
+- LEADER → members of own D Group, and people invited to it
+- DISCIPLER → assigned Disciples, own Leader
+- DISCIPLE → self, own Leader and own Discipler
+
+The LEADER, DISCIPLER and DISCIPLE scopes are implemented by
+church_memberships_select_ministry (Migration 006), with the same
+predicate as the profiles ministry scope.
 
 INSERT / UPDATE:
 
@@ -389,6 +423,10 @@ WRITE:
 
 - ADMIN only through controlled role-management operations.
 
+Migration 006 revokes INSERT, UPDATE, DELETE and TRUNCATE from
+authenticated, so no client write path exists until role management
+is built.
+
 ---
 
 ## d_groups
@@ -410,6 +448,12 @@ through set_d_group_status(). ARCHIVED is rejected while active DISCIPLE
 memberships or DRAFT gatherings remain. See DATABASE_CONSTRAINTS.md
 section 2.
 
+Implemented (Migration 006): COORDINATOR church-wide; LEADER,
+DISCIPLER and DISCIPLE own group (any active responsibility in it).
+ADMIN without COORDINATOR has no scope. Writes: create_d_group() and
+assign_d_group_leader(); set_d_group_status() is not built yet.
+Clients hold SELECT only; anon holds nothing.
+
 ---
 
 ## d_group_memberships
@@ -421,6 +465,11 @@ SELECT:
 - DISCIPLER → own D Group where required
 - DISCIPLE → own membership and permitted group information
 
+Implemented (Migration 006): COORDINATOR church-wide and LEADER own
+group, history included; DISCIPLER the active rows of their group;
+DISCIPLE their own rows, their Leader's active row and their own
+Discipler's active row. Everyone sees their own rows.
+
 WRITE:
 
 Use controlled operations for:
@@ -431,6 +480,10 @@ Use controlled operations for:
 - promotion
 
 Do not allow arbitrary direct client mutation.
+
+Implemented: create_d_group(), assign_d_group_leader(),
+respond_to_d_group_invitation(), add_self_as_discipler() and
+end_d_group_membership(). Clients hold SELECT only.
 
 ---
 
@@ -446,6 +499,37 @@ SELECT:
 WRITE:
 
 Use controlled operations for assignment and reassignment.
+
+Implemented (Migration 006): the SELECT scopes above as written;
+writes through set_discipler() and end_d_group_membership() only.
+
+---
+
+## d_group_invitations
+
+Added by Migration 006.
+
+SELECT:
+
+- COORDINATOR → church-wide, every status
+- LEADER → own D Group's, every status (a decline is shown to the
+  inviter, who may invite again)
+- Invitee → own
+- DISCIPLER, DISCIPLE, ADMIN without COORDINATOR → none
+
+The invitee reads their live invitation, with the group name and
+inviter name, through get_my_pending_invitation(); they have no
+d_groups scope before accepting.
+
+WRITE:
+
+- invite_to_d_group() → COORDINATOR, or the group's LEADER
+- withdraw_d_group_invitation() → COORDINATOR, or the inviter while
+  they are the group's LEADER
+- respond_to_d_group_invitation() → the invitee only, own membership
+  ACTIVE
+
+Clients hold SELECT only; anon holds nothing.
 
 ---
 
@@ -824,9 +908,12 @@ Recommended operations:
 - create_d_group()
 - set_d_group_status()
 - assign_d_group_leader()
-- assign_disciple_to_group()
-- assign_discipler()
-- reassign_discipler()
+- invite_to_d_group()
+- withdraw_d_group_invitation()
+- respond_to_d_group_invitation()
+- add_self_as_discipler()
+- end_d_group_membership()
+- set_discipler()
 - transfer_disciple()
 - create_gathering()
 - save_draft_attendance()
@@ -927,6 +1014,59 @@ regenerate_join_code()
 assign_church_role() and any role-ending operation
 → reject any change leaving the church with zero active COORDINATOR
 
+create_d_group()
+→ COORDINATOR only
+→ creates the group and its LEADER row together; the Leader must be an
+  unplaced ACTIVE member of the church
+→ audited as D_GROUP_CREATED
+
+assign_d_group_leader()
+→ COORDINATOR only
+→ ends the current LEADER row and creates the new one in one
+  transaction; the new Leader is unplaced or already a DISCIPLER in the
+  same group
+→ audited as D_GROUP_LEADER_ASSIGNED
+
+invite_to_d_group() / withdraw_d_group_invitation() /
+respond_to_d_group_invitation()
+→ placement by confirmed invitation; see section 3, d_group_invitations
+→ the invitee must be unplaced with no pending invitation, and is
+  re-checked on accept
+→ an expired invitation is refused on response; withdrawing one that
+  has lapsed reports EXPIRED
+→ audited as D_GROUP_INVITATION_SENT / _WITHDRAWN / _ACCEPTED /
+  _DECLINED
+
+add_self_as_discipler()
+→ the group's LEADER only, for themselves
+→ audited as D_GROUP_MEMBER_ADDED
+
+end_d_group_membership()
+→ COORDINATOR or the group's LEADER
+→ ends a DISCIPLER or DISCIPLE row and every active assignment on
+  either side of it; LEADER rows are refused (replace instead)
+→ audited as D_GROUP_MEMBER_ENDED
+
+set_discipler()
+→ COORDINATOR or the group's LEADER
+→ one operation pairs, re-pairs (ends the old assignment, creates the
+  new one) or, with a null Discipler, unpairs; replaces the
+  assign_discipler() / reassign_discipler() names listed before
+  Vertical Slice 3
+→ audited as DISCIPLER_ASSIGNED / _REASSIGNED / _UNASSIGNED
+→ CONSECUTIVE_MISSED_MEETINGS resolution on an ended assignment
+  arrives with the meeting slice; the function marks the place
+
+list_placeable_members() / get_my_pending_invitation() /
+get_my_d_group_roster()
+→ read-only SECURITY DEFINER reads
+→ list_placeable_members(): COORDINATOR (every ACTIVE member with
+  placement) or the group's LEADER (unplaced members only); names and
+  placement, never phone numbers
+→ get_my_d_group_roster(): the caller's group by name, with phone
+  numbers only for their own Leader, own Discipler and, for a
+  Discipler, assigned Disciples
+
 set_d_group_status()
 → COORDINATOR only
 → ARCHIVED rejected while active DISCIPLE memberships or DRAFT
@@ -941,7 +1081,8 @@ transfer_disciple()
 → the next assignment's missed-meeting streak never carries the
   previous streak forward
 
-reassign_discipler() and promote_disciple_to_discipler()
+set_discipler() (re-pair or unpair), end_d_group_membership() and
+promote_disciple_to_discipler()
 → end the Disciple's discipler assignment
 → resolve the ACTIVE CONSECUTIVE_MISSED_MEETINGS condition belonging to
   the ended assignment

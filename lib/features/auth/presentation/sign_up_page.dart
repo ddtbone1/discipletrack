@@ -9,6 +9,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/app_text_link.dart';
 import '../../../core/widgets/brand_mark.dart';
 import '../../../core/widgets/error_state.dart';
 import '../application/auth_providers.dart';
@@ -39,7 +40,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   String? _nameError;
   String? _emailError;
   String? _passwordError;
-  String? _notice;
+  bool _alreadyRegistered = false;
   bool _obscure = true;
 
   /// Matches `auth.minimum_password_length` in supabase/config.toml.
@@ -65,7 +66,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
       _passwordError = password.length < _minPasswordLength
           ? 'Use at least $_minPasswordLength characters'
           : null;
-      _notice = null;
+      _alreadyRegistered = false;
     });
     return _nameError == null && _emailError == null && _passwordError == null;
   }
@@ -87,11 +88,10 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
         ref.read(pendingVerificationProvider.notifier).set(email);
         context.go(Routes.verifyEmail);
       case SignUpAlreadyRegistered():
-        setState(() {
-          _notice =
-              'An account with that email already exists. Sign in instead, '
-              'or verify it if you never finished.';
-        });
+        // Stays here whether or not the existing account was verified. An
+        // unverified owner finishes by signing in with their original
+        // password, which routes to verification.
+        setState(() => _alreadyRegistered = true);
       case SignUpSignedIn():
       case null:
         // A session appeared (the router redirects) or the controller holds
@@ -128,9 +128,20 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                   : 'Something went wrong. Please try again.',
             ),
             const SizedBox(height: AppSpacing.md),
-          ] else if (_notice != null) ...[
-            InlineError(message: _notice!),
-            const SizedBox(height: AppSpacing.md),
+          ] else if (_alreadyRegistered) ...[
+            const InlineError(
+              message:
+                  'An account with this email already exists. Sign in '
+                  'instead.',
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: AppTextLink(
+                label: 'Sign in',
+                onTap: isLoading ? null : () => context.go(Routes.signIn),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
           ],
 
           AppTextField(
@@ -184,11 +195,10 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
           const SizedBox(height: AppSpacing.md),
 
           Center(
-            child: AppButton(
-              label: 'Already have an account? Sign in',
-              variant: AppButtonVariant.text,
-              expand: false,
-              onPressed: isLoading ? null : () => context.go(Routes.signIn),
+            child: AppTextLink(
+              prefix: 'Already have an account?',
+              label: 'Sign in',
+              onTap: isLoading ? null : () => context.go(Routes.signIn),
             ),
           ),
           const SizedBox(height: AppSpacing.xl),

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../offline/data/offline_snapshot.dart';
 import '../data/auth_repository.dart';
 
 /// Drives registration, sign-in, email verification and sign-out.
@@ -45,8 +46,12 @@ class AuthController extends Notifier<AsyncValue<void>> {
     () => ref.read(authRepositoryProvider).resendVerificationCode(email),
   );
 
-  Future<bool> signOut() =>
-      _succeeds(() => ref.read(authRepositoryProvider).signOut());
+  /// Also deletes the offline snapshots, so the next person to use the
+  /// device sees nothing of the last one's data (Slice 4 plan).
+  Future<bool> signOut() => _succeeds(() async {
+    await ref.read(offlineSnapshotStoreProvider).clearAll();
+    await ref.read(authRepositoryProvider).signOut();
+  });
 
   /// Clears a shown failure, for example when the person edits the form.
   void clearError() {

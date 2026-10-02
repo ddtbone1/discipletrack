@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../connectivity/connection_status.dart';
 import '../theme/app_spacing.dart';
+import 'offline_banner.dart';
+import 'floating_dock.dart';
 
 /// The page shell every DiscipleTrack screen uses.
 ///
@@ -13,6 +17,7 @@ class AppScaffold extends StatelessWidget {
     this.title,
     this.actions,
     this.showBackButton = false,
+    this.backFallback = '/home',
     this.scrollable = true,
     this.padding = const EdgeInsets.symmetric(horizontal: AppSpacing.page),
     super.key,
@@ -21,7 +26,19 @@ class AppScaffold extends StatelessWidget {
   final Widget child;
   final String? title;
   final List<Widget>? actions;
+
+  /// Outside the dock shell, always offer a back button, even when the page
+  /// was opened with `go` and there is nothing to pop.
+  ///
+  /// Inside the dock shell this is ignored: a back button appears exactly
+  /// when the page was navigated to (there is something to pop), and the
+  /// dock is the way out of a top-level destination.
   final bool showBackButton;
+
+  /// Where back goes when there is nothing to pop. The router redirects
+  /// `/home` to whatever the current session state allows, so it is a safe
+  /// default in every state.
+  final String backFallback;
 
   /// Most pages scroll. Pass false for a page that manages its own scrolling.
   final bool scrollable;
@@ -30,13 +47,22 @@ class AppScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final body = Padding(padding: padding, child: child);
+    final canPop = ModalRoute.of(context)?.canPop ?? false;
+    final showBack = canPop || (showBackButton && !DockScope.of(context));
 
     return Scaffold(
-      appBar: title == null && !showBackButton
+      appBar: title == null && !showBack
           ? null
           : AppBar(
               title: title == null ? null : Text(title!),
-              automaticallyImplyLeading: showBackButton,
+              automaticallyImplyLeading: false,
+              leading: showBack
+                  ? BackButton(
+                      onPressed: () => canPop
+                          ? Navigator.of(context).pop()
+                          : context.go(backFallback),
+                    )
+                  : null,
               actions: actions,
             ),
       // A plain scroll view. Deliberately no IntrinsicHeight.
@@ -51,12 +77,22 @@ class AppScaffold extends StatelessWidget {
       // pass scrollable: false and build a Column with an Expanded scroll
       // region, which costs one layout pass instead of two.
       body: SafeArea(
-        child: scrollable
-            ? SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                child: body,
-              )
-            : body,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Every page says when it is showing saved data.
+            if (ConnectionScope.isOffline(context))
+              OfflineBanner(onRetry: ConnectionScope.retryOf(context)),
+            Expanded(
+              child: scrollable
+                  ? SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      child: body,
+                    )
+                  : body,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -407,6 +407,74 @@ On successful archival, in one transaction:
 Open follow-ups are left untouched. They are church-scoped care cases
 and remain the assignee's responsibility.
 
+## Responsibility Combinations
+
+Added in Vertical Slice 3 (Migration 006), enforced by the
+d_group_memberships integrity trigger for every writer:
+
+- At any moment, all of a person's responsibilities are in one D Group.
+  A person cannot be a Discipler in one group and a Disciple or Leader
+  in another.
+- DISCIPLE excludes both LEADER and DISCIPLER, for overlapping periods,
+  not only active rows.
+- LEADER with DISCIPLER in the same group is allowed.
+- A d_group_memberships row and its D Group belong to the same church.
+- One active row per person, group and responsibility (partial unique
+  index WHERE ended_at IS NULL).
+
+"Unplaced" means an ACTIVE member with no active D Group
+responsibility.
+
+## Leader Presence
+
+Every D Group has an active LEADER from the moment it exists.
+create_d_group() creates the group and its LEADER row in one
+transaction, assign_d_group_leader() replaces the Leader in one
+transaction, and end_d_group_membership() refuses LEADER rows. A
+replaced Leader keeps any DISCIPLER row they hold in the group;
+otherwise they become unplaced.
+
+The Leader of a new group must be unplaced. A replacement Leader must
+be unplaced or hold nothing but a DISCIPLER row in that same group.
+
+Departure of the Leader's membership from ACTIVE is not handled yet;
+see section 1, Effects of Leaving ACTIVE.
+
+## Group Names
+
+d_groups.name is not blank and is unique within the church ignoring
+case and surrounding spaces, among groups that are not ARCHIVED
+(partial unique index on (church_id, lower(trim(name)))).
+
+## Placement by Invitation
+
+DISCIPLER and DISCIPLE responsibilities are created only by an
+accepted invitation (d_group_invitations), or for a Leader adding
+themselves as Discipler, by add_self_as_discipler().
+
+- The invitee is an unplaced ACTIVE member of the group's church with
+  no PENDING invitation. Both conditions are re-checked on acceptance.
+- A member holds at most one PENDING invitation (partial unique index).
+- An invitation is answered once. Status moves PENDING → ACCEPTED,
+  DECLINED, WITHDRAWN or EXPIRED and never back. The state CHECK ties
+  responded_at and resulting_d_group_membership_id to the status.
+- An invitation expires 14 days after it was sent. Expiry is lazy: a
+  PENDING row past expires_at is treated as EXPIRED by every operation
+  and read, and is marked EXPIRED (responded_at = expires_at) by the
+  next successful write that touches it. An operation that refuses an
+  expired invitation cannot persist the mark, because the refusal rolls
+  the transaction back.
+- An invitation and its invitee belong to the same church (integrity
+  trigger).
+
+## Discipler Assignments
+
+In addition to Responsibility Correctness above: the two sides of an
+assignment differ (CHECK), and a Disciple's assignment periods never
+overlap (integrity trigger). Removing a Discipler or Disciple from the
+group ends every active assignment on either side in the same
+transaction.
+
 ## Controlled Operations
 
 Use transactional database operations for:
@@ -417,6 +485,15 @@ Use transactional database operations for:
 - D Group lifecycle changes
 
 A transfer must succeed completely or fail completely.
+
+Implemented in Migration 006: create_d_group(),
+assign_d_group_leader(), invite_to_d_group(),
+withdraw_d_group_invitation(), respond_to_d_group_invitation(),
+add_self_as_discipler(), end_d_group_membership() and set_discipler().
+Each locks the affected person's church_memberships row before
+changing their D Group rows, so concurrent operations on one person
+serialise. Transfer between groups is not built; the stopgap is
+removal followed by a new invitation, which keeps history.
 
 ---
 
@@ -936,7 +1013,8 @@ Recalculation triggers:
 - record_discipleship_meeting()
 - void_discipleship_meeting()
 - void_meeting_participant()
-- reassign_discipler()
+- set_discipler() (re-pair or unpair) and end_d_group_membership(),
+  which replaced reassign_discipler() in Vertical Slice 3
 - transfer_disciple()
 - promote_disciple_to_discipler()
 

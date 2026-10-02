@@ -49,7 +49,7 @@ const seededAdminUserId = 'a0000000-0000-4000-8000-000000000001';
 const seededAdminEmail = 'admin@discipletrack.local';
 const seededAdminPassword = 'dev-password-123';
 const seededJoinCode = '7QK4MZP2XR';
-const seededChurchName = 'Bankal Seventh-day Adventist Church';
+const seededChurchName = 'Liberty Bible Baptist Church - Gensan';
 
 /// Service-role client. Bypasses RLS; used only for setup and teardown.
 late SupabaseClient service;
@@ -118,16 +118,124 @@ Future<SupabaseClient> signInAgain(String email) async {
   return client;
 }
 
+List<String> _ids(List<Map<String, dynamic>> rows, [String key = 'id']) => [
+  for (final r in rows)
+    if (r[key] != null) r[key] as String,
+];
+
+/// Deletes D Group rows in foreign-key order: assignments, invitations,
+/// D Group memberships, then the groups themselves.
+///
+/// Rows are selected by any of: belonging to [groupIds], touching one of
+/// [membershipIds] (on either side of an assignment), or having been written
+/// by [actorId]. A group is deleted only when listed in [groupIds].
+Future<void> deleteMinistryRows({
+  List<String> groupIds = const [],
+  List<String> membershipIds = const [],
+  String? actorId,
+}) async {
+  final dgmIds = <String>{};
+  if (groupIds.isNotEmpty) {
+    dgmIds.addAll(
+      _ids(
+        await service
+            .from('d_group_memberships')
+            .select('id')
+            .inFilter('d_group_id', groupIds),
+      ),
+    );
+  }
+  if (membershipIds.isNotEmpty) {
+    dgmIds.addAll(
+      _ids(
+        await service
+            .from('d_group_memberships')
+            .select('id')
+            .inFilter('church_membership_id', membershipIds),
+      ),
+    );
+  }
+  if (actorId != null) {
+    dgmIds.addAll(
+      _ids(
+        await service
+            .from('d_group_memberships')
+            .select('id')
+            .eq('assigned_by', actorId),
+      ),
+    );
+  }
+  final dgms = dgmIds.toList();
+
+  if (dgms.isNotEmpty) {
+    await service
+        .from('discipler_assignments')
+        .delete()
+        .inFilter('discipler_d_group_membership_id', dgms);
+    await service
+        .from('discipler_assignments')
+        .delete()
+        .inFilter('disciple_d_group_membership_id', dgms);
+    await service
+        .from('d_group_invitations')
+        .delete()
+        .inFilter('resulting_d_group_membership_id', dgms);
+  }
+  if (groupIds.isNotEmpty) {
+    await service
+        .from('discipler_assignments')
+        .delete()
+        .inFilter('d_group_id', groupIds);
+    await service
+        .from('d_group_invitations')
+        .delete()
+        .inFilter('d_group_id', groupIds);
+  }
+  if (membershipIds.isNotEmpty) {
+    await service
+        .from('d_group_invitations')
+        .delete()
+        .inFilter('church_membership_id', membershipIds);
+  }
+  if (actorId != null) {
+    await service
+        .from('discipler_assignments')
+        .delete()
+        .eq('assigned_by', actorId);
+    await service
+        .from('d_group_invitations')
+        .delete()
+        .eq('invited_by', actorId);
+  }
+  if (dgms.isNotEmpty) {
+    await service.from('d_group_memberships').delete().inFilter('id', dgms);
+  }
+  if (groupIds.isNotEmpty) {
+    await service.from('d_groups').delete().inFilter('id', groupIds);
+  }
+}
+
 /// Removes everything a test user can own, in dependency order.
 ///
 /// Migration 001 declares every foreign key ON DELETE NO ACTION, so rows that
 /// reference the profile (memberships, audit events they performed, roles
-/// they assigned) go first, then the profile, then the auth user.
+/// they assigned) go first, then the profile, then the auth user. D Group rows
+/// touching the person's memberships, written by them, or in groups they
+/// created, go before all of that.
 Future<void> deleteUser(String userId) async {
   final memberships = await service
       .from('church_memberships')
       .select('id')
       .eq('user_id', userId);
+  final createdGroups = await service
+      .from('d_groups')
+      .select('id')
+      .eq('created_by', userId);
+  await deleteMinistryRows(
+    groupIds: _ids(createdGroups),
+    membershipIds: _ids(memberships),
+    actorId: userId,
+  );
   for (final m in memberships) {
     await service
         .from('church_role_assignments')
@@ -242,6 +350,41 @@ Future<String> seedMembership(
   return row['id'] as String;
 }
 
+typedef TestMember = ({TestUser user, String membershipId});
+
+/// A confirmed user with an ACTIVE, onboarded membership in [churchId].
+Future<TestMember> createActiveMember(
+  String churchId, {
+  required String fullName,
+  String tag = 'member',
+  String? phone,
+}) async {
+  final user = await createUser(fullName: fullName, tag: tag);
+  if (phone != null) {
+    await service
+        .from('profiles')
+        .update({'phone': phone})
+        .eq('id', user.userId);
+  }
+  final membershipId = await seedMembership(
+    churchId,
+    user.userId,
+    'ACTIVE',
+    onboardingCompletedAt: DateTime.now().toUtc(),
+  );
+  return (user: user, membershipId: membershipId);
+}
+
+/// Calls an RPC that returns a table and gives back its single row.
+Future<Map<String, dynamic>> rpcRow(
+  SupabaseClient client,
+  String fn, [
+  Map<String, dynamic>? params,
+]) async {
+  final rows = await client.rpc<List<dynamic>>(fn, params: params);
+  return rows.single as Map<String, dynamic>;
+}
+
 /// Removes a church and everything hanging off it, then its approver.
 Future<void> deleteChurch(TestChurch church) async {
   await deleteChurchRows(church.churchId);
@@ -249,6 +392,12 @@ Future<void> deleteChurch(TestChurch church) async {
 }
 
 Future<void> deleteChurchRows(String churchId) async {
+  final groups = await service
+      .from('d_groups')
+      .select('id')
+      .eq('church_id', churchId);
+  await deleteMinistryRows(groupIds: _ids(groups));
+
   final memberships = await service
       .from('church_memberships')
       .select('id')

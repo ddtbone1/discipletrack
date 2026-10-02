@@ -37,6 +37,9 @@ dependencies:
   supabase_flutter: ^2.17.2
   flutter_riverpod: ^3.4.3
   go_router: ^18.0.1
+  # Already resolved through supabase_flutter, which keeps the session in it.
+  # Declared because the offline snapshot (Slice 4) uses it directly.
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:

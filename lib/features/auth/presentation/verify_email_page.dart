@@ -12,6 +12,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/app_text_link.dart';
 import '../../../core/widgets/brand_mark.dart';
 import '../../../core/widgets/error_state.dart';
 import '../application/auth_providers.dart';
@@ -241,19 +242,16 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
           const SizedBox(height: AppSpacing.lg),
 
           Center(
-            child: AppButton(
+            child: AppTextLink(
               label: 'Use a different email',
-              variant: AppButtonVariant.text,
-              expand: false,
-              onPressed: isLoading ? null : _useDifferentEmail,
+              onTap: isLoading ? null : _useDifferentEmail,
             ),
           ),
           Center(
-            child: AppButton(
-              label: 'Already verified? Sign in',
-              variant: AppButtonVariant.text,
-              expand: false,
-              onPressed: isLoading
+            child: AppTextLink(
+              prefix: 'Already verified?',
+              label: 'Sign in',
+              onTap: isLoading
                   ? null
                   : () {
                       ref.read(authControllerProvider.notifier).clearError();

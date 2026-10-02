@@ -20,6 +20,11 @@
 // rewritten; the revision reaches the database through a new
 // migration in the Discipleship Meeting + Progress slice.
 //
+// Revised by Vertical Slice 3 (Ministry Structure, Migration
+// 006): d_group_invitations and its status enum, the per-church
+// group name rule, and the D Group membership and assignment
+// constraints noted on each table.
+//
 // ============================================================
 
 
@@ -174,6 +179,15 @@ Enum d_group_responsibility {
   LEADER
   DISCIPLER
   DISCIPLE
+}
+
+
+Enum d_group_invitation_status {
+  PENDING
+  ACCEPTED
+  DECLINED
+  WITHDRAWN
+  EXPIRED
 }
 
 
@@ -549,8 +563,21 @@ Table d_groups {
 
   archived_at timestamptz
 
+  indexes {
+    (church_id, `lower(trim(name))`) [unique, note: 'WHERE status <> ARCHIVED']
+  }
+
   Note: '''
   Represents one D Group.
+
+  name is required and not blank, and unique within the church
+  ignoring case and surrounding spaces among groups that are not
+  ARCHIVED. An archived group releases its name.
+
+  Every group has exactly one active LEADER from creation:
+  create_d_group() creates the group and the LEADER row together,
+  and assign_d_group_leader() replaces the Leader in one
+  transaction. See DATABASE_CONSTRAINTS.md section 2.
 
   D Groups do not require a fixed recurring meeting schedule.
 
@@ -631,7 +658,21 @@ Table d_group_memberships {
   LEADER and DISCIPLER MAY be active simultaneously for the same
   person. A D Group Leader who personally disciples members must hold
   the DISCIPLER responsibility in order to receive discipler
-  assignments. Only DISCIPLE and DISCIPLER are mutually exclusive.
+  assignments. DISCIPLE excludes both LEADER and DISCIPLER.
+
+  Enforced since Migration 006, for every writer:
+
+  - one active row per (church_membership_id, d_group_id,
+    responsibility): partial unique index WHERE ended_at IS NULL
+  - integrity trigger: same church as the group; no overlapping
+    periods for the same person, group and responsibility; a
+    person's responsibilities at any moment are all in one D Group;
+    DISCIPLE cannot overlap LEADER or DISCIPLER
+
+  Rows are created only by create_d_group(),
+  assign_d_group_leader(), respond_to_d_group_invitation() (accept)
+  and add_self_as_discipler(), and ended by assign_d_group_leader()
+  (LEADER) and end_d_group_membership() (DISCIPLER, DISCIPLE).
 
   Overlap prevention matters because attendance eligibility is
   resolved as of gathering.starts_at. Ambiguous overlapping periods
@@ -676,6 +717,69 @@ Table discipler_assignments {
   Reassignment ends the previous relationship and creates a new one.
 
   Historical assignments are preserved.
+
+  Enforced since Migration 006: CHECK that the two sides differ, and
+  an integrity trigger requiring the DISCIPLER side, the DISCIPLE
+  side and both rows in this assignment's D Group, with no
+  overlapping periods for the same Disciple. Written only by
+  set_discipler() (pair, re-pair, unpair) and ended by
+  end_d_group_membership() when either side is removed.
+  '''
+}
+
+
+// ============================================================
+// 7a. D GROUP INVITATIONS
+// ============================================================
+
+Table d_group_invitations {
+  id uuid [pk]
+
+  d_group_id uuid [not null]
+  church_membership_id uuid [not null, note: 'the invitee']
+
+  responsibility d_group_responsibility [not null, note: 'DISCIPLER or DISCIPLE only']
+
+  status d_group_invitation_status [not null, default: 'PENDING']
+
+  invited_by uuid [not null]
+
+  created_at timestamptz [not null]
+  expires_at timestamptz [not null, note: 'created_at + 14 days']
+  responded_at timestamptz
+
+  resulting_d_group_membership_id uuid
+
+  indexes {
+    church_membership_id [unique, note: 'WHERE status = PENDING']
+    (d_group_id, status)
+  }
+
+  Note: '''
+  Confirmed placement. A Coordinator (any group) or the group's
+  Leader invites an unplaced ACTIVE member as DISCIPLER or DISCIPLE;
+  the member accepts or declines once. Accepting creates the
+  d_group_memberships row and records it here. LEADER is never
+  invited: it is a direct Coordinator appointment.
+
+  A member holds at most one PENDING invitation.
+
+  State CHECK:
+
+  PENDING   → responded_at NULL, resulting NULL
+  ACCEPTED  → responded_at and resulting set
+  DECLINED / WITHDRAWN / EXPIRED → responded_at set, resulting NULL
+
+  Expiry is lazy, with no scheduler. A PENDING row past expires_at
+  is EXPIRED in meaning everywhere and is marked EXPIRED, with
+  responded_at = expires_at, by the next successful write that
+  touches it.
+
+  Same church as the invitee, enforced by an integrity trigger.
+
+  Written only by invite_to_d_group(), withdraw_d_group_invitation()
+  and respond_to_d_group_invitation(). See DATABASE_CONSTRAINTS.md
+  section 2 and RBAC_RLS_MATRIX.md section 3.
   '''
 }
 
@@ -1777,6 +1881,19 @@ Ref: discipler_assignments.discipler_d_group_membership_id > d_group_memberships
 Ref: discipler_assignments.disciple_d_group_membership_id > d_group_memberships.id
 
 Ref: discipler_assignments.assigned_by > profiles.id
+
+
+// ============================================================
+// D Group Invitations
+// ============================================================
+
+Ref: d_group_invitations.d_group_id > d_groups.id
+
+Ref: d_group_invitations.church_membership_id > church_memberships.id
+
+Ref: d_group_invitations.invited_by > profiles.id
+
+Ref: d_group_invitations.resulting_d_group_membership_id > d_group_memberships.id
 
 
 // ============================================================

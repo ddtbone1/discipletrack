@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../connectivity/connection_status.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 
 enum AppButtonVariant {
-  /// Ink fill: near-black with a white label in light mode, near-white with a
-  /// dark label in dark mode. The default for primary actions.
-  ///
-  /// The mint and sky accents are surfaces, not button fills, so an accent
-  /// never competes with the one primary action on a screen.
+  /// Sky fill with a near-black label, the 10% accent of the 60-30-10 rule
+  /// (UI_DESIGN_SYSTEM section 40). The default for primary actions, and the
+  /// only place the sky accent is used as a fill, so the one primary action
+  /// on a screen is always the most prominent element.
   primary,
 
   /// Bordered, transparent fill. Secondary actions.
@@ -22,8 +22,8 @@ enum AppButtonVariant {
 
 /// The single button in DiscipleTrack.
 ///
-/// Gives every action the same feedback: an ink ripple, a disabled state, and
-/// an inline spinner that replaces the label **without changing the button's
+/// Gives every action the same feedback: a pressed shade one step darker
+/// than the resting fill, a greyed-out disabled state, and an inline spinner that replaces the label **without changing the button's
 /// size**, so submitting never makes the layout jump.
 class AppButton extends StatelessWidget {
   const AppButton({
@@ -33,6 +33,7 @@ class AppButton extends StatelessWidget {
     this.isLoading = false,
     this.icon,
     this.expand = true,
+    this.requiresConnection = false,
     super.key,
   });
 
@@ -40,6 +41,10 @@ class AppButton extends StatelessWidget {
 
   /// Null disables the button. Also forced null while [isLoading].
   final VoidCallback? onPressed;
+
+  /// The action changes data. While offline it is disabled, because the
+  /// app is view-only then (Slice 4 plan); the banner says why.
+  final bool requiresConnection;
   final AppButtonVariant variant;
   final bool isLoading;
   final IconData? icon;
@@ -50,13 +55,14 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final enabled = onPressed != null && !isLoading;
+    final blocked = requiresConnection && ConnectionScope.isOffline(context);
+    final enabled = onPressed != null && !isLoading && !blocked;
     final p = context.palette;
 
     final (bg, fg, border) = switch (variant) {
       AppButtonVariant.primary => (
-        enabled ? p.ink : p.surfaceAlt,
-        enabled ? p.onInk : p.disabled,
+        enabled ? p.sky : p.surfaceAlt,
+        enabled ? p.onSky : p.disabled,
         null,
       ),
       AppButtonVariant.secondary => (
@@ -82,6 +88,17 @@ class AppButton extends StatelessWidget {
         child: InkWell(
           onTap: enabled ? onPressed : null,
           borderRadius: AppRadius.control,
+          // Mobile states only (no hover): pressed is one shade step from the
+          // resting fill. The overlay is drawn under the label, so a fully
+          // opaque pressed colour still leaves the label readable.
+          splashFactory: NoSplash.splashFactory,
+          overlayColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.pressed)
+                ? (variant == AppButtonVariant.primary
+                      ? p.skyPressed
+                      : p.border.withValues(alpha: 0.6))
+                : Colors.transparent,
+          ),
           child: Container(
             constraints: const BoxConstraints(minHeight: _minHeight),
             width: expand ? double.infinity : null,

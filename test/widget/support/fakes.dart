@@ -11,6 +11,14 @@ import 'package:discipletrack/features/membership/domain/church_membership.dart'
 import 'package:discipletrack/features/membership_review/application/membership_review_providers.dart';
 import 'package:discipletrack/features/membership_review/data/membership_review_repository.dart';
 import 'package:discipletrack/features/membership_review/domain/membership_request.dart';
+import 'package:discipletrack/features/ministry/data/ministry_repository.dart';
+import 'package:discipletrack/features/offline/data/offline_snapshot.dart';
+import 'package:discipletrack/features/ministry/domain/d_group.dart';
+import 'package:discipletrack/features/ministry/domain/d_group_detail.dart';
+import 'package:discipletrack/features/ministry/domain/d_group_invitation.dart';
+import 'package:discipletrack/features/ministry/domain/d_group_member.dart';
+import 'package:discipletrack/features/ministry/domain/member_option.dart';
+import 'package:discipletrack/features/ministry/domain/ministry_context.dart';
 import 'package:discipletrack/features/profile/application/profile_providers.dart';
 import 'package:discipletrack/features/profile/domain/profile.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +37,7 @@ final sampleProfile = Profile(
 
 const sampleChurch = ChurchSummary(
   id: sampleChurchId,
-  name: 'Bankal Seventh-day Adventist Church',
+  name: 'Liberty Bible Baptist Church - Gensan',
 );
 
 ChurchMembership sampleMembership(
@@ -189,6 +197,117 @@ class FakeMembershipReviewRepository implements MembershipReviewRepository {
       throw UnimplementedError('${invocation.memberName}');
 }
 
+/// Records ministry operations and returns whatever the test configured.
+class FakeMinistryRepository implements MinistryRepository {
+  MinistryContext? ministryContext;
+  DGroupInvitation? pendingInvitation;
+  List<DGroupSummary> groups = const [];
+  Map<String, DGroupDetail> details = {};
+  List<MemberOption> placeable = const [];
+  MinistryFailure? actionFailure;
+
+  final responses = <({String id, bool accept})>[];
+  final invites = <({String groupId, String membershipId, String role})>[];
+  final withdrawn = <String>[];
+  final ended = <String>[];
+  final pairings = <({String disciple, String? discipler})>[];
+  final selfAdded = <String>[];
+  final leaders = <({String groupId, String membershipId})>[];
+
+  Future<void> _act() async {
+    if (actionFailure != null) throw actionFailure!;
+  }
+
+  @override
+  Future<MinistryContext?> fetchMyMinistryContext() async => ministryContext;
+
+  @override
+  Future<DGroupInvitation?> fetchMyPendingInvitation() async =>
+      pendingInvitation;
+
+  @override
+  Future<List<DGroupSummary>> fetchGroups(String churchId) async => groups;
+
+  @override
+  Future<DGroupDetail?> fetchGroupDetail(String groupId) async =>
+      details[groupId];
+
+  @override
+  Future<List<MemberOption>> fetchPlaceableMembers({
+    String? groupId,
+    String? churchId,
+  }) async => placeable;
+
+  @override
+  Future<void> respondToInvitation(
+    String invitationId, {
+    required bool accept,
+  }) async {
+    responses.add((id: invitationId, accept: accept));
+    await _act();
+  }
+
+  @override
+  Future<void> invite({
+    required String groupId,
+    required String membershipId,
+    required DGroupResponsibility responsibility,
+  }) async {
+    invites.add((
+      groupId: groupId,
+      membershipId: membershipId,
+      role: responsibility.toDb,
+    ));
+    await _act();
+  }
+
+  @override
+  Future<void> withdrawInvitation(String invitationId) async {
+    withdrawn.add(invitationId);
+    await _act();
+  }
+
+  @override
+  Future<void> endMembership(String dGroupMembershipId) async {
+    ended.add(dGroupMembershipId);
+    await _act();
+  }
+
+  @override
+  Future<PairingOutcome> setDiscipler({
+    required String discipleDGroupMembershipId,
+    String? disciplerDGroupMembershipId,
+  }) async {
+    pairings.add((
+      disciple: discipleDGroupMembershipId,
+      discipler: disciplerDGroupMembershipId,
+    ));
+    await _act();
+    return disciplerDGroupMembershipId == null
+        ? PairingOutcome.unassigned
+        : PairingOutcome.assigned;
+  }
+
+  @override
+  Future<void> addSelfAsDiscipler(String groupId) async {
+    selfAdded.add(groupId);
+    await _act();
+  }
+
+  @override
+  Future<void> assignLeader({
+    required String groupId,
+    required String membershipId,
+  }) async {
+    leaders.add((groupId: groupId, membershipId: membershipId));
+    await _act();
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName}');
+}
+
 /// Pumps [page] inside a `MaterialApp` with the standard overrides.
 ///
 /// Every provider the onboarding screens read is overridden, so nothing
@@ -205,17 +324,25 @@ Future<void> pumpPage(
   FakeMembershipRepository? membershipRepo,
   FakeAuthRepository? auth,
   FakeMembershipReviewRepository? reviewRepo,
+  FakeMinistryRepository? ministryRepo,
+  String userId = sampleUserId,
   ThemeMode mode = ThemeMode.light,
 }) async {
   final repo = membershipRepo ?? FakeMembershipRepository()
     ..membership = membership;
   repo.church = church;
   repo.roles = roles;
+  final ministry = ministryRepo ?? FakeMinistryRepository();
 
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        currentUserIdProvider.overrideWithValue(sampleUserId),
+        currentUserIdProvider.overrideWithValue(userId),
+        // No platform plugin in widget tests; the store has its own tests.
+        offlineSnapshotStoreProvider.overrideWithValue(
+          OfflineSnapshotStore(enabled: false),
+        ),
+        ministryRepositoryProvider.overrideWithValue(ministry),
         myProfileProvider.overrideWith((ref) async => profile ?? sampleProfile),
         myMembershipProvider.overrideWithBuild(
           (ref, notifier) async => membership,

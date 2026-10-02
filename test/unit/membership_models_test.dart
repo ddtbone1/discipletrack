@@ -49,12 +49,12 @@ void main() {
   group('ChurchSummary', () {
     test('reads both the RPC shape and the table shape', () {
       expect(
-        ChurchSummary.fromMap({'church_id': 'c1', 'church_name': 'Bankal'}),
-        const ChurchSummary(id: 'c1', name: 'Bankal'),
+        ChurchSummary.fromMap({'church_id': 'c1', 'church_name': 'Liberty'}),
+        const ChurchSummary(id: 'c1', name: 'Liberty'),
       );
       expect(
-        ChurchSummary.fromMap({'id': 'c1', 'name': 'Bankal'}),
-        const ChurchSummary(id: 'c1', name: 'Bankal'),
+        ChurchSummary.fromMap({'id': 'c1', 'name': 'Liberty'}),
+        const ChurchSummary(id: 'c1', name: 'Liberty'),
       );
     });
   });

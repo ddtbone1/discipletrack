@@ -229,5 +229,56 @@ void main() {
         );
       }
     });
+
+    test('D Group routes match by pattern, so one entry covers every '
+        'group', () {
+      for (final pattern in [
+        Routes.dGroups,
+        Routes.newDGroup,
+        Routes.dGroupDetail,
+        Routes.dGroupInvite,
+        Routes.myGroup,
+      ]) {
+        expect(
+          redirectFor(SessionState.active, pattern),
+          isNull,
+          reason: pattern,
+        );
+      }
+      expect(Routes.dGroupDetailFor('abc'), '/groups/abc');
+      expect(Routes.dGroupInviteFor('abc'), '/groups/abc/invite');
+    });
+
+    test('a concrete path is not a pattern and is not allowed by itself', () {
+      // The router passes GoRouterState.fullPath, never the location.
+      expect(
+        redirectFor(SessionState.active, Routes.dGroupDetailFor('abc')),
+        Routes.home,
+      );
+    });
+
+    test('D Group routes are refused outside the active state', () {
+      for (final state in [
+        SessionState.noMembership,
+        SessionState.pending,
+        SessionState.activeFirstEntry,
+        SessionState.noAccess,
+        SessionState.signedOut,
+        SessionState.unknown,
+      ]) {
+        for (final pattern in Routes.ministryRoutes) {
+          expect(
+            redirectFor(state, pattern),
+            destinationFor(state),
+            reason: '$state $pattern',
+          );
+        }
+      }
+    });
+
+    test('an unmatched location goes to the state\'s destination', () {
+      expect(redirectFor(SessionState.active, ''), Routes.home);
+      expect(redirectFor(SessionState.signedOut, ''), Routes.signIn);
+    });
   });
 }

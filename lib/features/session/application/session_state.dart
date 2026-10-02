@@ -76,10 +76,16 @@ final sessionStateProvider = Provider<SessionState>((ref) {
   final profile = ref.watch(myProfileProvider);
   final membership = ref.watch(myMembershipProvider);
 
+  // A refresh that already has a value (a retry after reconnecting, a saved
+  // edit) keeps the session resolved, so the router never flashes the
+  // splash while data reloads in the background.
+  bool pending(AsyncValue<Object?> v) => v.isLoading && !v.hasValue;
+  bool failed(AsyncValue<Object?> v) => v.hasError && !v.hasValue;
+
   return resolveSessionState(
     hasSession: true,
-    isLoading: profile.isLoading || membership.isLoading,
-    hasError: profile.hasError || membership.hasError,
+    isLoading: pending(profile) || pending(membership),
+    hasError: failed(profile) || failed(membership),
     membershipStatus: membership.value?.status,
     onboardingCompleted: membership.value?.onboardingCompletedAt != null,
   );

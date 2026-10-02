@@ -15,7 +15,7 @@
 #     -SupabaseUrl https://<ref>.supabase.co `
 #     -ServiceRoleKey $env:SUPABASE_SERVICE_ROLE_KEY `
 #     -DbUrl "postgresql://postgres:<password>@db.<ref>.supabase.co:5432/postgres" `
-#     -ChurchName "Bankal Seventh-day Adventist Church" `
+#     -ChurchName "Liberty Bible Baptist Church - Gensan" `
 #     -AdminEmail admin@example.org -AdminPassword <password> -AdminFullName "Admin Name"
 #
 # Omit -JoinCode to let the database generate one cryptographically; it is

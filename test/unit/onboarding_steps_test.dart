@@ -51,9 +51,9 @@ void main() {
   test('the church name labels the join step once a request exists', () {
     final steps = onboardingSteps(
       OnboardingStage.pending,
-      churchName: 'Bankal SDA Church',
+      churchName: 'Liberty Bible Baptist Church',
     );
-    expect(steps[2].subtitle, 'Bankal SDA Church');
+    expect(steps[2].subtitle, 'Liberty Bible Baptist Church');
   });
 
   test('exactly one step is current at every stage', () {

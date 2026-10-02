@@ -110,9 +110,34 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Edit profile'), findsOneWidget);
     });
+
+    testWidgets('holds Sign out, which calls the repository', (tester) async {
+      final auth = FakeAuthRepository();
+      await pumpPage(tester, const ProfilePage(), auth: auth);
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Sign out'));
+      await tester.tap(find.text('Sign out'));
+      await tester.pumpAndSettle();
+      expect(auth.signOuts, 1);
+    });
+
+    testWidgets('Home has no Sign out', (tester) async {
+      await pumpPage(
+        tester,
+        const HomePage(),
+        membership: sampleMembership(
+          MembershipStatus.active,
+          onboardingCompletedAt: DateTime.utc(2026, 9, 26),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Sign out'), findsNothing);
+    });
   });
 
   group('Sign out and profile entry on every onboarding page', () {
+    // Home is not an onboarding page: its Sign out moved to Profile.
     final pages = <String, (Widget, MembershipStatus?)>{
       'JoinChurchPage': (const JoinChurchPage(), null),
       'PendingApprovalPage': (
@@ -120,7 +145,6 @@ void main() {
         MembershipStatus.pending,
       ),
       'NoAccessPage': (const NoAccessPage(), MembershipStatus.archived),
-      'HomePage': (const HomePage(), MembershipStatus.active),
     };
 
     for (final entry in pages.entries) {

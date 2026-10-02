@@ -147,18 +147,20 @@ Semantic Colors
 
 Palette (tokens in `lib/core/theme/app_colors.dart`):
 
-| Token | Light | Use |
-|---|---|---|
-| background | `#FFFFFF` | page |
-| mint | `#C8E9CA` | primary accent surface |
-| sky | `#87DCFB` | secondary accent surface |
-| ink | `#201F1F` | text, primary buttons |
+| Token | Light | Dark | Use |
+|---|---|---|---|
+| background | `#F5F7F8` | `#121517` | page, the 60% |
+| surface | `#FBFCFC` | `#1C2023` | cards |
+| mint | `#CFE4D2` | `#AFCBB4` | major elements, the 30% |
+| sky | `#7DBFD9` | `#6FAFC8` | primary actions and highlights, the 10% |
+| skyPressed | `#68ABC6` | `#5C9BB4` | pressed primary action |
+| ink | `#201F1F` | `#E8ECEE` | text, snackbar |
 
-Dark mode uses a near-black page, dark grey raised cards and white
-text. Mint and sky carry across unchanged.
+Neither mode uses pure white (`#FFFFFF`) or pure black (`#000000`),
+and both accents are desaturated, a step further in dark mode.
 
-Both accents are light colours, so they always carry dark text, never
-white, in either mode.
+Both accents are light colours, so they always carry dark text in
+either mode.
 
 Light mode is the default. A signed-in person switches to dark mode
 with the toggle beside the profile avatar in the top-right corner; the
@@ -207,6 +209,20 @@ Neutral:
 - metadata
 
 Do not use semantic warning/error colors merely as decoration.
+
+Proportion follows 60-30-10:
+
+- 60%: the cool off-white neutral (background, surface)
+- 30%: mint on major elements such as cards that carry the main content
+- 10%: sky, reserved for the primary action and small highlights
+
+Sky is never a card fill, so the primary action stays the most
+prominent element on every screen.
+
+Interactive states are mobile states; there is no hover. Active is the
+resting colour, pressed is one shade step darker (`skyPressed` for the
+primary action), and disabled is the muted grey of `surfaceAlt` with
+`disabled` text.
 
 ---
 
@@ -1096,6 +1112,11 @@ Destructive Action
 
 Avoid screens containing several equally prominent primary buttons.
 
+The primary button is filled with `sky` and carries an `ink` label.
+It replaces the earlier ink-filled primary button. Where a screen has a
+main action, it is placed before the content it acts on, so it is the
+first thing seen.
+
 ---
 
 ## 41. Forms
@@ -1111,6 +1132,9 @@ Forms should:
 Use progressive disclosure or sections when appropriate.
 
 Do not rely only on placeholder text as a field label.
+
+Placeholders show the expected format, for example "e.g. Young Adults
+A", alongside the label rather than instead of it.
 
 ---
 
@@ -1175,6 +1199,10 @@ Examples:
 
 Routine actions should not be burdened with unnecessary confirmation
 dialogs.
+
+Keep popups few. An action that is undone simply by doing it again,
+such as withdrawing an invitation that can be re-sent, runs immediately
+without a dialog.
 
 ---
 
