@@ -22,7 +22,7 @@ import 'package:flutter/material.dart';
 /// no other green shade appears anywhere in the app. [brandPressed] is that
 /// lime one step darker, shown only while a button is held down.
 abstract final class AppColors {
-  static const background = Color(0xFFF2F3F4);
+  static const background = Color(0xFFF8F9FA);
   static const surface = Color(0xFFFFFFFF);
   static const surfaceAlt = Color(0xFFFFFFFF); // fields, quiet panels
   static const border = Color(0xFFE5E7EB); // separates white on white

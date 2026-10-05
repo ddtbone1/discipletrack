@@ -5,7 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/connectivity/connection_status.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_pill.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/error_state.dart';
@@ -105,8 +105,9 @@ class _MemberPickerPageState extends ConsumerState<MemberPickerPage> {
             loading: () => const SizedBox(height: 240, child: LoadingState()),
             error: (e, _) => SizedBox(
               height: 240,
-              child: ErrorState(
-                message: e.toString(),
+              child: ErrorState.load(
+                subject: 'the people you can invite',
+                error: e,
                 onRetry: () =>
                     ref.invalidate(placeableMembersProvider(widget.groupId)),
               ),
@@ -132,28 +133,25 @@ class _MemberPickerPageState extends ConsumerState<MemberPickerPage> {
                   style: context.supportingStyle,
                 );
               }
-              return AppCard(
-                padding: EdgeInsets.zero,
-                child: Column(
-                  children: dividedRows([
-                    for (final m in shown)
-                      _OptionRow(
-                        option: m,
-                        reason: m.ineligibilityReason(
-                          widget.purpose,
-                          dGroupId: widget.groupId,
-                        ),
-                        busy: structure.isRunning(
-                          'invite:${m.churchMembershipId}',
-                        ),
-                        // Choosing someone is a change, so not offline.
-                        enabled:
-                            !structure.isBusy &&
-                            !ConnectionScope.isOffline(context),
-                        onTap: () => _pick(m),
+              return TileGroup(
+                children: [
+                  for (final m in shown)
+                    _OptionRow(
+                      option: m,
+                      reason: m.ineligibilityReason(
+                        widget.purpose,
+                        dGroupId: widget.groupId,
                       ),
-                  ]),
-                ),
+                      busy: structure.isRunning(
+                        'invite:${m.churchMembershipId}',
+                      ),
+                      // Choosing someone is a change, so not offline.
+                      enabled:
+                          !structure.isBusy &&
+                          !ConnectionScope.isOffline(context),
+                      onTap: () => _pick(m),
+                    ),
+                ],
               );
             },
           ),

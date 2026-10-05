@@ -58,6 +58,18 @@ abstract final class AppTheme {
         labelSmall: textTheme.labelSmall?.copyWith(color: p.muted),
       ),
 
+      // Text and outlined buttons are black: lime text on white is hard to
+      // read, so lime stays a fill colour for primary actions.
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(foregroundColor: p.textPrimary),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: p.textPrimary,
+          side: BorderSide(color: p.border),
+        ),
+      ),
+
       appBarTheme: AppBarTheme(
         backgroundColor: p.background,
         foregroundColor: p.textPrimary,

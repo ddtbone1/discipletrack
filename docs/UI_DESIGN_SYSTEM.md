@@ -1,5 +1,12 @@
 # DiscipleTrack UI Design System
 
+> Set aside 2026-10-05 (user decision): until revisited, the app follows
+> standard Material 3 Flutter patterns where they differ from this
+> document. Lesson completion wording follows ADR-015 (no Leader
+> confirmation). The curriculum has ten lessons (user decision
+> 2026-10-05); examples below that say "of 12" or "12 segments" are
+> historical.
+
 *Document Status:* MVP Baseline  
 *Last Updated:* October 2026
 

@@ -195,10 +195,15 @@ void main() {
       expect(find.text('Add myself as Discipler'), findsNothing);
 
       // Pairing state is visible per Disciple.
-      expect(find.text('Discipler: Ben Discipler'), findsOneWidget);
+      expect(find.text('Paired with Ben Discipler'), findsOneWidget);
       expect(find.text('Not paired yet'), findsOneWidget);
       expect(find.text('Pair'), findsOneWidget);
       expect(find.text('Change'), findsOneWidget);
+      // The Disciple who needs pairing is listed first.
+      expect(
+        tester.getTopLeft(find.text('Not paired yet')).dy,
+        lessThan(tester.getTopLeft(find.text('Paired with Ben Discipler')).dy),
+      );
     });
 
     testWidgets('the Leader manages their group but cannot change its '
@@ -545,7 +550,7 @@ void main() {
 
     testWidgets('Leader: the My D Group row', (tester) async {
       await pumpHome(tester, ministryContext: _leaderContext());
-      expect(find.text('MY D GROUP'), findsOneWidget);
+      expect(find.text('My D Group'), findsOneWidget);
       expect(find.text('Young Adults A'), findsOneWidget);
     });
 
@@ -553,8 +558,11 @@ void main() {
       tester,
     ) async {
       await pumpHome(tester, ministryContext: _discipleContext());
-      expect(find.text('Leader: Ana Leader'), findsOneWidget);
-      expect(find.text('Discipler: Ben Discipler'), findsOneWidget);
+      expect(find.text('Ana Leader'), findsOneWidget);
+      expect(find.text('Your Leader'), findsOneWidget);
+      expect(find.text('Ben Discipler'), findsOneWidget);
+      expect(find.text('Your Discipler'), findsOneWidget);
+      expect(find.text("You're a Disciple"), findsOneWidget);
     });
 
     testWidgets('Disciple without a Discipler: "not paired yet"', (

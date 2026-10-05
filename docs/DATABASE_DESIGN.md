@@ -30,6 +30,10 @@ describe a fixed four-meeting requirement or count-driven readiness,
 they are historical reasoning; the ADRs, the ERD and
 DATABASE_CONSTRAINTS.md section 4 govern.
 
+Revision 2026-10-05 (ADR-015): the Discipler marks a lesson completed in
+one step, with no Leader confirmation; section 17 updated, section 15.2
+marked historical.
+
 Revision 2026-10-05: ADR-014 (D Group gatherings and gathering
 attendance removed from the MVP; one monitoring condition,
 CONSECUTIVE_ABSENCE, from explicitly recorded ABSENT discipleship
@@ -613,7 +617,7 @@ Constraint:
 
 UNIQUE(curriculum_id, lesson_number)
 
-The active curriculum contains 12 lessons.
+The active curriculum contains 10 lessons.
 
 The number four should exist as curriculum/domain data rather than being
 scattered as magic numbers throughout Flutter.
@@ -748,6 +752,11 @@ See the ERD for fields, statuses and uniqueness.
 
 ## 15.2 Progress State Transitions
 
+*Historical (ADR-011, ADR-015): no count moves a lesson forward, and
+READY_FOR_COMPLETION is no longer entered. The current lifecycle is
+NOT_STARTED, IN_PROGRESS at the first credited meeting, then COMPLETED
+when the Discipler marks the lesson completed. See section 17.*
+
 Expected lifecycle:
 
 NOT_STARTED
@@ -796,18 +805,19 @@ future performance requirements justify a cache.
 
 Lesson completion is represented through the progress record.
 
-When the Discipler submits the lesson as finished (ADR-011; previously,
-when the required number of meetings was reached):
-
-status = READY_FOR_COMPLETION
-
-The D Group Leader may then confirm the lesson.
-
-Confirmation records:
+When the Discipler marks the lesson completed (ADR-015; previously a
+Discipler submission followed by Leader confirmation, ADR-011, and
+before that a count threshold), the progress record is set in one step:
 
 - status = COMPLETED
 - completed_at
-- confirmed_by
+- confirmed_by (the person who marked it)
+- ready_at = completed_at and submitted_by = the same person, so the
+  existing state check holds without a separate submission
+
+READY_FOR_COMPLETION is no longer entered. A completion can be undone
+within a short window (latest completed lesson, no meeting yet on the
+next lesson); afterwards only the Coordinator can reopen it.
 
 This provides accountability for the completion decision.
 
@@ -823,7 +833,7 @@ Lesson 1
 → Lesson 2
 → Lesson 3
 → ...
-→ Lesson 12
+→ Lesson 10
 
 The system prevents progression that bypasses required previous lesson
 completion. Lesson N requires lesson N-1 COMPLETED, and lesson 1 is
@@ -846,7 +856,7 @@ migration workflow is documented future scope.
 # 19. Curriculum Completion
 
 *Historical (ADR-012): Discipler eligibility is now derived from
-confirmed COMPLETED of Lesson 5 of the active curriculum, not every
+COMPLETED of Lesson 5 of the active curriculum (ADR-015), not every
 lesson. Eligibility is never stored and never automatic.*
 
 Curriculum completion is derived when all required lessons are completed.
@@ -855,7 +865,7 @@ Every lesson of the church's ACTIVE curriculum COMPLETED
 
 → Eligible for Discipler Review
 
-The MVP curriculum holds twelve lessons, but that is seed data. No rule
+The MVP curriculum holds ten lessons, but that is seed data. No rule
 hard-codes the count.
 
 Eligibility itself should normally be derived rather than manually

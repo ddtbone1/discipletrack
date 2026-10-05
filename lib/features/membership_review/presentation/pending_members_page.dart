@@ -11,6 +11,8 @@ import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../application/membership_review_providers.dart';
 import '../domain/membership_request.dart';
+import '../../../core/widgets/confirm_dialog.dart';
+import '../../../core/widgets/empty_state.dart';
 
 /// Membership requests awaiting review, for Admins and Coordinators.
 ///
@@ -40,14 +42,21 @@ class PendingMembersPage extends ConsumerWidget {
             loading: () => const SizedBox(height: 320, child: LoadingState()),
             error: (e, _) => SizedBox(
               height: 320,
-              child: ErrorState(
-                message: e.toString(),
+              child: ErrorState.load(
+                subject: 'membership requests',
+                error: e,
                 onRetry: () =>
                     ref.invalidate(pendingMembershipRequestsProvider),
               ),
             ),
             data: (items) => items.isEmpty
-                ? const _EmptyRequests()
+                ? const EmptyState(
+                    icon: Icons.inbox_outlined,
+                    title: 'No pending requests',
+                    message:
+                        'When someone enters your church join code and asks '
+                        'to join, their request appears here.',
+                  )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -75,43 +84,6 @@ class PendingMembersPage extends ConsumerWidget {
   }
 }
 
-class _EmptyRequests extends StatelessWidget {
-  const _EmptyRequests();
-
-  @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    return AppCard(
-      fill: AppCardFill.pastel,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.inbox_outlined, size: 22),
-              const SizedBox(width: AppSpacing.xs),
-              Text(
-                'No pending requests',
-                style: AppTypography.sectionTitle.copyWith(
-                  color: AppCardFill.pastel.foreground(p),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'When someone enters your church join code and asks to join, '
-            'their request appears here.',
-            style: AppTypography.body.copyWith(
-              color: AppCardFill.pastel.foregroundMuted(p),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _RequestCard extends ConsumerWidget {
   const _RequestCard({
     required this.request,
@@ -130,27 +102,16 @@ class _RequestCard extends ConsumerWidget {
   Future<void> _decline(BuildContext context, WidgetRef ref) async {
     // UI_DESIGN_SYSTEM section 45: a destructive action confirms first.
     // Rejection archives the request and only the church can reinstate it.
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Decline this request?'),
-        content: Text(
+    final confirmed = await showConfirmDialog(
+      context,
+      title: 'Decline this request?',
+      message:
           '${request.fullName} will not be able to request again from the '
           'app. Only your church can reopen a declined request.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Keep request'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Decline'),
-          ),
-        ],
-      ),
+      confirmLabel: 'Decline',
+      cancelLabel: 'Keep request',
     );
-    if (confirmed == true) {
+    if (confirmed) {
       await ref
           .read(membershipReviewControllerProvider.notifier)
           .reject(request.membershipId);

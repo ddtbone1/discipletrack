@@ -18,6 +18,20 @@ monitoring" in the sentence above, and the Consequences statement
 The condition is CONSECUTIVE_ABSENCE, counting explicitly recorded
 ABSENT outcomes only. The rest of this ADR is unchanged.
 
+Partially superseded (2026-10-05) by
+[ADR-015](ADR-015-discipler-marks-lesson-completed.md): the Leader
+confirmation step. Replaced are the Progression diagram's
+READY_FOR_COMPLETION state and Leader confirmation; decision 5's
+"submits" (the Discipler now marks the lesson completed in one step);
+the confirmation part of decision 6; decision 7; decision 9; decision 15
+(dormant, since nothing enters READY_FOR_COMPLETION); decision 16's
+resulting state (reopen now returns to IN_PROGRESS or NOT_STARTED);
+decision 17 (withdrawal, replaced by a time-bounded undo); and the
+Consequences entry naming the submission, withdrawal and confirmation
+operations. The separation of meetings from completion, the single
+policy point and the open decision below remain accepted. The body below
+is the 2026-10-02 text and is not rewritten.
+
 One numeric rule is **not decided** by this ADR and is a blocking
 product decision (see "Open decision"). The architecture below works
 for every option.

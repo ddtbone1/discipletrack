@@ -27,21 +27,13 @@ List<String> _labels(List<DockItem> items) => [for (final i in items) i.label];
 void main() {
   group('dockItemsFor', () {
     test('an unplaced member gets Home and Profile only', () {
-      final items = dockItemsFor(
-        isCoordinator: false,
-        canReview: false,
-        ministry: null,
-      );
+      final items = dockItemsFor(isCoordinator: false, ministry: null);
       expect(_labels(items), ['Home', 'Profile']);
     });
 
-    test('the Coordinator gets D Groups and Requests', () {
-      final items = dockItemsFor(
-        isCoordinator: true,
-        canReview: true,
-        ministry: null,
-      );
-      expect(_labels(items), ['Home', 'D Groups', 'Requests', 'Profile']);
+    test('the Coordinator gets D Groups; Requests is not in the dock', () {
+      final items = dockItemsFor(isCoordinator: true, ministry: null);
+      expect(_labels(items), ['Home', 'D Groups', 'Profile']);
       expect(items[1].path, Routes.dGroups);
     });
 
@@ -49,42 +41,60 @@ void main() {
         'roster', () {
       final leader = dockItemsFor(
         isCoordinator: false,
-        canReview: false,
         ministry: _context(DGroupResponsibility.leader),
       );
-      expect(_labels(leader), ['Home', 'My Group', 'Profile']);
+      expect(_labels(leader), ['Home', 'D Group', 'Profile']);
       expect(leader[1].path, Routes.dGroupDetailFor('g1'));
 
       final disciple = dockItemsFor(
         isCoordinator: false,
-        canReview: false,
         ministry: _context(DGroupResponsibility.disciple),
       );
-      expect(disciple[1].path, Routes.myGroup);
+      expect(disciple[2].path, Routes.myGroup);
     });
 
-    test('an Admin who is not Coordinator gets Requests but no D Groups', () {
-      final items = dockItemsFor(
+    test('Journey is offered to a Disciple and to a Discipler, from the '
+        'relationship, never to a Leader who holds neither', () {
+      for (final r in [
+        DGroupResponsibility.disciple,
+        DGroupResponsibility.discipler,
+      ]) {
+        final items = dockItemsFor(isCoordinator: false, ministry: _context(r));
+        expect(_labels(items), ['Home', 'Journey', 'D Group', 'Profile']);
+        expect(items[1].path, Routes.journey);
+      }
+      final leader = dockItemsFor(
         isCoordinator: false,
-        canReview: true,
-        ministry: null,
+        ministry: _context(DGroupResponsibility.leader),
       );
-      expect(_labels(items), ['Home', 'Requests', 'Profile']);
+      expect(_labels(leader), isNot(contains('Journey')));
+    });
+
+    test('a Coordinator who also disciples gets Journey, and the dock never '
+        'exceeds five items', () {
+      final items = dockItemsFor(
+        isCoordinator: true,
+        ministry: _context(DGroupResponsibility.discipler),
+      );
+      expect(_labels(items), ['Home', 'Journey', 'D Groups', 'Profile']);
+      expect(items.length, lessThanOrEqualTo(5));
+    });
+
+    test('an Admin who is not Coordinator and not placed gets Home and '
+        'Profile', () {
+      final items = dockItemsFor(isCoordinator: false, ministry: null);
+      expect(_labels(items), ['Home', 'Profile']);
     });
   });
 
   group('activeDockIndex', () {
-    final items = dockItemsFor(
-      isCoordinator: true,
-      canReview: true,
-      ministry: null,
-    );
+    final items = dockItemsFor(isCoordinator: true, ministry: null);
 
     test('matches the destination and the pages under it', () {
       expect(activeDockIndex(items, Routes.home), 0);
       expect(activeDockIndex(items, Routes.dGroups), 1);
       expect(activeDockIndex(items, '/groups/g1/invite'), 1);
-      expect(activeDockIndex(items, Routes.editProfile), 3);
+      expect(activeDockIndex(items, Routes.editProfile), 2);
     });
 
     test('a path that only shares a prefix does not match', () {
@@ -163,11 +173,7 @@ void main() {
 
   testWidgets('the dock renders and slides without a Scaffold above it, as '
       'in the app', (tester) async {
-    final items = dockItemsFor(
-      isCoordinator: true,
-      canReview: true,
-      ministry: null,
-    );
+    final items = dockItemsFor(isCoordinator: true, ministry: null);
     Widget dock(int active) => MaterialApp(
       theme: AppTheme.light(),
       home: Align(
@@ -201,11 +207,7 @@ void main() {
   });
 
   testWidgets('the dock marks the active destination', (tester) async {
-    final items = dockItemsFor(
-      isCoordinator: true,
-      canReview: false,
-      ministry: null,
-    );
+    final items = dockItemsFor(isCoordinator: true, ministry: null);
     final handle = tester.ensureSemantics();
     await tester.pumpWidget(
       MaterialApp(

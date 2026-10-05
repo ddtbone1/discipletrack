@@ -8,6 +8,9 @@ Implementation belongs to the Curriculum / Lesson Content vertical
 slice. The concrete content structure is deliberately left open until
 the real lesson material has been inspected (see Consequences).
 
+Curriculum size revised to ten lessons (user decision 2026-10-05);
+references to twelve lessons below are historical.
+
 ## Context
 
 Until this decision the specification stated that DiscipleTrack tracks

@@ -35,7 +35,7 @@ Widget typographyTokens() => const _Sheet(
       _TypeRow(
         'body',
         AppTypography.body,
-        'Attendance is recorded per gathering.',
+        'Meetings are recorded after they happen.',
       ),
       _TypeRow('supporting', AppTypography.supporting, 'Secondary information'),
       _TypeRow('caption', AppTypography.caption, 'JOINED CHURCH'),

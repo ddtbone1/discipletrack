@@ -24,7 +24,7 @@ class InvitationCard extends ConsumerWidget {
   final DateTime? now;
 
   Future<void> _decline(BuildContext context, WidgetRef ref) async {
-    final confirmed = await confirmAction(
+    final confirmed = await showConfirmDialog(
       context,
       title: 'Decline this invitation?',
       message:

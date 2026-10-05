@@ -23,8 +23,12 @@ enum AppCardFill {
   /// Pale mint in light mode, deep green-grey in dark mode. Quiet grouping.
   pastel,
 
-  /// Surface with a soft border. The default for plain grouped content.
+  /// White surface. The default for plain grouped content.
   plain,
+
+  /// The brand lime with black text, in both modes. The single most lively
+  /// card on a screen, such as the D Group card on Home.
+  lime,
 }
 
 extension AppCardFillColors on AppCardFill {
@@ -34,6 +38,7 @@ extension AppCardFillColors on AppCardFill {
     AppCardFill.sky => p.sky,
     AppCardFill.pastel => p.pastel,
     AppCardFill.plain => p.surface,
+    AppCardFill.lime => p.brand,
   };
 
   Color foreground(AppPalette p) => switch (this) {
@@ -42,6 +47,7 @@ extension AppCardFillColors on AppCardFill {
     AppCardFill.sky => p.onSky,
     AppCardFill.pastel => p.onPastel,
     AppCardFill.plain => p.textPrimary,
+    AppCardFill.lime => p.onBrand,
   };
 
   /// Muted foreground, for supporting lines inside the card.
@@ -51,9 +57,8 @@ extension AppCardFillColors on AppCardFill {
     AppCardFill.sky => p.onSky.withValues(alpha: 0.7),
     AppCardFill.pastel => p.onPastel.withValues(alpha: 0.65),
     AppCardFill.plain => p.muted,
+    AppCardFill.lime => p.onBrand.withValues(alpha: 0.62),
   };
-
-  bool get hasBorder => this == AppCardFill.plain;
 }
 
 /// A rounded surface for content that forms a meaningful group, has its own
@@ -91,30 +96,12 @@ class AppCard extends StatelessWidget {
       ),
     );
 
-    // Soft edges: a faint outline and a low, wide shadow, so cards lift off
-    // the grey page without hard lines.
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: AppRadius.card,
-        boxShadow: [
-          BoxShadow(
-            color: p.textPrimary.withValues(alpha: 0.05),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Material(
-        color: fill.background(p),
-        shape: RoundedRectangleBorder(
-          borderRadius: AppRadius.card,
-          side: fill.hasBorder
-              ? BorderSide(color: p.border.withValues(alpha: 0.6))
-              : BorderSide.none,
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: onTap == null ? content : InkWell(onTap: onTap, child: content),
-      ),
+    return Material(
+      color: fill.background(p),
+      // Flat: no border and no shadow; white on the light page is enough.
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
+      clipBehavior: Clip.antiAlias,
+      child: onTap == null ? content : InkWell(onTap: onTap, child: content),
     );
   }
 }

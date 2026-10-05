@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../connectivity/connection_status.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
@@ -11,6 +12,10 @@ import 'app_button.dart';
 /// UI_DESIGN_SYSTEM section 44: errors must be understandable without exposing
 /// internal detail, and must not rely on colour alone, so an icon and text
 /// carry the meaning too.
+///
+/// Use [ErrorState.load] when loading something failed. The default
+/// constructor is for sentences written for the screen; it must never receive
+/// exception text.
 class ErrorState extends StatelessWidget {
   const ErrorState({
     required this.message,
@@ -18,6 +23,39 @@ class ErrorState extends StatelessWidget {
     this.onRetry,
     super.key,
   });
+
+  /// A failed load of [subject] ("your D Group"), in fixed wording.
+  ///
+  /// The error itself is never shown. When it means the server could not be
+  /// reached, the offline wording is used instead, because "try again" will
+  /// only help once the connection is back.
+  factory ErrorState.load({
+    required String subject,
+    required Object error,
+    VoidCallback? onRetry,
+    Key? key,
+  }) {
+    if (isNetworkFailure(error)) {
+      return ErrorState(
+        key: key,
+        title: "You're offline",
+        message:
+            '${_capitalise(subject)} needs a connection. Connect and try '
+            'again.',
+        onRetry: onRetry,
+      );
+    }
+    return ErrorState(
+      key: key,
+      title: "Couldn't load $subject",
+      message:
+          "We couldn't load $subject. Check your connection and try again.",
+      onRetry: onRetry,
+    );
+  }
+
+  static String _capitalise(String s) =>
+      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 
   final String title;
   final String message;

@@ -25,10 +25,11 @@ ADRs explain why a decision exists so future developers and AI coding agents can
 | ADR-008 | Documentation Precedence and Schema Source of Truth | Accepted |
 | ADR-009 | Discipleship Meeting Attendance and Role-Specific Monitoring | Accepted; partially superseded by ADR-011 (lesson readiness), ADR-012 (promotion as a recalculation trigger) and ADR-014 (gatherings, gathering monitoring, the missed-meeting condition, two thresholds) |
 | ADR-010 | Lesson Content Delivery and Offline-First Reading | Accepted |
-| ADR-011 | Explicit Lesson Completion, Independent of a Fixed Meeting Count | Accepted; one numeric rule open (minimum meetings); partially superseded by ADR-014 (condition name, role-specific monitoring) |
-| ADR-012 | Discipler Eligibility After Lesson 5 and Concurrent Disciple and Discipler Responsibilities | Accepted; D2 decided (policy function); the Slice 6 questions open |
+| ADR-011 | Explicit Lesson Completion, Independent of a Fixed Meeting Count | Accepted; one numeric rule open (minimum meetings); partially superseded by ADR-014 (condition name, role-specific monitoring) and ADR-015 (Leader confirmation step, submission withdrawal, reopen result) |
+| ADR-012 | Discipler Eligibility After Lesson 5 and Concurrent Disciple and Discipler Responsibilities | Accepted; D2 decided (policy function); the Slice 6 questions open; eligibility wording amended by ADR-015 |
 | ADR-013 | Curriculum Workbook and Guide Modes | Reserved, not written (see Reserved numbers) |
 | ADR-014 | Remove D Group Gathering Attendance from the MVP | Accepted |
+| ADR-015 | The Discipler Marks a Lesson Completed, Without Leader Confirmation | Accepted |
 
 ADR numbers are identifiers, not implementation order.
 

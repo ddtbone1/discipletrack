@@ -10,6 +10,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_pill.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_text_link.dart';
 import '../../../core/widgets/error_state.dart';
@@ -24,6 +25,7 @@ import '../domain/member_option.dart';
 import 'member_picker_page.dart';
 import 'ministry_ui.dart';
 import 'pair_sheet.dart';
+import '../../../core/widgets/empty_state.dart';
 
 /// One D Group, for its Coordinator (any group) and its Leader (their own).
 ///
@@ -66,47 +68,22 @@ class DGroupDetailPage extends ConsumerWidget {
             loading: () => const SizedBox(height: 320, child: LoadingState()),
             error: (e, _) => SizedBox(
               height: 320,
-              child: ErrorState(
-                message: e.toString(),
+              child: ErrorState.load(
+                subject: 'this D Group',
+                error: e,
                 onRetry: () => ref.invalidate(dGroupDetailProvider(groupId)),
               ),
             ),
             data: (d) => d == null
-                ? const _NotAvailable()
+                ? const EmptyState.restricted(
+                    title: "This D Group isn't available",
+                    message:
+                        "Only the church Coordinator and the group's Leader "
+                        "can open a D Group's details.",
+                  )
                 : _DetailBody(detail: d, now: now ?? DateTime.now()),
           ),
           const SizedBox(height: AppSpacing.xl),
-        ],
-      ),
-    );
-  }
-}
-
-class _NotAvailable extends StatelessWidget {
-  const _NotAvailable();
-
-  @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    return AppCard(
-      fill: AppCardFill.pastel,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'This D Group isn\'t available',
-            style: AppTypography.sectionTitle.copyWith(
-              color: AppCardFill.pastel.foreground(p),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Only the church Coordinator and the group\'s Leader can open a '
-            'D Group\'s details.',
-            style: AppTypography.body.copyWith(
-              color: AppCardFill.pastel.foregroundMuted(p),
-            ),
-          ),
         ],
       ),
     );
@@ -133,7 +110,7 @@ class _DetailBody extends ConsumerWidget {
     );
     if (picked == null || !context.mounted) return;
     final current = detail.leader?.fullName ?? 'The current Leader';
-    final confirmed = await confirmAction(
+    final confirmed = await showConfirmDialog(
       context,
       title: 'Make ${picked.fullName} the Leader?',
       message:
@@ -156,7 +133,7 @@ class _DetailBody extends ConsumerWidget {
     final pairings = member.responsibility == DGroupResponsibility.discipler
         ? detail.disciplesOf(member).length
         : 0;
-    final confirmed = await confirmAction(
+    final confirmed = await showConfirmDialog(
       context,
       title: 'Remove ${member.fullName}?',
       message: [
@@ -189,7 +166,7 @@ class _DetailBody extends ConsumerWidget {
     // UI_DESIGN_SYSTEM section 45: removing an assignment is confirmed.
     if (selection.disciplerDGroupMembershipId == null) {
       final current = detail.disciplerOf(disciple);
-      final confirmed = await confirmAction(
+      final confirmed = await showConfirmDialog(
         context,
         title: 'Unpair ${disciple.fullName}?',
         message:
@@ -292,35 +269,63 @@ class _DetailBody extends ConsumerWidget {
           padding: EdgeInsets.zero,
           child: PersonRow(
             name: leader?.fullName ?? 'No Leader',
-            detail: [
-              if (leader?.phone != null) leader!.phone!,
-              if (detail.leaderIsDiscipler) 'Also a Discipler',
-            ].join(' · ').ifEmpty(null),
+            leading: leader == null
+                ? null
+                : InitialsAvatar(name: leader.fullName),
+            detail: leader?.phone,
+            pills: [
+              if (leader != null)
+                const AppPill(
+                  tone: PillTone.brand,
+                  icon: Icons.star_rounded,
+                  label: 'Leader',
+                ),
+              if (detail.leaderIsDiscipler)
+                const AppPill(
+                  icon: Icons.school_outlined,
+                  label: 'Also a Discipler',
+                ),
+            ],
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
 
         // Disciplers -----------------------------------------------------
         SectionHeading('Disciplers'),
-        AppCard(
-          padding: EdgeInsets.zero,
-          child: Column(
-            children: dividedRows([
-              if (disciplers.isEmpty)
-                const PersonRow(
-                  name: 'No Disciplers yet',
-                  detail: 'Invite someone as a Discipler, then pair them with Disciples.',
-                ),
-              for (final d in disciplers)
-                PersonRow(
-                  name: d.fullName,
-                  detail: _disciplesLine(detail.disciplesOf(d)),
-                  trailing: overflow([
-                    ('Remove from group', () => _remove(context, ref, d)),
-                  ]),
-                ),
-            ]),
-          ),
+        TileGroup(
+          children: [
+            if (disciplers.isEmpty)
+              const PersonRow(
+                name: 'No Disciplers yet',
+                detail: 'Invite someone as a Discipler, then pair them with Disciples.',
+              ),
+            for (final d in disciplers)
+              PersonRow(
+                name: d.fullName,
+                leading: InitialsAvatar(name: d.fullName),
+                detail: _disciplesLine(detail.disciplesOf(d)),
+                pills: [
+                  const AppPill(
+                    icon: Icons.school_outlined,
+                    label: 'Discipler',
+                  ),
+                  if (detail.disciplesOf(d).isEmpty)
+                    const AppPill(
+                      tone: PillTone.warning,
+                      label: 'No Disciples yet',
+                    )
+                  else
+                    AppPill(
+                      label: detail.disciplesOf(d).length == 1
+                          ? '1 Disciple'
+                          : '${detail.disciplesOf(d).length} Disciples',
+                    ),
+                ],
+                trailing: overflow([
+                  ('Remove from group', () => _remove(context, ref, d)),
+                ]),
+              ),
+          ],
         ),
         if (isLeaderHere && !detail.leaderIsDiscipler) ...[
           const SizedBox(height: AppSpacing.sm),
@@ -348,86 +353,84 @@ class _DetailBody extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
         ],
-        AppCard(
-          padding: EdgeInsets.zero,
-          child: Column(
-            children: dividedRows([
-              if (disciples.isEmpty)
-                const PersonRow(
-                  name: 'No Disciples yet',
-                  detail: 'Invite members as Disciples. They join once they accept.',
-                ),
-              for (final d in disciples)
-                _DiscipleRow(
-                  disciple: d,
-                  discipler: detail.disciplerOf(d),
-                  canManage: canManage,
-                  busy: structure.isRunning('pair:${d.dGroupMembershipId}'),
-                  enabled: !structure.isBusy,
-                  onPair: () => _pair(context, ref, d),
-                  overflow: overflow([
-                    ('Remove from group', () => _remove(context, ref, d)),
-                  ]),
-                ),
-            ]),
-          ),
+        TileGroup(
+          children: [
+            if (disciples.isEmpty)
+              const PersonRow(
+                name: 'No Disciples yet',
+                detail:
+                    'Invite members as Disciples. They join once they accept.',
+              ),
+            for (final d in [
+              ...disciples.where((d) => detail.disciplerOf(d) == null),
+              ...disciples.where((d) => detail.disciplerOf(d) != null),
+            ])
+              _DiscipleRow(
+                disciple: d,
+                discipler: detail.disciplerOf(d),
+                canManage: canManage,
+                busy: structure.isRunning('pair:${d.dGroupMembershipId}'),
+                enabled: !structure.isBusy,
+                onPair: () => _pair(context, ref, d),
+                overflow: overflow([
+                  ('Remove from group', () => _remove(context, ref, d)),
+                ]),
+              ),
+          ],
         ),
         const SizedBox(height: AppSpacing.lg),
 
         // Invitations ----------------------------------------------------
         if (canManage) ...[
           SectionHeading('Invitations'),
-          AppCard(
-            padding: EdgeInsets.zero,
-            child: Column(
-              children: dividedRows([
-                if (open.isEmpty && closed.isEmpty)
-                  const PersonRow(
-                    name: 'No invitations waiting',
-                    detail: 'People you invite show up here until they answer.',
-                  ),
-                for (final i in open)
-                  PersonRow(
-                    name: i.inviteeName ?? 'Unnamed member',
-                    detail:
-                        '${i.responsibility.label} · '
-                        '${MinistryFormat.expiresIn(i.daysLeftAt(now))}',
-                    trailing:
-                        (isCoordinator ||
-                            (isLeaderHere && i.invitedBy == myUserId))
-                        ? AppTextLink(
-                            label: 'Withdraw',
-                            requiresConnection: true,
-                            onTap: structure.isBusy
-                                ? null
-                                : () => _withdraw(context, ref, i),
-                          )
-                        : const StatusPill(
-                            label: 'Pending',
-                            tone: StatusTone.waiting,
+          TileGroup(
+            children: [
+              if (open.isEmpty && closed.isEmpty)
+                const PersonRow(
+                  name: 'No invitations waiting',
+                  detail: 'People you invite show up here until they answer.',
+                ),
+              for (final i in open)
+                PersonRow(
+                  name: i.inviteeName ?? 'Unnamed member',
+                  detail:
+                      '${i.responsibility.label} · '
+                      '${MinistryFormat.expiresIn(i.daysLeftAt(now))}',
+                  trailing:
+                      (isCoordinator ||
+                          (isLeaderHere && i.invitedBy == myUserId))
+                      ? AppTextLink(
+                          label: 'Withdraw',
+                          requiresConnection: true,
+                          onTap: structure.isBusy
+                              ? null
+                              : () => _withdraw(context, ref, i),
+                        )
+                      : const StatusPill(
+                          label: 'Pending',
+                          tone: StatusTone.waiting,
+                        ),
+                ),
+              for (final i in closed)
+                PersonRow(
+                  name: i.inviteeName ?? 'Unnamed member',
+                  detail:
+                      '${i.responsibility.label} · '
+                      '${i.statusAt(now) == DGroupInvitationStatus.declined ? 'Declined' : 'Expired'}'
+                      ' ${MinistryFormat.shortDate(i.respondedAt ?? i.expiresAt)}',
+                  trailing: AppTextLink(
+                    label: 'Invite again',
+                    requiresConnection: true,
+                    onTap: structure.isBusy || i.churchMembershipId == null
+                        ? null
+                        : () => controller.invite(
+                            _groupId,
+                            i.churchMembershipId!,
+                            i.responsibility,
                           ),
                   ),
-                for (final i in closed)
-                  PersonRow(
-                    name: i.inviteeName ?? 'Unnamed member',
-                    detail:
-                        '${i.responsibility.label} · '
-                        '${i.statusAt(now) == DGroupInvitationStatus.declined ? 'Declined' : 'Expired'}'
-                        ' ${MinistryFormat.shortDate(i.respondedAt ?? i.expiresAt)}',
-                    trailing: AppTextLink(
-                      label: 'Invite again',
-                      requiresConnection: true,
-                      onTap: structure.isBusy || i.churchMembershipId == null
-                          ? null
-                          : () => controller.invite(
-                              _groupId,
-                              i.churchMembershipId!,
-                              i.responsibility,
-                            ),
-                    ),
-                  ),
-              ]),
-            ),
+                ),
+            ],
           ),
         ],
       ],
@@ -461,35 +464,91 @@ class _DiscipleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PersonRow(
-      name: disciple.fullName,
-      detail: discipler == null
-          ? 'Not paired yet'
-          : 'Discipler: ${discipler!.fullName}',
-      trailing: !canManage
-          ? null
-          : Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (busy)
-                  const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                else
-                  AppTextLink(
-                    label: discipler == null ? 'Pair' : 'Change',
-                    requiresConnection: true,
-                    onTap: enabled ? onPair : null,
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    final paired = discipler != null;
+
+    final Widget action;
+    if (!canManage) {
+      action = const SizedBox.shrink();
+    } else if (busy) {
+      action = const SizedBox(
+        height: 20,
+        width: 20,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      );
+    } else if (paired) {
+      action = TextButton(
+        onPressed: enabled ? onPair : null,
+        child: const Text('Change'),
+      );
+    } else {
+      // Unpaired is the state that needs action, so its action stands out.
+      action = FilledButton.tonalIcon(
+        onPressed: enabled ? onPair : null,
+        icon: const Icon(Icons.link_rounded, size: 18),
+        label: const Text('Pair'),
+      );
+    }
+
+    return InkWell(
+      onTap: () =>
+          context.push(Routes.discipleDetailFor(disciple.churchMembershipId)),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.md,
+          AppSpacing.sm,
+          AppSpacing.xs,
+          AppSpacing.sm,
+        ),
+        child: Row(
+          children: [
+            InitialsAvatar(name: disciple.fullName),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    disciple.fullName,
+                    style: text.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ?overflow,
-              ],
+                  const SizedBox(height: 4),
+                  if (paired)
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.link_rounded,
+                          size: 16,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            'Paired with ${discipler!.fullName}',
+                            style: text.bodySmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    const AppPill(
+                      tone: PillTone.warning,
+                      icon: Icons.link_off_rounded,
+                      label: 'Not paired yet',
+                    ),
+                ],
+              ),
             ),
+            action,
+            ?overflow,
+          ],
+        ),
+      ),
     );
   }
-}
-
-extension on String {
-  String? ifEmpty(String? fallback) => isEmpty ? fallback : this;
 }

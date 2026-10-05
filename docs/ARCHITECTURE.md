@@ -12,6 +12,12 @@ core constraints and section 9 Discipler Appointment Model (ADR-012);
 sections 14, 18 and 30 promotion wording; sections 20 and 23 attendance
 wording.
 
+Revision 2026-10-05 (ADR-015): the Discipler marks a lesson completed
+with no Leader confirmation; sections 8, 9, 19 and 30.
+
+Revision 2026-10-05 (user decision, ninth): the curriculum has ten
+lessons, not twelve; sections 8, 9 and 19.
+
 ---
 
 ## 1. Architecture Goal
@@ -216,7 +222,7 @@ absence streak (BR-027a). No record is not an absence.
 
 ## 8. Curriculum Progress Model
 
-The church curriculum contains 12 ordered lessons.
+The church curriculum contains 10 ordered lessons.
 
 Meeting occurrence and lesson completion are separate concerns
 (ADR-011). A lesson takes as many credited meetings as its material
@@ -230,15 +236,19 @@ Lesson
 → Meeting         Absent    not credited
 → Meeting 3       Late      credited
 → ...             (as many as the material takes)
-→ Discipler submits the lesson as finished   → Ready for Completion
-→ Leader confirms                             → Completed
+→ Discipler marks the lesson completed       → Completed (ADR-015)
 → next lesson becomes current
 
-Absent and Excused outcomes stay in the Disciple's meeting history but
-never count as lesson meetings. Meetings recorded while the lesson
-awaits confirmation are credited and not clamped. There is no maximum.
+There is no Leader confirmation (ADR-015). The Leader and the
+Coordinator may mark a lesson completed as fallback. A completion can be
+undone while it is the latest and no meeting has been recorded on the
+next lesson; after that only the Coordinator can reopen it.
 
-Every count-dependent rule (whether a minimum applies before submission,
+Absent and Excused outcomes stay in the Disciple's meeting history but
+never count as lesson meetings. There is no maximum.
+
+Every count-dependent rule (whether a minimum applies before marking
+completed,
 and whether a typical number is shown) reads one meeting policy
 function in the database. Its numeric answer is an open product
 decision; nothing else in the client or the database encodes a number.
@@ -250,15 +260,15 @@ written by the client, and reading it never changes progress.
 
 ## 9. Discipler Appointment Model
 
-Confirmed completion of Lesson 5 of the active curriculum makes a
-Disciple eligible to be appointed as a Discipler (ADR-012). In Progress
-and Ready for Completion do not count. The eligibility lesson is
+Completion of Lesson 5 of the active curriculum, marked by the
+Discipler (ADR-015), makes a Disciple eligible to be appointed as a
+Discipler (ADR-012). In Progress does not count. The eligibility lesson is
 defined in one place, the policy function `private.discipler_eligibility_lesson()` (D2, decided
 2026-10-05), never in Flutter.
 
 Conceptually:
 
-Lesson 5 confirmed Completed
+Lesson 5 Completed (marked by the Discipler)
 → Eligible (derived, never stored)
 → Coordinator appoints (no acceptance workflow; attributed and audited)
 → DISCIPLER responsibility added in the same D Group
@@ -271,7 +281,7 @@ responsibility row, and an assignment row.
 Appointment is an explicit ministry action rather than an automatic
 database side effect. It does not end the person's DISCIPLE
 responsibility, their own discipler assignment or their progress; they
-continue their own journey through Lesson 12. Slice 6 owns the forward
+continue their own journey through Lesson 10. Slice 6 owns the forward
 migration that allows this (ADR-012 decision 10).
 
 ---
@@ -541,8 +551,8 @@ Meeting Participant Outcomes
 → Consecutive Recorded Absence Streak (Disciples)
 
 Lesson Completion Records
-→ Curriculum Progress ("Lesson 6 of 12", "5 of 12 completed")
-→ Discipler Eligibility (confirmed Lesson 5, ADR-012)
+→ Curriculum Progress ("Lesson 6 of 10", "5 of 10 completed")
+→ Discipler Eligibility (Lesson 5 COMPLETED, ADR-012, ADR-015)
 
 No attendance percentage, gathering streak or meeting-consistency ratio
 is derived (ADR-014, decision 8).
@@ -816,7 +826,7 @@ For deterministic domain logic such as:
 - lesson meeting eligibility
 - follow-up eligibility
 - progression rules
-- Discipler eligibility (confirmed Lesson 5, ADR-012)
+- Discipler eligibility (Lesson 5 COMPLETED, ADR-012, ADR-015)
 
 ### Widget Tests
 
@@ -847,8 +857,7 @@ Register
 and:
 
 Discipleship Meetings
-→ Discipler submits the lesson as finished
-→ Leader Confirmation
+→ Discipler marks the lesson completed (ADR-015)
 → Lesson Completion
 
 The gathering journey (D Group Gathering, Attendance, Leader or

@@ -80,7 +80,7 @@ class _JoinChurchPageState extends ConsumerState<JoinChurchPage> {
           const SizedBox(height: AppSpacing.xxs),
           Text(
             'Your church gives you a join code. Once your request is '
-            'approved, your D Group, lessons and gatherings appear here.',
+            'approved, your D Group and your lessons appear here.',
             style: context.supportingStyle,
           ),
           const SizedBox(height: AppSpacing.lg),

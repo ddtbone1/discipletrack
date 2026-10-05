@@ -68,28 +68,25 @@ void main() {
       expect(roles.every((r) => r['ended_at'] == null), isTrue);
     });
 
-    test(
-      'one ACTIVE curriculum with twelve lessons of four meetings',
-      () async {
-        final curricula = await service
-            .from('curricula')
-            .select('id, status')
-            .eq('church_id', seededChurchId);
-        expect(curricula.where((c) => c['status'] == 'ACTIVE'), hasLength(1));
+    test('one ACTIVE curriculum with ten lessons of four meetings', () async {
+      final curricula = await service
+          .from('curricula')
+          .select('id, status')
+          .eq('church_id', seededChurchId);
+      expect(curricula.where((c) => c['status'] == 'ACTIVE'), hasLength(1));
 
-        final lessons = await service
-            .from('curriculum_lessons')
-            .select('lesson_number, required_meetings')
-            .eq('curriculum_id', curricula.single['id'] as String)
-            .order('lesson_number', ascending: true);
-        expect(lessons, hasLength(12));
-        expect(
-          lessons.map((l) => l['lesson_number']),
-          List.generate(12, (i) => i + 1),
-        );
-        expect(lessons.every((l) => l['required_meetings'] == 4), isTrue);
-      },
-    );
+      final lessons = await service
+          .from('curriculum_lessons')
+          .select('lesson_number, required_meetings')
+          .eq('curriculum_id', curricula.single['id'] as String)
+          .order('lesson_number', ascending: true);
+      expect(lessons, hasLength(10));
+      expect(
+        lessons.map((l) => l['lesson_number']),
+        List.generate(10, (i) => i + 1),
+      );
+      expect(lessons.every((l) => l['required_meetings'] == 4), isTrue);
+    });
 
     test('a CHURCH_BOOTSTRAPPED audit event exists', () async {
       final events = await service

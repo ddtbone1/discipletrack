@@ -40,6 +40,33 @@ abstract final class Routes {
   /// The roster for a Discipler or Disciple.
   static const myGroup = '/my-group';
 
+  /// Journey (Slice 5, N8): My Journey and My Disciples, derived from the
+  /// person's relationships. [journeyDisciples] selects the My Disciples tab
+  /// when both views exist; it is ignored otherwise.
+  static const journey = '/journey';
+  static const journeyDisciples = '/journey?view=disciples';
+
+  /// One Disciple's journey and history, and recording a meeting for them.
+  /// Patterns: build concrete paths with [discipleDetailFor] and
+  /// [recordMeetingFor]. [myDisciples] itself redirects to Journey.
+  static const myDisciples = '/disciples';
+  static const discipleDetail = '/disciples/:membershipId';
+  static const recordMeeting = '/disciples/:membershipId/record';
+
+  static String discipleDetailFor(String membershipId) =>
+      '/disciples/$membershipId';
+
+  /// [on] preselects the meeting's date (a day, local time).
+  static String recordMeetingFor(String membershipId, {DateTime? on}) =>
+      on == null
+      ? '/disciples/$membershipId/record'
+      : '/disciples/$membershipId/record?date=${_isoDay(on)}';
+
+  static String _isoDay(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-'
+      '${d.month.toString().padLeft(2, '0')}-'
+      '${d.day.toString().padLeft(2, '0')}';
+
   static String dGroupDetailFor(String groupId) => '/groups/$groupId';
   static String dGroupInviteFor(String groupId) => '/groups/$groupId/invite';
 
@@ -60,4 +87,14 @@ abstract final class Routes {
   /// membership, and section 1a lets a PENDING member see their own onboarding
   /// state, so the profile screens are not restricted to ACTIVE members.
   static const profileRoutes = {profile, editProfile};
+
+  /// Discipleship screens. Reachable by any ACTIVE member; each read and
+  /// write is authorized by the database for the pair (caller, person), so
+  /// a deep link without authority opens a refused screen, never data.
+  static const discipleshipRoutes = {
+    journey,
+    myDisciples,
+    discipleDetail,
+    recordMeeting,
+  };
 }

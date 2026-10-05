@@ -27,6 +27,17 @@ Leader exclusion; Disciple and Discipler may coexist; no self-pairing),
 BR-024 self-credit rationale, BR-036 (confirmed Lesson 5), BR-037
 (appointment, not promotion), BR-053.
 
+Revision 2026-10-05 (ADR-015): the Discipler marks a lesson completed
+in one step, with no Leader confirmation. BR-030, BR-032, BR-032a,
+BR-033, BR-033a, BR-034, BR-035, BR-036 and BR-053 revised (titles
+changed, numbering stable): Leader and Coordinator fallback, a
+time-bounded undo, Coordinator reopen to In Progress, Ready for
+Completion no longer entered.
+
+Revision 2026-10-05 (user decision, ninth): the curriculum has ten
+lessons, not twelve. BR-029 retitled (numbering stable); examples in
+BR-035 and BR-037.
+
 ---
 
 ## BR-001 — System Roles and D Group Responsibilities Are Separate
@@ -383,9 +394,9 @@ AI does not determine whether the absence threshold was reached.
 
 ---
 
-## BR-029 — Curriculum Contains 12 Ordered Lessons
+## BR-029 — Curriculum Contains 10 Ordered Lessons
 
-The church's MVP discipleship curriculum consists of 12 ordered lessons.
+The church's MVP discipleship curriculum consists of 10 ordered lessons.
 
 The curriculum is represented as data and must not be hard-coded into
 Flutter UI/business logic.
@@ -408,6 +419,8 @@ not a completion signal. Offline reading never enables an offline write.
 
 ## BR-030 — Lesson Meetings Are Counted, Not Required
 
+*Revised 2026-10-05 (ADR-015).*
+
 A lesson is worked through in as many credited meetings as the material
 takes. The number varies: four is common, around six happens. The
 meeting count is factual history of the lesson; it is not what
@@ -423,8 +436,8 @@ A meeting for another lesson does not count toward the current lesson.
 There is no maximum number of meetings per lesson.
 
 Whether a minimum number of credited meetings must exist before a
-lesson can be submitted as finished is an open product decision
-(ADR-011). Until it is decided, no rule may assume a fixed number.
+lesson can be marked completed is an open product decision
+(ADR-011; ADR-015). Until it is decided, no rule may assume a fixed number.
 Counts are shown as counts ("5 meetings recorded"), never as a fraction
 of a target ("5 / 4").
 
@@ -528,80 +541,99 @@ Every void is audited and remains subject to Completed-lesson protection
 
 ## BR-032 — No Meeting Count Completes a Lesson
 
-Recording a meeting, of any ordinal, never makes a lesson Ready for
-Completion or Completed by itself (ADR-011).
+*Revised 2026-10-05 (ADR-015).*
+
+Recording a meeting, of any ordinal, never makes a lesson Completed by
+itself (ADR-011).
 
 Lesson progression:
 
 Not Started
 → In Progress, at the first credited meeting
-→ Ready for Completion, when the Discipler submits the lesson as
-  finished (BR-032a)
-→ Completed, when the D Group Leader confirms (BR-033)
-→ the next lesson in sequence becomes current
+→ Completed, when the Discipler marks the lesson completed (BR-033)
+→ the next lesson in sequence becomes current, for every role
 
-Meetings may continue while the lesson awaits confirmation. They are
-recorded and credited to the same lesson, add to its factual count, and
-do not withdraw the submission. The lesson stays Ready for Completion
-until confirmed or until the submission is withdrawn.
+There is no intermediate "awaiting confirmation" state. Ready for
+Completion remains in the schema but is no longer entered (ADR-015).
+Meetings recorded after completion belong to the next lesson, which is
+then the current lesson.
 
-## BR-032a — The Discipler Submits a Lesson as Finished
+## BR-032a — The Discipler Decides When a Lesson Is Finished
+
+*Revised 2026-10-05 (ADR-015).*
 
 The Discipler conducting the lesson, normally the Disciple's current
-assigned Discipler, decides when the lesson material has been covered
-and submits it: "We have finished covering this lesson". The submission
-records who submitted it and when, and is audited.
+assigned Discipler, decides when the lesson material has been covered.
+That judgement is recorded by marking the lesson completed (BR-033); no
+separate submission step exists.
 
-The D Group Leader and the Coordinator may submit on the Discipler's
-behalf as a fallback, as they may record meetings on the Discipler's
-behalf.
-
-A lesson can be submitted only while it is In Progress, so it has at
-least one credited meeting. Whether a larger minimum applies is the open
-decision in BR-030.
-
-A submission may be withdrawn, returning the lesson to In Progress, by
-the people RBAC_RLS_MATRIX.md section 5 names. A Disciple never
-submits, withdraws or confirms their own lesson.
+A lesson can be marked completed only while it is In Progress, so it
+has at least one credited meeting. Whether a larger minimum applies is
+the open decision in BR-030. A Disciple never marks, undoes or reopens
+their own lesson.
 
 ---
 
-## BR-033 — D Group Leader Confirms Lesson Completion
+## BR-033 — The Discipler Marks a Lesson Completed
 
-The relevant D Group Leader reviews a lesson that has been submitted as
-finished (BR-032a) and confirms completion. The confirmation is a
-deliberate act: the app asks for it explicitly, because only the
-Coordinator can reopen a completed lesson.
+*Revised 2026-10-05 (ADR-015). Previously: D Group Leader Confirms
+Lesson Completion.*
 
-Only after confirmation is the lesson considered Completed.
+The Disciple's current assigned Discipler marks the lesson completed
+("Mark Lesson 4 completed"). The lesson is Completed immediately and the
+next lesson in sequence becomes current. There is no Leader
+confirmation.
 
-The Coordinator may also confirm completion as a ministry-oversight
-fallback, for example where a D Group currently has no active Leader.
-Without this, a leadership gap would block progression for every
-Disciple in that group. Coordinator confirmation is attributable through
-confirmed_by and is audited.
+The Leader of the Disciple's current D Group and the Coordinator may
+mark a lesson completed on the Discipler's behalf, as they may record
+meetings on the Discipler's behalf. Without this fallback, a gap in the
+Discipler relationship would block progression.
+
+Marking completed requires that the lesson is the Disciple's current
+lesson, that it is In Progress, and that its credited meetings meet the
+lesson meeting policy minimum at that moment (BR-030). The completion
+records who marked it and when, and is audited.
+
+A completion may be undone by the current assigned Discipler, the
+Leader of the Disciple's current D Group or the Coordinator, only while
+both hold:
+
+- it is the Disciple's latest Completed lesson (no later lesson is
+  Completed); and
+- no meeting has been recorded for the Disciple on the next lesson.
+
+Undo returns the lesson to In Progress (or Not Started when it has no
+credited meeting), clears the completion attribution and is audited
+with the prior values. From Slice 6, the eligibility-lesson protection
+for an appointed Discipler (BR-036, ADR-012) also applies to undo.
+
+After that window, only the Coordinator can reopen a completed lesson
+(BR-033a).
 
 ---
 
 ## BR-033a — Completed Lessons Are Protected
 
-A confirmed Completed lesson must not be silently invalidated.
+*Revised 2026-10-05 (ADR-015).*
+
+A Completed lesson must not be silently invalidated.
 
 A void never changes a Completed status. Voiding a meeting or
 participation record that would leave a Completed lesson with fewer
-credited meetings than a submission needs (BR-032a, and the open minimum
-in BR-030) must be rejected. Voiding an Absent or Excused outcome never
-affects progress.
+credited meetings than marking completed needs (BR-033, and the open
+minimum in BR-030) must be rejected. Voiding an Absent or Excused
+outcome never affects progress.
 
 Correcting such a case requires an explicit authorized reopen operation
-first. Reopening returns the lesson to Ready for Completion with its
-original submission, unless the meetings no longer support it.
+first (Coordinator only, outside the undo window of BR-033). Reopening
+returns the lesson to In Progress, or Not Started when no credited
+meeting remains.
 
-Progress that has not been confirmed recomputes only from credited
-presence: a lesson with no credited meeting is Not Started, and a
-submission that a void leaves below the minimum is withdrawn
-automatically. Recomputation never makes a lesson Ready for Completion
-or Completed.
+Progress that is not Completed recomputes only from credited presence:
+a lesson with no credited meeting is Not Started. Recomputation never
+makes a lesson Completed. The automatic withdrawal of a Ready for
+Completion submission that a void leaves below the minimum is dormant,
+because that state is no longer entered (ADR-015).
 
 ---
 
@@ -618,8 +650,9 @@ only a discipleship meeting outcome.
 Discipleship meeting attendance and lesson progress share one record,
 but only credited attendance (Present or Late) counts as a lesson
 meeting. Absent and Excused outcomes are meeting history, not progress.
-Lesson completion is a further step, separate from both: the Discipler's
-submission and the Leader's confirmation (BR-032a, BR-033).
+Lesson completion is a further step, separate from both: the Discipler
+explicitly marks the lesson completed (BR-033; revised 2026-10-05,
+ADR-015).
 
 ---
 
@@ -629,25 +662,29 @@ Discipleship Meeting and lesson-completion records are authoritative.
 
 Current-stage indicators and overall progress are derived from these
 underlying records. They are presented as factual states ("Lesson 6 of
-12", "5 of 12 completed", "Lesson 6 · 5 meetings recorded", "Lesson 6
-awaiting confirmation", "Last recorded meeting Sep 25"), never as
+10", "5 of 10 completed", "Lesson 6 · 5 meetings recorded", "Last
+recorded meeting Sep 25"), never as
 rankings, comparisons between people or groups, consistency ratios,
 performance percentages or evaluative labels such as "behind" or
 "advanced" (decisions 8, 22).
 
 Overall progress is a segmented view of the curriculum: one segment per
-lesson, each completed, current or upcoming. Only a confirmed Completed
-lesson counts as completed; a lesson Ready for Completion does not. The
+lesson, each completed, current or upcoming. Only a Completed lesson
+counts as completed (revised 2026-10-05, ADR-015). The
 number of recorded meetings never determines progress. The total comes
 from the active curriculum, never from a literal.
 
 ---
 
-## BR-036 — Confirmed Lesson 5 Creates Discipler Eligibility
+## BR-036 — Completed Lesson 5 Creates Discipler Eligibility
+
+*Revised 2026-10-05 (ADR-015).*
 
 A Disciple becomes eligible to be appointed as a Discipler when Lesson 5
-of the church's active curriculum is confirmed Completed (ADR-012). In
-Progress and Ready for Completion do not count. Because progression is
+of the church's active curriculum is Completed, as marked by the
+Discipler (ADR-012, ADR-015). In Progress does not count. Completion has
+no second check, so the Coordinator's appointment decision (BR-037) is
+the human check before anyone becomes a Discipler. Because progression is
 sequential (BR-030a), Lessons 1 to 4 are then Completed as well.
 
 Eligibility is derived from the completion record. It is never stored
@@ -670,7 +707,7 @@ Appointment adds a DISCIPLER responsibility in the same D Group as the
 person's DISCIPLE responsibility. It does not end their DISCIPLE
 responsibility, their own discipler assignment or their lesson
 progress: they continue their own journey through the last lesson of
-the curriculum (Lesson 12 in the MVP curriculum) under their own
+the curriculum (Lesson 10 in the MVP curriculum) under their own
 Discipler (BR-015; enforced from Slice 6).
 
 Eligibility, appointment and assignment are distinct facts. Eligibility
@@ -935,7 +972,7 @@ Examples include:
 - Discipler assignment
 - Discipleship Meeting recording, including each outcome
 - meeting and participant voids
-- lesson confirmation
+- lesson completion, undo and reopen (ADR-015)
 - Discipler appointment (ADR-012)
 - follow-up actions
 

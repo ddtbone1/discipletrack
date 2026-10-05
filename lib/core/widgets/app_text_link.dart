@@ -18,6 +18,7 @@ class AppTextLink extends StatelessWidget {
     required this.onTap,
     this.prefix,
     this.requiresConnection = false,
+    this.offlineAction,
     super.key,
   });
 
@@ -27,8 +28,12 @@ class AppTextLink extends StatelessWidget {
   final VoidCallback? onTap;
   final String? prefix;
 
-  /// The action changes data, so it is disabled while offline.
+  /// The action changes data, so it looks disabled while offline and a tap
+  /// explains why.
   final bool requiresConnection;
+
+  /// Completes "You're offline. Connect to ...".
+  final String? offlineAction;
 
   static const _minHeight = 44.0;
 
@@ -45,7 +50,11 @@ class AppTextLink extends StatelessWidget {
       label: label,
       excludeSemantics: true,
       child: InkWell(
-        onTap: enabled ? onTap : null,
+        onTap: enabled
+            ? onTap
+            : (blocked && onTap != null)
+            ? () => explainOffline(context, action: offlineAction)
+            : null,
         borderRadius: AppRadius.control,
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: _minHeight),

@@ -17,12 +17,13 @@ import '../../membership/application/membership_providers.dart';
 import '../../membership/presentation/membership_status_pill.dart';
 import '../application/profile_providers.dart';
 import '../domain/profile.dart';
+import 'ministry_summary.dart';
 
 /// The signed-in user's own profile.
 ///
-/// MVP_SPEC section 28 describes a richer profile carrying D Group, Discipler,
-/// attendance and progress. Those appear as each feature lands and its read
-/// authorization exists. Nothing is shown that RLS does not already permit.
+/// Contact, ministry (group, every responsibility held, one journey summary
+/// and who the person disciples) and membership. Nothing is shown that the
+/// database does not already permit the person to read.
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
@@ -41,8 +42,9 @@ class ProfilePage extends ConsumerWidget {
         loading: () => const SizedBox(height: 400, child: LoadingState()),
         error: (e, _) => SizedBox(
           height: 400,
-          child: ErrorState(
-            message: e.toString(),
+          child: ErrorState.load(
+            subject: 'your profile',
+            error: e,
             onRetry: () => ref.invalidate(myProfileProvider),
           ),
         ),
@@ -105,6 +107,8 @@ class _ProfileBody extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.lg),
+
+        const MinistrySummary(),
 
         InfoGroup(
           title: 'Membership',

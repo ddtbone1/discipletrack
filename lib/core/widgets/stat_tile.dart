@@ -8,19 +8,35 @@ import 'app_card.dart';
 /// One figure on a full-width soft card: an icon in a round chip, its label
 /// over the figure, and an arrow when tapping opens the screen behind it.
 ///
-/// Shows a dash while [value] is still unknown, never a guessed number.
+/// Shows a dash while the value is still unknown, never a guessed number.
+/// [supporting] adds one factual line under the figure, such as
+/// "2 people waiting to join".
 class StatTile extends StatelessWidget {
   const StatTile({
     required this.icon,
     required this.label,
-    required this.value,
+    required int? value,
+    this.supporting,
+    this.onTap,
+    super.key,
+  }) : text = value == null ? null : '$value';
+
+  /// A figure that is not a plain number, such as "Lesson 4".
+  const StatTile.text({
+    required this.icon,
+    required this.label,
+    required this.text,
+    this.supporting,
     this.onTap,
     super.key,
   });
 
   final IconData icon;
   final String label;
-  final int? value;
+
+  /// The figure as shown; null while loading.
+  final String? text;
+  final String? supporting;
   final VoidCallback? onTap;
 
   @override
@@ -28,7 +44,7 @@ class StatTile extends StatelessWidget {
     final p = context.palette;
     return Semantics(
       button: onTap != null,
-      label: '$label: ${value ?? 'loading'}',
+      label: ['$label: ${text ?? 'loading'}', ?supporting].join('. '),
       excludeSemantics: true,
       child: AppCard(
         onTap: onTap,
@@ -60,11 +76,20 @@ class StatTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    value?.toString() ?? '–',
+                    text ?? '–',
                     style: AppTypography.metricSmall.copyWith(
                       color: p.textPrimary,
                     ),
                   ),
+                  if (supporting != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      supporting!,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.caption.copyWith(color: p.muted),
+                    ),
+                  ],
                 ],
               ),
             ),

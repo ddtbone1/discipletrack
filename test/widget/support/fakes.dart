@@ -4,6 +4,12 @@ library;
 
 import 'package:discipletrack/core/supabase/supabase_providers.dart';
 import 'package:discipletrack/core/theme/app_theme.dart';
+import 'package:discipletrack/features/discipleship/data/discipleship_repository.dart';
+
+import 'discipleship_fakes.dart';
+
+export 'discipleship_fakes.dart';
+
 import 'package:discipletrack/features/auth/data/auth_repository.dart';
 import 'package:discipletrack/features/membership/application/membership_providers.dart';
 import 'package:discipletrack/features/membership/data/membership_repository.dart';
@@ -325,6 +331,7 @@ Future<void> pumpPage(
   FakeAuthRepository? auth,
   FakeMembershipReviewRepository? reviewRepo,
   FakeMinistryRepository? ministryRepo,
+  FakeDiscipleshipRepository? discipleshipRepo,
   String userId = sampleUserId,
   ThemeMode mode = ThemeMode.light,
 }) async {
@@ -343,6 +350,9 @@ Future<void> pumpPage(
           OfflineSnapshotStore(enabled: false),
         ),
         ministryRepositoryProvider.overrideWithValue(ministry),
+        discipleshipRepositoryProvider.overrideWithValue(
+          discipleshipRepo ?? FakeDiscipleshipRepository(),
+        ),
         myProfileProvider.overrideWith((ref) async => profile ?? sampleProfile),
         myMembershipProvider.overrideWithBuild(
           (ref, notifier) async => membership,

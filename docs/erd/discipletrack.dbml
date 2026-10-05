@@ -54,6 +54,17 @@
 //   enforced from Slice 6).
 // - "Missed meeting" wording and percentage examples removed.
 //
+// Revised 2026-10-05 (ADR-015): the Discipler marks a lesson
+// completed in one step, with no Leader confirmation. No column or
+// type changes: complete_lesson() sets COMPLETED, completed_at,
+// confirmed_by, and reuses ready_at (= completed_at) and
+// submitted_by (= confirmed_by). READY_FOR_COMPLETION is dormant.
+//
+// Revised 2026-10-05 (user decision, ninth): the curriculum has ten
+// lessons, not twelve. No column or type changes; the Slice 5
+// migration replaces the bootstrap functions for the count (see
+// curricula and curriculum_lessons).
+//
 // ============================================================
 
 
@@ -270,7 +281,7 @@ Enum meeting_participation_status {
 Enum lesson_progress_status {
   NOT_STARTED
   IN_PROGRESS
-  READY_FOR_COMPLETION
+  READY_FOR_COMPLETION [note: 'dormant: no operation enters it (ADR-015); kept because Migration 001 is immutable']
   COMPLETED
 }
 
@@ -1018,7 +1029,9 @@ Table curricula {
   Note: '''
   Represents a church-owned discipleship curriculum.
 
-  The MVP uses one active fixed curriculum.
+  The MVP uses one active fixed curriculum of ten lessons (user
+  decision 2026-10-05). The count is seed data, not a rule: no rule
+  or client hard-codes a lesson total.
 
   A church has at most one ACTIVE curriculum, enforced by a partial
   unique index. Discipler eligibility (ADR-012) and sequential progression both
@@ -1071,11 +1084,16 @@ Table curriculum_lessons {
 
   MVP:
 
-  12 lessons
+  10 lessons, numbered 1 to 10 (user decision 2026-10-05).
+  Migration 004 seeded twelve; the Slice 5 migration replaces
+  private.bootstrap_church() and
+  private.assert_bootstrap_postconditions() with the count changed
+  to ten, and removes unreferenced Lessons 11 and 12 from existing
+  ACTIVE curricula (DATABASE_CONSTRAINTS.md section 0).
 
   required_meetings (applied in Migration 001, seeded as 4) no
-  longer drives progression (ADR-011). A lesson is ready for
-  completion when the Discipler submits it as finished, not when a
+  longer drives progression (ADR-011). A lesson is completed
+  when the Discipler marks it completed (ADR-015), not when a
   count is reached. Whether this column becomes a minimum
   (minimum_meetings), a recommendation (recommended_meetings) or is
   retired is an open product decision. Until then it is not renamed,
@@ -1322,14 +1340,14 @@ Table disciple_lesson_progress {
 
   lesson_id uuid [not null]
 
-  status lesson_progress_status [not null, default: 'NOT_STARTED']
+  status lesson_progress_status [not null, default: 'NOT_STARTED', note: 'READY_FOR_COMPLETION is not entered by any operation (ADR-015)']
 
   started_at timestamptz
-  ready_at timestamptz
-  submitted_by uuid [note: 'profiles.id of who submitted the lesson as finished (ADR-011); added by the Slice 5 migration']
+  ready_at timestamptz [note: 'ADR-015: equals completed_at for a completion; READY_FOR_COMPLETION is no longer entered']
+  submitted_by uuid [note: 'profiles.id; added by the Slice 5 migration (ADR-011). Under ADR-015 set by complete_lesson() to the same person as confirmed_by; cleared by undo and reopen']
 
   completed_at timestamptz
-  confirmed_by uuid
+  confirmed_by uuid [note: 'profiles.id of who marked the lesson completed (ADR-015); no Leader confirmation']
 
   created_at timestamptz [not null]
   updated_at timestamptz [not null]
@@ -1353,27 +1371,26 @@ Table disciple_lesson_progress {
   - Discipler reassignment
   - Leader changes
 
-  Expected lifecycle (ADR-011):
+  Expected lifecycle (ADR-011, revised by ADR-015):
 
   NOT_STARTED
       ↓ first credited participation (derived)
 
   IN_PROGRESS
-      ↓ the Discipler submits the lesson as finished (explicit)
-
-  READY_FOR_COMPLETION
-      ↓ current D Group Leader confirms (explicit)
+      ↓ the Discipler marks the lesson completed (explicit;
+        complete_lesson(); the Leader of the current D Group or the
+        Coordinator as fallback)
 
   COMPLETED
 
-  No meeting count moves a lesson to READY_FOR_COMPLETION. The meeting
-  count is derived from credited participation and is factual history.
-  ABSENT and EXCUSED outcomes never advance progress.
+  There is no Leader confirmation (ADR-015). READY_FOR_COMPLETION
+  stays in the lesson_progress_status enum (Migration 001 is
+  immutable) but no operation enters it.
 
-  Legitimate meetings may continue to be recorded for a lesson that is
-  READY_FOR_COMPLETION and awaiting confirmation. They add to the
-  factual count and do not withdraw the submission. There is no upper
-  limit.
+  No meeting count completes a lesson. The meeting count is derived
+  from credited participation and is factual history. ABSENT and
+  EXCUSED outcomes never advance progress. There is no upper limit on
+  meetings per lesson.
 
   A missing progress row may also be interpreted as NOT_STARTED
   during implementation, avoiding unnecessary empty rows.
@@ -1389,37 +1406,56 @@ Table disciple_lesson_progress {
   started_at is recomputed when backdated participation changes the
   chronology.
 
-  ready_at, submitted_by
-  → when, and by whom, the lesson was submitted as finished. Set by
-    the submission operation; cleared when a submission is withdrawn.
+  completed_at, confirmed_by
+  → when, and by whom, the lesson was marked completed.
 
-  A submission needs at least the meeting policy's
-  submission_minimum credited participations (ADR-011: never below
-  1; the numeric rule is an open product decision). See
-  DATABASE_CONSTRAINTS.md section 4.
+  ready_at, submitted_by
+  → reused without a schema change (ADR-015): complete_lesson() sets
+    ready_at = completed_at and submitted_by = the same person as
+    confirmed_by, so the Progress State Check (all five fields set for
+    COMPLETED) is unchanged.
+
+  All four are cleared by undo_lesson_completion() and by
+  reopen_lesson_completion().
+
+  Marking completed needs the lesson to be the eligible lesson,
+  IN_PROGRESS, with at least the meeting policy's submission_minimum
+  credited participations (ADR-011: never below 1; the numeric rule
+  is an open product decision). See DATABASE_CONSTRAINTS.md section 4.
+
+  Undo (ADR-015): the current assigned Discipler, the Leader of the
+  current D Group or the Coordinator, only while the lesson is the
+  person's latest COMPLETED lesson and no meeting has been recorded
+  for them on the next lesson. Returns to IN_PROGRESS (NOT_STARTED
+  when no credited participation remains); audited with the prior
+  values.
 
   COMPLETED is protected. A void never changes a COMPLETED status. A
   void that would leave a COMPLETED lesson with fewer than
   submission_minimum credited participations is rejected; an explicit
-  controlled reopen operation must run first. Voiding an uncredited
-  (ABSENT or EXCUSED) row never affects progress.
+  controlled undo or reopen operation must run first. Voiding an
+  uncredited (ABSENT or EXCUSED) row never affects progress.
 
-  Reopening never cascades. It is permitted only when no later lesson
-  is COMPLETED for the same church membership and, for a person
-  appointed as a Discipler, the lesson is later than the eligibility
-  lesson (Lesson 5): the eligibility lesson and earlier lessons cannot
-  be reopened for an appointed person; later lessons can, subject to
-  the other preconditions (ADR-012 decision 9, N9; the eligibility lesson comes
-  from private.discipler_eligibility_lesson(), D2). completed_at and confirmed_by are cleared, and
-  the prior confirmation stays recoverable through audit_events.
+  Reopening (Coordinator only) never cascades. It is permitted only
+  when no later lesson is COMPLETED for the same church membership
+  and, for a person appointed as a Discipler, the lesson is later than
+  the eligibility lesson (Lesson 5): the eligibility lesson and
+  earlier lessons cannot be reopened for an appointed person; later
+  lessons can, subject to the other preconditions (ADR-012 decision 9,
+  N9; the eligibility lesson comes from
+  private.discipler_eligibility_lesson(), D2). It returns the lesson
+  to IN_PROGRESS, or NOT_STARTED when no credited participation
+  remains, never to READY_FOR_COMPLETION (ADR-015); the prior
+  completion stays recoverable through audit_events.
 
-  Discipler eligibility is derived from confirmed COMPLETED of Lesson
-  5 of the active curriculum (completed_at is the "eligible since"
-  date). It is never stored here (ADR-012).
+  Discipler eligibility is derived from COMPLETED of Lesson 5 of the
+  active curriculum, marked by the Discipler (ADR-015; completed_at is
+  the "eligible since" date). It is never stored here (ADR-012).
 
-  A void that would leave a READY_FOR_COMPLETION lesson below
-  submission_minimum withdraws the submission (IN_PROGRESS, or
-  NOT_STARTED when no credited participation remains).
+  Dormant (ADR-015): a void that would leave a READY_FOR_COMPLETION
+  lesson below submission_minimum withdraws the submission
+  (IN_PROGRESS, or NOT_STARTED when no credited participation
+  remains). Nothing enters that state any more.
 
   Progression is sequential: lesson N requires lesson N-1 COMPLETED.
   Lesson 1 is exempt.
@@ -1460,12 +1496,12 @@ Table ministry_role_transitions {
   The row records that a Disciple was appointed as a Discipler. It
   does NOT mean the DISCIPLE responsibility ended: the person keeps
   their DISCIPLE row, their own discipler assignment and their lesson
-  progress, and continues through Lesson 12 (ADR-012 decision 4).
+  progress, and continues through Lesson 10 (ADR-012 decision 4).
 
   Appointment requires:
 
   - eligibility: Lesson 5 of the church's ACTIVE curriculum at
-    confirmed COMPLETED (IN_PROGRESS and READY_FOR_COMPLETION do not
+    COMPLETED, marked by the Discipler (ADR-015; IN_PROGRESS does not
     count); derived, never stored (ADR-012 decision 1; the lesson comes
     from private.discipler_eligibility_lesson(), D2)
   - a direct Coordinator appointment, with no acceptance workflow;

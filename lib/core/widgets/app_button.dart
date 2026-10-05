@@ -33,6 +33,7 @@ class AppButton extends StatelessWidget {
     this.icon,
     this.expand = true,
     this.requiresConnection = false,
+    this.offlineAction,
     this.pill = true,
     super.key,
   });
@@ -42,9 +43,14 @@ class AppButton extends StatelessWidget {
   /// Null disables the button. Also forced null while [isLoading].
   final VoidCallback? onPressed;
 
-  /// The action changes data. While offline it is disabled, because the
-  /// app is view-only then (Slice 4 plan); the banner says why.
+  /// The action changes data. While offline it looks disabled, because the
+  /// app is view-only then (Slice 4 plan), and a tap explains why instead of
+  /// doing nothing.
   final bool requiresConnection;
+
+  /// Completes "You're offline. Connect to ...", for example
+  /// "record this meeting". A generic sentence is used when null.
+  final String? offlineAction;
 
   /// Fully rounded ends, the app-wide default. False gives the squarer
   /// control radius.
@@ -92,7 +98,11 @@ class AppButton extends StatelessWidget {
         borderRadius: radius,
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: enabled ? onPressed : null,
+          onTap: enabled
+              ? onPressed
+              : (blocked && onPressed != null && !isLoading)
+              ? () => explainOffline(context, action: offlineAction)
+              : null,
           borderRadius: radius,
           // Mobile states only (no hover): pressed is one shade step from the
           // resting fill. The overlay is drawn under the label, so a fully

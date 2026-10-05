@@ -5,6 +5,17 @@
 Accepted (2026-10-05, user decisions 16 and 21). Accepted before the
 Slice 5 work that depends on the progression model (decision N9).
 
+Wording amended (2026-10-05) by
+[ADR-015](ADR-015-discipler-marks-lesson-completed.md): Lesson 5
+COMPLETED is marked by the Discipler, without Leader confirmation. The
+eligibility rule is unchanged; the Coordinator's appointment remains the
+human check.
+
+Curriculum size revised to ten lessons (user decision 2026-10-05);
+references to twelve lessons below ("Lesson 12", "Lessons 6 to 12")
+are historical. The eligibility
+lesson stays Lesson 5.
+
 Partially supersedes
 [ADR-009](ADR-009-discipleship-meeting-attendance-monitoring.md) for one
 statement (see "Superseded statements"). No ADR established the
@@ -46,8 +57,9 @@ Facts that shape the decision:
 ## Decision
 
 1. **Eligibility.** A Disciple becomes eligible to be appointed as a
-   Discipler when Lesson 5 of the active curriculum reaches confirmed
-   COMPLETED. IN_PROGRESS and READY_FOR_COMPLETION do not count.
+   Discipler when Lesson 5 of the active curriculum reaches COMPLETED
+   (marked by the Discipler, ADR-015). IN_PROGRESS does not count, and
+   READY_FOR_COMPLETION is no longer entered.
    Eligibility is derived, never stored, and never changes anything by
    itself. Sequential eligibility (ADR-011 decision 8) means Lesson 5
    COMPLETED implies Lessons 1 to 4 COMPLETED. The eligibility

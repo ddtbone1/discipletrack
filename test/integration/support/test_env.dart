@@ -123,8 +123,87 @@ List<String> _ids(List<Map<String, dynamic>> rows, [String key = 'id']) => [
     if (r[key] != null) r[key] as String,
 ];
 
-/// Deletes D Group rows in foreign-key order: assignments, invitations,
-/// D Group memberships, then the groups themselves.
+/// Deletes discipleship rows in foreign-key order: meeting participants,
+/// meetings, then lesson progress.
+///
+/// Meetings are selected by group, by Discipler row ([dgmIds]) or by
+/// recorder; participant and progress rows also by person or by actor.
+Future<void> deleteDiscipleshipRows({
+  List<String> groupIds = const [],
+  List<String> dgmIds = const [],
+  List<String> membershipIds = const [],
+  String? actorId,
+}) async {
+  final meetingIds = <String>{};
+  if (groupIds.isNotEmpty) {
+    meetingIds.addAll(
+      _ids(
+        await service
+            .from('discipleship_meetings')
+            .select('id')
+            .inFilter('d_group_id', groupIds),
+      ),
+    );
+  }
+  if (dgmIds.isNotEmpty) {
+    meetingIds.addAll(
+      _ids(
+        await service
+            .from('discipleship_meetings')
+            .select('id')
+            .inFilter('discipler_d_group_membership_id', dgmIds),
+      ),
+    );
+  }
+  if (actorId != null) {
+    meetingIds.addAll(
+      _ids(
+        await service
+            .from('discipleship_meetings')
+            .select('id')
+            .or('recorded_by.eq.$actorId,voided_by.eq.$actorId'),
+      ),
+    );
+  }
+  final meetings = meetingIds.toList();
+
+  if (meetings.isNotEmpty) {
+    await service
+        .from('discipleship_meeting_participants')
+        .delete()
+        .inFilter('meeting_id', meetings);
+  }
+  if (membershipIds.isNotEmpty) {
+    await service
+        .from('discipleship_meeting_participants')
+        .delete()
+        .inFilter('church_membership_id', membershipIds);
+    await service
+        .from('disciple_lesson_progress')
+        .delete()
+        .inFilter('church_membership_id', membershipIds);
+  }
+  if (actorId != null) {
+    await service
+        .from('discipleship_meeting_participants')
+        .delete()
+        .eq('voided_by', actorId);
+    await service
+        .from('disciple_lesson_progress')
+        .delete()
+        .or('submitted_by.eq.$actorId,confirmed_by.eq.$actorId');
+  }
+  if (meetings.isNotEmpty) {
+    await service
+        .from('discipleship_meetings')
+        .delete()
+        .inFilter('id', meetings);
+  }
+}
+
+/// Deletes D Group rows in foreign-key order: discipleship rows,
+/// assignments, invitations, D Group memberships, then the groups
+/// themselves.
 ///
 /// Rows are selected by any of: belonging to [groupIds], touching one of
 /// [membershipIds] (on either side of an assignment), or having been written
@@ -166,6 +245,13 @@ Future<void> deleteMinistryRows({
     );
   }
   final dgms = dgmIds.toList();
+
+  await deleteDiscipleshipRows(
+    groupIds: groupIds,
+    dgmIds: dgms,
+    membershipIds: membershipIds,
+    actorId: actorId,
+  );
 
   if (dgms.isNotEmpty) {
     await service
@@ -396,12 +482,24 @@ Future<void> deleteChurchRows(String churchId) async {
       .from('d_groups')
       .select('id')
       .eq('church_id', churchId);
-  await deleteMinistryRows(groupIds: _ids(groups));
-
   final memberships = await service
       .from('church_memberships')
       .select('id')
       .eq('church_id', churchId);
+  await deleteMinistryRows(
+    groupIds: _ids(groups),
+    membershipIds: _ids(memberships),
+  );
+  final curricula = _ids(
+    await service.from('curricula').select('id').eq('church_id', churchId),
+  );
+  if (curricula.isNotEmpty) {
+    await service
+        .from('curriculum_lessons')
+        .delete()
+        .inFilter('curriculum_id', curricula);
+    await service.from('curricula').delete().inFilter('id', curricula);
+  }
   for (final m in memberships) {
     await service
         .from('church_role_assignments')
@@ -479,3 +577,43 @@ Matcher throwsPostgrestCode(String code) =>
 /// Matches an [AuthApiException] with the given GoTrue error code.
 Matcher throwsAuthCode(String code) =>
     throwsA(isA<AuthApiException>().having((e) => e.code, 'code', code));
+
+/// The local stack's database container, for [sqlRows] and [sqlError].
+final dbContainer =
+    Platform.environment['SUPABASE_DB_CONTAINER'] ??
+    'supabase_db_discipletrack';
+
+Future<ProcessResult> _psql(String sql) => Process.run('docker', [
+  'exec',
+  dbContainer,
+  'psql',
+  '-U',
+  'postgres',
+  '-v',
+  'ON_ERROR_STOP=1',
+  '-tA',
+  '-F',
+  '\t',
+  '-c',
+  sql,
+]);
+
+/// Runs [sql] in the local database as postgres and returns each row's
+/// fields (NULL as an empty string). For trusted functions in the private
+/// schema, which PostgREST deliberately does not expose. Needs Docker and
+/// the local stack's database container.
+Future<List<List<String>>> sqlRows(String sql) async {
+  final r = await _psql(sql);
+  if (r.exitCode != 0) fail('psql in $dbContainer failed: ${r.stderr}');
+  return [
+    for (final line in (r.stdout as String).split('\n'))
+      if (line.trim().isNotEmpty) line.replaceAll('\r', '').split('\t'),
+  ];
+}
+
+/// Runs [sql], which must fail, and returns the error text.
+Future<String> sqlError(String sql) async {
+  final r = await _psql(sql);
+  expect(r.exitCode, isNot(0), reason: 'expected to fail: $sql');
+  return r.stderr as String;
+}

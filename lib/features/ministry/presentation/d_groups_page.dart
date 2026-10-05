@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_pill.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/error_state.dart';
@@ -15,6 +16,7 @@ import '../../../core/widgets/status_pill.dart';
 import '../application/ministry_providers.dart';
 import '../domain/d_group.dart';
 import 'ministry_ui.dart';
+import '../../../core/widgets/empty_state.dart';
 
 /// The Coordinator's list of D Groups, with New group.
 ///
@@ -37,7 +39,9 @@ class DGroupsPage extends ConsumerWidget {
         children: [
           const SizedBox(height: AppSpacing.md),
           if (!isCoordinator)
-            const _CoordinatorOnly()
+            const EmptyState.restricted(
+              message: 'The list of D Groups is for your church Coordinator.',
+            )
           else ...[
             if (unplaced != null) ...[
               Text(
@@ -60,13 +64,20 @@ class DGroupsPage extends ConsumerWidget {
               loading: () => const SizedBox(height: 240, child: LoadingState()),
               error: (e, _) => SizedBox(
                 height: 240,
-                child: ErrorState(
-                  message: e.toString(),
+                child: ErrorState.load(
+                  subject: "your church's D Groups",
+                  error: e,
                   onRetry: () => ref.invalidate(dGroupsProvider),
                 ),
               ),
               data: (items) => items.isEmpty
-                  ? const _NoGroups()
+                  ? const EmptyState(
+                      title: 'No D Groups yet',
+                      message:
+                          'Create the first group and appoint its Leader. '
+                          'The Leader can then invite members as Disciplers '
+                          'and Disciples.',
+                    )
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -148,30 +159,27 @@ class _Unplaced extends ConsumerWidget {
               for (final m in all)
                 if (!m.isPlaced) m,
             ];
-            return AppCard(
-              padding: EdgeInsets.zero,
-              child: Column(
-                children: dividedRows([
-                  if (unplaced.isEmpty)
-                    const PersonRow(
-                      name: 'Everyone is placed',
-                      detail: 'Every active member is in a D Group.',
-                    ),
-                  for (final m in unplaced)
-                    PersonRow(
-                      name: m.fullName,
-                      detail: m.hasPendingInvitation
-                          ? 'Invitation waiting for an answer'
-                          : 'Not invited yet',
-                      trailing: m.hasPendingInvitation
-                          ? const StatusPill(
-                              label: 'Invited',
-                              tone: StatusTone.waiting,
-                            )
-                          : null,
-                    ),
-                ]),
-              ),
+            return TileGroup(
+              children: [
+                if (unplaced.isEmpty)
+                  const PersonRow(
+                    name: 'Everyone is placed',
+                    detail: 'Every active member is in a D Group.',
+                  ),
+                for (final m in unplaced)
+                  PersonRow(
+                    name: m.fullName,
+                    detail: m.hasPendingInvitation
+                        ? 'Invitation waiting for an answer'
+                        : 'Not invited yet',
+                    trailing: m.hasPendingInvitation
+                        ? const StatusPill(
+                            label: 'Invited',
+                            tone: StatusTone.waiting,
+                          )
+                        : null,
+                  ),
+              ],
             );
           },
         ),
@@ -183,55 +191,6 @@ class _Unplaced extends ConsumerWidget {
           ),
         ],
       ],
-    );
-  }
-}
-
-class _NoGroups extends StatelessWidget {
-  const _NoGroups();
-
-  @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    return AppCard(
-      fill: AppCardFill.pastel,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'No D Groups yet',
-            style: AppTypography.sectionTitle.copyWith(
-              color: AppCardFill.pastel.foreground(p),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Create the first group and appoint its Leader. The Leader can '
-            'then invite members as Disciplers and Disciples.',
-            style: AppTypography.body.copyWith(
-              color: AppCardFill.pastel.foregroundMuted(p),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CoordinatorOnly extends StatelessWidget {
-  const _CoordinatorOnly();
-
-  @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    return AppCard(
-      fill: AppCardFill.pastel,
-      child: Text(
-        'The list of D Groups is for your church Coordinator.',
-        style: AppTypography.body.copyWith(
-          color: AppCardFill.pastel.foreground(p),
-        ),
-      ),
     );
   }
 }

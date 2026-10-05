@@ -2,7 +2,9 @@
 
 *Document Status:* MVP Baseline  
 *Last Updated:* October 2026 (revision 2026-10-02: lesson content, ADR-010; explicit lesson completion, ADR-011; monthly meeting history; see sections 9, 10, 18 to 21, 33 and 34)  
-*Revision 2026-10-05:* D Group gatherings and gathering attendance removed; attendance exists only as a discipleship meeting outcome; one monitoring condition, consecutive recorded absences, for Disciples only; missed-meeting and inactivity conditions withdrawn (ADR-014). Discipler eligibility after confirmed Lesson 5, direct appointment, concurrent Disciple and Discipler responsibilities (ADR-012). Relationship-scoped Discipler progress visibility (N7); relationship-aware Journey (N8); factual 12-segment progress and no percentages (decisions 8, 22); read-only monthly meeting indicator (decisions 10, 11); "lessons completed this month" recorded as a candidate Reporting metric only (decision 9). Sections changed: 1, 2, 7 to 10, 15 and 16 (withdrawn, headings kept), 17, 19 to 24, 28 to 30, 32 to 34. Section 34 steps renumbered (simple numbered list; gathering steps removed, appointment steps rewritten).
+*Revision 2026-10-05:* D Group gatherings and gathering attendance removed; attendance exists only as a discipleship meeting outcome; one monitoring condition, consecutive recorded absences, for Disciples only; missed-meeting and inactivity conditions withdrawn (ADR-014). Discipler eligibility after confirmed Lesson 5, direct appointment, concurrent Disciple and Discipler responsibilities (ADR-012). Relationship-scoped Discipler progress visibility (N7); relationship-aware Journey (N8); factual 12-segment progress and no percentages (decisions 8, 22); read-only monthly meeting indicator (decisions 10, 11); "lessons completed this month" recorded as a candidate Reporting metric only (decision 9). Sections changed: 1, 2, 7 to 10, 15 and 16 (withdrawn, headings kept), 17, 19 to 24, 28 to 30, 32 to 34. Section 34 steps renumbered (simple numbered list; gathering steps removed, appointment steps rewritten).  
+*Revision 2026-10-05 (ADR-015):* the Discipler marks a lesson completed in one step; no Leader confirmation and no "awaiting confirmation" state; Leader and Coordinator fallback; undo within a window, then Coordinator reopen to In Progress. Recorded meeting history on Disciple detail and My Journey shown as a month calendar with outcome-marked dates. Sections changed: 8 to 10, 18 to 22, 29 (Leader Home focus), 34 (steps 9, 10, 17).  
+*Revision 2026-10-05 (user decision, ninth):* the curriculum has ten lessons, not twelve. Sections changed: 18, 21, 22, 28, 29, 34 (steps 11, 19).
 
 ---
 
@@ -224,7 +226,9 @@ Responsibilities include:
 - view Disciplers and Disciples within their D Group
 - oversee discipleship progress and recorded meeting history
 - review lesson completion eligibility
-- confirm lesson completion
+- mark a lesson completed on the Discipler's behalf as a fallback, and
+  undo a completion within the undo window (ADR-015; there is no Leader
+  confirmation)
 - monitor members requiring attention
 - oversee follow-ups within their D Group
 - create D Group announcements
@@ -249,7 +253,8 @@ A Discipler may:
 - view their assigned Disciples
 - conduct discipleship meetings and record each one through Record
   Meeting, with every Disciple's outcome
-- submit a lesson as finished when its material has been covered
+- mark a lesson completed when its material has been covered, and undo
+  that completion within the undo window (ADR-015)
 - void meetings and outcomes they recorded themselves
 - view the detailed lesson progress of their own currently assigned
   Disciples only (N7)
@@ -292,7 +297,7 @@ A Disciple may:
 A Disciple cannot:
 
 - record or change their own discipleship meeting outcomes
-- mark their own lesson finished or complete
+- mark their own lesson completed, or undo or reopen its completion
 - appoint themselves as a Discipler
 - assign themselves to a D Group
 - assign themselves a Discipler
@@ -498,7 +503,7 @@ same equivalent condition.
 ## 18. Discipleship Curriculum
 
 The church uses one fixed discipleship curriculum consisting of
-12 ordered lessons.
+10 ordered lessons.
 
 The curriculum must be represented as data rather than hard-coded into
 Flutter.
@@ -515,14 +520,14 @@ Curriculum
     ├── Meeting 1
     ├── Meeting 2
     ├── ...
-    └── Meeting n, then "finished" submitted by the Discipler
+    └── Meeting n, then "completed" marked by the Discipler
 
 ...
 
-└── Lesson 12
+└── Lesson 10
 
 Whether a minimum number of credited meetings applies before a lesson
-can be submitted as finished is an open product decision (section 20).
+can be marked completed is an open product decision (section 20).
 The existing required_meetings value, seeded as four, is kept unchanged
 until that decision.
 
@@ -593,8 +598,8 @@ Sep 24    Present   counted
 Oct 1     Present   counted
 Oct 8     Late      counted
 
-→ the Discipler submits Lesson 1 as finished
-→ Ready for Completion
+→ the Discipler marks Lesson 1 completed
+→ Completed; Lesson 2 becomes current
 
 In a small-group meeting, each Disciple's outcome is independent.
 
@@ -618,22 +623,23 @@ authoritative record per meeting.
 
 ## 20. Lesson Completion
 
+Revised 2026-10-05 (ADR-015): the Discipler marks a lesson completed in
+one step; there is no Leader confirmation.
+
 Meeting occurrence and lesson completion are separate (ADR-011).
-Meetings record what happened; completion records that the material was
-covered and confirmed.
+Meetings record what happened; completion records that the Discipler
+has judged the material covered.
 
 Progress:
 
 Not Started
 → In Progress (first credited meeting)
-→ the Discipler submits: "We have finished covering this lesson"
-→ Ready for Completion
-→ D Group Leader confirmation
+→ the Discipler marks the lesson completed ("Mark Lesson 1 completed")
 → Completed
-→ the next lesson becomes current
+→ the next lesson becomes current, for every role
 
-No meeting count moves a lesson to Ready for Completion, and recording a
-meeting never completes a lesson. Present and Late meetings count as
+No meeting count completes a lesson, and recording a meeting never
+completes a lesson. Present and Late meetings count as
 lesson meetings. Absent and Excused are attendance outcomes and never
 indicate that material was covered.
 
@@ -649,37 +655,30 @@ recommended / completely flexible depending on when the lesson material
 is actually completed?" The options are A, no minimum; B, a minimum
 number of credited meetings; C, a recommended number only. In every
 case the meeting count never completes a lesson automatically: the
-Discipler explicitly indicates that the lesson is fully covered, and the
-approved confirmation workflow (Leader confirmation) determines
-Completed. Until it is answered, a lesson can be submitted once it has
-at least one credited meeting, and the rule is held in one policy point
-so the answer is a contained change.
+Discipler explicitly marks the lesson completed when it is fully
+covered, and that sets Completed. Until it is answered, a lesson can be
+marked completed once it has at least one credited meeting, and the
+rule is held in one policy point so the answer is a contained change.
 
-The Discipler conducting the lesson normally submits it. The D Group
-Leader or the Coordinator may submit on the Discipler's behalf as a
-fallback. A submission may be withdrawn while the lesson awaits
-confirmation.
+The Disciple's current assigned Discipler normally marks the lesson
+completed. The D Group Leader or the Coordinator may mark it completed
+on the Discipler's behalf as a fallback. Every completion records who
+marked it and when.
 
-Meetings may continue while the lesson awaits confirmation. They are
-recorded and credited to the same lesson and do not withdraw the
-submission.
-
-The D Group Leader reviews and confirms completion. The app asks the
-Leader to confirm explicitly, because a confirmed lesson can be
-reopened only by the Coordinator.
-
-The Coordinator may confirm as a ministry-oversight fallback, for
-example where a D Group currently has no active Leader. The Leader
-remains the normal authority, and every confirmation records who
-confirmed it.
+A completion may be undone by the current assigned Discipler, the
+Leader of the Disciple's current D Group or the Coordinator, only while
+it is the Disciple's latest completed lesson and no meeting has been
+recorded on the next lesson. Undo returns the lesson to In Progress.
+After that, only the Coordinator can reopen it, and reopening also
+returns it to In Progress.
 
 Lessons are worked through in order. A Disciple may begin lesson N only
 once lesson N-1 is completed. Lesson 1 is exempt.
 
 A completed lesson is protected. A meeting correction never un-completes
 it. Correcting a meeting record that would leave a completed lesson
-with fewer credited meetings than a submission needs requires an
-explicit authorized reopen step first.
+with fewer credited meetings than marking it completed needs requires
+an explicit authorized undo or reopen step first.
 
 The Disciple does not need to separately confirm each meeting in the MVP.
 
@@ -690,24 +689,24 @@ The Disciple does not need to separately confirm each meeting in the MVP.
 A Disciple's journey should clearly and factually communicate their
 progress:
 
-- lessons completed, for example "5 of 12 completed"
-- current lesson, for example "Lesson 6 of 12" or "Lesson 6 awaiting
-  confirmation"
+- lessons completed, for example "5 of 10 completed"
+- current lesson, for example "Lesson 6 of 10"
 - current meeting count, shown as a count
 - recorded meeting history, with the Disciple's recorded outcome for
   each meeting
 - a read-only monthly meeting indicator
 - completion status
 
-Progress is shown as a factual 12-segment visualization (decision 22):
+Progress is shown as a factual segmented visualization, one segment
+per lesson (10 in the MVP curriculum; decision 22):
 
-Lesson 6 of 12
-✓ ✓ ✓ ✓ ✓ ● ○ ○ ○ ○ ○ ○
-5 of 12 completed
+Lesson 6 of 10
+✓ ✓ ✓ ✓ ✓ ● ○ ○ ○ ○
+5 of 10 completed
 
-A segment is completed (✓) only when its lesson is confirmed Completed.
-Ready for Completion does not count; it is shown as "Lesson 6 awaiting
-confirmation". The current lesson is ● and upcoming lessons are ○. The
+A segment is completed (✓) only when its lesson is Completed (marked by
+the Discipler, ADR-015). The current lesson is ● and upcoming lessons
+are ○. The
 total comes from the active curriculum, never a fixed literal. The
 meeting count does not determine progress. There are no percentages and
 no evaluative labels (decision 8).
@@ -717,7 +716,10 @@ the dates of recorded discipleship meetings (decisions 10, 11). It
 answers "When did this discipleship actually meet?". Days without a
 recorded meeting are plain, with no warning. It has no manual events, no
 scheduling and no gathering attendance, and there is no Leader
-group-wide calendar.
+group-wide calendar. On Disciple detail and My Journey the recorded
+meeting history is shown as this month calendar, with each recorded
+meeting date marked by its outcome; tapping a date opens that meeting's
+details, and the full list is one tap away (2026-10-05).
 
 The journey has one home, the Journey destination, and it follows the
 person's relationships rather than a role mode (N8):
@@ -756,15 +758,16 @@ Eligibility never makes a Disciple a Discipler automatically (ADR-012).
 The basic pathway is:
 
 Disciple
-→ Lesson 5 of the active curriculum confirmed Completed
+→ Lesson 5 of the active curriculum Completed (marked by the Discipler)
 → Eligible for Discipler appointment (derived)
 → Coordinator appoints
 → Disciples assigned
-→ the person's own journey continues through Lesson 12
+→ the person's own journey continues through Lesson 10
 
-Eligibility is derived from confirmed Completed of Lesson 5. In
-Progress and Ready for Completion do not count. Eligibility is never
-stored and never changes anything by itself.
+Eligibility is derived from Completed of Lesson 5 (ADR-015). In
+Progress does not count. Eligibility is never stored and never changes
+anything by itself; with no second check on completion, the
+Coordinator's appointment decision is the human check.
 
 Eligibility is not appointment. The Coordinator appoints an eligible
 Disciple directly; there is no acceptance workflow. Appointment is
@@ -773,7 +776,7 @@ same D Group as the person's Disciple responsibility.
 
 Appointment does not end the person's Disciple responsibility, their own
 Discipler assignment or their lesson progress. They continue through
-Lesson 12 under their own Discipler while discipling others (ADR-012;
+Lesson 10 under their own Discipler while discipling others (ADR-012;
 enforced from Slice 6; until then Migration 006 still refuses DISCIPLE
 with DISCIPLER). Slice 6 (Discipler Progression) builds appointment.
 
@@ -958,7 +961,7 @@ Depending on authorization, a profile may communicate:
 - assigned Disciples
 - recorded discipleship meeting outcomes, for example "2 consecutive
   recorded absences" or "Last recorded meeting Sep 28"
-- discipleship progress, for example "5 of 12 lessons completed"
+- discipleship progress, for example "5 of 10 lessons completed"
 - current lesson
 - recent activity
 - relevant follow-up information
@@ -985,9 +988,9 @@ dates, never percentages (decision 8).
 
 Focus on:
 
-- current lesson, for example "Lesson 6 of 12"
+- current lesson, for example "Lesson 6 of 10"
 - meeting progress
-- journey summary, for example "5 of 12 completed", linking to My
+- journey summary, for example "5 of 10 completed", linking to My
   Journey
 - recorded meeting history
 - D Group
@@ -1014,7 +1017,6 @@ Oversight-oriented, not an attendance-entry workspace. Focus on:
 - recorded meeting facts: last recorded meeting, consecutive recorded
   absences
 - Disciplers and the last recorded meeting of each of their Disciples
-- lessons submitted as finished and awaiting completion confirmation
 - members requiring attention
 - follow-ups
 - recent discipleship activity
@@ -1034,7 +1036,7 @@ Focus on:
 "Lessons completed this month" is a candidate Reporting / Oversight
 metric only, not defined and not governing (decision 9). Before it is
 adopted it needs a precise definition; which timestamp or event counts
-(likely lessons reaching confirmed Completed in the month, that is
+(likely lessons reaching Completed in the month, that is
 their completion time); church time zone semantics; a privacy review
 (RBAC_RLS_MATRIX.md section 2b); and small-population suppression before
 broad member visibility. It is owned by Slice 11, Reporting / Oversight,
@@ -1168,19 +1170,20 @@ The MVP must support this end-to-end scenario:
 7. The Discipler meets the Disciple for a curriculum lesson.
 8. The Discipler records each discipleship meeting through Record
    Meeting, with the Disciple's outcome.
-9. When the lesson material has been covered, the Discipler submits the
-   lesson as finished, making it ready for completion.
-10. The D Group Leader confirms lesson completion.
-11. The Disciple continues through the 12-lesson curriculum.
+9. When the lesson material has been covered, the Discipler marks the
+   lesson completed (ADR-015).
+10. The next lesson becomes current; the D Group Leader sees the
+    completion in the group's progress, with no confirmation step.
+11. The Disciple continues through the 10-lesson curriculum.
 12. Monitoring detects consecutive recorded absences for a Disciple.
 13. A follow-up is assigned to the appropriate responsible person.
 14. Follow-up actions are recorded.
 15. The follow-up is resolved.
 16. Leadership can see the appropriate ministry outcome.
-17. Once Lesson 5 is confirmed Completed, the Disciple is eligible for
+17. Once Lesson 5 is Completed, the Disciple is eligible for
     Discipler appointment (derived, ADR-012).
 18. The Coordinator may appoint the Disciple as a Discipler in the same
     D Group; Disciples are assigned to them.
-19. The person continues their own journey through Lesson 12.
+19. The person continues their own journey through Lesson 10.
 
 This is the primary acceptance workflow for the DiscipleTrack MVP.

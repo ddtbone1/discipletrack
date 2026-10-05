@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/widgets/floating_dock.dart';
-import '../features/membership/application/membership_providers.dart';
+import '../features/discipleship/domain/journey_views.dart';
 import '../features/ministry/application/ministry_providers.dart';
 import '../features/ministry/domain/ministry_context.dart';
 import '../features/session/application/session_state.dart';
@@ -14,10 +14,11 @@ import 'routes.dart';
 ///
 /// Only screens that exist are offered, so nobody sees a destination they
 /// cannot use. Showing a destination is presentation; the database still
-/// decides what each screen returns.
+/// decides what each screen returns. Membership requests are reached from
+/// the Home tile, not the dock. Never more than five items: Home, Journey,
+/// D Group or D Groups, Profile.
 List<DockItem> dockItemsFor({
   required bool isCoordinator,
-  required bool canReview,
   required MinistryContext? ministry,
 }) => [
   const DockItem(
@@ -27,6 +28,16 @@ List<DockItem> dockItemsFor({
     glyph: _house,
     path: Routes.home,
   ),
+  // Journey (N8): offered from relationships, never from a role. A
+  // Coordinator or Leader gets it too when they also disciple or are a
+  // Disciple.
+  if (JourneyViews.of(ministry).isOffered)
+    const DockItem(
+      label: 'Journey',
+      icon: CupertinoIcons.book,
+      activeIcon: CupertinoIcons.book_fill,
+      path: Routes.journey,
+    ),
   if (isCoordinator)
     const DockItem(
       label: 'D Groups',
@@ -36,19 +47,12 @@ List<DockItem> dockItemsFor({
     )
   else if (ministry != null)
     DockItem(
-      label: 'My Group',
+      label: 'D Group',
       icon: CupertinoIcons.person_2,
       activeIcon: CupertinoIcons.person_2_fill,
       path: ministry.isLeader
           ? Routes.dGroupDetailFor(ministry.dGroupId)
           : Routes.myGroup,
-    ),
-  if (canReview)
-    const DockItem(
-      label: 'Requests',
-      icon: CupertinoIcons.envelope,
-      activeIcon: CupertinoIcons.envelope_fill,
-      path: Routes.pendingMembers,
     ),
   const DockItem(
     label: 'Profile',
@@ -93,7 +97,6 @@ class DockShell extends ConsumerWidget {
 
     final items = dockItemsFor(
       isCoordinator: ref.watch(isCoordinatorProvider),
-      canReview: ref.watch(canReviewMembershipsProvider),
       ministry: ref.watch(myMinistryContextProvider).value,
     );
     final media = MediaQuery.of(context);

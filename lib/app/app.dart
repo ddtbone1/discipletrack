@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/connectivity/connection_status.dart';
 import '../core/theme/app_theme.dart';
 import '../features/appearance/application/theme_mode_provider.dart';
+import '../features/discipleship/application/discipleship_providers.dart';
 import '../features/membership/application/membership_providers.dart';
 import '../features/ministry/application/ministry_providers.dart';
 import '../features/offline/application/offline_providers.dart';
@@ -52,11 +53,16 @@ class _DiscipleTrackAppState extends ConsumerState<DiscipleTrackApp> {
           return;
         }
         ref.read(myMembershipProvider.notifier).refresh();
-        // An invitation sent, or a placement or pairing made, while the app
-        // was in the background.
+        // An invitation sent, a placement or pairing made, or a meeting
+        // recorded by someone else, while the app was in the background.
         ref
           ..invalidate(myPendingInvitationProvider)
-          ..invalidate(myMinistryContextProvider);
+          ..invalidate(myMinistryContextProvider)
+          ..invalidate(myDisciplesProvider)
+          ..invalidate(discipleJourneyProvider)
+          ..invalidate(meetingHistoryProvider)
+          ..invalidate(meetingSummaryProvider)
+          ..invalidate(progressSummaryProvider);
       },
     );
   }

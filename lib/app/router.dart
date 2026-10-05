@@ -2,6 +2,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/discipleship/presentation/disciple_detail_page.dart';
+import '../features/discipleship/presentation/journey_page.dart';
+import '../features/discipleship/presentation/record_meeting_page.dart';
 import '../features/auth/presentation/sign_in_page.dart';
 import '../features/auth/presentation/sign_up_page.dart';
 import '../features/auth/application/intro_state.dart';
@@ -62,6 +65,7 @@ Set<String> allowedFor(SessionState state) => switch (state) {
     ...Routes.profileRoutes,
     Routes.pendingMembers,
     ...Routes.ministryRoutes,
+    ...Routes.discipleshipRoutes,
   },
 };
 
@@ -205,6 +209,46 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: Routes.myGroup,
             pageBuilder: (c, s) =>
                 buildPage(state: s, child: const MyGroupPage()),
+          ),
+          GoRoute(
+            path: Routes.journey,
+            pageBuilder: (c, s) => buildPage(
+              state: s,
+              child: JourneyPage(initialView: s.uri.queryParameters['view']),
+            ),
+          ),
+          // My Disciples lives in Journey (N8). The path stays as the parent
+          // of one Disciple's pages, which are opened from a relationship.
+          GoRoute(
+            path: Routes.myDisciples,
+            redirect: (c, s) => s.uri.path == Routes.myDisciples
+                ? Routes.journeyDisciples
+                : null,
+            routes: [
+              GoRoute(
+                path: ':membershipId',
+                pageBuilder: (c, s) => buildPage(
+                  state: s,
+                  child: DiscipleDetailPage(
+                    membershipId: s.pathParameters['membershipId']!,
+                  ),
+                ),
+                routes: [
+                  GoRoute(
+                    path: 'record',
+                    pageBuilder: (c, s) => buildPage(
+                      state: s,
+                      child: RecordMeetingPage(
+                        membershipId: s.pathParameters['membershipId']!,
+                        initialDate: DateTime.tryParse(
+                          s.uri.queryParameters['date'] ?? '',
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
       ),

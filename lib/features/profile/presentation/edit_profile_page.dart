@@ -38,8 +38,9 @@ class EditProfilePage extends ConsumerWidget {
       scrollable: false,
       child: profileAsync.when(
         loading: () => const LoadingState(),
-        error: (e, _) => ErrorState(
-          message: e.toString(),
+        error: (e, _) => ErrorState.load(
+          subject: 'your profile',
+          error: e,
           onRetry: () => ref.invalidate(myProfileProvider),
         ),
         data: (profile) => profile == null

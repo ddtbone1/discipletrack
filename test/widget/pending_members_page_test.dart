@@ -124,8 +124,12 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Requests'), findsOneWidget);
-      // The tile shows the number waiting.
-      expect(find.bySemanticsLabel('Requests: 2'), findsOneWidget);
+      // The tile shows the number waiting and says what it means.
+      expect(find.text('2 people waiting to join'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel('Requests: 2. 2 people waiting to join'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('an ordinary member does not', (tester) async {

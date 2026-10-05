@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Implemented by repository failures that know whether the server was
@@ -36,6 +36,25 @@ class ConnectionStatus extends Notifier<bool> {
 final isOfflineProvider = NotifierProvider<ConnectionStatus, bool>(
   ConnectionStatus.new,
 );
+
+/// Tells the person why a change can't be made right now, when they tap an
+/// action that needs a connection while offline (UI_DESIGN_SYSTEM section
+/// 66). [action] completes the sentence: "record this meeting".
+void explainOffline(BuildContext context, {String? action}) {
+  final messenger = ScaffoldMessenger.maybeOf(context);
+  if (messenger == null) return;
+  messenger
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text(
+          action == null
+              ? "You're offline. Connect to make changes."
+              : "You're offline. Connect to $action.",
+        ),
+      ),
+    );
+}
 
 /// Makes the offline state readable by core widgets without Riverpod, so
 /// [AppButton] and [AppScaffold] stay plain widgets and still work in a bare

@@ -30,6 +30,14 @@ Discipler appointment (ADR-012, from Slice 6): section 2 row, section 5
 Relationship-scoped capability principle (section 5). Candidate
 "lessons completed this month" aggregate (section 2b, decision 9).
 
+Revision 2026-10-05 (ADR-015): the Discipler marks a lesson completed
+with no Leader confirmation. Section 2 rows and notes, section 5
+`disciple_lesson_progress` WRITE and section 10 operations: complete_lesson()
+and undo_lesson_completion() replace submission, withdrawal and
+confirmation; reopen (Coordinator only) returns to IN_PROGRESS. The open
+question whether submission and confirmation must be made by different
+people no longer arises.
+
 ---
 
 # 1. Role Model
@@ -178,9 +186,8 @@ D Group responsibility. This is a valid state, not a stored role.
 | View discipleship meeting history | No | Church-wide | Own D Group | Own Discipler meetings | Self (own participant rows) | No |
 | View progress | No | Church-wide | Own D Group | Own currently assigned Disciples (N7) | Self | No |
 | View active discipleships (section 2b) | No | Church-wide | Own D Group | Own assignments | No | No |
-| Submit lesson as finished | No | Fallback | Fallback, own D Group | Assigned Disciples | No | No |
-| Withdraw lesson submission | No | Yes | Own D Group | Assigned Disciples | No | No |
-| Confirm lesson completion | No | Oversight | Own D Group | No | No | No |
+| Mark lesson completed (ADR-015) | No | Fallback | Fallback, own D Group | Assigned Disciples | No | No |
+| Undo lesson completion, within the undo window (ADR-015) | No | Yes | Own D Group | Assigned Disciples | No | No |
 | Reopen lesson completion | No | Yes | No | No | No | No |
 | View attention conditions | No | Church-wide | Own D Group | Assigned Disciples | Self summary | No |
 | View internal follow-up notes | No | Church-wide | Own D Group | Assigned Follow-ups | No | No |
@@ -206,8 +213,8 @@ covered in section 4.
 
 *Appoint eligible Disciple as Discipler* (ADR-012) replaces *Promote
 Disciple*. The COORDINATOR appoints directly; there is no acceptance
-workflow. Eligibility (confirmed COMPLETED of Lesson 5 of the active
-curriculum) is derived, never stored and never automatic, and is not
+workflow. Eligibility (COMPLETED of Lesson 5 of the active curriculum,
+marked by the Discipler, ADR-015) is derived, never stored and never automatic, and is not
 appointment. Appointment creates a DISCIPLER responsibility in the same
 D Group and does not end the person's DISCIPLE responsibility, their own
 discipler assignment or their progress. Built in Slice 6; until then
@@ -278,39 +285,34 @@ an open decision (section 2a, Meeting-context scope).
 (N7): a Discipler reads detailed lesson progress only of the Disciples
 currently assigned to them. This reverses the 2026-10-02 widening to
 every Disciple in the D Group (Slice 5 decision 13). Recording, voiding,
-submitting and meeting-record detail are likewise limited to their own
+marking completed, undoing a completion and meeting-record detail are likewise limited to their own
 assigned Disciples. Each capability is decided for the pair (caller,
 person viewed), not from holding a responsibility in general (ADR-012
 decision 8): a person who is both a Disciple and a Discipler (ADR-012;
 from Slice 6) reads their own progress as "Self" and their assigned
 Disciples' progress as their Discipler, and nothing more.
 
-*Submit lesson as finished* (ADR-011) is the Discipler's statement that
-the lesson material has been covered. The normal submitter is the
-Disciple's current assigned Discipler. LEADER (own D Group) and
-COORDINATOR may submit on the Discipler's behalf as a fallback, mirroring
-fallback recording; submitted_by shows who submitted. Nobody submits a
-lesson in which they are the Disciple.
+*Mark lesson completed* (ADR-015, replacing *Submit lesson as finished*,
+*Withdraw lesson submission* and *Confirm lesson completion*) is the
+Discipler's judgement that the lesson material has been covered. It sets
+COMPLETED in one step; there is no Leader confirmation. The normal
+caller is the Disciple's current assigned Discipler. LEADER (own D
+Group) and COORDINATOR may mark it completed on the Discipler's behalf
+as a fallback, mirroring fallback recording; confirmed_by and
+submitted_by show who marked it. Nobody marks a lesson completed in
+which they are the Disciple.
 
-*Withdraw lesson submission* returns a READY_FOR_COMPLETION lesson to
-IN_PROGRESS. The cells are the proposed default and await product
-confirmation: the Disciple's current assigned Discipler (for example, a
-submission made too early), the Leader of the Disciple's current D Group
-(returning the lesson to the Discipler instead of confirming it) and the
-COORDINATOR. Every withdrawal is audited.
+*Undo lesson completion* is allowed to the Disciple's current assigned
+Discipler, the Leader of the Disciple's current D Group and the
+COORDINATOR, only while the lesson is the person's latest COMPLETED
+lesson and no meeting has been recorded for them on the next lesson
+(DATABASE_CONSTRAINTS.md section 4, Lesson Completion). After that
+window only the COORDINATOR can reopen. Every undo is audited.
 
-The same person may submit a lesson and then confirm it, for example a
-Leader who also holds DISCIPLER and disciples the person (BR-013).
-Whether submission and confirmation must be made by different people is
-an open product decision; until it is made, both actions are allowed to
-one person and each is attributed separately.
-
-*Confirm lesson completion* and *Create D Group announcement* show
-"Oversight" for COORDINATOR. The D Group Leader is the normal authority
-in both cases. Coordinator capability exists as a ministry-oversight
-fallback, for example where a D Group currently has no active Leader.
-Coordinator lesson confirmation is attributable through confirmed_by and
-is audited.
+*Create D Group announcement* shows "Oversight" for COORDINATOR. The D
+Group Leader is the normal authority. Coordinator capability exists as a
+ministry-oversight fallback, for example where a D Group currently has
+no active Leader.
 
 ADMIN has no access to discipleship meeting outcomes (attendance) or
 discipleship progress. Administering the system does not confer
@@ -427,7 +429,7 @@ percentage, ratio or consistency score (decision 8).
 Candidate aggregate, not granted (decision 9): "lessons completed this
 month". It is a candidate Reporting / Oversight metric owned by Slice 11,
 not a defined or governing metric. Before any role is granted it, it
-needs a precise definition (likely lessons reaching confirmed COMPLETED
+needs a precise definition (likely lessons reaching COMPLETED
 with completed_at in the month), the church time zone semantics for
 "month", a privacy review under this section, and small-population
 suppression before any broad member visibility. It does not block
@@ -820,32 +822,31 @@ Do not allow arbitrary client updates.
 
 Progress transitions must be controlled by business operations.
 
-Submission as finished (ADR-011), through submit_lesson_finished():
+Marking a lesson completed (ADR-015), through complete_lesson():
 
 - DISCIPLER → the Disciple's current assigned Discipler, the normal
-  submitter
+  caller
 - LEADER → own D Group, fallback on behalf of the Discipler
 - COORDINATOR → fallback on behalf of the Discipler
 
-Withdrawal of a submission, through withdraw_lesson_submission()
-(proposed default, awaiting product confirmation):
+There is no Leader confirmation. Submission as finished, its withdrawal
+and Leader confirmation (ADR-011) are withdrawn.
+
+Undoing a completion, through undo_lesson_completion(), only within the
+undo window (latest COMPLETED lesson; no meeting recorded on the next
+lesson; DATABASE_CONSTRAINTS.md section 4):
 
 - DISCIPLER → the Disciple's current assigned Discipler
 - LEADER → own D Group
 - COORDINATOR
 
-Leader confirmation:
+Completion and undo are attributable (confirmed_by and submitted_by;
+audit_events with the prior values) and audited.
 
-- LEADER → own D Group, the normal authority
-- COORDINATOR → oversight/fallback, for example where a D Group has no active Leader
+No caller ever marks completed, undoes or reopens a lesson in which they
+are the Disciple.
 
-Coordinator confirmation is attributable through confirmed_by and is
-audited.
-
-No caller ever submits, withdraws or confirms a lesson in which they are
-the Disciple.
-
-Reopening a COMPLETED lesson:
+Reopening a COMPLETED lesson after the undo window:
 
 - COORDINATOR only, through reopen_lesson_completion(), audited
 
@@ -1073,9 +1074,8 @@ Recommended operations:
 - record_discipleship_meeting()
 - void_discipleship_meeting()
 - void_meeting_participant()
-- submit_lesson_finished()
-- withdraw_lesson_submission()
-- confirm_lesson_completion()
+- complete_lesson(p_membership_id, p_lesson_id) (ADR-015; replaces submit_lesson_finished())
+- undo_lesson_completion(p_membership_id, p_lesson_id) (ADR-015)
 - reopen_lesson_completion()
 - Discipler appointment operation (ADR-012; from Slice 6; replaces
   promote_disciple_to_discipler(); name fixed by Slice 6)
@@ -1087,6 +1087,10 @@ The gathering operations create_gathering(), save_draft_attendance(),
 finalize_gathering(), cancel_gathering() and
 correct_finalized_attendance() are withdrawn with their notes (ADR-014).
 None was built, and none will be.
+
+withdraw_lesson_submission() and confirm_lesson_completion() are no
+longer planned, and submit_lesson_finished() is replaced by
+complete_lesson() (ADR-015).
 
 Operation notes:
 
@@ -1126,8 +1130,7 @@ record_discipleship_meeting()
 → requires every RECORDED participant, whatever the outcome, to be
   eligible for the meeting's lesson
 → validates participant rules P1 to P3 as of occurred_at
-→ accepts additional meetings for a lesson that is READY_FOR_COMPLETION
-→ never changes readiness or completion (ADR-011)
+→ never changes completion (ADR-011, ADR-015)
 → occurred_at is immutable after creation; corrections use void and
   re-record
 → triggers CONSECUTIVE_ABSENCE recalculation (from the monitoring
@@ -1138,32 +1141,40 @@ void_discipleship_meeting() / void_meeting_participant()
   under their own active DISCIPLER membership
 → reject any void that would leave a COMPLETED lesson below the meeting
   policy's submission_minimum credited participations
-→ withdraw, in the same transaction, a submission that the void leaves
-  below submission_minimum
+→ dormant (ADR-015): withdraw, in the same transaction, a
+  READY_FOR_COMPLETION submission that the void leaves below
+  submission_minimum; no operation enters that state any more
 → audited
 → trigger CONSECUTIVE_ABSENCE recalculation (from the monitoring
   slice on; ADR-014)
 
-submit_lesson_finished()
+complete_lesson(p_membership_id, p_lesson_id) (ADR-015)
 → the Disciple's current assigned DISCIPLER; own-D-Group LEADER or
   COORDINATOR as fallback
 → never the Disciple themselves
 → requires the Disciple's eligible lesson, status IN_PROGRESS and
-  credited participations >= submission_minimum
-→ sets READY_FOR_COMPLETION, ready_at and submitted_by; audited
+  credited participations >= submission_minimum at that moment
+→ sets COMPLETED, completed_at = now(), confirmed_by = caller,
+  ready_at = completed_at, submitted_by = caller; audited as
+  LESSON_COMPLETED
+→ refusals: cannot_act_on_own_lesson, not_authorized, lesson_not_eligible,
+  lesson_not_in_progress, below_submission_minimum
+→ the next lesson becomes current by derivation
 
-withdraw_lesson_submission()
-→ authority as in section 5 (proposed default)
-→ requires READY_FOR_COMPLETION
-→ returns to IN_PROGRESS, clears ready_at and submitted_by; audited
-  with the prior values
-
-confirm_lesson_completion()
-→ LEADER of the Disciple's current D Group, or COORDINATOR as oversight
+undo_lesson_completion(p_membership_id, p_lesson_id) (ADR-015)
+→ the Disciple's current assigned DISCIPLER, own-D-Group LEADER or
+  COORDINATOR
 → never the Disciple themselves
-→ requires READY_FOR_COMPLETION and, re-checked, credited participations
-  >= submission_minimum
-→ sets COMPLETED, completed_at and confirmed_by; audited
+→ requires COMPLETED, no later lesson COMPLETED, and no RECORDED
+  participant row for the person in a RECORDED meeting for the next
+  lesson
+→ from Slice 6, the eligibility-lesson refusal for an appointed person
+  (as for reopen) also applies
+→ returns to IN_PROGRESS (NOT_STARTED when no credited participation
+  remains); clears ready_at, submitted_by, completed_at and
+  confirmed_by; audited as LESSON_COMPLETION_UNDONE with the prior values
+→ refusals: cannot_act_on_own_lesson, not_authorized, lesson_not_completed,
+  later_lesson_completed, next_lesson_started
 
 reopen_lesson_completion()
 → COORDINATOR only for the MVP
@@ -1175,15 +1186,15 @@ reopen_lesson_completion()
   subject to the other preconditions (ADR-012 decision 9, N9; the
   eligibility lesson comes from `private.discipler_eligibility_lesson()`, D2). This replaces "rejected when
   the person has already been promoted to DISCIPLER".
-→ returns to READY_FOR_COMPLETION with the original submission when the
-  meetings still support it (ADR-011)
+→ returns to IN_PROGRESS, or NOT_STARTED when no credited participation
+  remains; never to READY_FOR_COMPLETION (ADR-015)
 → never cascades; see DATABASE_CONSTRAINTS.md section 4
 
 Discipler appointment (ADR-012; from Slice 6; replaces
 promote_disciple_to_discipler())
 → COORDINATOR only; no acceptance workflow
 → requires derived eligibility: Lesson 5 of the active curriculum at
-  confirmed COMPLETED (never stored)
+  COMPLETED (ADR-015; never stored)
 → creates a DISCIPLER responsibility in the same D Group as the
   person's DISCIPLE responsibility, and the appointment record in
   ministry_role_transitions
