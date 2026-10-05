@@ -1,7 +1,16 @@
 # DiscipleTrack Architecture
 
 *Document Status:* MVP Baseline  
-*Last Updated:* September 2026
+*Last Updated:* October 2026 (revision 2026-10-02: sections 8, 10a, 19 and 30, for ADR-010 and ADR-011)
+
+Revision 2026-10-05: D Group gatherings and gathering attendance removed
+(ADR-014) from sections 3, 7, 14, 17, 18, 19, 20 and 30; one monitoring
+condition, CONSECUTIVE_ABSENCE from recorded discipleship meeting
+outcomes, in sections 19, 20 and 30; "missed meetup" wording and meeting
+consistency removed from sections 7, 8, 14 and 19 (decision 8); section 6
+core constraints and section 9 Discipler Appointment Model (ADR-012);
+sections 14, 18 and 30 promotion wording; sections 20 and 23 attendance
+wording.
 
 ---
 
@@ -64,8 +73,6 @@ Initial domains include:
 - Church / Membership
 - D Groups
 - D Group Assignments
-- D Group Gatherings
-- Gathering Attendance
 - Curriculum
 - Discipleship Meetings and Meeting Attendance
 - Progress
@@ -77,6 +84,10 @@ Initial domains include:
 
 Domain boundaries should remain understandable even though they operate
 within one application/backend.
+
+D Group Gatherings and Gathering Attendance are withdrawn as domains
+(ADR-014). Their applied tables remain in Migrations 001 and 002 as
+deprecated objects with no MVP owner.
 
 ---
 
@@ -157,34 +168,24 @@ Core constraints include:
 - one active primary Discipler per Disciple at most
 - one Discipler may care for multiple Disciples
 - one Leader may lead only one active D Group
-- Disciple and Discipler responsibilities are not simultaneously active
-  for the same person
+- Disciple and Leader responsibilities are not simultaneously active for
+  the same person
+- Disciple and Discipler responsibilities may be held at the same time,
+  in the same D Group (ADR-012; enforced from Slice 6; until then
+  Migration 006 still refuses DISCIPLE with DISCIPLER)
+- nobody is paired with themselves: the two sides of a discipler
+  assignment are different church memberships (ADR-012, enforced from
+  Slice 6)
 
 Historical assignments should be preserved.
 
 ---
 
-## 7. Separate Meeting Domains
+## 7. Discipleship Meetings
 
-DiscipleTrack contains two distinct meeting concepts.
-
-### D Group Gathering
-
-Purpose:
-
-- overall group gathering
-- group participation of ministry workers and group members
-- absence monitoring for D Group Leaders and Disciplers
-
-Typical participants:
-
-- D Group Leader
-- Disciplers
-- Disciples
-
-Gatherings are secondary to the core discipleship workflow. They do not
-drive lesson progress, and gathering attendance never creates an
-attention condition for a Disciple.
+DiscipleTrack has one meeting concept: the discipleship meeting. D Group
+gatherings are not tracked (ADR-014), and attendance exists only as a
+discipleship meeting outcome.
 
 ### Discipleship Meeting
 
@@ -192,8 +193,10 @@ Purpose:
 
 - work through a specific curriculum lesson
 - record individual discipleship progression
-- record Disciple attendance and consistency, including missed meetups
-- absence monitoring for Disciples
+- record each expected Disciple's outcome (Present, Late, Absent or
+  Excused)
+- absence monitoring for Disciples, from explicitly recorded ABSENT
+  outcomes
 
 Typical participants:
 
@@ -201,14 +204,13 @@ Typical participants:
 - assigned Disciple or small set of assigned Disciples
 
 The Discipler and Disciple arrange meetups themselves. DiscipleTrack
-records what happened afterwards and does not schedule meetings. A
-missed meetup is a recorded meeting whose participants were Absent or
-Excused; only Present or Late participation is credited toward the
-lesson.
-
-These concepts must not be merged simply because both are meetings.
-
-Their lifecycle, permissions, data and business meaning differ.
+records what happened afterwards and does not schedule meetings. Only
+Present or Late participation is credited toward the lesson. A meeting
+record shows each Disciple's recorded outcome; there is no derived
+"held" or "missed" label (ADR-014 decision 8). A recorded meeting in
+which every outcome is Excused is not an absence for anyone: it has no
+credited participation and breaks each Disciple's consecutive recorded
+absence streak (BR-027a). No record is not an absence.
 
 ---
 
@@ -216,48 +218,61 @@ Their lifecycle, permissions, data and business meaning differ.
 
 The church curriculum contains 12 ordered lessons.
 
-Each lesson requires four credited Discipleship Meetings. The number is
-the lesson's required_meetings data, seeded as four.
+Meeting occurrence and lesson completion are separate concerns
+(ADR-011). A lesson takes as many credited meetings as its material
+needs; the count is factual history and never completes a lesson.
 
 Conceptually:
 
 Lesson
 → Meeting 1       Present   credited
 → Meeting 2       Present   credited
-→ Missed meetup   Absent    not credited
+→ Meeting         Absent    not credited
 → Meeting 3       Late      credited
-→ Meeting 4       Present   credited
-→ Ready for Completion
-→ Leader Confirmation
-→ Completed
+→ ...             (as many as the material takes)
+→ Discipler submits the lesson as finished   → Ready for Completion
+→ Leader confirms                             → Completed
+→ next lesson becomes current
 
-The four meetings are specifically meetings working through that lesson.
-Missed meetups stay in the Disciple's history as consistency information
-but never advance progress. Additional meetings recorded while the lesson
-awaits confirmation are credited and not clamped.
+Absent and Excused outcomes stay in the Disciple's meeting history but
+never count as lesson meetings. Meetings recorded while the lesson
+awaits confirmation are credited and not clamped. There is no maximum.
 
-Reaching four meetings does not automatically complete the lesson.
+Every count-dependent rule (whether a minimum applies before submission,
+and whether a typical number is shown) reads one meeting policy
+function in the database. Its numeric answer is an open product
+decision; nothing else in the client or the database encodes a number.
 
-The D Group Leader performs final completion confirmation.
+Lesson content is a separate concern again (ADR-010). It is read, never
+written by the client, and reading it never changes progress.
 
 ---
 
-## 9. Promotion Model
+## 9. Discipler Appointment Model
 
-Completing every lesson of the church's active curriculum creates
-eligibility for Discipler review.
+Confirmed completion of Lesson 5 of the active curriculum makes a
+Disciple eligible to be appointed as a Discipler (ADR-012). In Progress
+and Ready for Completion do not count. The eligibility lesson is
+defined in one place, the policy function `private.discipler_eligibility_lesson()` (D2, decided
+2026-10-05), never in Flutter.
 
 Conceptually:
 
-Active Curriculum Completed
-→ Eligible for Review
-→ Coordinator Decision
-→ Discipler Responsibility
+Lesson 5 confirmed Completed
+→ Eligible (derived, never stored)
+→ Coordinator appoints (no acceptance workflow; attributed and audited)
+→ DISCIPLER responsibility added in the same D Group
+→ Disciples assigned separately (discipler assignments)
 
-Promotion is an explicit ministry action rather than an automatic
-database side effect.
+Eligibility, appointment and assignment are three distinct facts: a
+derived predicate, an attributed appointment record with its
+responsibility row, and an assignment row.
 
-Historical Disciple progress must remain available after promotion.
+Appointment is an explicit ministry action rather than an automatic
+database side effect. It does not end the person's DISCIPLE
+responsibility, their own discipler assignment or their progress; they
+continue their own journey through Lesson 12. Slice 6 owns the forward
+migration that allows this (ADR-012 decision 10).
 
 ---
 
@@ -278,6 +293,29 @@ Flutter is responsible for:
 Flutter widgets must not contain core business rules.
 
 The mobile application is an untrusted client for security purposes.
+
+---
+
+## 10a. Offline Read-Only Access and Lesson Content
+
+Offline is view-only (Vertical Slice 4). The app keeps a device copy of
+what the person may already see and shows it while offline. Every write
+is disabled offline and nothing is queued, so this is not offline
+synchronization (MVP section 33).
+
+Two kinds of device data exist:
+
+- the session snapshot (Slice 4): own profile, membership, church name,
+  roles, group names and the phone numbers visible to the person;
+- the published lesson content (ADR-010), from the Curriculum / Lesson
+  Content slice: synced once, then readable offline, refreshed when the
+  published version changes.
+
+Supabase stays authoritative for both. Device data is display data,
+never authorizes anything, is cleared on sign-out, and never masks a
+refusal from the server. Ministry records such as meetings, progress and
+attention states are not part of the device copy unless a later slice
+decides so explicitly.
 
 ---
 
@@ -350,7 +388,6 @@ Examples:
 - journey
 - current lesson
 - meeting progress and meeting history
-- gathering attendance
 - D Group
 - announcements
 
@@ -371,21 +408,21 @@ Oversight-oriented, not an attendance-entry workspace:
 
 - D Group health
 - discipleship progress
-- meeting consistency
+- recorded meeting outcomes and last recorded meeting dates
 - members needing attention
 - completion approvals
 - follow-ups
-- gathering attendance, as secondary information
 
 ### Coordinator
 
 - ministry-wide D Groups
-- progress and meeting consistency
+- progress and recorded meeting history
 - members needing attention
 - follow-ups
 - assignments
-- promotion eligibility
-- gathering attendance, as secondary information
+- Discipler eligibility and appointment (ADR-012)
+
+No role sees gathering attendance; it is not tracked (ADR-014).
 
 Role-aware presentation does not replace backend authorization.
 
@@ -456,8 +493,8 @@ Important invariants should be enforced at the strongest practical layer.
 
 For example:
 
-A member/session attendance combination should not be duplicated merely
-because Flutter accidentally submits the operation twice.
+A Disciple's outcome for a discipleship meeting should not be duplicated
+merely because Flutter accidentally submits the operation twice.
 
 Some invariants span several tables and cannot be expressed as ordinary
 constraints. Those use constraint triggers or trusted database
@@ -477,11 +514,10 @@ Examples include:
 - previous D Group membership
 - previous Discipler assignment
 - previous leadership assignment
-- attendance
-- discipleship meetings
+- discipleship meetings and their recorded outcomes
 - lesson completion
 - follow-ups
-- promotion history
+- Discipler appointment history
 
 The database should distinguish current state from historical events
 where appropriate.
@@ -494,21 +530,22 @@ Underlying records are authoritative.
 
 Examples:
 
-Attendance Records
-→ Attendance Percentage
-
-Gathering History
-→ Consecutive Absence Streak (Leaders and Disciplers)
-
 Discipleship Meetings
-→ Meeting 3/4
+→ Lesson meeting count ("5 meetings recorded"), meeting ordinal
+
+Discipler assignments
+→ Active Discipleships
 
 Meeting Participant Outcomes
-→ Meeting Consistency, Last Meeting Date
-→ Consecutive Missed-Meeting Streak (Disciples)
+→ Last Recorded Meeting Date
+→ Consecutive Recorded Absence Streak (Disciples)
 
 Lesson Completion Records
-→ Curriculum Progress
+→ Curriculum Progress ("Lesson 6 of 12", "5 of 12 completed")
+→ Discipler Eligibility (confirmed Lesson 5, ADR-012)
+
+No attendance percentage, gathering streak or meeting-consistency ratio
+is derived (ADR-014, decision 8).
 
 Follow-ups
 → Open/Overdue Counts
@@ -522,43 +559,42 @@ their authoritative source must remain clear.
 
 Core monitoring is deterministic.
 
-Monitoring sources are role-specific (ADR-009).
+Monitoring has one condition, one source and one threshold (ADR-014),
+and uses only explicitly recorded facts.
 
 Disciples:
 
 Recorded Discipleship Meeting
-→ Participant Outcomes
-→ Missed-Meeting Rule
-→ Attention Condition (CONSECUTIVE_MISSED_MEETINGS)
-→ Follow-up
-→ Responsible Person
-→ Actions
-→ Resolution
-
-D Group Leaders and Disciplers:
-
-Finalized D Group Gathering
-→ Attendance Records
-→ Absence Rule
+→ Recorded Participant Outcomes
+→ Consecutive Recorded Absence Rule (BR-027a)
 → Attention Condition (CONSECUTIVE_ABSENCE)
 → Follow-up
 → Responsible Person
 → Actions
 → Resolution
 
-Gathering attendance never creates a condition for a Disciple.
+Initial rule:
 
-Initial rules:
-
-Configured consecutive threshold for each source
-(default 3)
+`church_settings.consecutive_absence_threshold` (default 3)
+consecutive recorded ABSENT outcomes within the current discipler
+assignment
 → Follow-up eligibility
 
-Monitoring only sees recorded meetups. Oversight views surface each
-Disciple's last meeting date, derived at read time, so that meetings
-which stop without being recorded are still visible.
+D Group Leaders and Disciplers have no automated monitoring in the MVP;
+their participation is noticed through human oversight. A person who is
+both a Disciple and a Discipler is monitored as a Disciple only. The
+LEADER and DISCIPLER branches of the follow-up chain have no MVP trigger
+(ADR-014) and are not built until a factual condition for those subjects
+is approved.
 
-AI is not the source of truth for deterministic attendance conditions.
+Monitoring only sees recorded meetings. No record is not an absence,
+and no condition is ever generated from elapsed time, inactivity or the
+lack of a record. Oversight views surface each Disciple's last recorded
+meeting date, derived at read time, as a displayed fact, never a
+condition, so that meetings which stop without being recorded are still
+visible.
+
+AI is not the source of truth for deterministic absence conditions.
 
 ---
 
@@ -623,7 +659,7 @@ Depending on viewer permissions, it may expose:
 - responsibility
 - Discipler
 - assigned Disciples
-- attendance
+- recorded discipleship meeting outcomes
 - progress
 - recent activity
 - follow-up information
@@ -780,7 +816,7 @@ For deterministic domain logic such as:
 - lesson meeting eligibility
 - follow-up eligibility
 - progression rules
-- promotion eligibility
+- Discipler eligibility (confirmed Lesson 5, ADR-012)
 
 ### Widget Tests
 
@@ -804,23 +840,19 @@ For critical journeys such as:
 Register
 → Join Church
 → Assignment
-→ Discipleship Meetings with missed meetups
-→ Missed-Meeting Condition
+→ Discipleship Meetings with recorded Absent outcomes
+→ Consecutive Recorded Absence Condition (CONSECUTIVE_ABSENCE)
 → Follow-up
 
 and:
 
-Discipleship Meeting
-→ 4/4
+Discipleship Meetings
+→ Discipler submits the lesson as finished
 → Leader Confirmation
 → Lesson Completion
 
-and:
-
-D Group Gathering
-→ Attendance
-→ Leader or Discipler Absence Condition
-→ Follow-up
+The gathering journey (D Group Gathering, Attendance, Leader or
+Discipler Absence Condition, Follow-up) is withdrawn (ADR-014).
 
 AI-generated implementation is not considered correct merely because it
 compiles.

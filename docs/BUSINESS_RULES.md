@@ -1,10 +1,31 @@
 # DiscipleTrack Business Rules
 
 *Document Status:* MVP Baseline  
-*Last Updated:* September 2026
+*Last Updated:* October 2026
 
 This document defines domain rules that DiscipleTrack must preserve
 regardless of UI implementation.
+
+Revision 2026-10-02: BR-029a (lesson content, ADR-010); BR-030, BR-032,
+BR-032a, BR-033 and BR-033a (explicit lesson completion independent of
+a fixed meeting count, ADR-011, decision B); BR-031a (recorded meeting
+history may be viewed by month, decision A4); BR-027a (missed-meeting
+wording, decision A9).
+
+Revision 2026-10-05: D Group gatherings and gathering attendance removed
+(ADR-014): BR-016 to BR-020, BR-025 and BR-026 withdrawn (headings kept,
+numbering stable); BR-010, BR-021 to BR-024 rescoped to discipleship
+meeting outcomes; BR-027 and BR-027a rewritten as one condition, one
+source and one threshold (consecutive recorded absences); "missed
+meetup" wording removed from BR-028, BR-030a, BR-031, BR-031a, BR-031b,
+BR-034 and BR-044a; BR-034 and BR-039 lose the gathering concept (LEADER
+and DISCIPLER follow-up branches have no MVP trigger); BR-035 factual
+segmented progress, no percentages (decisions 8, 22); examples in
+BR-053, BR-055 and BR-055a; BR-056 out-of-scope list. Discipler
+eligibility and appointment (ADR-012): BR-010, BR-015 (Disciple and
+Leader exclusion; Disciple and Discipler may coexist; no self-pairing),
+BR-024 self-credit rationale, BR-036 (confirmed Lesson 5), BR-037
+(appointment, not promotion), BR-053.
 
 ---
 
@@ -123,10 +144,12 @@ The Coordinator oversees church-wide discipleship operations including:
 - Disciples
 - assignments
 - curriculum
-- attendance oversight
-- progress
+- progress, including recorded discipleship meeting outcomes
 - follow-ups
-- promotion review
+- Discipler appointment (ADR-012)
+
+Gathering attendance oversight is withdrawn with D Group gatherings
+(ADR-014).
 
 ---
 
@@ -172,220 +195,189 @@ Changes in assignment must preserve historical records.
 
 ---
 
-## BR-015 — Disciple and Discipler Are Mutually Exclusive Active Responsibilities
+## BR-015 — Disciple and Leader Are Mutually Exclusive Active Responsibilities
 
-A person cannot simultaneously be an active Disciple and active
-Discipler.
+A person cannot simultaneously be an active Disciple and an active
+D Group Leader. Only this pair is mutually exclusive.
 
-Only this pair is mutually exclusive. LEADER and DISCIPLER may coexist
-for the same person, as described in BR-013.
+DISCIPLE and DISCIPLER may coexist for the same person in one D Group:
+a Disciple appointed as a Discipler continues their own journey as a
+Disciple (BR-037) (ADR-012; enforced from Slice 6; until then Migration
+006 still refuses DISCIPLE with DISCIPLER). LEADER and DISCIPLER may
+also coexist, as described in BR-013. All of a person's active
+responsibilities are in one D Group at a time.
 
-Promotion changes the person's active ministry responsibility while
-preserving historical discipleship records.
+Nobody is paired with themselves: the Discipler and the Disciple of a
+discipler assignment belong to different church memberships (ADR-012,
+enforced from Slice 6). Whether two people may disciple each other at
+the same time (reciprocal pairing) is open (D7).
 
 ---
 
 ## BR-016 — D Group Gathering and Discipleship Meeting Are Different
 
-A D Group Gathering represents the overall group's meeting.
-
-A Discipleship Meeting represents lesson work between a Discipler and
-assigned Disciple(s).
-
-They must remain distinct domain concepts, and so must their attendance:
-
-- D Group gathering attendance is the participation of ministry workers
-  and group members in the D Group gathering context.
-- Discipleship meeting attendance is the participation and consistency
-  of Disciples in their lesson-based discipleship meetings.
-
-Discipleship meetings are the core discipleship workflow. D Group
-gatherings remain in the MVP but are secondary to it.
+Withdrawn (ADR-014). D Group gatherings are not part of the MVP;
+attendance exists only as a discipleship meeting outcome, recorded
+through Record Meeting (BR-031 to BR-031b).
 
 ---
 
 ## BR-017 — D Group Gatherings Have Flexible Scheduling
 
-D Groups are not required to maintain a fixed recurring meeting schedule.
-
-Each actual gathering records its own date/time.
+Withdrawn (ADR-014). Gatherings are not tracked. Discipleship meetings
+are recorded, not scheduled (BR-031a).
 
 ---
 
 ## BR-018 — Gathering Attendance Includes D Group Participants
 
-Attendance may be recorded for:
-
-- D Group Leader
-- Disciplers
-- Disciples
-
-according to their active participation in the D Group.
+Withdrawn (ADR-014). Only the Disciples of a discipleship meeting
+receive an outcome (BR-031b).
 
 ---
 
 ## BR-019 — Attendance Uniqueness
 
-A person can have at most one attendance record for a particular
-D Group Gathering.
-
-This invariant should be enforced at the database level.
+Withdrawn (ADR-014). The gathering form of this rule is gone. Each
+expected Disciple has exactly one outcome per discipleship meeting
+(BR-031b), enforced in the database (BR-055).
 
 ---
 
 ## BR-020 — Attendance Source of Truth
 
-Individual attendance records are authoritative.
-
-Derived information includes:
-
-- attendance percentage
-- sessions attended
-- sessions missed
-- consecutive absences
-- last attendance date
-
-Each of these has exactly one authoritative definition, recorded in
-DATABASE_CONSTRAINTS.md under Derived Metric Definitions. Excused
-attendance is excluded from the attendance-percentage denominator.
-
-Historical attendance metrics survive D Group transfer. The current
-gathering consecutive-absence streak applies to Leaders and Disciplers,
-is scoped to the current D Group membership episode and resets when that
-episode ends, while the underlying attendance history is never reset or
-discarded.
-
-Discipleship meeting attendance has its own derived metrics, defined in
-the same section, and is never combined with gathering attendance.
+Withdrawn (ADR-014). Gathering attendance percentage, sessions attended,
+sessions missed and the gathering consecutive-absence streak no longer
+exist, and no attendance percentage is defined (decision 8). Recorded
+meeting outcomes are authoritative; the consecutive recorded absence
+streak is BR-027a and progress is BR-035.
 
 ---
 
 ## BR-021 — Attendance States
 
-MVP attendance states are:
+Attendance exists only as the outcome of a discipleship meeting
+(ADR-014). Each expected Disciple receives one of these states:
 
 - Present
 - Absent
 - Late
 - Excused
 
+Their effects on lesson credit and on the consecutive recorded absence
+streak are in BR-031b.
+
 ---
 
-## BR-022 — Late Counts as Attended
+## BR-022 — Late Is Credited
 
-Late attendance counts as attendance for consecutive-absence monitoring.
+A Late outcome credits the meeting to the Disciple toward the lesson,
+exactly as Present does (BR-030).
 
-It must not increment an absence streak.
+It breaks the consecutive recorded absence streak and never increments
+it (BR-027a).
 
 ---
 
 ## BR-023 — Excused Breaks the Absence Streak
 
-An Excused attendance state does not count as an unexplained absence.
+An Excused outcome is never an absence.
 
-It resets/breaks the consecutive unexplained absence streak.
+It is not credited toward the lesson, and it breaks the consecutive
+recorded absence streak (BR-027a).
 
-Example:
+Example of recorded outcomes, oldest first:
 
 Absent
 Absent
 Excused
 Absent
 
-results in a current consecutive unexplained absence streak of 1.
+results in a current streak of 1 consecutive recorded absence.
 
 ---
 
-## BR-024 — Nobody Modifies Their Own Attendance
+## BR-024 — Nobody Records Their Own Meeting Outcome
 
-A person may view their own attendance history.
+A person may view their own discipleship meeting history.
 
-No person may create, modify or delete their own official attendance
-record. This applies in every role, including Coordinator, D Group
+No person may create, modify or void their own official meeting
+outcome. This applies in every role, including Coordinator, D Group
 Leader and Discipler, not only to ordinary members.
 
-The same holds for discipleship meeting outcomes. A Disciple never
-records or changes their own meeting outcome, and because Disciple and
-Discipler are mutually exclusive, a recorder is never a participant in
-the meeting they record.
+A Disciple never records or changes their own meeting outcome. A
+recorder is never a participant in a meeting they record (explicit
+check from Slice 5), and nobody is paired with themselves (ADR-012,
+enforced from Slice 6), so nobody can credit themselves.
 
 Recording authority always means recording for other eligible members
-within the recorder's authorized scope.
-
-Where a D Group's only authorized recorder is its Leader, another
-Discipler in that D Group or the Coordinator records the Leader's
-attendance. No additional recorder role exists in the MVP.
+within the recorder's authorized scope (BR-031).
 
 ---
 
 ## BR-025 — Attendance Recording Authorization
 
-Authorized D Group Leaders and Disciplers may record D Group attendance.
-
-The Coordinator may oversee/correct attendance according to defined
-permissions.
-
-Exact edit/finalization permissions will be enforced by the authorization
-model.
+Withdrawn (ADR-014). There is no gathering attendance to record.
+Discipleship meeting recording authority is BR-031, and voids are
+BR-031c.
 
 ---
 
 ## BR-026 — Gathering Monitoring Uses Finalized Gatherings
 
-Gathering-based absence monitoring uses finalized official D Group
-Gathering records.
-
-Draft/incomplete gatherings must not incorrectly trigger follow-ups.
-
-Gathering-based absence monitoring applies to D Group Leaders and
-Disciplers only. Gathering attendance is still recorded for Disciples as
-part of their attendance history, but it never creates an attention
-condition for a Disciple. Disciples are monitored through discipleship
-meeting outcomes (BR-027a).
+Withdrawn (ADR-014). No gathering source exists. Monitoring uses
+recorded discipleship meeting outcomes only (BR-027, BR-027a).
 
 ---
 
-## BR-027 — Monitoring Sources Are Role-Specific
+## BR-027 — One Monitoring Condition, One Source, One Threshold
 
-The MVP monitors consecutive unexplained absences from a source that
-depends on the person's responsibility:
+The MVP monitors one condition, consecutive recorded absences
+(`CONSECUTIVE_ABSENCE`), for Disciples only (ADR-014). Its only source is
+the outcomes explicitly recorded in discipleship meetings (BR-027a).
 
-- D Group Leaders and Disciplers: consecutive unexplained absences from
-  finalized D Group gatherings (Consecutive Absence)
-- Disciples: consecutive missed discipleship meetups (Consecutive Missed
-  Meetings)
+The threshold is `church_settings.consecutive_absence_threshold`, with a
+default of 3. It is configurable per church rather than hard-coded. No
+other threshold is read by any monitoring rule.
 
-A Disciple therefore has one absence-condition stream, not two.
-
-The initial/default threshold for each is 3.
-
-Each threshold is configurable separately rather than permanently
-hard-coded.
+Leaders and Disciplers have no automated monitoring in the MVP; their
+participation is noticed through human oversight. A person who is both
+a Disciple and a Discipler (BR-015) is monitored as a Disciple only.
 
 ---
 
-## BR-027a — Consecutive Missed Meetings
+## BR-027a — Consecutive Recorded Absences
 
-A Disciple's missed-meeting streak is built from the outcomes recorded
-for their discipleship meetups.
+A Disciple's consecutive recorded absence streak is built only from
+outcomes explicitly recorded for that Disciple on recorded (not voided)
+discipleship meetings, in chronological order.
 
-- Absent increments or continues the streak.
+- Absent increments the streak.
 - Present or Late breaks the streak.
-- Excused does not count as an absence and breaks the streak.
+- Excused breaks the streak and is never an absence.
 
 The streak runs across lesson boundaries and is scoped to the Disciple's
 current Discipler assignment. A new Discipler starts with a fresh streak,
-because they did not witness the earlier missed meetups.
+because they did not witness the earlier recorded absences.
 
-Monitoring only sees meetups that were recorded. If meetings stop and
-nothing is recorded, the Disciple's last meeting date is how leadership
-notices. An automated inactivity condition is future scope.
+Monitoring only sees meetings that were recorded. If meetings stop and
+nothing is recorded, the Disciple's last recorded meeting date is how
+leadership notices. That date is a displayed fact, never a condition. No
+condition or follow-up is ever generated from elapsed time, inactivity
+or the lack of a record (ADR-014 decision 4).
+
+An absence exists only where a meeting was recorded with an ABSENT
+outcome for that Disciple. No record is not an absence. An absence is
+never inferred from elapsed time, inactivity, the lack of a record or an
+empty calendar date. Wording follows the record: "2 recorded absences",
+"2 consecutive recorded absences", "Last recorded meeting Sep 12".
 
 ---
 
 ## BR-028 — Monitoring Is Deterministic
 
-Core attendance monitoring must use deterministic business rules.
+Core absence monitoring (BR-027a) must use deterministic business
+rules.
 
 AI does not determine whether the absence threshold was reached.
 
@@ -400,18 +392,41 @@ Flutter UI/business logic.
 
 ---
 
-## BR-030 — Each Lesson Requires Four Discipleship Meetings
+## BR-029a — Lesson Content Is Delivered, Separately from Progress
 
-Each lesson requires four credited meetings specifically working through
-that lesson. The requirement is the lesson's required_meetings value,
-seeded as four.
+DiscipleTrack delivers the published lesson material to every ACTIVE
+member of the church (ADR-010). Supabase holds the authoritative
+published content; the repository Markdown is its publishing source.
+
+Reading is offline-first: once the curriculum has synced, lessons are
+readable without a connection, with no per-lesson download.
+
+Reading a lesson records nothing. It is not attendance, not progress and
+not a completion signal. Offline reading never enables an offline write.
+
+---
+
+## BR-030 — Lesson Meetings Are Counted, Not Required
+
+A lesson is worked through in as many credited meetings as the material
+takes. The number varies: four is common, around six happens. The
+meeting count is factual history of the lesson; it is not what
+completes the lesson (BR-032).
 
 A meeting is credited to a Disciple only when that Disciple was Present
-or Late. A missed meetup, Absent or Excused, never counts toward the
-requirement, but it remains visible in the Disciple's meeting history.
+or Late. Absent and Excused are attendance outcomes; they never count
+as lesson meetings and never indicate that material was covered, but
+they remain visible in the Disciple's meeting history.
 
-A meeting for another lesson does not count toward the current lesson's
-four-meeting requirement.
+A meeting for another lesson does not count toward the current lesson.
+
+There is no maximum number of meetings per lesson.
+
+Whether a minimum number of credited meetings must exist before a
+lesson can be submitted as finished is an open product decision
+(ADR-011). Until it is decided, no rule may assume a fixed number.
+Counts are shown as counts ("5 meetings recorded"), never as a fraction
+of a target ("5 / 4").
 
 ---
 
@@ -435,15 +450,17 @@ sequencing override in the MVP.
 A participant may only be listed in a meeting when that person was an
 active Disciple of the meeting's D Group and was assigned to the
 meeting's Discipler at the time the meeting occurred. A Disciple with no
-assigned Discipler cannot receive progress credit, or have a missed
-meetup recorded, until an assignment exists.
+assigned Discipler cannot receive progress credit, or have any meeting
+outcome recorded, until an assignment exists.
 
 ---
 
 ## BR-031 — Discipler Records Discipleship Meetings
 
-The responsible Discipler records each Discipleship Meeting after it was
-due, whether it was held or missed.
+The responsible Discipler records each Discipleship Meeting afterwards,
+with each expected Disciple's outcome, whether that outcome is Present,
+Late, Absent or Excused. A meeting record shows each Disciple's recorded
+outcome; it carries no "held" or "missed" label (ADR-014 decision 8).
 
 A D Group Leader or the Coordinator may record on behalf of the
 responsible Discipler as a fallback. The record shows who entered it.
@@ -458,11 +475,19 @@ one authoritative record per meeting.
 
 The Discipler and Disciple arrange their meetups themselves, outside the
 app. DiscipleTrack records what actually happened. It is not a
-scheduling or calendar system.
+scheduling or calendar system: it does not schedule, plan, invite to or
+manage meetings, and no record exists before a meetup.
 
-A missed meetup is recorded the same way as a held one, afterwards: the
-lesson, the date the meetup was arranged for, the Disciple(s) who were
-expected, and each person's outcome. The date may not be in the future.
+Viewing recorded meetings by month is not scheduling. A read-only
+monthly view derived from the occurred_at of meetings already recorded
+is allowed. It shows only recorded meetings and their outcomes. It
+never shows a planned meeting, never offers to create one for a date,
+and never marks a date without a record as missed.
+
+A meeting at which a Disciple was Absent or Excused is recorded the same
+way as any other, afterwards: the lesson, the date the meetup took place
+or was arranged for, the Disciple(s) who were expected, and each
+person's outcome. The date may not be in the future.
 
 A meetup that both sides cancelled in advance is not recorded.
 
@@ -472,14 +497,17 @@ A meetup that both sides cancelled in advance is not recorded.
 
 Each expected Disciple receives one explicit outcome:
 
-| Outcome | Counts toward lesson | Missed-meeting streak |
+| Outcome | Counts toward lesson | Consecutive recorded absence streak (BR-027a) |
 |---|---|---|
 | Present | Yes | Breaks |
 | Late | Yes | Breaks |
 | Absent | No | Increments |
 | Excused | No | Breaks; not an absence |
 
-In a small-group meeting, each Disciple's outcome is independent.
+In a small-group meeting, each Disciple's outcome is independent. A
+recorded meeting in which every outcome is Excused is not an absence for
+anyone: it has no credited participation and breaks each Disciple's
+streak (ADR-014 decision 8).
 
 ---
 
@@ -498,26 +526,52 @@ Every void is audited and remains subject to Completed-lesson protection
 
 ---
 
-## BR-032 — Four Meetings Do Not Automatically Complete a Lesson
+## BR-032 — No Meeting Count Completes a Lesson
 
-When the fourth required meeting is recorded:
+Recording a meeting, of any ordinal, never makes a lesson Ready for
+Completion or Completed by itself (ADR-011).
 
-Lesson
-→ Ready for Completion
+Lesson progression:
 
-The lesson does not automatically become Completed.
+Not Started
+→ In Progress, at the first credited meeting
+→ Ready for Completion, when the Discipler submits the lesson as
+  finished (BR-032a)
+→ Completed, when the D Group Leader confirms (BR-033)
+→ the next lesson in sequence becomes current
 
-Meetings may continue while the lesson awaits confirmation. Additional
-legitimate meetings are recorded and credited to the same lesson, so the
-credited count may exceed the requirement. They are not clamped or
-discarded, and the lesson stays Ready for Completion until confirmed.
+Meetings may continue while the lesson awaits confirmation. They are
+recorded and credited to the same lesson, add to its factual count, and
+do not withdraw the submission. The lesson stays Ready for Completion
+until confirmed or until the submission is withdrawn.
+
+## BR-032a — The Discipler Submits a Lesson as Finished
+
+The Discipler conducting the lesson, normally the Disciple's current
+assigned Discipler, decides when the lesson material has been covered
+and submits it: "We have finished covering this lesson". The submission
+records who submitted it and when, and is audited.
+
+The D Group Leader and the Coordinator may submit on the Discipler's
+behalf as a fallback, as they may record meetings on the Discipler's
+behalf.
+
+A lesson can be submitted only while it is In Progress, so it has at
+least one credited meeting. Whether a larger minimum applies is the open
+decision in BR-030.
+
+A submission may be withdrawn, returning the lesson to In Progress, by
+the people RBAC_RLS_MATRIX.md section 5 names. A Disciple never
+submits, withdraws or confirms their own lesson.
 
 ---
 
 ## BR-033 — D Group Leader Confirms Lesson Completion
 
-The relevant D Group Leader reviews a lesson that has reached 4/4 and
-confirms completion.
+The relevant D Group Leader reviews a lesson that has been submitted as
+finished (BR-032a) and confirms completion. The confirmation is a
+deliberate act: the app asks for it explicitly, because only the
+Coordinator can reopen a completed lesson.
 
 Only after confirmation is the lesson considered Completed.
 
@@ -533,36 +587,39 @@ confirmed_by and is audited.
 
 A confirmed Completed lesson must not be silently invalidated.
 
-Voiding a meeting or participation record that would reduce credited
-meetings below the requirement for a Completed lesson must be
-rejected. Voiding a missed-meetup outcome never affects progress.
+A void never changes a Completed status. Voiding a meeting or
+participation record that would leave a Completed lesson with fewer
+credited meetings than a submission needs (BR-032a, and the open minimum
+in BR-030) must be rejected. Voiding an Absent or Excused outcome never
+affects progress.
 
 Correcting such a case requires an explicit authorized reopen operation
-first.
+first. Reopening returns the lesson to Ready for Completion with its
+original submission, unless the meetings no longer support it.
 
-Progress that has not been confirmed may recompute freely. A lesson at
-Ready for Completion may return to In Progress when credited meeting count
-falls below the requirement.
+Progress that has not been confirmed recomputes only from credited
+presence: a lesson with no credited meeting is Not Started, and a
+submission that a void leaves below the minimum is withdrawn
+automatically. Recomputation never makes a lesson Ready for Completion
+or Completed.
 
 ---
 
 ## BR-034 — Attendance and Discipleship Progress Are Separate
 
-Three concepts are distinct:
+Two concepts are distinct:
 
-- D Group gathering attendance
-- Discipleship meeting attendance
+- Discipleship meeting attendance (each Disciple's recorded outcome)
 - Lesson progress
 
-D Group gathering attendance and lesson progress are unrelated. A
-Disciple may miss a D Group Gathering while continuing individual
-Discipleship Meetings. Attending a D Group Gathering does not count as
-one of the required lesson meetings unless explicitly represented as a
-valid Discipleship Meeting under the discipleship workflow.
+D Group gathering attendance no longer exists (ADR-014); attendance is
+only a discipleship meeting outcome.
 
 Discipleship meeting attendance and lesson progress share one record,
-but only credited attendance (Present or Late) advances progress. Missed
-meetups are consistency information, not progress.
+but only credited attendance (Present or Late) counts as a lesson
+meeting. Absent and Excused outcomes are meeting history, not progress.
+Lesson completion is a further step, separate from both: the Discipler's
+submission and the Leader's confirmation (BR-032a, BR-033).
 
 ---
 
@@ -570,31 +627,57 @@ meetups are consistency information, not progress.
 
 Discipleship Meeting and lesson-completion records are authoritative.
 
-Overall progress percentages and current-stage indicators are derived
-from these underlying records.
+Current-stage indicators and overall progress are derived from these
+underlying records. They are presented as factual states ("Lesson 6 of
+12", "5 of 12 completed", "Lesson 6 · 5 meetings recorded", "Lesson 6
+awaiting confirmation", "Last recorded meeting Sep 25"), never as
+rankings, comparisons between people or groups, consistency ratios,
+performance percentages or evaluative labels such as "behind" or
+"advanced" (decisions 8, 22).
+
+Overall progress is a segmented view of the curriculum: one segment per
+lesson, each completed, current or upcoming. Only a confirmed Completed
+lesson counts as completed; a lesson Ready for Completion does not. The
+number of recorded meetings never determines progress. The total comes
+from the active curriculum, never from a literal.
 
 ---
 
-## BR-036 — Curriculum Completion Creates Promotion Eligibility
+## BR-036 — Confirmed Lesson 5 Creates Discipler Eligibility
 
-Completing every lesson of the church's active curriculum makes a
-Disciple eligible for Discipler review.
+A Disciple becomes eligible to be appointed as a Discipler when Lesson 5
+of the church's active curriculum is confirmed Completed (ADR-012). In
+Progress and Ready for Completion do not count. Because progression is
+sequential (BR-030a), Lessons 1 to 4 are then Completed as well.
 
-The MVP curriculum contains twelve lessons, but that count is seed data
-rather than a rule. Eligibility is evaluated against the active
-curriculum, never against a hard-coded number.
+Eligibility is derived from the completion record. It is never stored
+and never changes anything by itself.
 
-It does not automatically promote them.
+The eligibility lesson is defined in one place and is not hard-coded in
+Flutter or repeated across rules. That place is the policy function
+`private.discipler_eligibility_lesson()`, which returns 5 and is not configurable per church (D2,
+decided 2026-10-05).
 
 ---
 
-## BR-037 — Coordinator Approves Discipler Promotion
+## BR-037 — Coordinator Appoints Disciplers
 
-Promotion from Disciple to Discipler requires an explicit Coordinator
-decision.
+Appointment as a Discipler is an explicit Coordinator act on an eligible
+Disciple (ADR-012). There is no acceptance workflow. The appointment is
+attributed, audited and preserved as history.
 
-The system must preserve the person's completed discipleship history
-after promotion.
+Appointment adds a DISCIPLER responsibility in the same D Group as the
+person's DISCIPLE responsibility. It does not end their DISCIPLE
+responsibility, their own discipler assignment or their lesson
+progress: they continue their own journey through the last lesson of
+the curriculum (Lesson 12 in the MVP curriculum) under their own
+Discipler (BR-015; enforced from Slice 6).
+
+Eligibility, appointment and assignment are distinct facts. Eligibility
+is derived (BR-036); appointment is an attributed record; assigning
+Disciples to the new Discipler is a separate discipler assignment
+(BR-014). Being eligible does not appoint, and being appointed does not
+assign any Disciple.
 
 ---
 
@@ -612,20 +695,23 @@ Concern Detected
 
 ---
 
-## BR-039 — Attendance Follow-up Assignment
+## BR-039 — Absence Follow-up Assignment
 
-Absence monitoring applies to Leaders, Disciplers and Disciples, from
-the role-specific sources in BR-027. Leaders and Disciplers reach this
-chain through gathering absences; Disciples through missed discipleship
-meetups.
+In the MVP, a follow-up is triggered only by the consecutive recorded
+absence condition for a Disciple (BR-027, BR-027a). Gathering absences
+are withdrawn as a source (ADR-014).
 
-When an attendance-based follow-up is created, responsibility is
-assigned using the following chain, evaluated on distinct people:
+When that follow-up is created, responsibility is assigned using the
+following chain, evaluated on distinct people:
 
 Subject is a Disciple:
 → active primary Discipler
 → otherwise the D Group Leader
 → otherwise the Coordinator
+
+The chain also defines branches for other subjects. They have no MVP
+trigger (ADR-014) and are not built until a factual condition for those
+subjects is approved:
 
 Subject is a Discipler:
 → the D Group Leader
@@ -705,8 +791,9 @@ The MVP does not require automatic multi-level escalation.
 
 ## BR-044a — Condition Resolution Does Not Resolve Care
 
-When monitoring resolves an attention condition because the person has
-resumed attending, the related follow-up is not automatically closed.
+When monitoring resolves an attention condition because a later recorded
+outcome breaks the streak (BR-027a), the related follow-up is not
+automatically closed.
 
 The human care obligation remains until someone resolves it
 deliberately, normally recording that the underlying condition has
@@ -846,10 +933,10 @@ Examples include:
 - role assignment
 - D Group assignment
 - Discipler assignment
-- attendance changes
-- Discipleship Meeting creation
+- Discipleship Meeting recording, including each outcome
+- meeting and participant voids
 - lesson confirmation
-- promotion
+- Discipler appointment (ADR-012)
 - follow-up actions
 
 ---
@@ -872,7 +959,7 @@ rather than relying entirely on client logic.
 
 Examples include:
 
-- attendance uniqueness
+- one outcome per Disciple per discipleship meeting
 - valid relationships
 - referential integrity
 - constrained state values
@@ -884,9 +971,9 @@ Examples include:
 A record must never relate information belonging to different churches.
 
 Examples that must be rejected include a D Group membership referencing
-a church membership from another church, attendance referencing a
-gathering outside the member's church, and lesson progress referencing
-another church's curriculum.
+a church membership from another church, a discipleship meeting
+participant referencing a meeting outside the Disciple's church, and
+lesson progress referencing another church's curriculum.
 
 This must be enforced inside PostgreSQL. Ordinary foreign keys are used
 where the relationship is naturally expressible; trusted database
@@ -905,6 +992,7 @@ Post-MVP functionality must not be introduced accidentally.
 Features such as:
 
 - QR attendance
+- D Group gatherings and gathering or event attendance (ADR-014)
 - AI insights
 - SMS
 - automated escalation

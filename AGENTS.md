@@ -4,7 +4,9 @@ Instructions for anyone working in this repository, human or AI agent.
 
 ## Current phase
 
-Implementation, in vertical slices. Completed: Auth + Profile (migrations 001 to 003); Church Join + Membership Approval + First Entry (migrations 004 and 005, bootstrap, seed). In review: Ministry Structure, Vertical Slice 3 (migration 006: D Groups with a Leader, placement by invitation, pairing, removal, role-scoped reads); Offline read-only, Vertical Slice 4 (client only, no migration: a device snapshot of what the person may already see, view-only while offline). Not started: discipleship meetings, attendance, progress, monitoring, follow-ups, announcements.
+Implementation, in vertical slices. Completed: Slice 1 Auth + Profile (migrations 001 to 003); Slice 2 Church Join + Membership Approval + First Entry (migrations 004 and 005, bootstrap, seed); Slice 3 Ministry Structure (migration 006: D Groups with a Leader, placement by invitation, pairing, removal, role-scoped reads); Slice 4 Offline read-only (client only, no migration: a device snapshot of what the person may already see, view-only while offline). Planned: Slice 5 Journey / Meeting Progress (plan in `docs/plans/`; attendance exists only as a discipleship meeting outcome recorded through Record Meeting). Not started: Slices 6 to 11.
+
+Roadmap (2026-10-05, eleven slices; re-checked before each slice): 5 Journey / Meeting Progress; 6 Discipler Progression (ADR-012); 7 Curriculum / Lesson Content (ADR-010); 8 Workbook / Guide (ADR-013, reserved); 9 Monitoring / Follow-ups (ADR-014: consecutive recorded absences only); 10 Announcements; 11 Reporting / Oversight. D Group gatherings and gathering attendance are removed from the MVP (ADR-014); there is no Gatherings / Attendance slice. Numbering is not fixed: if dependency analysis later shows a better order, the roadmap changes. Monitoring depends primarily on Slice 5 and may move ahead of Curriculum if ministry priorities justify it. UI refinement happens inside each slice; there is no separate redesign slice.
 
 Applied migrations are immutable. Any schema change goes in a new migration.
 
@@ -25,6 +27,8 @@ Before writing anything, read in this order:
 7. [docs/database/DATABASE_CONSTRAINTS.md](docs/database/DATABASE_CONSTRAINTS.md)
 8. [docs/security/RBAC_RLS_MATRIX.md](docs/security/RBAC_RLS_MATRIX.md)
 9. [docs/UI_DESIGN_SYSTEM.md](docs/UI_DESIGN_SYSTEM.md) before any UI work
+
+Every slice plan runs the slice UX review in UI_DESIGN_SYSTEM.md section 69 before implementation, and its role walkthrough again before the slice is called done.
 
 ## Document authority
 
@@ -53,7 +57,7 @@ Authority is domain-specific, not a ranked override chain. See [ADR-008](docs/ad
 
 **Never delete history.** End, resolve, cancel, archive or void records instead. Queries distinguish active from historical.
 
-**Do not store derived values** such as attendance percentage, absence streak, meeting count or promotion eligibility as independent sources of truth. Definitions are in `DATABASE_CONSTRAINTS.md`.
+**Do not store derived values** such as consecutive recorded absences, meeting count, lessons completed or Discipler eligibility as independent sources of truth. Definitions are in `DATABASE_CONSTRAINTS.md`.
 
 **Do not introduce post-MVP scope.** The out-of-scope list in `MVP_SPEC.md` is deliberate.
 
@@ -81,6 +85,6 @@ Code is not correct merely because it compiles. Deterministic mechanisms are aut
 
 ## Testing expectations
 
-- Unit tests for deterministic domain logic: absence streaks, lesson eligibility, follow-up assignment, promotion eligibility
+- Unit tests for deterministic domain logic: consecutive recorded absences, lesson eligibility, follow-up assignment, Discipler eligibility
 - Integration tests for repositories, constraints, authentication and RLS policies
 - RLS policies must be explicitly tested, not assumed

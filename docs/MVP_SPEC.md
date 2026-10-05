@@ -1,16 +1,19 @@
 # DiscipleTrack MVP Specification
 
 *Document Status:* MVP Baseline  
-*Last Updated:* September 2026
+*Last Updated:* October 2026 (revision 2026-10-02: lesson content, ADR-010; explicit lesson completion, ADR-011; monthly meeting history; see sections 9, 10, 18 to 21, 33 and 34)  
+*Revision 2026-10-05:* D Group gatherings and gathering attendance removed; attendance exists only as a discipleship meeting outcome; one monitoring condition, consecutive recorded absences, for Disciples only; missed-meeting and inactivity conditions withdrawn (ADR-014). Discipler eligibility after confirmed Lesson 5, direct appointment, concurrent Disciple and Discipler responsibilities (ADR-012). Relationship-scoped Discipler progress visibility (N7); relationship-aware Journey (N8); factual 12-segment progress and no percentages (decisions 8, 22); read-only monthly meeting indicator (decisions 10, 11); "lessons completed this month" recorded as a candidate Reporting metric only (decision 9). Sections changed: 1, 2, 7 to 10, 15 and 16 (withdrawn, headings kept), 17, 19 to 24, 28 to 30, 32 to 34. Section 34 steps renumbered (simple numbered list; gathering steps removed, appointment steps rewritten).
 
 ---
 
 ## 1. Product Overview
 
-*DiscipleTrack* is a mobile-first discipleship, attendance, and member
-growth monitoring system for churches.
+*DiscipleTrack* is a mobile-first discipleship and member growth
+monitoring system for churches. Attendance in DiscipleTrack is the
+outcome of a discipleship meeting, recorded through Record Meeting; there
+is no separate group, church-wide or event attendance (ADR-014).
 
-DiscipleTrack is not intended to be only an attendance tracker.
+DiscipleTrack is not intended to be an attendance tracker.
 
 Its primary purpose is to help church leaders understand:
 
@@ -27,6 +30,11 @@ Its primary purpose is to help church leaders understand:
 The system should help prevent members from quietly becoming inactive
 without their Discipler, D Group Leader, or Discipleship Coordinator
 noticing and responding.
+
+In the MVP, automated monitoring serves this purpose for Disciples only,
+through explicitly recorded discipleship meeting outcomes (section 17).
+Leaders and Disciplers have no automated monitoring in the MVP; their
+participation is noticed through human oversight (ADR-014).
 
 ---
 
@@ -45,16 +53,21 @@ Church Setup
 → Church Membership Approval
 → D Group Assignment
 → Discipler Assignment
-→ Discipleship Meetings, held or missed
+→ Discipleship Meetings, each recorded with every Disciple's outcome
 → Lesson Progress
-→ Discipleship Consistency Monitoring
+→ Consecutive Recorded Absence Monitoring
 → Follow-up
 → Ministry Oversight
 
-D Group Gatherings and gathering attendance are also part of the MVP.
-They are secondary to the discipleship workflow above: they record group
-participation and monitor Leaders and Disciplers, but they do not drive
-lesson progress or Disciple monitoring.
+Attendance exists only as a discipleship meeting outcome, recorded
+through Record Meeting: Journey, the selected discipleship, the current
+lesson, Record Meeting, then each Disciple's outcome. D Group gatherings
+and gathering attendance are not part of the MVP (ADR-014). There is no
+D Group, church-wide or event attendance, no attendance dashboard or
+percentage, and no Attendance navigation destination.
+
+Leaders and Disciplers have no automated monitoring in the MVP
+(ADR-014).
 
 ---
 
@@ -181,17 +194,16 @@ Responsibilities include:
 - assign Disciples to D Groups
 - assign Disciples to Disciplers
 - manage the discipleship curriculum
-- oversee D Group gatherings
-- review attendance
 - review discipleship progress
 - review members requiring attention
 - oversee follow-ups
 - review overdue follow-ups
-- review members eligible for Discipler promotion
+- review members eligible for Discipler appointment, and appoint them
+  (ADR-012)
 - view ministry-level dashboard information
 - create church-wide announcements
-- manage ministry settings such as the consecutive absence threshold,
-  the consecutive missed-meeting threshold and follow-up due days
+- manage ministry settings: the consecutive recorded absences threshold
+  (one threshold, ADR-014) and follow-up due days
 
 Church and system configuration, including the join code, remains with
 the Admin. Ministry settings belong to the Coordinator because they
@@ -210,9 +222,7 @@ Responsibilities include:
 
 - view their D Group
 - view Disciplers and Disciples within their D Group
-- oversee discipleship progress and meeting consistency
-- create/manage D Group gatherings
-- record/review gathering attendance
+- oversee discipleship progress and recorded meeting history
 - review lesson completion eligibility
 - confirm lesson completion
 - monitor members requiring attention
@@ -237,18 +247,26 @@ A Discipler may:
 
 - view their D Group
 - view their assigned Disciples
-- conduct and record discipleship meetings, including missed meetups
+- conduct discipleship meetings and record each one through Record
+  Meeting, with every Disciple's outcome
+- submit a lesson as finished when its material has been covered
 - void meetings and outcomes they recorded themselves
-- record authorized D Group gathering attendance
-- view their Disciples' lesson progress
+- view the detailed lesson progress of their own currently assigned
+  Disciples only (N7)
 - receive follow-up responsibilities
 - record follow-up actions and notes
 - monitor the Disciples assigned to their care
 
+A Discipler may have several Disciples.
+
 A Discipler is not automatically a church-wide privileged system user.
 
-A person cannot simultaneously hold active Disciple and Discipler
-responsibilities.
+A Discipler may also be a Disciple continuing their own journey: the
+DISCIPLE and DISCIPLER responsibilities may be held at the same time, in
+the same D Group (ADR-012; enforced from Slice 6; until then Migration
+006 still refuses DISCIPLE with DISCIPLER). A person is never paired
+with themselves (ADR-012, enforced from Slice 6). DISCIPLE still
+excludes D Group Leader.
 
 ---
 
@@ -262,19 +280,20 @@ A Disciple may:
 - view their D Group
 - view their D Group Leader
 - view their assigned Discipler
-- view their gathering attendance history
 - view their discipleship journey
 - view completed lessons
 - view their current lesson and meeting progress
-- view their own meeting history, including missed meetups
+- view their own recorded meeting history, with their recorded outcome
+  for each meeting, and a read-only monthly meeting indicator (section
+  21)
+- read the lesson material, also offline once it has synced
 - view appropriate announcements
 
 A Disciple cannot:
 
-- modify their own attendance
 - record or change their own discipleship meeting outcomes
-- mark their own lesson complete
-- promote themselves
+- mark their own lesson finished or complete
+- appoint themselves as a Discipler
 - assign themselves to a D Group
 - assign themselves a Discipler
 - access private follow-up/leadership notes
@@ -408,142 +427,68 @@ Historical Discipler assignments must be preserved.
 
 ## 15. D Group Gatherings
 
-A D Group Gathering is a meeting involving the overall D Group.
-
-It is separate from a Discipleship Meeting.
-
-Gathering attendance is the participation of ministry workers and group
-members in the D Group gathering context. Gatherings are secondary to
-the core discipleship workflow and do not affect lesson progress.
-
-D Group Gatherings do not require a fixed recurring schedule.
-
-Gatherings are created based on the actual date/time arranged by the
-group.
-
-A gathering may include:
-
-- D Group
-- date/time
-- topic/title
-- notes
-- status
-- attendance
-
-MVP lifecycle:
-
-Draft
-├── → Finalized
-└── → Cancelled
-
-Finalized gatherings become part of the official attendance history.
-
-Cancelled represents a gathering that did not occur. It is excluded from
-attendance statistics, monitoring and follow-up generation.
-
-Only a Draft gathering may be finalized or cancelled. Both Finalized and
-Cancelled are final states in the MVP. Retracting an already finalized
-gathering is not ordinary cancellation and would require its own
-controlled operation.
-
-Attendance entered while a gathering was Draft is preserved if the
-gathering is later cancelled, but it never becomes official.
-
-Authorized D Group Leaders may cancel gatherings for their own D Group.
-The Coordinator may cancel across the ministry. Disciplers may not
-create or cancel gatherings.
+Withdrawn (ADR-014). D Group gatherings are removed from the MVP; group,
+church-wide and event attendance are out of scope (section 33).
 
 ---
 
 ## 16. D Group Attendance
 
-Attendance is recorded for participants of the D Group, including where
-applicable:
-
-- D Group Leader
-- Disciplers
-- Disciples
-
-Supported attendance states:
-
-- Present
-- Absent
-- Late
-- Excused
-
-Late counts as attended for absence monitoring.
-
-Excused does not count as an unexplained absence and breaks a consecutive
-absence streak.
-
-Authorized D Group Leaders and Disciplers may record attendance for
-other members of their D Group.
-
-The Coordinator may oversee/correct attendance according to permissions.
-
-Nobody records their own attendance, in any role. Where a D Group's only
-authorized recorder is its Leader, another Discipler in that group or
-the Coordinator records the Leader's status. A gathering cannot be
-finalized until every eligible member has a status, so that step must
-happen first.
-
-Members may view their own attendance history but cannot modify it.
-
-The system must:
-
-- prevent duplicate attendance for the same person and gathering
-- preserve attendance history
-- record relevant audit information
-- calculate statistics from underlying attendance records
-
-Individual attendance records are the source of truth.
+Withdrawn (ADR-014). Attendance exists only as a discipleship meeting
+outcome, recorded through Record Meeting (section 19).
 
 ---
 
-## 17. Consecutive Absence Monitoring
+## 17. Consecutive Recorded Absence Monitoring
 
-Monitoring sources are role-specific:
+The MVP has one monitoring condition, for Disciples only (ADR-014):
 
-| Who | Monitored through | Condition |
-|---|---|---|
-| D Group Leaders and Disciplers | finalized D Group gathering attendance | Consecutive Absence |
-| Disciples | discipleship meeting outcomes | Consecutive Missed Meetings |
+| Condition | Source | Subjects | Threshold |
+|---|---|---|---|
+| Consecutive recorded absences (CONSECUTIVE_ABSENCE) | Absent outcomes explicitly recorded on discipleship meetings | Disciples | one configurable threshold, default 3 |
 
-Gathering attendance never raises a condition for a Disciple, so a
-Disciple has one absence-condition stream rather than two.
+Default rule:
 
-Default rule for each:
-
-3 consecutive unexplained absences
+3 consecutive recorded absences
 → Member Requires Attention
 → Follow-up Required
 
-Each threshold is configurable separately rather than permanently
-hard-coded.
+The threshold is configurable by the Coordinator rather than
+permanently hard-coded. There is one threshold.
 
-The Disciple streak counts Absent meetup outcomes under the current
-Discipler assignment. Present and Late break it. Excused is not an
-absence and breaks it. A new Discipler starts with a fresh streak.
+The streak counts the Disciple's explicitly recorded Absent outcomes, in
+the order the meetings took place, under the current Discipler
+assignment and across lesson boundaries. Present and Late break it.
+Excused is not an absence and breaks it. A new Discipler starts with a
+fresh streak. Voided meetings and voided outcomes do not count.
 
-Monitoring only sees what was recorded. When meetings stop and nothing
-is recorded, leadership notices through the Disciple's last meeting
-date. An automated inactivity condition is future scope.
+Monitoring uses only facts DiscipleTrack explicitly records. No record
+is not an absence and not a missed meeting. No condition or follow-up
+is ever generated from elapsed time, inactivity or the lack of a record,
+and attendance is never inferred from missing data. When meetings stop
+and nothing is recorded, leadership sees the Disciple's last recorded
+meeting date in oversight views, for example "Last recorded meeting
+Sep 28". That date is a displayed fact, never a condition. The
+automated missed-meeting condition and an automated inactivity
+condition are withdrawn, not deferred (ADR-014).
 
-Example, which applies to both streaks:
+A person who is both a Disciple and a Discipler (ADR-012) is monitored
+as a Disciple only. Leaders and Disciplers have no automated monitoring
+in the MVP.
+
+Example:
 
 Absent
-→ streak 1
+→ 1 consecutive recorded absence
 
 Absent
-→ streak 2
+→ 2 consecutive recorded absences
 
 Excused
 → streak reset
 
 Absent
-→ streak 1
-
-Late and Present are considered attended for absence monitoring.
+→ 1 consecutive recorded absence
 
 Monitoring must avoid creating duplicate unresolved follow-ups for the
 same equivalent condition.
@@ -558,9 +503,10 @@ The church uses one fixed discipleship curriculum consisting of
 The curriculum must be represented as data rather than hard-coded into
 Flutter.
 
-Each lesson requires four credited discipleship meetings specifically
-working through that lesson. The requirement is data
-(required_meetings), seeded as four.
+Each lesson is worked through in as many credited discipleship meetings
+as its material takes. Four is common and around six happens; the
+number is not fixed (ADR-011). A lesson is finished when the Discipler
+says its material has been covered, not when a count is reached.
 
 Conceptually:
 
@@ -568,24 +514,27 @@ Curriculum
 └── Lesson 1
     ├── Meeting 1
     ├── Meeting 2
-    ├── Meeting 3
-    └── Meeting 4
+    ├── ...
+    └── Meeting n, then "finished" submitted by the Discipler
 
 ...
 
 └── Lesson 12
-    ├── Meeting 1
-    ├── Meeting 2
-    ├── Meeting 3
-    └── Meeting 4
 
-Lesson names/content may be managed as church-owned curriculum data.
+Whether a minimum number of credited meetings applies before a lesson
+can be submitted as finished is an open product decision (section 20).
+The existing required_meetings value, seeded as four, is kept unchanged
+until that decision.
+
+Lesson names and content are church-owned curriculum data. DiscipleTrack
+delivers the lesson material in the app (ADR-010): it originates as
+Markdown, is published into Supabase, and is readable offline once it
+has synced, without a per-lesson download. Reading never records
+progress, and offline reading never allows an offline change.
 
 ---
 
 ## 19. Discipleship Meetings
-
-A Discipleship Meeting is separate from a D Group Gathering.
 
 It is normally a one-on-one or small discipleship meeting involving a
 Discipler and their assigned Disciple(s).
@@ -596,14 +545,17 @@ Because a meeting records exactly one lesson, every participant listed
 in that meeting must be working on that same lesson. Disciples who are
 on different lessons require separate meeting records.
 
-Discipleship meeting attendance is the participation and consistency of
-Disciples in their lesson-based discipleship meetings. It is the primary
-discipleship consistency signal.
+Discipleship meeting attendance is each Disciple's recorded outcome in
+their lesson-based discipleship meetings. It is the only attendance in
+the MVP (ADR-014), and it is recorded only through Record Meeting:
+Journey, the selected discipleship, the current lesson, Record Meeting,
+then each Disciple's outcome.
 
 DiscipleTrack does not schedule meetings. The Discipler and Disciple
-arrange their meetups themselves, outside the app, and the Discipler
+arrange their meetings themselves, outside the app, and the Discipler
 records what actually happened afterwards. The primary Discipler action
-is Record Meeting, not "add attendance".
+is Record Meeting, not "add attendance". Nothing is inferred when no
+meeting is recorded (section 17).
 
 A recorded meeting contains:
 
@@ -616,33 +568,37 @@ A recorded meeting contains:
 
 Outcomes per Disciple:
 
-| Outcome | Counts toward lesson | Missed-meeting streak |
+| Outcome | Counts toward lesson | Consecutive recorded absence streak |
 |---|---|---|
 | Present | Yes | Breaks |
 | Late | Yes | Breaks |
 | Absent | No | Increments |
 | Excused | No | Breaks; not an absence |
 
-A missed meetup is recorded the same way as a held one. Example: the
-Discipler and Juan agree to meet on Wednesday and Juan does not come.
-Afterwards the Discipler records the Lesson 1 meetup for Wednesday with
-Juan marked Absent. Juan's progress does not change, and the missed
-meetup appears in his meeting history.
+Every meeting is recorded the same way, with each Disciple's outcome.
+Example: the Discipler and Juan agree to meet on Wednesday and Juan does
+not come. Afterwards the Discipler records the Lesson 1 meeting for
+Wednesday with Juan's outcome Absent. Juan's progress does not change,
+and the meeting appears in his meeting history with his recorded
+outcome. A recorded meeting in which every outcome is Excused is not an
+absence; it credits no participation and breaks the streak (ADR-014).
 
 Example history for one lesson:
 
 Lesson 1
-Meeting 1       Present   counted
-Meeting 2       Present   counted
-Missed meetup   Absent    not counted
-Meeting 3       Present   counted
-Meeting 4       Present   counted
+Sep 3     Present   counted
+Sep 10    Present   counted
+Sep 17    Absent    not counted
+Sep 24    Present   counted
+Oct 1     Present   counted
+Oct 8     Late      counted
 
+→ the Discipler submits Lesson 1 as finished
 → Ready for Completion
 
 In a small-group meeting, each Disciple's outcome is independent.
 
-The date may not be in the future. A meetup both sides cancelled in
+The date may not be in the future. A meeting both sides cancelled in
 advance is not recorded.
 
 Recorded meetings are not edited. A mistake is corrected by voiding the
@@ -662,30 +618,55 @@ authoritative record per meeting.
 
 ## 20. Lesson Completion
 
-Each lesson requires four credited Discipleship Meetings. Missed meetups
-do not count.
+Meeting occurrence and lesson completion are separate (ADR-011).
+Meetings record what happened; completion records that the material was
+covered and confirmed.
 
 Progress:
 
-Meeting 1/4
-→ Meeting 2/4
-→ Meeting 3/4
-→ Meeting 4/4
+Not Started
+→ In Progress (first credited meeting)
+→ the Discipler submits: "We have finished covering this lesson"
 → Ready for Completion
-→ D Group Leader Confirmation
+→ D Group Leader confirmation
 → Completed
+→ the next lesson becomes current
 
-Reaching 4/4 meetings does not automatically complete the lesson.
+No meeting count moves a lesson to Ready for Completion, and recording a
+meeting never completes a lesson. Present and Late meetings count as
+lesson meetings. Absent and Excused are attendance outcomes and never
+indicate that material was covered.
 
-At 4/4, the lesson becomes eligible/ready for completion.
+Meeting counts are shown as counts, for example "5 meetings recorded",
+never "5 / 4". Where a typical number is defined it may be shown beside
+the count, "5 meetings recorded · Typical: 4"; more meetings than typical
+is never exceptional. There is no maximum.
 
-Meetings may continue while the lesson awaits confirmation. Additional
-legitimate meetings are recorded and credited to the same lesson, so a
-lesson may show, for example, five credited meetings against a
-requirement of four. They are not clamped or discarded, and the lesson
-remains Ready for Completion until confirmed.
+Open product decision, still blocked and blocking for lesson completion
+(ADR-011; decision 23): "Is there a minimum number of credited meetings
+required before a lesson can be marked finished, or is the number only
+recommended / completely flexible depending on when the lesson material
+is actually completed?" The options are A, no minimum; B, a minimum
+number of credited meetings; C, a recommended number only. In every
+case the meeting count never completes a lesson automatically: the
+Discipler explicitly indicates that the lesson is fully covered, and the
+approved confirmation workflow (Leader confirmation) determines
+Completed. Until it is answered, a lesson can be submitted once it has
+at least one credited meeting, and the rule is held in one policy point
+so the answer is a contained change.
 
-The D Group Leader reviews and confirms completion.
+The Discipler conducting the lesson normally submits it. The D Group
+Leader or the Coordinator may submit on the Discipler's behalf as a
+fallback. A submission may be withdrawn while the lesson awaits
+confirmation.
+
+Meetings may continue while the lesson awaits confirmation. They are
+recorded and credited to the same lesson and do not withdraw the
+submission.
+
+The D Group Leader reviews and confirms completion. The app asks the
+Leader to confirm explicitly, because a confirmed lesson can be
+reopened only by the Coordinator.
 
 The Coordinator may confirm as a ministry-oversight fallback, for
 example where a D Group currently has no active Leader. The Leader
@@ -695,9 +676,10 @@ confirmed it.
 Lessons are worked through in order. A Disciple may begin lesson N only
 once lesson N-1 is completed. Lesson 1 is exempt.
 
-A completed lesson is protected. Correcting a meeting record that would
-drop a completed lesson below its requirement needs an explicit
-authorized reopen step first.
+A completed lesson is protected. A meeting correction never un-completes
+it. Correcting a meeting record that would leave a completed lesson
+with fewer credited meetings than a submission needs requires an
+explicit authorized reopen step first.
 
 The Disciple does not need to separately confirm each meeting in the MVP.
 
@@ -705,54 +687,102 @@ The Disciple does not need to separately confirm each meeting in the MVP.
 
 ## 21. Discipleship Journey
 
-A Disciple's profile should clearly communicate their progress.
+A Disciple's journey should clearly and factually communicate their
+progress:
 
-Examples:
-
-- lessons completed
-- current lesson
-- current meeting count
-- meeting history, including missed meetups
-- overall progress
+- lessons completed, for example "5 of 12 completed"
+- current lesson, for example "Lesson 6 of 12" or "Lesson 6 awaiting
+  confirmation"
+- current meeting count, shown as a count
+- recorded meeting history, with the Disciple's recorded outcome for
+  each meeting
+- a read-only monthly meeting indicator
 - completion status
 
-Example:
+Progress is shown as a factual 12-segment visualization (decision 22):
 
-Lesson 1 — Completed
-Lesson 2 — Completed
-Lesson 3 — Meeting 3/4
-Lesson 4 — Not Started
+Lesson 6 of 12
+✓ ✓ ✓ ✓ ✓ ● ○ ○ ○ ○ ○ ○
+5 of 12 completed
 
-Overall progress is derived from underlying lesson/meeting records rather
+A segment is completed (✓) only when its lesson is confirmed Completed.
+Ready for Completion does not count; it is shown as "Lesson 6 awaiting
+confirmation". The current lesson is ● and upcoming lessons are ○. The
+total comes from the active curriculum, never a fixed literal. The
+meeting count does not determine progress. There are no percentages and
+no evaluative labels (decision 8).
+
+The monthly meeting indicator is read-only and historical, derived from
+the dates of recorded discipleship meetings (decisions 10, 11). It
+answers "When did this discipleship actually meet?". Days without a
+recorded meeting are plain, with no warning. It has no manual events, no
+scheduling and no gathering attendance, and there is no Leader
+group-wide calendar.
+
+The journey has one home, the Journey destination, and it follows the
+person's relationships rather than a role mode (N8):
+
+- a Disciple only: Journey shows My Journey, with no tab bar
+- a Disciple who is also the assigned Discipler of at least one
+  Disciple: Journey shows two tabs, My Journey and My Disciples
+- a Discipler only: Journey shows My Disciples directly
+
+My Journey is the journey in which the user is the Disciple. My
+Disciples lists the Disciples for whom the user is the assigned
+Discipler; selecting one opens that Disciple's journey and monthly
+meeting indicator. Tabs appear only when both relationships exist, and
+there is no global role-mode switch. Which tab opens first when both
+exist is open (D11; proposed default My Journey, remembered per device).
+
+Home and Profile show a short summary derived from the same
+relationships and link to Journey. The D Group Leader and the
+Coordinator see the same journey inside Disciple detail. Detailed
+progress is visible to the Disciple themself, their currently assigned
+Discipler only (N7), the Leader of their current D Group and the
+Coordinator.
+
+States are factual. The journey never compares a Disciple with others,
+ranks people or groups, or labels anyone as ahead or behind.
+
+Progress is derived from underlying lesson and meeting records rather
 than being the sole authoritative record.
 
 ---
 
-## 22. Disciple-to-Discipler Promotion
+## 22. Discipler Appointment
 
-Completing the discipleship curriculum does not automatically make a
-Disciple a Discipler.
+Eligibility never makes a Disciple a Discipler automatically (ADR-012).
 
 The basic pathway is:
 
 Disciple
-→ Complete every lesson of the active curriculum
-→ Eligible for Discipler Review
-→ Coordinator Review
-→ Promotion
-→ Discipler
+→ Lesson 5 of the active curriculum confirmed Completed
+→ Eligible for Discipler appointment (derived)
+→ Coordinator appoints
+→ Disciples assigned
+→ the person's own journey continues through Lesson 12
 
-The MVP curriculum contains twelve lessons, but eligibility is evaluated
-against the church's active curriculum rather than a fixed number.
+Eligibility is derived from confirmed Completed of Lesson 5. In
+Progress and Ready for Completion do not count. Eligibility is never
+stored and never changes anything by itself.
 
-Curriculum completion is an eligibility requirement.
+Eligibility is not appointment. The Coordinator appoints an eligible
+Disciple directly; there is no acceptance workflow. Appointment is
+attributed and audited, and creates a Discipler responsibility in the
+same D Group as the person's Disciple responsibility.
 
-The Coordinator makes the actual promotion decision.
-
-Once promoted, the person's active D Group responsibility changes
-according to the approved ministry workflow.
+Appointment does not end the person's Disciple responsibility, their own
+Discipler assignment or their lesson progress. They continue through
+Lesson 12 under their own Discipler while discipling others (ADR-012;
+enforced from Slice 6; until then Migration 006 still refuses DISCIPLE
+with DISCIPLER). Slice 6 (Discipler Progression) builds appointment.
 
 Historical discipleship progress remains preserved.
+
+D2 is decided: the eligibility lesson comes from one policy function
+(`private.discipler_eligibility_lesson()`), not a church setting. Open decisions, listed
+and not decided here: D5, D6, D7 (reciprocal pairing: may A
+disciple B while B disciples A), D8, D9 and D14. See ADR-012.
 
 ---
 
@@ -763,7 +793,7 @@ attention.
 
 Example:
 
-Disciple reaches the missed-meeting threshold
+Disciple reaches the consecutive recorded absences threshold
 → Follow-up created
 → Responsible person contacts/checks on Disciple
 → Action recorded
@@ -797,8 +827,8 @@ Required
 → In Progress
 → Resolved
 
-Detection and care have independent lifecycles. If the person resumes
-attending, the detected condition resolves but the follow-up does not
+Detection and care have independent lifecycles. If a later recorded
+outcome breaks the streak, the detected condition resolves but the follow-up does not
 close by itself. Someone still records what care happened and closes it
 deliberately.
 
@@ -806,24 +836,23 @@ deliberately.
 
 ## 24. Follow-up Assignment
 
-Monitoring applies to D Group Leaders, Disciplers and Disciples, through
-the role-specific sources in section 17.
+In the MVP, monitoring applies to Disciples only, through consecutive
+recorded absences (section 17, ADR-014).
 
 When a monitoring-based follow-up is created, responsibility is
 assigned using this chain, always resolving to a different person than
 the one the follow-up concerns:
 
-Disciple
+Disciple (triggered by consecutive recorded absences)
 → assigned primary Discipler
 → otherwise D Group Leader
 → otherwise Coordinator
 
-Discipler
-→ D Group Leader
-→ otherwise Coordinator
-
-D Group Leader
-→ Coordinator
+The chain also defines branches for a Discipler subject (D Group Leader,
+otherwise Coordinator) and a D Group Leader subject (Coordinator). These
+branches have no MVP trigger (ADR-014); they are kept as architecture
+and are not built until a factual condition for those subjects is
+approved.
 
 Where one person holds several responsibilities, the chain continues
 until a different person is reached.
@@ -927,13 +956,16 @@ Depending on authorization, a profile may communicate:
 - D Group Leader
 - assigned Discipler
 - assigned Disciples
-- attendance information
-- discipleship progress
+- recorded discipleship meeting outcomes, for example "2 consecutive
+  recorded absences" or "Last recorded meeting Sep 28"
+- discipleship progress, for example "5 of 12 lessons completed"
 - current lesson
 - recent activity
 - relevant follow-up information
 
-The information displayed depends on who is viewing the profile.
+The information displayed depends on who is viewing the profile and is
+derived from the relationship between the viewer and the person viewed
+(N7, N8). There is no attendance or progress percentage (decision 8).
 
 Users should not gain access to sensitive information simply because a
 profile UI exists.
@@ -942,17 +974,22 @@ profile UI exists.
 
 ## 29. Dashboard / Home
 
-Home should provide actionable, role-relevant information.
+Home should provide actionable, role-relevant information. What Home
+shows is derived from the person's current relationships (a Disciple, an
+assigned Discipler, a Leader, the Coordinator), not from a role-mode
+switch. A person who is both a Disciple and a Discipler sees both
+summaries, each linking to Journey (N8). Home shows factual counts and
+dates, never percentages (decision 8).
 
 ### Disciple
 
 Focus on:
 
-- current lesson
+- current lesson, for example "Lesson 6 of 12"
 - meeting progress
-- overall journey
-- meeting history
-- gathering attendance, as secondary information
+- journey summary, for example "5 of 12 completed", linking to My
+  Journey
+- recorded meeting history
 - D Group
 - Discipler
 - announcements
@@ -974,26 +1011,34 @@ Oversight-oriented, not an attendance-entry workspace. Focus on:
 
 - D Group health
 - discipleship progress per Disciple
-- meeting consistency: last meeting, missed meetups
-- Disciplers and how recently their Disciples met
-- lessons awaiting completion confirmation
+- recorded meeting facts: last recorded meeting, consecutive recorded
+  absences
+- Disciplers and the last recorded meeting of each of their Disciples
+- lessons submitted as finished and awaiting completion confirmation
 - members requiring attention
 - follow-ups
 - recent discipleship activity
-- D Group gathering attendance, as secondary information
 
 ### Coordinator
 
 Focus on:
 
 - D Groups
-- discipleship progress and meeting consistency
+- discipleship progress and last recorded meeting dates
 - members requiring attention
-- ministry gathering attendance, as secondary information
 - unresolved/overdue follow-ups
 - unassigned members
-- promotion eligibility
+- members eligible for Discipler appointment (ADR-012)
 - ministry-wide announcements
+
+"Lessons completed this month" is a candidate Reporting / Oversight
+metric only, not defined and not governing (decision 9). Before it is
+adopted it needs a precise definition; which timestamp or event counts
+(likely lessons reaching confirmed Completed in the month, that is
+their completion time); church time zone semantics; a privacy review
+(RBAC_RLS_MATRIX.md section 2b); and small-population suppression before
+broad member visibility. It is owned by Slice 11, Reporting / Oversight,
+and does not block Slice 5.
 
 The same application should use a consistent design system while
 prioritizing different information according to responsibility.
@@ -1014,8 +1059,8 @@ Possible lifecycle states include:
 
 A person keeps one membership record per church for their whole history
 with that church. Someone who leaves and returns reactivates the same
-record rather than starting a new one, so their attendance, progress and
-care history stay continuous.
+record rather than starting a new one, so their meeting history,
+progress and care history stay continuous.
 
 Transferred means the person transferred out of this church. Moving a
 Disciple between D Groups is a separate concept and does not change
@@ -1065,10 +1110,10 @@ Important examples include:
 - role changes
 - D Group assignments
 - Discipler assignments
-- attendance changes
-- discipleship meeting records
+- discipleship meeting records and voids, including each Disciple's
+  recorded outcome
 - lesson completion
-- promotion
+- Discipler appointment (ADR-012)
 - follow-up actions
 
 ---
@@ -1085,10 +1130,19 @@ The following are intentionally postponed:
 - predictive inactivity scoring
 - automatic multi-level follow-up escalation
 - event management
+- D Group gatherings and gathering or event attendance tracking
+  (ADR-014); attendance exists only as a discipleship meeting outcome
+- automated missed-meeting or inactivity conditions: monitoring never
+  infers anything from elapsed time or the lack of a record (ADR-014)
 - advanced reporting
-- full offline synchronization
+- full offline synchronization (a read-only device copy of what the
+  person may already see, and offline lesson reading under ADR-010, are
+  not synchronization: nothing is written offline)
 - web administration portal
-- meeting scheduling or calendar functionality
+- meeting scheduling or calendar functionality, meaning scheduling,
+  planning, invitations or calendar management of meetings. A read-only
+  monthly view of meetings already recorded, derived from their dates,
+  is not calendar functionality and is in scope.
 - meeting photo attachments (a possible additive future capability;
   would add a separate attachment table and file storage without
   changing meeting records)
@@ -1111,22 +1165,22 @@ The MVP must support this end-to-end scenario:
 4. Membership is approved.
 5. The Coordinator assigns the Member to a D Group.
 6. The Coordinator assigns a primary Discipler.
-7. The D Group holds a gathering.
-8. Gathering attendance is recorded and finalized.
-9. The Discipler meets the Disciple for a curriculum lesson.
-10. The Discipler records each discipleship meeting, including any
-    missed meetup.
-11. Four credited meetings make the lesson ready for completion.
-12. The D Group Leader confirms lesson completion.
-13. The Disciple continues through the 12-lesson curriculum.
-14. Monitoring detects repeated missed meetups for a Disciple, or
-    repeated gathering absences for a Leader or Discipler.
-15. A follow-up is assigned to the appropriate responsible person.
-16. Follow-up actions are recorded.
-17. The follow-up is resolved.
-18. Leadership can see the appropriate ministry outcome.
-19. After every lesson of the active curriculum is completed, twelve in
-    the MVP, the Disciple becomes eligible for Discipler review.
-20. The Coordinator may approve promotion to Discipler.
+7. The Discipler meets the Disciple for a curriculum lesson.
+8. The Discipler records each discipleship meeting through Record
+   Meeting, with the Disciple's outcome.
+9. When the lesson material has been covered, the Discipler submits the
+   lesson as finished, making it ready for completion.
+10. The D Group Leader confirms lesson completion.
+11. The Disciple continues through the 12-lesson curriculum.
+12. Monitoring detects consecutive recorded absences for a Disciple.
+13. A follow-up is assigned to the appropriate responsible person.
+14. Follow-up actions are recorded.
+15. The follow-up is resolved.
+16. Leadership can see the appropriate ministry outcome.
+17. Once Lesson 5 is confirmed Completed, the Disciple is eligible for
+    Discipler appointment (derived, ADR-012).
+18. The Coordinator may appoint the Disciple as a Discipler in the same
+    D Group; Disciples are assigned to them.
+19. The person continues their own journey through Lesson 12.
 
 This is the primary acceptance workflow for the DiscipleTrack MVP.

@@ -2,7 +2,23 @@
 
 ## Status
 
-Accepted
+Accepted. Partially superseded by
+[ADR-011](ADR-011-explicit-lesson-completion.md) (2026-10-02): the
+sentence "Credited meetings may exceed required_meetings while a lesson
+is READY_FOR_COMPLETION. They are not clamped." and the count basis of
+"COMPLETED protection" below no longer apply; lesson readiness is an
+explicit submission under ADR-011. The rest of this ADR is unchanged and
+remains authoritative.
+
+Also partially superseded (2026-10-05) by
+[ADR-012](ADR-012-discipler-eligibility-concurrent-responsibilities.md)
+("and promotion" as a recalculation trigger) and by
+[ADR-014](ADR-014-remove-d-group-gathering-attendance.md) (D Group
+gatherings and gathering-based monitoring, the CONSECUTIVE_MISSED_MEETINGS
+condition and "missed meetup" wording, the two thresholds, the rejected
+meeting-only alternative, and inactivity as a future condition source).
+Both ADRs quote each replaced statement. The text below is unchanged
+historical record for those statements.
 
 Supersedes [ADR-007](ADR-007-server-side-monitoring.md).
 

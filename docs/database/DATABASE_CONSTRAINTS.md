@@ -8,6 +8,10 @@ The ERD defines the data structure.
 
 This document defines the rules PostgreSQL must protect so invalid business states cannot be created even if the Flutter client contains a bug.
 
+Revision 2026-10-02: lesson content delivery (ADR-010, section 0); explicit lesson completion independent of a fixed meeting count, with one open numeric rule (ADR-011, section 4); Active Discipleships and the missed-meeting wording (section 11).
+
+Revision 2026-10-05: D Group gatherings and gathering attendance removed from the MVP (ADR-014): section 3 withdrawn and reduced to a deprecated-schema note; gathering clauses removed from section 1 (last-Coordinator reasons), section 2 (Temporal Integrity rationale, D Group Lifecycle), section 7, sections 9 and 10 (examples), section 11 (gathering metrics) and section 12 (function and derived lists). Section 0: `consecutive_absence_threshold` redefined, `consecutive_missed_meeting_threshold` dormant. Section 6: one condition, CONSECUTIVE_ABSENCE, from explicitly recorded ABSENT discipleship meeting outcomes, one threshold; the missed-meeting condition is withdrawn. Section 4: outcome table column renamed, "Held and Missed Meetups" withdrawn and replaced (resolves the all-EXCUSED contradiction). Discipler eligibility after confirmed Lesson 5 and concurrent DISCIPLE and DISCIPLER responsibilities (ADR-012): section 2 Rules and Responsibility Combinations, section 4 eligibility, self-credit rationale and reopen precondition 4, section 5 rewritten as Discipler Appointment, section 6 triggers and episodes, section 11 Active Discipleships and Discipler eligibility. Percentages removed from section 11 and 12 (decision 8); "lessons completed this month" recorded as a candidate, non-governing metric (decision 9).
+
 ---
 
 # 0. Bootstrap and Initial State
@@ -59,9 +63,29 @@ All within one transaction:
 6. curriculum_lessons — twelve rows, lesson_number 1 through 12, required_meetings = 4
 7. audit_events — CHURCH_BOOTSTRAPPED
 
-Lesson rows are identification and ordering only. DiscipleTrack tracks
-progress through the curriculum; it does not store or deliver lesson
-content.
+Lesson rows are identification and ordering only. Lesson content is not
+part of bootstrap: it is published separately by trusted tooling under
+ADR-010, which supersedes the earlier statement that DiscipleTrack does
+not store or deliver lesson content.
+
+The two thresholds in step 2 (ADR-014 decisions 12 and 13):
+
+- consecutive_absence_threshold (Migration 001) is retained and
+  redefined: the number of consecutive explicitly recorded ABSENT
+  discipleship meeting outcomes, within the current discipler
+  assignment, that raises CONSECUTIVE_ABSENCE for a Disciple (section
+  6). It has no structural tie to the deprecated gathering tables.
+- consecutive_missed_meeting_threshold (Migration 004) is dormant. It
+  has no owner and no rule reads it; its database comment still names
+  the withdrawn missed-meeting condition. It is still inserted by
+  private.bootstrap_church() and asserted equal to 3 by
+  private.assert_bootstrap_postconditions(). Dropping it requires
+  replacing both functions in the same forward migration and updating
+  test/integration/bootstrap_test.dart. It is not dropped now.
+
+required_meetings = 4 is the value bootstrap seeds (Migration 004). It
+no longer drives progression (ADR-011); what it will mean is an open
+product decision (section 4, Lesson Meeting Policy).
 
 The initial user holds both ADMIN and COORDINATOR for the single-church
 deployment. COORDINATOR is required because follow-up escalation
@@ -86,7 +110,8 @@ leaves no partial state, so re-running is always safe.
 These are assertable and serve as the bootstrap test:
 
 - exactly one ACTIVE church with the supplied id
-- church_settings present, both thresholds 3, due days 7
+- church_settings present, both thresholds 3 (one of them dormant, see
+  above), due days 7
 - the initial user holds an ACTIVE membership
 - that membership has an active ADMIN and an active COORDINATOR role
 - exactly one ACTIVE curriculum for the church
@@ -114,7 +139,7 @@ Runtime church creation and multi-church onboarding are future scope.
 - Only ACTIVE church members may receive active church roles.
 - The same church role cannot be active twice for the same member.
 - Historical role assignments must be ended using ended_at, not deleted.
-- The church must preserve at least one active COORDINATOR, because follow-up escalation terminates there and because the Coordinator is the fallback attendance recorder.
+- The church must preserve at least one active COORDINATOR, because follow-up escalation terminates there. (The former second reason, the Coordinator as fallback gathering attendance recorder, is withdrawn with gatherings, ADR-014.)
 
 ## Last Coordinator Protection
 
@@ -168,7 +193,8 @@ implementation.
 
 A person has exactly one church_memberships row per church. A returning
 member reactivates that row. A second row is never created, so their
-attendance, discipleship progress and care history remain continuous.
+discipleship meeting history, discipleship progress and care history
+remain continuous.
 
 Allowed transitions:
 
@@ -200,8 +226,8 @@ following execute in the same transaction as the status change:
 
 Deliberately untouched:
 
-- attendance, discipleship meetings, lesson progress and resolved care
-  records remain as history
+- discipleship meetings and their recorded outcomes, lesson progress
+  and resolved care records remain as history
 - open follow-ups where the person is the SUBJECT remain open as care
   cases; the assignee may resolve them with ADMINISTRATIVE_CORRECTION
 
@@ -326,7 +352,10 @@ state (RBAC section 1a). No other church data is visible until ACTIVE.
 - A D Group may have only one active LEADER.
 - A person may actively lead only one D Group.
 - A DISCIPLE may belong to only one active D Group.
-- A person cannot simultaneously have active DISCIPLE and DISCIPLER responsibilities.
+- A person cannot simultaneously have active DISCIPLE and LEADER responsibilities.
+- A person MAY simultaneously hold active DISCIPLE and DISCIPLER responsibilities, in the same D Group (ADR-012; enforced from Slice 6; until then Migration 006 still refuses DISCIPLE with DISCIPLER).
+- The two sides of a discipler assignment belong to different church memberships: nobody is paired with themselves (ADR-012; enforced from Slice 6).
+- Whether reciprocal pairing (A disciples B while B disciples A) is allowed is open (D7). It is not decided here.
 - A person MAY simultaneously hold active LEADER and DISCIPLER responsibilities. A Leader who personally disciples members must hold the DISCIPLER responsibility in order to receive discipler assignments.
 - A DISCIPLER may care for multiple Disciples.
 - A DISCIPLE may have only one active primary Discipler.
@@ -356,10 +385,15 @@ Overlap prevention:
 Ambiguous overlapping periods must be prevented for the same person,
 D Group and responsibility.
 
-This matters because attendance eligibility is resolved as of
-gathering.starts_at. Overlapping periods would make "did this person
-belong to the D Group at time T" undecidable, which in turn makes
-eligibility and the finalization completeness check ambiguous.
+This matters because discipleship meeting participant validity is
+resolved as of discipleship_meetings.occurred_at (section 4,
+Participant Validity), and monitoring episodes are bounded by the
+discipler assignment period (section 6). Overlapping periods would make
+"did this person hold this responsibility, or this assignment, at time
+T" undecidable, which in turn makes participant validity and the
+monitoring episode ambiguous. (The earlier rationale anchored on
+gathering starts_at and the gathering finalization check, withdrawn
+with gatherings, ADR-014.)
 
 ## Responsibility Correctness
 
@@ -384,16 +418,25 @@ INACTIVE → ACTIVE
 INACTIVE → ARCHIVED
 ARCHIVED → terminal in the MVP
 
-INACTIVE prevents creation of new gatherings. Existing data is preserved
-and remains visible to authorized roles.
+INACTIVE: existing data is preserved and remains visible to authorized
+roles.
 
-ARCHIVED must be REJECTED while either of the following remains:
+Note (ADR-014): INACTIVE previously "prevents creation of new
+gatherings". With gatherings removed that clause is withdrawn, and this
+section states no other restriction for INACTIVE. Migration 006 already
+refuses assign_d_group_leader(), invite_to_d_group(),
+respond_to_d_group_invitation() and add_self_as_discipler() for a group
+that is not ACTIVE (d_group_not_active), but that behaviour is not
+documented as a rule here, and whether an INACTIVE group may record
+discipleship meetings or change pairings is not defined. This is an open
+gap, not a decision; no replacement rule is invented here.
 
-- any active DISCIPLE d_group_membership in the group
-- any DRAFT gathering belonging to the group
+ARCHIVED must be REJECTED while any active DISCIPLE d_group_membership
+remains in the group. (The second condition, "any DRAFT gathering
+belonging to the group", is withdrawn with gatherings, ADR-014.)
 
-The Coordinator must explicitly transfer or unassign disciples and
-finalize or cancel draft gatherings first. Disciples are never
+The Coordinator must explicitly transfer or unassign disciples first.
+Disciples are never
 automatically transferred, because moving a person between D Groups is a
 ministry decision that must stay explicit and auditable.
 
@@ -415,8 +458,11 @@ d_group_memberships integrity trigger for every writer:
 - At any moment, all of a person's responsibilities are in one D Group.
   A person cannot be a Discipler in one group and a Disciple or Leader
   in another.
-- DISCIPLE excludes both LEADER and DISCIPLER, for overlapping periods,
-  not only active rows.
+- DISCIPLE excludes LEADER, for overlapping periods, not only active
+  rows.
+- DISCIPLE with DISCIPLER in the same group is allowed (ADR-012;
+  enforced from Slice 6; until then Migration 006 still refuses
+  DISCIPLE with DISCIPLER through d_group_membership_disciple_conflict).
 - LEADER with DISCIPLER in the same group is allowed.
 - A d_group_memberships row and its D Group belong to the same church.
 - One active row per person, group and responsibility (partial unique
@@ -471,7 +517,14 @@ themselves as Discipler, by add_self_as_discipler().
 
 In addition to Responsibility Correctness above: the two sides of an
 assignment differ (CHECK), and a Disciple's assignment periods never
-overlap (integrity trigger). Removing a Discipler or Disciple from the
+overlap (integrity trigger).
+
+The CHECK (discipler_assignments_distinct_sides_check, Migration 006)
+compares d_group_memberships row ids only. Once DISCIPLE and DISCIPLER
+may coexist, it no longer prevents a person from being paired with
+themselves, so the two sides must also belong to different church
+memberships (ADR-012; enforced from Slice 6 in the assignment
+integrity check and set_discipler()). Reciprocal pairing is open (D7). Removing a Discipler or Disciple from the
 group ends every active assignment on either side in the same
 transaction.
 
@@ -499,137 +552,55 @@ removal followed by a new invitation, which keeps history.
 
 # 3. Gatherings and Attendance
 
-## Rules
+Withdrawn (ADR-014). D Group gatherings and gathering attendance are
+removed from the MVP entirely. Attendance exists only as the outcome of
+a discipleship meeting, recorded through Record Meeting; its rules are
+in section 4 (Attendance Outcome and Credit) and its monitoring in
+section 6. The section number is kept so references stay stable.
 
-- One attendance record exists per member per gathering.
-- Attendance may only be recorded for members belonging to the D Group at gathering.starts_at.
-- All eligible members must have an attendance status before finalization.
-- Only FINALIZED gatherings affect official attendance and monitoring.
-- DRAFT gatherings do not count.
-- CANCELLED gatherings do not count.
-- ABSENT contributes to consecutive unexplained absence for LEADER and DISCIPLER responsibilities. Gathering attendance never creates an attention condition for a DISCIPLE responsibility; see section 6.
-- PRESENT breaks the absence streak.
-- LATE breaks the absence streak.
-- EXCUSED breaks the absence streak.
-- Backdated attendance calculations use starts_at, not record creation time.
-- Finalized attendance corrections must be controlled and audited.
-- A gathering may not be FINALIZED while starts_at is in the future.
-- Attendance recorded while DRAFT is preserved when a gathering is cancelled, but excluded from metrics, monitoring and follow-up generation.
-- No person may create or modify their own official attendance.
+## Deprecated Schema
 
-## No Self-Attendance
+The applied migrations still contain the gathering objects. They are
+deprecated: no MVP owner (ADR-014); retained in applied migrations; to
+be locked down by forward migration. No RPC, policy, seed row or
+Flutter code reads or writes them.
 
-The person identified by gathering_attendance.recorded_by must never be
-the person identified by gathering_attendance.church_membership_id.
+Objects:
 
-This applies universally, to Coordinator, Leader and Discipler alike.
-Recording authority always means recording for OTHER eligible members
-within the recorder's authorized scope.
+- tables d_group_gatherings and gathering_attendance (Migration 001),
+  with their CHECK and UNIQUE constraints
+- enum gathering_status (DRAFT, FINALIZED, CANCELLED) (Migration 001)
+- set_updated_at triggers on both tables (Migration 002)
 
-Without this rule, the same person who is monitored controls their own
-status and can mark themselves EXCUSED indefinitely, which would
-neutralise absence monitoring for exactly the Leaders and Disciplers
-that section 7 escalates for.
+attendance_status is not deprecated: discipleship meeting participants
+use all four values (ADR-014 decision 11).
 
-The check spans gathering_attendance, church_memberships and profiles,
-so it is not expressible as a row CHECK.
+Security issue: both tables have RLS enabled with zero policies, and
+they still hold Supabase's default grants (ALL to anon and
+authenticated), because no later migration narrowed them (Migration
+006 narrowed grants only on the ministry tables). RLS deny-by-default
+is their only protection; a single permissive policy added by mistake
+would open them.
 
-Enforcement:
+Lifecycle (ADR-014 decision 14), safest first:
 
-- constraint trigger on gathering_attendance, INSERT and UPDATE, which
-  holds regardless of write path
-- rejection inside save_draft_attendance() and
-  correct_finalized_attendance() so the caller receives a usable error
+1. Lock down at the earliest approved migration step, expected to be
+   the Slice 5 migration's grant step: revoke all privileges on both
+   tables from anon and authenticated, keep RLS enabled, add no policy.
+   Security-only; removes no object and no data; reversible.
+2. Deprecate: governing documents mark the objects deprecated; a
+   forward migration may also update their database comments.
+3. Drop, only after a separate explicit decision: gathering_attendance,
+   then d_group_gatherings (their triggers go with them), then
+   gathering_status, in a forward migration that first verifies both
+   tables are empty and refuses otherwise.
 
-RLS alone is insufficient, because the controlled operations run with
-elevated rights.
-
-## Single Authorized Recorder
-
-A D Group may have only one person with recording authority, for example
-a Leader with no separate Discipler.
-
-Resolution order for that Leader's own attendance:
-
-1. another DISCIPLER in the same D Group, using existing draft
-   attendance authority
-2. otherwise the COORDINATOR, using existing church-wide authority
-
-No new recorder role is introduced for the MVP.
-
-Consequence: a D Group whose only authorized recorder is the Leader
-cannot finalize a gathering until someone else records the Leader's
-status, because finalization requires every eligible member to have a
-status. This is an accepted workflow dependency.
-
-## Chronological Ordering
-
-Attendance and monitoring order gatherings by:
-
-(starts_at, id)
-
-The identifier tiebreak keeps ordering deterministic when two gatherings
-share the same starts_at.
-
-## Gathering Lifecycle
-
-Allowed transitions:
-
-DRAFT → FINALIZED
-DRAFT → CANCELLED
-
-FINALIZED and CANCELLED are terminal in the MVP.
-
-Not permitted:
-
-- FINALIZED → CANCELLED
-- CANCELLED → DRAFT
-- CANCELLED → FINALIZED
-
-Retracting an already finalized gathering would silently withdraw
-official attendance from monitoring. If that capability is ever
-required, it must be designed as its own controlled operation with
-explicit attendance and monitoring recalculation, not as ordinary
-cancellation.
-
-## Unique Constraint
-
-gathering_attendance(gathering_id, church_membership_id)
-
-## Gathering State Check
-
-When:
-
-status = DRAFT
-
-Require:
-
-- finalized_by IS NULL
-- finalized_at IS NULL
-- cancelled_by IS NULL
-- cancelled_at IS NULL
-
-When:
-
-status = FINALIZED
-
-Require:
-
-- finalized_by IS NOT NULL
-- finalized_at IS NOT NULL
-- cancelled_by IS NULL
-- cancelled_at IS NULL
-
-When:
-
-status = CANCELLED
-
-Require:
-
-- cancelled_by IS NOT NULL
-- cancelled_at IS NOT NULL
-- finalized_by IS NULL
-- finalized_at IS NULL
+The former rules of this section (attendance eligibility at
+starts_at, finalization, No Self-Attendance, Single Authorized
+Recorder, gathering ordering, Gathering Lifecycle and Gathering State
+Check) describe no MVP behaviour. The CHECK and UNIQUE constraints
+that implement some of them remain in Migration 001 until the objects
+are dropped.
 
 ---
 
@@ -645,20 +616,21 @@ Require:
 - A meeting records exactly one lesson, so every RECORDED participant in that meeting, whatever their attendance outcome, must be eligible for that same lesson.
 - Disciples on different lessons therefore require separate discipleship meeting records. This is an intentional ministry constraint.
 - There is no Coordinator sequencing override in the MVP. A correction or migration workflow is documented future scope.
-- A discipleship meeting record reports a meetup after the fact, held or missed. DiscipleTrack does not schedule meetings.
+- A discipleship meeting record reports a meetup after the fact, with each listed Disciple's recorded outcome. DiscipleTrack does not schedule meetings. (The words "held or missed" are withdrawn, ADR-014 decision 8.)
 - Every participant row carries an explicit attendance_status. There is no default.
 - Only credited participation counts toward progress. See Attendance Outcome and Credit below.
 - An absence never increments progress.
 - One Disciple may appear only once in a meeting.
+- A Disciple's eligible lesson is the lowest-numbered lesson of the ACTIVE curriculum that is not COMPLETED. Meetings are recorded only against it, so a meeting for an already COMPLETED lesson is refused (Slice 5 decision 2).
 - The first credited participation moves the lesson into IN_PROGRESS.
-- Reaching the required credited meeting count moves it to READY_FOR_COMPLETION.
-- Reaching the meeting requirement does NOT automatically complete the lesson.
-- Legitimate meetings may still be recorded for a lesson that is READY_FOR_COMPLETION. The credited count may exceed required_meetings, is neither clamped nor discarded, and the status remains READY_FOR_COMPLETION.
+- No meeting count moves a lesson to READY_FOR_COMPLETION (ADR-011). The lesson becomes READY_FOR_COMPLETION only when it is explicitly submitted as finished. See Lesson Submission below.
+- Recording a meeting, of any ordinal, never completes a lesson.
+- Legitimate meetings may still be recorded for a lesson that is READY_FOR_COMPLETION. They add to the factual count, do not withdraw the submission, and are never clamped. There is no maximum.
 - The current D Group Leader confirms completion. The Coordinator may confirm as an oversight or fallback capability, for example where a D Group has no active Leader. Coordinator confirmation is attributable through confirmed_by and audited.
 - Progress belongs to church_membership_id and survives D Group transfers and Discipler reassignment.
-- Curriculum progress percentage is derived, not stored.
-- Completing every lesson of the church's ACTIVE curriculum creates promotion eligibility.
-- Promotion to DISCIPLER requires Coordinator approval.
+- Curriculum progress is derived, not stored, and is expressed as a count of confirmed COMPLETED lessons against the active curriculum's lesson total ("5 of 12 completed"), never as a percentage (decision 8).
+- Confirmed COMPLETED of Lesson 5 of the church's ACTIVE curriculum creates Discipler eligibility. IN_PROGRESS and READY_FOR_COMPLETION do not count. Eligibility is derived, never stored and never automatic. The eligibility lesson number comes from `private.discipler_eligibility_lesson()` (D2, ADR-012). This replaces eligibility at completion of every lesson.
+- Eligibility is not appointment. Discipler appointment is a Coordinator operation (section 5).
 
 ## One Active Curriculum
 
@@ -684,7 +656,44 @@ elsewhere may hard-code a lesson count.
 
 ## Check Constraint
 
-required_meetings > 0
+required_meetings > 0 (Migration 001; unchanged while its meaning is
+open, see Lesson Meeting Policy)
+
+## Lesson Meeting Policy
+
+ADR-011 makes one numeric rule a product decision that is still open:
+
+> Is there a minimum number of credited meetings required before a
+> lesson can be marked finished, or is the number only recommended /
+> completely flexible depending on when the lesson material is actually
+> completed?
+
+The question is still open and blocks Slice 5 (N1, decision 23). The
+options are A (no minimum), B (a minimum number of credited meetings)
+and C (a recommended number only). In every case: a meeting count never
+completes a lesson automatically; the Discipler explicitly indicates
+that the lesson is fully covered (Lesson Submission); and the approved
+confirmation workflow (the Leader confirms) determines COMPLETED.
+
+Every count-dependent rule reads the answer from one place, a trusted
+policy function resolved per lesson, which yields:
+
+- submission_minimum: credited participations a lesson needs before it
+  may be submitted as finished. Never below 1, because a lesson with no
+  credited participation is NOT_STARTED.
+- recommended_meetings: a guidance number for display only, or NULL.
+
+| Model | submission_minimum | recommended_meetings |
+|---|---|---|
+| A, fully flexible | 1 | NULL |
+| B, minimum + flexible | the decided minimum | optional |
+| C, recommended only | 1 | the decided recommendation |
+
+Rules that read the policy, and nothing else: Lesson Submission, the
+READY_FOR_COMPLETION and COMPLETED void protections, the resulting state
+of reopen_lesson_completion(), and every read RPC that reports counts.
+No rule reads required_meetings directly, and no client reads it at
+all. No rule defines a maximum.
 
 ## Attendance Outcome and Credit
 
@@ -694,12 +703,16 @@ the rename to RECORDED is applied by a new migration.
 
 discipleship_meeting_participants.attendance_status is the outcome:
 
-| Outcome | Progress | Missed-meeting streak |
+| Outcome | Progress | Consecutive recorded absence streak |
 |---|---|---|
 | PRESENT | credited | breaks |
 | LATE | credited | breaks |
 | ABSENT | not credited | increments / continues |
 | EXCUSED | not credited | breaks; not an absence |
+
+The third column was "Missed-meeting streak"; it is the consecutive
+recorded absence streak of section 6 (ADR-014 decision 6). The effects
+are unchanged.
 
 A participation is credited only when all three hold:
 
@@ -711,17 +724,28 @@ A participation is credited only when all three hold:
 
 ## Held and Missed Meetups
 
-Held and missed are derived from participant outcomes, never stored:
+Withdrawn (ADR-014 decision 8). The derived labels "held meetup" and
+"missed meetup" are no longer domain terms. A meeting record shows each
+listed Disciple's recorded outcome; nothing is derived about the meeting
+as a whole beyond that.
 
-- held meetup: a RECORDED meeting with at least one credited participant
-- missed meetup: a RECORDED meeting with no credited participant
+This resolves a contradiction. The withdrawn definition made a RECORDED
+meeting with no credited participant a "missed meetup", which included a
+meeting where every outcome is EXCUSED. BUSINESS_RULES.md BR-027a and
+ARCHITECTURE.md section 7 treat EXCUSED as never an absence. The rule
+now is: a recorded meeting in which every outcome is EXCUSED is not a
+missed meeting and not an absence. It has no credited participation and
+breaks the consecutive recorded absence streak (section 6).
+
+Absence monitoring uses only explicitly recorded ABSENT outcomes
+(BR-027a). NO RECORD is not ABSENT and is not a missed meeting.
 
 Without a scheduler, an expected participant is one the recorder lists
 when recording the meetup. A meetup cancelled by agreement before it was
 due is not recorded.
 
-discipleship_meetings.occurred_at is when the meetup took place, or for
-a missed meetup when it was arranged to take place.
+discipleship_meetings.occurred_at is when the meetup took place or, where
+no listed Disciple attended, when it was arranged to take place.
 
 occurred_at must not be in the future. Enforced inside
 record_discipleship_meeting(), because a CHECK constraint cannot
@@ -751,14 +775,16 @@ Disciple who is not assigned to the meeting's Discipler or not on the
 meeting's lesson.
 
 Consequence: a Disciple with no assigned Discipler cannot receive
-progress credit, or have a missed meetup recorded, until an assignment
+progress credit, or have any outcome recorded, until an assignment
 exists. This is intentional. The
 remedy is to make the assignment, which is an existing Coordinator
 operation.
 
-There is no self-crediting risk here, because DISCIPLE and DISCIPLER are
-mutually exclusive, so a Discipler can never be a participant in their
-own meeting.
+There is no self-crediting risk here: a recorder is never a participant
+in a meeting they record (explicit check from Slice 5), and nobody is
+paired with themselves (ADR-012, enforced from Slice 6). The earlier
+rationale, that DISCIPLE and DISCIPLER are mutually exclusive, no longer
+holds once they may coexist (ADR-012).
 
 Enforcement:
 
@@ -804,16 +830,60 @@ Voiding a participant row is for a person who should not have been
 listed at all. Every void is audited and remains subject to COMPLETED
 protection below. Void authority is defined in RBAC_RLS_MATRIX.md.
 
+## Lesson Submission
+
+READY_FOR_COMPLETION is entered only through an explicit controlled
+operation in which the Discipler states that the lesson material has
+been covered ("We have finished covering this lesson").
+
+Preconditions, all required, otherwise reject:
+
+1. The caller holds submission authority for this Disciple
+   (RBAC_RLS_MATRIX.md section 5): normally the Disciple's current
+   assigned Discipler; the Leader of the Disciple's current D Group or
+   the Coordinator as fallback.
+2. The caller is not the Disciple.
+3. The lesson is the Disciple's eligible lesson and its status is
+   IN_PROGRESS.
+4. Credited participations for the lesson >= submission_minimum.
+
+Effect: status READY_FOR_COMPLETION, ready_at = now(), submitted_by =
+the caller, audited.
+
+Withdrawing a submission is a separate controlled operation:
+READY_FOR_COMPLETION → IN_PROGRESS, ready_at and submitted_by cleared,
+audited with the prior values. Authority is defined in
+RBAC_RLS_MATRIX.md section 5.
+
+Confirmation requires status READY_FOR_COMPLETION and, re-checked at
+confirmation time, credited participations >= submission_minimum.
+
+## Progress State Check
+
+disciple_lesson_progress fields must agree with its status:
+
+| Status | Required fields |
+|---|---|
+| NOT_STARTED | started_at, ready_at, submitted_by, completed_at, confirmed_by all NULL |
+| IN_PROGRESS | started_at set; the rest NULL |
+| READY_FOR_COMPLETION | started_at, ready_at, submitted_by set; completed_at, confirmed_by NULL |
+| COMPLETED | all five set |
+
+Enforced by a CHECK constraint in the Slice 5 migration.
+
 ## Progress Timestamps
 
 started_at
-= occurred_at of the earliest credited participation for that lesson
+= occurred_at of the earliest credited participation for that lesson.
+  Recomputed when backdated participation changes the chronology.
 
 ready_at
-= the point at which the required credited meeting count is reached,
-  according to the authoritative progression calculation
+= when the lesson was submitted as finished (Lesson Submission). It is
+  an action time, not derived from meetings, and is not recomputed by
+  later meetings or voids.
 
-Both are recomputed when backdated participation changes the chronology.
+completed_at
+= when the lesson was confirmed.
 
 ## Voiding Rules
 
@@ -833,16 +903,24 @@ monitoring.
 ## COMPLETED Is Protected
 
 An ordinary void must not retroactively invalidate a confirmed COMPLETED
-lesson. Silently un-completing a lesson could withdraw promotion
-eligibility from someone who has already been promoted.
+lesson. Silently un-completing a lesson could withdraw Discipler
+eligibility from someone who has already been appointed as a Discipler
+(ADR-012), and would silently change the confirmed progress the Journey
+shows.
 
-A void that would reduce credited participation below
-required_meetings for a COMPLETED lesson must be REJECTED.
+A void never changes a COMPLETED status: completion is a confirmed
+judgement, not a count, so recomputation never touches COMPLETED rows.
+
+A void that would leave a COMPLETED lesson with fewer credited
+participations than submission_minimum (Lesson Meeting Policy) must be
+REJECTED, so a confirmed lesson never rests on fewer meetings than a
+submission would need. Under a minimum of 1 this refuses only a void
+that would remove the lesson's last credited participation.
 
 Voiding an uncredited (ABSENT or EXCUSED) participation never affects
-progress, so it is never rejected on these grounds. A lesson whose
-credited count exceeds required_meetings may lose the surplus to a void
-without rejection.
+progress, so it is never rejected on these grounds. A COMPLETED lesson
+whose credited count stays at or above submission_minimum may lose
+meetings to a void without rejection.
 
 Correcting such a case requires the explicit controlled operation
 reopen_lesson_completion() first. It is Coordinator-only for the MVP and
@@ -850,8 +928,10 @@ is audited.
 
 For progress that is not COMPLETED:
 
-- READY_FOR_COMPLETION may recompute back to IN_PROGRESS when credited participation falls below the requirement.
-- Backdated credited participation may recompute progress chronology.
+- A void that leaves a READY_FOR_COMPLETION lesson below submission_minimum withdraws the submission in the same transaction: IN_PROGRESS, or NOT_STARTED when no credited participation remains, with ready_at and submitted_by cleared. The void's audit event records the withdrawal.
+- IN_PROGRESS returns to NOT_STARTED when no credited participation remains.
+- Backdated credited participation may recompute started_at.
+- No recomputation ever sets READY_FOR_COMPLETION or COMPLETED.
 
 ## reopen_lesson_completion()
 
@@ -865,22 +945,35 @@ Preconditions, all required, otherwise reject:
 2. The target progress row exists and status = COMPLETED.
 3. No lesson of the same curriculum with a higher lesson_number is
    COMPLETED for this church_membership_id.
-4. No ministry_role_transitions row exists for this
-   church_membership_id with to_responsibility = DISCIPLER.
+4. If a ministry_role_transitions row exists for this
+   church_membership_id with to_responsibility = DISCIPLER (the person
+   has been appointed as a Discipler), the target lesson is not the
+   eligibility lesson (Lesson 5) or an earlier lesson. Later lessons
+   may be reopened, subject to preconditions 1 to 3 (ADR-012 decision
+   9, N9).
 
-Precondition 4 is not redundant. Precondition 3 already blocks lessons 1
-through 11 for a fully completed Disciple, but the final lesson has no
-higher lesson, so without 4 an already-promoted person's last lesson
-could be un-completed.
+Precondition 4 was previously "no such row exists", which refused every
+reopen for an appointed person. Under ADR-012 an appointed person
+usually continues as a Disciple through Lesson 12, so that form would
+forbid correcting any of Lessons 6 to 12. The narrowed form protects
+exactly what the appointment rests on: the eligibility lesson. Earlier
+lessons are already covered by precondition 3 once the eligibility
+lesson is COMPLETED, so precondition 4 adds the eligibility lesson
+itself. Slice 5 builds the narrowed form, reading the eligibility lesson
+from `private.discipler_eligibility_lesson()` (D2, decided 2026-10-05).
 
-Resulting state, derived from currently credited participation:
+Resulting state (ADR-011). Completion is no longer count-derived, so
+reopening returns the lesson to the submitted state it was confirmed
+from, provided the submission is still valid:
 
-credited count >= required_meetings  → READY_FOR_COMPLETION, ready_at retained
-0 < credited count < required        → IN_PROGRESS, ready_at NULL
-credited count = 0                   → NOT_STARTED, ready_at NULL
+credited count >= submission_minimum → READY_FOR_COMPLETION, ready_at and submitted_by retained
+0 < credited count < minimum         → IN_PROGRESS, ready_at and submitted_by NULL
+credited count = 0                   → NOT_STARTED, ready_at and submitted_by NULL
 
 In the normal case the void has not happened yet, so the result is
-READY_FOR_COMPLETION. The other rows exist for determinism.
+READY_FOR_COMPLETION. The other rows exist for determinism. If the
+lesson material was in fact not finished, the submission is then
+withdrawn through the ordinary withdrawal operation.
 
 Also:
 
@@ -893,10 +986,12 @@ An audit_events row records the action together with the prior
 completed_at and confirmed_by, so the original confirmation remains
 recoverable.
 
-Promotion eligibility is derived from all lessons of the active
-curriculum being COMPLETED, so reopening makes eligibility false
-immediately. Precondition 4 guarantees no existing promotion is ever
-invalidated.
+Discipler eligibility is derived from confirmed COMPLETED of the
+eligibility lesson (ADR-012), so reopening that lesson makes
+eligibility false immediately. Precondition 4 guarantees no existing
+appointment is ever invalidated: for an appointed person the
+eligibility lesson cannot be reopened, and reopening a later lesson
+does not affect eligibility.
 
 Sequential progression stays consistent, because precondition 3
 guarantees no later lesson is COMPLETED.
@@ -906,96 +1001,128 @@ the lesson is no longer COMPLETED, so the void rejection above no longer
 applies.
 
 Out of scope: historical correction of an early lesson for someone with
-later completed lessons or an existing promotion. That is an exceptional
+later completed lessons, or of the eligibility lesson or an earlier
+lesson for someone with an existing Discipler appointment. That is an exceptional
 correction workflow and is not part of the MVP.
 
 ---
 
-# 5. Promotion
+# 5. Discipler Appointment
+
+Rewritten 2026-10-05 (ADR-012). This section was "Promotion", which
+ended the person's DISCIPLE responsibility and their own discipler
+assignment. Appointment ends neither. The table name
+ministry_role_transitions is kept; a row now records the appointment.
+
+Enforced from Slice 6. Until Slice 6's forward migration, Migration
+006 refuses DISCIPLE with DISCIPLER (d_group_membership_disciple_conflict),
+so no appointment can exist.
 
 ## Rules
 
-DISCIPLE → DISCIPLER requires:
+- Eligibility is derived from confirmed COMPLETED of the eligibility
+  lesson (Lesson 5) of the church's ACTIVE curriculum (section 4,
+  section 11). It is never stored and never changes anything by itself.
+- Eligibility is not appointment. The Coordinator appoints directly.
+  There is no acceptance workflow.
+- Appointment is never automatic.
 
-- every lesson of the church's ACTIVE curriculum COMPLETED
-- Coordinator authorization
-- valid D Group context
+## Preconditions
 
-Promotion is never automatic.
+All required, otherwise reject:
 
-Promotion must execute transactionally:
+1. The caller holds an active COORDINATOR role on an ACTIVE membership
+   in the target's church, and the target is not the caller's own
+   membership. Self-appointment is open (D9); this precondition stands
+   until D9 is decided.
+2. The target church membership is ACTIVE.
+3. The target holds an active DISCIPLE d_group_memberships row.
+4. The target is eligible (Discipler eligibility, section 11).
+5. The target holds no active DISCIPLER d_group_memberships row.
 
-1. Validate eligibility and authorization.
-2. End any active discipler_assignment in which the promotee is the Disciple.
-3. End active DISCIPLE responsibility.
-4. Create DISCIPLER responsibility in the same D Group.
-5. Record ministry_role_transitions.
-6. Record audit information.
+## Effects
 
-Either every operation succeeds or none are committed.
+In one transaction; either every step succeeds or none is committed:
 
-Step 2 exists because the promotee is normally the disciple side of an
-active discipler assignment. Without it, that assignment would survive
-while pointing at an ended D Group responsibility.
+1. Create a DISCIPLER d_group_memberships row in the same D Group as
+   the target's DISCIPLE row (ADR-012 decision 3; all of a person's
+   responsibilities stay in one D Group).
+2. Record the appointment in ministry_role_transitions (from DISCIPLE,
+   to DISCIPLER, that D Group, the approving Coordinator and time).
+3. Leave the DISCIPLE row, the person's own discipler assignment and
+   their lesson progress unchanged. They continue through Lesson 12
+   under their own Discipler (ADR-012 decision 4).
+4. Record audit information.
 
-The promotee's follow-ups and attention conditions as subject are scoped
-to church_membership_id and are deliberately left untouched.
+The appointee's follow-ups and attention conditions as subject are
+scoped to church_membership_id and are untouched. Appointment is not a
+monitoring episode boundary (section 6). A person who is both a
+Disciple and a Discipler is monitored as a Disciple only (ADR-014).
+
+## Open Items
+
+Not decided here (ADR-012; owned by Slice 6):
+
+- D2 is decided (2026-10-05): the eligibility lesson comes from
+  `private.discipler_eligibility_lesson()`, not configurable.
+- D5: whether appointment before eligibility is allowed as an
+  exception.
+- D8: whether appointment is allowed after the person's DISCIPLE
+  responsibility has ended.
+- D9: whether a Coordinator may appoint themselves.
 
 ---
 
 # 6. Automated Monitoring
 
-## MVP Conditions
+## MVP Condition
 
-Monitoring sources are role-specific (ADR-009). Each subject has exactly
-one absence-condition stream for each responsibility they hold.
+Revised 2026-10-05 (ADR-014). Monitoring uses only facts DiscipleTrack
+explicitly records. There is one condition, from one source, with one
+threshold:
 
 | Condition | Source | Subjects | Episode | Threshold |
 |---|---|---|---|---|
-| CONSECUTIVE_ABSENCE | FINALIZED D Group gathering attendance | LEADER, DISCIPLER | current D Group membership episode | church_settings.consecutive_absence_threshold |
-| CONSECUTIVE_MISSED_MEETINGS | discipleship meeting participant outcomes | DISCIPLE | current discipler assignment | church_settings.consecutive_missed_meeting_threshold |
+| CONSECUTIVE_ABSENCE | ABSENT outcomes on RECORDED participant rows of RECORDED discipleship meetings | DISCIPLE | current discipler assignment | church_settings.consecutive_absence_threshold |
 
-Default threshold for both: 3.
+Default threshold: 3 (section 0; Migration 004 asserts it). Whether the
+MVP default should stay 3 is open (ADR-014 Consequences).
 
-Real-world meaning:
+The enum value CONSECUTIVE_ABSENCE in attention_condition_type and
+follow_up_reason (Migration 001) keeps its name and now carries this
+meaning. It is not renamed, and CONSECUTIVE_MISSED_MEETINGS is not
+added (ADR-014 decision 7). The user-facing label is "consecutive
+recorded absences", for example "2 consecutive recorded absences".
 
-- D Group gathering attendance is the participation of ministry workers
-  and group members in the D Group gathering context.
-- Discipleship meeting attendance is the participation and consistency
-  of Disciples in their lesson-based discipleship meetings.
+Withdrawn (ADR-014):
 
-Gathering attendance never creates a CONSECUTIVE_ABSENCE condition for a
-DISCIPLE responsibility. This keeps a Disciple to a single
-absence-condition stream, driven by the concept that actually measures
-their discipleship.
+- the CONSECUTIVE_ABSENCE row sourced from FINALIZED D Group gathering
+  attendance for LEADER and DISCIPLER subjects, together with the
+  D Group membership episode;
+- the automated missed-meeting condition (planned as
+  CONSECUTIVE_MISSED_MEETINGS with its own threshold). It is withdrawn,
+  not deferred. church_settings.consecutive_missed_meeting_threshold is
+  dormant (section 0).
 
-## Rules Common to Both Conditions
+Consequence: Leaders and Disciplers have no automated monitoring in the
+MVP; their participation is noticed through human oversight. A person
+who is both a Disciple and a Discipler (ADR-012) is monitored as a
+Disciple only.
+
+## Monitoring Rules
 
 - Monitoring is evaluated server-side by controlled operations.
 - Duplicate active conditions must not be created.
-- Returning to attendance resolves the active condition.
+- A recorded outcome that breaks the streak (PRESENT, LATE or EXCUSED)
+  resolves the active condition.
 - A later absence episode creates a new condition instead of reopening the previous one.
 - Ending an episode resolves the ACTIVE condition belonging to it and starts a fresh streak.
 - Corrections trigger recalculation.
 - Monitoring operations must be idempotent.
+- No condition is ever generated from elapsed time, inactivity or the
+  lack of a record (ADR-014 decisions 3 and 4).
 
-## Gathering-Based Monitoring (CONSECUTIVE_ABSENCE)
-
-- Considers FINALIZED gatherings only.
-- Ignores DRAFT gatherings.
-- Ignores CANCELLED gatherings.
-- Uses chronological gathering time.
-- Considers only gatherings at which the member held LEADER or DISCIPLER
-  responsibility in that D Group at starts_at.
-- Only ABSENT contributes to the unexplained absence streak.
-
-Recalculation triggers:
-
-- finalize_gathering()
-- correct_finalized_attendance()
-- the end of the member's LEADER or DISCIPLER D Group membership episode
-
-## Meeting-Based Monitoring (CONSECUTIVE_MISSED_MEETINGS)
+## CONSECUTIVE_ABSENCE
 
 - Considers RECORDED participant rows in RECORDED meetings only.
 - VOIDED meetings and VOIDED participants are ignored.
@@ -1004,9 +1131,17 @@ Recalculation triggers:
   assignment: meetings whose discipler_d_group_membership_id is that
   assignment's Discipler and whose occurred_at falls within the
   assignment period.
-- Only ABSENT contributes to the streak. PRESENT, LATE and EXCUSED break it.
+- Only an explicitly recorded ABSENT outcome increments the streak.
+  PRESENT and LATE break it. EXCUSED breaks it and is never an absence
+  (BR-027a).
 - The streak runs across lesson boundaries. Completing a lesson does not
   reset it.
+- NO RECORD is not ABSENT. Elapsed time, inactivity, the absence of a
+  record and an empty calendar date are never an absence and never
+  contribute to the streak (ADR-014). Attendance is never inferred from
+  missing data.
+- Neither the number of meetings a lesson has taken nor a count above a
+  recommendation is ever a monitoring input (ADR-011).
 
 Recalculation triggers:
 
@@ -1016,17 +1151,20 @@ Recalculation triggers:
 - set_discipler() (re-pair or unpair) and end_d_group_membership(),
   which replaced reassign_discipler() in Vertical Slice 3
 - transfer_disciple()
-- promote_disciple_to_discipler()
+
+Discipler appointment is not a trigger: it does not end the Disciple's
+own assignment (ADR-012, which supersedes "and promotion" in ADR-009).
+No gathering operation is a trigger (ADR-014).
 
 ## Episodes
 
-Gathering-based monitoring is scoped to a D Group membership episode.
-Meeting-based monitoring is scoped to a discipler assignment.
+Monitoring is scoped to a discipler assignment. The D Group membership
+episode, used only by gathering-based monitoring, is withdrawn
+(ADR-014).
 
-Both scopes exist for the same reason: a follow-up is assigned within a
-specific ministry context, and carrying a streak across that boundary
-would raise a case against a Leader or Discipler who never saw those
-absences.
+The scope exists because a follow-up is assigned within a specific
+ministry context, and carrying a streak across that boundary would
+raise a case against a Discipler who never saw those absences.
 
 Any operation that ends an episode must, in the same transaction:
 
@@ -1034,11 +1172,12 @@ Any operation that ends an episode must, in the same transaction:
   setting resolved_at
 - recompute the streak for the new episode, where one begins
 
-For Disciples, the discipler assignment ends on Discipler reassignment,
-D Group transfer and promotion. transfer_disciple() therefore resolves
-an ACTIVE CONSECUTIVE_MISSED_MEETINGS condition as part of ending the
-assignment. The new assignment's streak begins from that assignment's
-own meetings. It never carries the previous streak forward.
+For Disciples, the discipler assignment ends on Discipler reassignment
+and D Group transfer. Discipler appointment does not end it (ADR-012).
+transfer_disciple() therefore resolves an ACTIVE CONSECUTIVE_ABSENCE
+condition as part of ending the assignment. The new assignment's streak
+begins from that assignment's own meetings. It never carries the
+previous streak forward.
 
 Resolving the condition does not close its follow-up. The care case
 remains open under the rules in section 7.
@@ -1061,10 +1200,10 @@ d_group_id would permit two concurrent ACTIVE conditions of one type for
 one person. Ending an episode resolves the old condition instead, which
 is what keeps the index correct.
 
-The index is keyed per condition_type, so a person who holds both a
-monitored ministry responsibility and a DISCIPLE responsibility may hold
-one ACTIVE condition of each type. Each belongs to a different
-responsibility.
+With one MVP condition type, a person holds at most one ACTIVE
+condition. A person who is both a Disciple and a Discipler is monitored
+as a Disciple only, so their DISCIPLER responsibility adds no second
+condition (ADR-012, ADR-014).
 
 ---
 
@@ -1072,10 +1211,10 @@ responsibility.
 
 ## Rules
 
-Monitoring covers LEADER, DISCIPLER and DISCIPLE responsibilities, from
-role-specific sources defined in section 6. LEADER and DISCIPLER
-subjects reach the chain through CONSECUTIVE_ABSENCE; DISCIPLE subjects
-reach it through CONSECUTIVE_MISSED_MEETINGS.
+In the MVP, follow-ups are triggered only by CONSECUTIVE_ABSENCE
+(section 6), whose subject is always a DISCIPLE responsibility
+(ADR-014 decision 9). Every gathering-derived input is removed. No
+replacement trigger is invented.
 
 When an attention condition requires care, assign responsibility using
 the escalation chain, evaluated on distinct people:
@@ -1092,6 +1231,11 @@ Subject is DISCIPLER
 Subject is LEADER
 1. Coordinator
 
+The DISCIPLER and LEADER subject branches have no MVP trigger
+(ADR-014); they are not built until a factual condition for those
+subjects is approved. They are kept as architecture. Whether to remove
+them from the documents instead is open (ADR-014 Consequences).
+
 A follow-up is never assigned to its own subject. Where one person holds
 several responsibilities, the chain continues until a different person
 is reached.
@@ -1102,10 +1246,10 @@ preserve at least one active COORDINATOR.
 ## D Group Context on Conditions and Follow-ups
 
 attention_conditions.d_group_id and follow_ups.d_group_id are nullable in
-the schema but are always populated by MVP monitoring, because both MVP
-conditions are derived from a specific D Group: CONSECUTIVE_ABSENCE from
-the gathering's D Group, CONSECUTIVE_MISSED_MEETINGS from the meeting's
-d_group_id.
+the schema but are always populated by MVP monitoring, because the MVP
+condition is derived from a specific D Group: CONSECUTIVE_ABSENCE from
+the d_group_id of the discipleship meetings that form the streak.
+(The gathering's D Group as a source is withdrawn, ADR-014.)
 
 Leader scoping depends on these columns, so a NULL would make a case
 visible only to the Coordinator.
@@ -1140,7 +1284,7 @@ The first actual follow-up action moves REQUIRED to IN_PROGRESS.
 Resolving a follow-up does not automatically resolve its underlying attention condition.
 
 The reverse also holds. When monitoring resolves the attention condition
-because attendance or meetings resumed, the follow-up is NOT auto-closed. The human
+because a later recorded outcome broke the streak, the follow-up is NOT auto-closed. The human
 care obligation remains until someone resolves it deliberately, normally
 with resolution_type CONDITION_CORRECTED.
 
@@ -1252,7 +1396,8 @@ Important historical operations should generate audit events.
 
 Examples:
 
-- finalized attendance correction
+- lesson completion reopening
+- Discipler appointment
 - discipleship meeting void
 - participant void
 - follow-up reassignment
@@ -1293,7 +1438,9 @@ functions and/or constraint triggers.
 ## Relationships That Must Reject Cross-Church Rows
 
 - d_group_memberships vs church_memberships
-- gathering_attendance vs gathering / D Group
+- discipleship_meetings vs D Group, Discipler and lesson (replaces
+  "gathering_attendance vs gathering / D Group", withdrawn with
+  gatherings, ADR-014; it follows directly from the rule above)
 - discipleship_meeting_participants vs meeting context
 - disciple_lesson_progress vs curriculum
 - discipler_assignments participants
@@ -1316,70 +1463,22 @@ principle, and is not required for the one-local-church MVP.
 Derived values must have one authoritative definition so the client,
 dashboards and monitoring cannot disagree.
 
-Two attendance domains exist and their metrics are never combined:
+Attendance exists only as a discipleship meeting outcome (ADR-014).
+There is one attendance domain, discipleship meeting outcomes from
+discipleship_meeting_participants. The gathering attendance domain and
+its subsections (Eligible Attendance, Attendance Metrics with
+attendance_percentage and last_attendance_date, Attendance History and
+Transfers, and the gathering Consecutive Absence Streak for LEADER and
+DISCIPLER responsibilities) are withdrawn with gatherings.
 
-- gathering attendance metrics, from gathering_attendance
-- discipleship meeting metrics, from discipleship_meeting_participants
+Lesson progress is a separate concept. It consumes only credited
+meeting participation and confirmed lesson status.
 
-Lesson progress is a third, separate concept. It consumes only credited
-meeting participation.
-
-## Eligible Attendance
-
-Eligible gatherings for a member are FINALIZED gatherings of D Groups in
-which that member held an active d_group_membership at the gathering's
-starts_at.
-
-DRAFT and CANCELLED gatherings are never eligible.
-
-## Attendance Metrics
-
-sessions_attended
-= count of PRESENT + LATE
-
-sessions_missed
-= count of ABSENT
-
-sessions_excused
-= count of EXCUSED
-
-attendance_percentage
-= sessions_attended / (sessions_attended + sessions_missed)
-
-EXCUSED is therefore excluded from the denominator, consistent with the
-rule that an excused absence is not an unexplained absence.
-
-Returns NULL when the denominator is 0.
-
-last_attendance_date
-= starts_at of the latest FINALIZED gathering with PRESENT or LATE
-
-## Attendance History and Transfers
-
-Historical attendance metrics survive D Group transfer. Attendance is
-anchored to church_membership_id and is never reset or discarded.
-
-## Consecutive Absence Streak
-
-Applies to LEADER and DISCIPLER responsibilities only.
-
-Walk eligible gatherings at which the member held LEADER or DISCIPLER
-responsibility, in descending (starts_at, id) order. Count leading
-ABSENT records. Stop at the first PRESENT, LATE or EXCUSED.
-
-Consecutive absence monitoring is scoped to the CURRENT D Group
-membership episode.
-
-Ending that episode therefore resets the current consecutive-absence
-streak. Historical attendance itself is not reset.
-
-The reason is that a follow-up is assigned within a D Group context.
-Carrying a streak across an episode boundary would raise a case against
-a Leader or Coordinator who never saw those absences.
-
-Gathering attendance of a DISCIPLE responsibility is still recorded and
-counted in the gathering attendance metrics above, but it never feeds
-this streak.
+No derived value is a percentage or ratio of performance or progress
+(decision 8). Progress and meeting facts are stated as counts and
+dates: "5 of 12 lessons completed", "Lesson 6 current", "Lesson 6
+awaiting confirmation", "2 consecutive recorded absences", "Last
+recorded meeting Sep 28".
 
 ## Credited Meetings
 
@@ -1387,58 +1486,129 @@ credited_meetings(member, lesson)
 = count of credited participations for that lesson, as defined in
   section 4
 
-The count may exceed required_meetings while the lesson is
-READY_FOR_COMPLETION. It is not clamped.
+The count has no upper limit and is never clamped. It is presented as a
+count ("5 meetings recorded"), never as a fraction of a target
+("5 / 4"). Where the meeting policy defines recommended_meetings it may
+be shown beside the count ("5 meetings recorded · Typical: 4"); a count
+above it is never exceptional.
 
 meeting_ordinal
 = position of a credited participation among that lesson's credited
   participations, ordered by (occurred_at, meeting id). Uncredited rows
   have no ordinal.
 
-## Meeting Consistency Metrics
+## Meeting Facts
+
+Revised 2026-10-05: this subsection was "Meeting Consistency Metrics".
+The meeting_consistency ratio is removed (decision 8); no consistency
+ratio or percentage is defined or shown. The remaining figures are
+counts and dates.
 
 Computed over RECORDED participant rows in RECORDED meetings.
 
 meetings_attended
 = count of PRESENT + LATE
 
-meetups_missed
+recorded_absences (formerly meetups_missed)
 = count of ABSENT
 
-meetups_excused
+excused (formerly meetups_excused)
 = count of EXCUSED
 
-meeting_consistency
-= meetings_attended / (meetings_attended + meetups_missed)
-
-EXCUSED is excluded from the denominator, matching the gathering
-attendance definition. Returns NULL when the denominator is 0.
-
-last_meeting_date
+last_recorded_meeting_date (formerly last_meeting_date)
 = occurred_at of the latest credited participation
 
-Oversight views may show the time since last_meeting_date. It is
-computed at read time and never stored.
+Wording rule for these figures: recorded_absences counts explicitly
+recorded ABSENT outcomes and is presented as "recorded absences" ("2
+recorded absences"). Time without a record is presented as a date
+("Last recorded meeting Sep 12", "No meeting recorded yet"), never as
+missed meetings or as absences.
 
-Historical meeting metrics survive D Group transfer and Discipler
+Oversight views may show the time since last_recorded_meeting_date. It
+is computed at read time and never stored, and it is never a condition
+(ADR-014 decision 4).
+
+Historical meeting facts survive D Group transfer and Discipler
 reassignment, because participation is anchored to church_membership_id.
 
-## Consecutive Missed-Meeting Streak
+## Consecutive Recorded Absences
 
-Applies to DISCIPLE responsibilities only.
+Revised 2026-10-05: this subsection was "Consecutive Missed-Meeting
+Streak" (ADR-014).
+
+consecutive_recorded_absences applies to DISCIPLE responsibilities
+only.
 
 Walk RECORDED participant rows in RECORDED meetings under the Disciple's
 CURRENT discipler assignment, in descending (occurred_at, meeting id)
 order. Count leading ABSENT outcomes. Stop at the first PRESENT, LATE or
 EXCUSED.
 
+This is the streak CONSECUTIVE_ABSENCE compares with
+church_settings.consecutive_absence_threshold (section 6).
+
 Ending the discipler assignment resets the streak. Historical meeting
-outcomes are not reset.
+outcomes are not reset. Discipler appointment does not end the
+assignment (ADR-012).
 
 The streak only reflects meetups that were recorded. A Discipler and
 Disciple who stop meeting and record nothing produce no streak; that
-situation is visible through last_meeting_date. An automated inactivity
-condition is future scope (ADR-009).
+situation is visible through last_recorded_meeting_date. An automated
+inactivity condition is withdrawn, not future scope (ADR-014 decision
+4).
+
+## Discipler Eligibility
+
+Added 2026-10-05 (ADR-012).
+
+discipler_eligible(member)
+= true when the member's progress row for the eligibility lesson
+  (Lesson 5) of the church's ACTIVE curriculum has status COMPLETED
+
+IN_PROGRESS and READY_FOR_COMPLETION do not count. Sequential
+eligibility (section 4) means this implies the earlier lessons are
+COMPLETED, so the one test is sufficient. The eligibility lesson
+number comes from `private.discipler_eligibility_lesson()` (D2); no rule hard-codes it elsewhere.
+
+"Eligible since" is that lesson's completed_at. Eligibility is derived
+at read time and never stored, so a reopen (section 4) withdraws it
+immediately. It never appoints anyone by itself (section 5).
+
+## Active Discipleships
+
+Definition (decision A3, verified against the schema):
+
+An active discipleship is a discipler_assignments row that is active
+now (started_at <= now() and ended_at IS NULL), whose disciple side is
+an active DISCIPLE d_group_memberships row of an ACTIVE church
+membership.
+
+active_discipleships(scope)
+= count of such rows within the scope: one Discipler's assignments, one
+  D Group, or the church
+
+A Disciple who is placed but not paired is not in an active
+discipleship, although their journey and progress exist. Lesson state
+and Discipler appointment do not enter the definition: a Disciple who
+is eligible for, or has received, a Discipler appointment continues
+their own journey and is still in an active discipleship until the
+assignment ends (ADR-012). (Previously "awaits promotion review".)
+
+Derived at read time, never stored. Who may see which scope is defined
+in RBAC_RLS_MATRIX.md section 2b.
+
+## Candidate: Lessons Completed This Month
+
+Not defined and not governing (decision 9). Recorded here only as a
+candidate Reporting / Oversight metric, owned by Slice 11. It does not
+block Slice 5. Before adoption it needs:
+
+- a precise definition;
+- which timestamp or event counts (likely lessons reaching confirmed
+  COMPLETED in the month, that is completed_at);
+- church time zone semantics for "this month";
+- a privacy review (RBAC_RLS_MATRIX.md section 2b);
+- small-population suppression before broad member visibility.
 
 ---
 
@@ -1476,16 +1646,18 @@ Examples:
 
 - transfer Disciple
 - reassign Discipler
-- finalize attendance
-- cancel gathering
-- correct finalized attendance
-- record discipleship meeting, held or missed
+- record discipleship meeting, with each Disciple's outcome
 - void discipleship meeting or participant
+- submit lesson as finished, withdraw a submission
 - confirm lesson
 - reopen lesson completion
-- promote Disciple
+- appoint Discipler (ADR-012; Slice 6)
 - resolve/recalculate monitoring conditions
 - same-church validation where ordinary foreign keys cannot express it
+
+Removed 2026-10-05: finalize attendance, cancel gathering and correct
+finalized attendance (ADR-014); promote Disciple, now appoint Discipler
+(ADR-012).
 
 ## Row Level Security
 
@@ -1514,15 +1686,19 @@ Used for information that should not be redundantly stored.
 
 Examples:
 
-- attendance percentage
-- consecutive absence count
 - lesson meeting count
-- meeting consistency
-- consecutive missed-meeting count
-- held or missed meetup
-- overall discipleship percentage
-- promotion eligibility
+- recorded absences and last recorded meeting date
+- consecutive recorded absences
+- lessons completed ("5 of 12 completed")
+- active discipleships
+- Discipler eligibility
 - overdue follow-up state
+
+Removed 2026-10-05: attendance percentage and the gathering
+consecutive absence count (ADR-014); meeting consistency and overall
+discipleship percentage (decision 8); held or missed meetup (ADR-014
+decision 8); promotion eligibility, now Discipler eligibility
+(ADR-012).
 
 ## Flutter Validation
 

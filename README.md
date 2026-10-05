@@ -1,6 +1,6 @@
 # DiscipleTrack
 
-A mobile-first discipleship, attendance and member growth monitoring system for churches.
+A mobile-first discipleship, meeting attendance and member growth monitoring system for churches.
 
 DiscipleTrack is not an attendance tracker. It exists to answer questions a spreadsheet cannot: who is progressing through discipleship, who is responsible for discipling whom, who is quietly becoming inactive, who is responsible for responding, and whether that care actually happened.
 
@@ -8,7 +8,9 @@ The system is designed so that a member cannot disengage without a named person 
 
 ## Status
 
-Implementation in vertical slices. Auth + Profile is complete; Church Join + Membership Approval + First Entry is implemented and under review. Local setup is described in `config/README.md`.
+Implementation in vertical slices (status as of 2026-10-05). Completed: Slices 1 to 4 (Auth + Profile; Church Join + Membership Approval + First Entry; Ministry Structure; Offline read-only). Planned next: Slice 5, Journey / Meeting Progress. Local setup is described in `config/README.md`.
+
+Roadmap, eleven slices, re-checked before each slice: 5 Journey / Meeting Progress; 6 Discipler Progression; 7 Curriculum / Lesson Content; 8 Workbook / Guide; 9 Monitoring / Follow-ups; 10 Announcements; 11 Reporting / Oversight. D Group gatherings and gathering attendance are not part of the MVP ([ADR-014](docs/adr/ADR-014-remove-d-group-gathering-attendance.md)); attendance is recorded only as the outcome of a discipleship meeting. The working roadmap and current phase are kept in [AGENTS.md](AGENTS.md).
 
 ## Platform
 
@@ -48,7 +50,7 @@ The two rules that matter most:
 - PostgreSQL is the source of truth. Flutter is an untrusted client.
 - Hiding a button is not authorization.
 - Preserve history. End, resolve, cancel or void records rather than deleting them.
-- Derive values such as attendance percentage and absence streaks rather than storing them.
+- Derive values such as meeting counts, lessons completed and consecutive recorded absences rather than storing them.
 - Introduce technology because it solves an identified requirement, not to appear sophisticated.
 
 See [AGENTS.md](AGENTS.md) for working instructions.
