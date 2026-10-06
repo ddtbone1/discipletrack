@@ -113,7 +113,7 @@ All authority requires the caller's own membership to be ACTIVE (RBAC section 1a
 
 ---
 
-## C. The meeting-count policy point (blocker N1)
+## C. The meeting-count policy point (blocker N1; withdrawn by ADR-017, see section W)
 
 **The open question (verbatim):** "Is there a minimum number of credited meetings required before a lesson can be marked finished, or is the number only recommended / completely flexible depending on when the lesson material is actually completed?"
 
@@ -212,7 +212,7 @@ The separate enum migration planned earlier (`20261002000001_meeting_enums.sql`,
 | PT401 | `authentication_required` |
 | PT403 | `not_authorized` |
 | PT404 | `lesson_not_found`, `meeting_not_found`, `participant_not_found`, `progress_not_found` |
-| PT409 | `occurred_at_in_future`, `discipler_not_active_at_occurred_at`, `lesson_not_in_active_curriculum`, `member_not_active`, `cannot_record_own_meeting`, `participant_not_assigned_at_occurred_at`, `lesson_not_eligible`, `meeting_not_recorded`, `participant_not_recorded`, `void_meeting_instead`, `lesson_completed_protected`, `lesson_not_in_progress`, `below_submission_minimum`, `lesson_not_submitted`, `cannot_act_on_own_lesson`, `lesson_not_completed`, `later_lesson_completed`, `eligibility_lesson_protected` (was `already_promoted`; ADR-012) |
+| PT409 | `occurred_at_in_future`, `discipler_not_active_at_occurred_at`, `lesson_not_in_active_curriculum`, `member_not_active`, `cannot_record_own_meeting`, `participant_not_assigned_at_occurred_at`, `lesson_not_eligible`, `meeting_not_recorded`, `participant_not_recorded`, `void_meeting_instead`, `cannot_void_own_meeting` (step 6), `lesson_completed_protected`, `lesson_not_in_progress`, `below_submission_minimum`, `lesson_not_submitted`, `cannot_act_on_own_lesson`, `lesson_not_completed`, `later_lesson_completed`, `eligibility_lesson_protected` (was `already_promoted`; ADR-012) |
 
 **RLS (read-only policies).**
 
@@ -382,13 +382,14 @@ Generic fallbacks: network ("You're offline or the connection dropped. Try again
 | `cannot_record_own_meeting` | You can't record a meeting you took part in as a Disciple. Ask your Discipler or Leader. |
 | `meeting_not_recorded` / `participant_not_recorded` | This was already voided. Refresh to see the latest. |
 | `void_meeting_instead` | This is the only person in the meeting. Void the whole meeting instead. |
-| `lesson_completed_protected` | Voiding this would leave {Name}'s completed Lesson {n} without the meetings it was confirmed on. Ask the Coordinator to reopen the lesson first. |
+| `lesson_completed_protected` | (ADR-016, step 6) When undo is available: "This is the only counted meeting on {Name}'s completed Lesson {n}. Undo Lesson {n}'s completion first, then void it." Otherwise: "This can't be voided because {Name}'s Lesson {n} is completed." |
 | `lesson_not_in_progress` | Lesson {n} has no counted meeting yet, so it can't be marked finished. |
 | `below_submission_minimum` | Lesson {n} needs at least {min} counted meetings before it can be marked finished. It has {count}. (Reachable only if N1 sets a minimum above 1.) |
 | `lesson_not_submitted` | Lesson {n} isn't marked finished, so there's nothing to confirm or withdraw. Refresh to see the latest. |
 | `cannot_act_on_own_lesson` | You can't mark, confirm or withdraw your own lesson. Another Leader or the Coordinator can. |
 | `lesson_not_completed` | Lesson {n} isn't completed, so there's nothing to reopen. |
-| `later_lesson_completed` | A later lesson is already completed. Reopen lessons from the latest one back. |
+| `later_lesson_completed` | (ADR-016) "Lesson {m} is already completed, so Lesson {n} is locked." |
+| `later_lesson_has_meetings` | (ADR-016) "Lesson {m} already has a recorded meeting, so Lesson {n} can't be reopened." |
 | `eligibility_lesson_protected` | {Name} has been appointed as a Discipler, so Lesson {n} and earlier lessons can't be reopened. Later lessons can. |
 | `not_authorized` | You can't do that for this person. Ask their Leader or the Coordinator. |
 | `*_not_found` | We couldn't find that anymore. It may have been changed. Refresh and try again. |
@@ -490,7 +491,7 @@ Leader Members tab replaced by the D Group destination; Requests moved to Home; 
 
 | # | Decision | Blocks | Proposed default / status |
 |---|---|---|---|
-| N1 | Minimum credited meetings before a lesson can be marked finished: Model A, B or C (section C) | Closing step 7 and the slice | none; placeholder floor until answered. In every model the count never completes a lesson (decision 22) |
+| N1 | Minimum credited meetings before a lesson can be marked finished: Model A, B or C (section C) | Closing step 7 and the slice | **Resolved 2026-10-06 (ADR-017): no minimum; meeting count never determines completion (section W).** |
 | D2 | Where the eligibility lesson ("Lesson 5") is defined (section Q) | | **Resolved 2026-10-05: one policy function**, `private.discipler_eligibility_lesson()`, returning 5; not configurable per church (section S) |
 | N2 | If Model B: per lesson (from `required_meetings`) or one church-wide value | the policy body | per lesson |
 | N3 | Who may withdraw a submission | nothing (default built) | assigned Discipler, Leader, Coordinator |
@@ -593,7 +594,7 @@ Recorded in [ADR-015](../adr/ADR-015-discipler-marks-lesson-completed.md); the g
 3. **Preconditions.** Eligible (current) lesson; IN_PROGRESS; credited meetings >= `submission_minimum` at the moment of marking completed. N1 still decides the value. The count never completes a lesson.
 4. **Storage, no schema change.** `complete_lesson()` sets COMPLETED, `completed_at = now()`, `confirmed_by` = caller, `ready_at = completed_at`, `submitted_by` = caller. The Progress State Check is unchanged. READY_FOR_COMPLETION stays in the enum; nothing enters it.
 5. **Undo.** `undo_lesson_completion()`: current assigned Discipler, Leader of the current group or Coordinator; only while (a) it is the latest COMPLETED lesson and (b) no RECORDED participant row in a RECORDED meeting exists for the person on the next lesson. Back to IN_PROGRESS (NOT_STARTED with no credited meeting); clears `ready_at`, `submitted_by`, `completed_at`, `confirmed_by`; audited with the prior values. Self rule applies. From Slice 6 the narrowed eligibility-lesson protection (ADR-012 decision 9) also applies.
-6. **Reopen.** After the window, Coordinator only, through `reopen_lesson_completion()` with unchanged preconditions 1 to 4. Result: IN_PROGRESS, or NOT_STARTED when no credited meeting remains; never READY_FOR_COMPLETION.
+6. **Reopen.** ~~After the window, Coordinator only~~ Superseded by ADR-016 (section U): after the window the completion is locked; `reopen_lesson_completion()` is Coordinator-only database-level recovery with no MVP action. Result when it succeeds: IN_PROGRESS, or NOT_STARTED when no credited meeting remains; never READY_FOR_COMPLETION.
 7. **Withdrawn.** `withdraw_lesson_submission()` and `confirm_lesson_completion()` are not built. `submit_lesson_finished()` is replaced by `complete_lesson()`. The Leader's Awaiting confirmation section and the "lessons awaiting your confirmation" Home tile are withdrawn.
 8. **Voids.** COMPLETED protection unchanged. The READY_FOR_COMPLETION auto-withdrawal is dormant, because nothing enters that state; it stays documented rather than deleted.
 9. **Eligibility.** Lesson 5 COMPLETED still creates eligibility; "confirmed COMPLETED" becomes "COMPLETED". The Coordinator's appointment is the human check.
@@ -612,7 +613,7 @@ Recorded in [ADR-015](../adr/ADR-015-discipler-marks-lesson-completed.md); the g
 
 **Tests (section H).** Completion, fallback, self-refusal and precondition cases target `complete_lesson()`; undo covers both window conditions, the resulting state, the cleared columns and the audit row; reopen expects IN_PROGRESS or NOT_STARTED; withdrawal and confirmation cases are dropped.
 
-**Reopen rule (user, 2026-10-05, fifth).** `reopen_lesson_completion()` (Coordinator only) refuses to reopen Lesson N when any later lesson is COMPLETED (`later_lesson_completed`) or has a RECORDED participant row in a RECORDED meeting for the person, whatever the outcome (`later_lesson_has_meetings`). It never moves, voids or deletes later meeting history; the refusal tells the Coordinator to void the conflicting later meetings first. DC section 4, reopen precondition 3, carries the rule. Enforced server-side and covered by integration tests when step 7 builds reopen.
+**Reopen rule (user, 2026-10-05, fifth).** `reopen_lesson_completion()` (Coordinator only) refuses to reopen Lesson N when any later lesson is COMPLETED (`later_lesson_completed`) or has a RECORDED participant row in a RECORDED meeting for the person, whatever the outcome (`later_lesson_has_meetings`). It never moves, voids or deletes later meeting history. ~~The refusal tells the Coordinator to void the conflicting later meetings first.~~ Withdrawn by ADR-016: the refusal states the lock, and legitimate later meetings are never voided to unlock it. DC section 4, reopen precondition 3, carries the rule. Enforced server-side and covered by integration tests when step 7 builds reopen.
 
 **Journey layout revision (user, 2026-10-05, sixth).** The current lesson comes first on My Journey and Disciple detail, in one card: a ring for lessons completed out of the curriculum (no percentage printed), Lesson n with its title and the Discipler, the meeting count, one step per recorded meeting of the current lesson coloured by outcome (no "remaining" markers, ADR-011), an outcome breakdown and the status line. The 12-segment journey stepper of decision 21 is replaced: rows, Home and Profile use one continuous bar; the lesson-by-lesson timeline becomes a collapsed "All lessons" list. "Mark Lesson n completed" sits in the card and asks for confirmation, stating the meetings recorded, what changes and the undo window. Recording moves into the meeting calendar: "Record a meeting today", or "Record a meeting on {date}" for a selected earlier empty date, which opens the form on that date. D Group detail lists unpaired Disciples first, with a "Not paired yet" chip and a prominent Pair action, and each Disciple row opens their detail.
 
@@ -635,3 +636,123 @@ Recorded in [ADR-015](../adr/ADR-015-discipler-marks-lesson-completed.md); the g
 **Premium group card, yellow "not started" (user, 2026-10-05, fifteenth).** The Home group card has a 32 px radius, two soft decorative circles in the top-right corner, a "MY D GROUP" chip with a round black arrow button, a larger group name, and the person's Leader, Discipler and Disciples in a translucent inner panel. Elements on the lime card contrast with the theme mode: translucent black in light mode, white (pills and avatars, black text) in dark mode. The attention tone is now a true yellow (pastel yellow with deep yellow text), used for Late, "not started" lessons and "Not paired".
 
 **Group card reverted to pastel green; dark mode reverted (user, 2026-10-05, sixteenth).** Dark mode is back to the pure black page with near-black cards. The Home group card keeps its modern structure (chip, arrow button, decorative circles, inner panel) but uses a Material tonal container of the brand green: pastel green with dark green-black text in light mode, deep green with light text in dark mode. Pills and the arrow button on it invert (dark with light text in light mode, light with dark text in dark mode). Avatars keep their name colours. `_useGreen` in `group_summary_card.dart` returns it to the plain card.
+
+**Original group card, sentence-case headings, roomier spacing (user, 2026-10-06).** The Home group card is reverted to its original form (the Leader's "My D Group" row; for others, a card listing Leader, Discipler and Disciples); the redesigned card and the lime card fill are removed. Section and group headings are sentence case, as written, in bold black. Spacing between content is roomier behind one switch, `AppSpacing.roomy` (section gap 28, card gap 16, card padding 22, list item gap 12; false restores 24, 12, 20 and 8).
+
+**Larger headings, tighter spacing, modern group card (user, 2026-10-06, second).** Section and group headings are 18 px bold black. Spacing is 4 less than the original values (section gap 20, card gap 8, card padding 16, list item gap 4) behind `_tighten` in `app_spacing.dart` (0 restores the originals). The last recorded meeting is plain muted text, never a pill. The Home group card is one modern card for every role: an icon tile with "My D Group" and the group name, label and value rows (your role, Leader, Discipler, your Disciples), and the members' avatars with the member count at the bottom.
+
+**Section spacing, history, completion dialog, record buttons (user, 2026-10-06, fourth).** The gap between a section's content and the next section heading is 16 (24 less 8). The meeting calendar no longer offers a full meeting list; the journey activity timeline (with "View journey history") tells the full history. "Mark Lesson n completed" opens a redesigned dialog: a lime celebration badge, the meeting summary with outcome pills, a "Lesson n to Lesson n+1" step panel (or "the last lesson"), the undo note, and Cancel / Mark completed. Record buttons use a `record` button variant: black with lime text in light mode, the usual lime button in dark mode; `kInkRecordButtons` in `app_button.dart` makes them ordinary primary buttons again.
+
+**Actions first, activity last, rings in rows (user, 2026-10-06, fifth).** Disciple detail opens with its intents: "Record a meeting today" and "Mark Lesson n completed" (with the undo link) above the current lesson card; the calendar offers recording only for an earlier date without a meeting. Recent activity and Journey activity sit at the bottom of their pages. Member rows show a small progress ring (lesson number of the total) instead of an avatar, in separate cards with a 28 px radius and 12 px between them. The completion dialog is minimal: badge, title, "Name · n meetings recorded", outcome pills, the "Lesson n to Lesson n+1" step and "Undo until the next lesson's first meeting." Record buttons are lime with black text in light mode and lime with white text in dark mode (`kWhiteRecordTextInDark`); white on lime is low contrast, flagged to the user. On Home, "Your discipleships" sits 16 px below the group card.
+
+### Amendment 2026-10-06: minimal group card, darker dark-mode record button
+
+- Home group card, minimal: the group's initials avatar top left; an outlined circle with a diagonal arrow top right (the card opens the group); the group name below in a larger, heavier font; the person's role in a pill on the left; three member avatars plus "+n" on the right, level with the pill, with no member-count text; a Record button bottom right for a Discipler who has someone with a current lesson (one Disciple opens Record a meeting directly, several open the chooser). The "My D Group" label inside the card is removed.
+- Record button in dark mode: a darker green (0xFF3F7A0F) with white text, so the text reads clearly. Light mode is unchanged (lime, black text). Reversible through `kWhiteRecordTextInDark` in `app_button.dart`.
+
+### Amendment 2026-10-06 (2): group card on light green
+
+- The Home group card is light green (0xFFE3FDC4; deep olive 0xFF1E2D0C in dark mode) with the same minimal layout. A group icon replaces the initials avatar. The role pill reads "You", a dot, then the role. The arrow's circle outline is 1px.
+- Bottom row, for a Discipler with someone to record for: an info line on the left (the Disciple's first name and current lesson, or "n Disciples") and a dense Record button on the right with a checklist icon. `AppButton` gained `dense` (40px tall) and `AppCard` an optional `color`.
+- Dark-mode record button: a deeper shade of the brand lime's hue (0xFF4C8A00) with white text, replacing 0xFF3F7A0F.
+
+### Amendment 2026-10-06 (3): group card as an overview on brand lime
+
+- The Home group card is the light-theme brand lime (`AppColors.brand`, 0xFF9BFC28) in both light and dark mode, with black and white content only: a black circle with a white group icon, a 1px black outlined arrow, the group name in black, a black "You · role" pill, white initials avatars with a black "+n", and a black Record button (`AppButtonVariant.ink`, dense) with a checklist icon.
+- Up to three white fact tiles for the person's highest role, counted on screen from data Home already reads (never stored): Leader sees Disciplers, Disciples and Members; Discipler sees Disciples, Last met and Not met yet (hidden while loading or offline); Disciple sees Lesson n of total, their Discipler and their Leader.
+
+### Amendment 2026-10-06 (4): two-layer group card
+
+- Replaces amendment (3)'s white tiles. The Home group card has two layers, the same in both modes: identity on the brand lime (black squircle with a lime group icon, faint concentric rings behind the 1px outlined arrow, the group name in headlineMedium, the black "You · role" pill, members' faces), then a black inset panel with the facts in one divided row (lime icons, white values, grey labels), segmented lesson bars (one per Disciple, up to three, for a Discipler; the person's own for a Disciple), and the lime Record button for a Discipler. The Disciple's Lesson fact moved into their bar. `AppButtonVariant.ink` was removed.
+
+### Amendment 2026-10-06 (5): pastel green group card with colour accents
+
+- Replaces amendment (4). The Home group card is pastel green (0xFFE4F7D2), the same in both modes, with a lighter blob behind the arrow. Content: white squircle group icon, the group name, a "Led by <Leader>" line ("You lead this group" for the Leader), a white "You · role" pill whose dot takes the role's colour (Leader violet, Discipler blue, Disciple amber), members' faces in pastel accents.
+- White fact tiles with coloured icon badges (blue, violet, amber; "Not met yet" coral when above zero, mint at zero). A white "Journeys" panel (Discipler, up to three Disciples) or "Your lessons" (Disciple) with segmented bars: deep green completed, lime current, grey ahead. Record (primary lime) sits on the panel's title row.
+- All colours are local to the card (`_G`, `_Accent` in home_page.dart), so reverting touches one file.
+
+### Amendment 2026-10-06 (6): group card redesigned from first principles
+
+- Replaces amendments (2) to (5). One surface, no nested cards and no buttons; the whole card opens the group, and recording stays in "Your discipleships". Hierarchy through type and space: the group name, "Led by <Leader> · n people", members' faces with a role sentence ("You lead this group", "You're a Discipler here"), a hairline, then one visual per role.
+- Leader: the group's make-up as a segmented bar (Disciplers, Disciples) with a legend. Discipler: up to three Disciples, each with lesson dots (filled completed, ringed current, faint ahead) and status ("Lesson 4", or "Not met yet" in amber), then "n more Disciples". Disciple: "Lesson 4 of 10", the lesson title, larger dots, and their Discipler (amber "Not paired with a Discipler yet" when unpaired).
+- Tones adapt to brightness: pastel green with deep green ink in light mode, deep green with soft green ink and lime progress in dark mode. Amber is the only attention colour. Tones are local (`_Tones` in home_page.dart).
+
+### Amendment 2026-10-06 (7): original group card; lesson card actions; calendar day inline
+
+- Home group card reverted to the committed `GroupSummaryCard` (amendments 2 to 6 withdrawn). `AppButton.dense`, `AppCard.color` and the darker dark-mode record green remain.
+- Disciple detail: "Record a meeting" and "Mark completed" sit inside the current-lesson card, side by side (either alone at full width), with "Recorded on <Discipler>'s behalf" under them when it applies, and the undo link below.
+- Calendar: the selected day's meeting (or "No meeting recorded on Oct 3.") is shown inside the calendar card under the month, without a separate date heading. The meeting fact pills (attended, recorded absences, in a row) moved under the calendar on Disciple detail and My Journey.
+- Follow-up (same day): in the lesson card, "Record a meeting today" sits on top at full width with "Mark completed" under it. Mark completed uses the new `AppButtonVariant.ink`: black with white text in light mode, white with black text in dark mode.
+- Follow-up 2: record buttons are the brand lime with black text in both modes again (the dark-mode green and white text are removed). The completion button reads "Mark Lesson n completed" and, in dark mode, is light grey (0xFFD4D6DA) with black text; light mode stays black with white text.
+- Follow-up 3: the completion button uses the `secondary` variant, the same as "Sign up" on the start page, in both modes (the `ink` variant is removed). The Home group card is light green with black content in dark mode too; it is drawn under the light theme there so its pills and faces keep their light colours.
+- Calendar: opens on the latest meeting's month with no day selected, so no meeting detail shows until a day is tapped. A day with a meeting is a solid filled circle (present lime, late amber 0xFFFFC53D, recorded absence red 0xFFE5484D, excused grey 0xFF8B8D98; voided only: outlined), replacing the small dots; the selected day gets a ring. Same colours in both modes.
+- Follow-up 4: calendar day fills are pastel (present 0xFFDDF9B5, late 0xFFFFEDB0, recorded absence 0xFFFFD6D6, excused 0xFFE4E7EB) with the day number in the deep tone of the same hue, in both modes.
+
+### Step 6 done (2026-10-06): voids
+
+- Migration `20261006000001_meeting_voids.sql` (new; Migration 007 untouched): `void_discipleship_meeting()`, `void_meeting_participant()`, helpers `can_void_meeting()` (Coordinator; Leader of the meeting's group; Discipler only for meetings they recorded under their own DISCIPLER row that has not ended), `is_meeting_participant()`, `assert_void_keeps_completed()`. `get_meeting_history()` is replaced (drop and create) to return the courtesy flags `can_void_meeting` and `can_void_participant`.
+- Refusal order: authentication; existence within the caller's view (`meeting_not_found` / `participant_not_found`, no existence leak); the caller's own outcome (`cannot_void_own_meeting`, new, every role); authority; record state; last participant (`void_meeting_instead`); COMPLETED protection (`lesson_completed_protected`, with detail `full_name`, `lesson_number` and `undo_available`).
+- A meeting void changes only the meeting row (no cascade); a participant void changes only that row. Credited people's progress is recomputed (COMPLETED never touched). Both are audited (`DISCIPLESHIP_MEETING_VOIDED`, `MEETING_PARTICIPANT_VOIDED`) with the participants, credited people and any dormant auto-withdrawal. Nothing is deleted.
+- App: a ⋮ menu on the selected meeting's details, shown only from the server flags: "Void meeting", and "Remove {name} from this meeting" when the meeting has another recorded participant. Both use the shared confirmation dialog. The completed-lesson refusal says to undo first only when `undo_available` is true; otherwise it states that the meeting can't be voided because the lesson is completed. A void refreshes every person's journey, history and summary, My Disciples and the Home figures.
+- Tests: `test/integration/meeting_void_test.dart` (21), `test/widget/meeting_void_test.dart` (6), failure-mapping and flag-parsing unit tests.
+
+### Step 7 (2026-10-06): reopen, server side; one contradiction open
+
+- Lifecycle under ADR-015 only: `complete_lesson()` and `undo_lesson_completion()` (Migration 007), and now `reopen_lesson_completion()` in Migration `20261006000002_reopen_lesson_completion.sql`. No submit / confirm step is restored.
+- Reopen, as DC section 4 specifies: caller not the person (`cannot_act_on_own_lesson`); COORDINATOR in the person's church (`not_authorized`); lesson in the ACTIVE curriculum (`lesson_not_found`); COMPLETED (`lesson_not_completed`); no later lesson COMPLETED (`later_lesson_completed`) and no later lesson with a RECORDED participant row in a RECORDED meeting, whatever the outcome (`later_lesson_has_meetings`); for a person appointed as a Discipler, not the eligibility lesson or earlier (`eligibility_lesson_protected`). Result IN_PROGRESS or NOT_STARTED, completion columns cleared, started_at kept; audited as `LESSON_COMPLETION_REOPENED` with the prior values. Never voids, moves or deletes later history.
+- Refusal wording (user, 2026-10-06): a later meeting or later completed lesson locks the earlier lesson, and the message states the lock. Voiding is only for correcting an invalid record; no message suggests voiding or undoing later progress to unlock. `next_lesson_started` no longer says "Ask the Coordinator to reopen", because reopen is refused in that same case.
+- **Contradiction, resolved 2026-10-06 by ADR-016 (section U).** Originally reported: ADR-015 decision 6, BR-033 and RBAC ("after the undo window, only the COORDINATOR can reopen") present reopen as the path after the window. DC reopen precondition 3 (revised 2026-10-05), together with the user's rule that legitimate later meetings are not voided to unlock, means reopen is refused whenever the window has closed; while the window is open, the Coordinator can already undo (verified by test). DC precondition 3 and DC "Ordering" also still describe voiding later meetings first as the way to reopen. No reopen UI is built until this is decided.
+- Tests: `test/integration/lesson_reopen_test.dart` (13), reopen and lock reasons in the failure-mapping unit tests.
+- Baseline, every test in one run: 526 before step 7; 540 after.
+
+## U. ADR-016: completion locked by later progress (user, 2026-10-06)
+
+Recorded in [ADR-016](../adr/ADR-016-completion-locked-by-later-progress.md); the governing documents carry it (revision 2026-10-06). Where any earlier section of this plan differs, this section governs.
+
+- **Undo** is the normal correction while its window holds.
+- **Void** corrects a meeting or participant record that was genuinely erroneous. It is never presented as a way to unlock a completion.
+- **Reopen** (`reopen_lesson_completion()`) is a Coordinator-only database-level recovery operation. There is no reopen screen or action for any role in the MVP. Its locks (`later_lesson_completed`, `later_lesson_has_meetings`, `eligibility_lesson_protected`) and its audit are unchanged.
+- **Deep correction** of a lesson once legitimate later progress exists (a recorded later meeting or a later completed lesson) is outside the MVP.
+- Superseded here: the Coordinator's Reopen in F1 (actions, patterns), F2 (Coordinator actions, Reopen dialog, success "Lesson 3 reopened"), the reopen rows of F3, E2's `LessonReviewController` reopen, H's reopen widget expectations, J step 7's reopen UI, K's Coordinator reopen walkthrough, and section T decision 6 as a path after the window.
+- Step 7 is complete: `reopen_lesson_completion()` server side, its tests, and the lock wording. Baseline, every test in one run: 540.
+
+### Step 8 done (2026-10-06): members' progress
+
+- Migration `20261006000003_group_progress.sql`: `list_group_progress(p_d_group_id)`, one row per current Disciple of the group (paired or not) with the same derived figures as `list_disciple_progress()` plus the current Discipler's name (NULL when unpaired). Authority: the group's Leader or a Coordinator of its church; everyone else, a Discipler of that group included (N7), gets `not_authorized`, also for an unknown group or another church's.
+- The assigned-Disciple branch of `can_view_progress_of` and its refused unassigned-read test already existed from step 3 (`discipleship_security_test.dart`, N7).
+- App: D Group detail's Disciple rows show a lesson ring and "Lesson n of 10" for the Leader and the Coordinator; without that read (loading, refused, offline) the row keeps its plain face, with no error. Recording, completion, undo and voids refresh it.
+- Not built: the Leader's Home "Members summary" (F2 Home). Step 8's scope in J is D Group detail.
+- Tests: `test/integration/group_progress_test.dart` (6), two D Group detail widget tests. Baseline, every test in one run: 548.
+
+## V. Step 10 and delivery record (2026-10-06)
+
+**Step 10 done.** Seed refreshed through the real operations: a duplicate meeting voided (Daniel), a participant removed from a shared meeting (Ella), a fresh completion with Undo open (Hana, by Grace) beside a locked one (Diana). Diana's completion is backdated by trusted seed update so her history reads in order. `config/README.md` accounts table, AGENTS.md current phase and remaining roadmap, README status, DBML / DC / RBAC as-built notes updated.
+
+**Walkthrough** (scripted against the seeded database as each real account, then on the emulator):
+- Lifecycle, all as expected: record → credited count and history update → complete → next lesson current, Undo offered → a meeting recorded on the next lesson locks the completion (Undo gone; undo refused `next_lesson_started`; database reopen refused `later_lesson_has_meetings`) → void of that erroneous record → Lesson 2 back to NOT_STARTED, Undo available again, the voided record kept in history with who voided it.
+- Visibility, all as expected: Disciple sees only self (no void actions); assigned Discipler sees own Disciples only (N7); another Discipler, an unpaired Disciple, another Discipler's Disciple and an unplaced member are refused every other journey and the group's progress; the Leader and the Coordinator see the group's progress; Coordinator Home shows 4 active discipleships.
+
+**Walkthrough findings**
+
+| # | Kind | Finding | Outcome |
+|---|---|---|---|
+| 1 | VISUAL | Floating snackbars rendered under the floating dock (messages and their actions hidden, offline explanations included) | Fixed: DockShell raises the snackbar inset above the dock |
+| 2 | UX | The completion snackbar with Undo never dismissed (Flutter persists action snackbars), leaving a stale Undo after the window closed (the server refused it) | Fixed: `persist: false`, 6 s; the card keeps Undo for the window; widget test added |
+| 3 | VISUAL | Snackbar action text (Undo) invisible on the ink background | Fixed: `actionTextColor` in the theme |
+| 4 | BUG (seed) | Seeded completion stamped at reset time, after the Lesson 2 meetings it precedes | Fixed in the seed |
+| 5 | UX | Lesson titles in the seeded curriculum equal their numbers, so cards read "Lesson 1 / Lesson 1" | FUTURE SLICE (7, real lesson content) |
+| 6 | VISUAL | The shared confirm dialog (void) is a plain Material dialog, unlike the styled completion dialog | Recorded; not changed |
+| 7 | UX | The Leader's Home has no members summary | FUTURE (F2 Home item, not in step 8 scope) |
+| 8 | UX | The bootstrap admin sees the first-entry welcome on first sign-in to the seed | Recorded; earlier-slice seed behaviour |
+
+**Delivered against section J:** steps 1 to 6, 8 and 10 as planned (with the amendments above); step 7 delivered as ADR-015 completion and undo plus a database-only reopen (ADR-016) instead of submission and confirmation; step 9 delivered as the month calendar with day details on tap. **Not delivered, by decision:** Leader confirmation and its queue and tile (ADR-015); a reopen action (ADR-016); the Leader Home members summary (finding 7). **N1:** closed 2026-10-06 by ADR-017 (section W).
+
+## W. ADR-017: no meeting minimum; N1 closed (user, 2026-10-06)
+
+Recorded in [ADR-017](../adr/ADR-017-no-minimum-meetings.md); the governing documents carry it. Where any earlier section of this plan differs (decision 22, section C, the policy rows of D, the `below_submission_minimum` and `lesson_completed_protected` rows of F3, the seed's "any minimum up to five" note in G, `meeting_policy_test.dart` in H, step 3's placeholder in J, the N1 entry in Q, S decision 5, T decision 3), this section governs.
+
+- Meeting count does not determine lesson completion; the authorized Discipler decides. No minimum, no placeholder floor, no typical number. A count never completes a lesson and never prevents completion.
+- Completion otherwise unchanged: the current lesson, from NOT_STARTED or IN_PROGRESS; assigned Discipler, Leader and Coordinator as fallback; never one's own lesson; the next lesson becomes current.
+- A void never implicitly changes a COMPLETED lesson; the count-based refusal is removed. The ADR-016 correction model is unchanged.
+- **As built:** Migration 011 (`20261006000004_no_minimum_meetings.sql`) drops `private.lesson_meeting_policy()` and `private.assert_void_keeps_completed()`, and replaces `complete_lesson()`, `recompute_lesson_progress()`, `get_disciple_journey()` (without `submission_minimum` and `recommended_meetings`) and both void operations. Refusals no longer raised: `below_submission_minimum`, `lesson_not_in_progress`, `lesson_completed_protected`. A zero-meeting completion sets `started_at = completed_at` (Progress State Check unchanged). The app drops the "Typical" line and the three refusal messages.
+- Post-closure fix (2026-10-06, user report on Ella): the activity timeline showed a voided record as "Meeting recorded · Present" with the Present colour, and a participant removal as "Meeting voided", while the lesson card said "No meetings recorded yet". Fixed: a voided record reads "… · Voided" with a neutral dot; a removal reads "Removed from meeting" (new `MeetingHistoryEntry.isRemoved`, participant row voided in a meeting that stands); the count line says "counted" ("No counted meetings yet", "2 counted meetings"), because it counts Present and Late only. Display only; no database change.

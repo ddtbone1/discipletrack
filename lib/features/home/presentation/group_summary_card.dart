@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_pill.dart';
 import '../../ministry/domain/d_group_member.dart';
@@ -13,9 +14,8 @@ import '../../ministry/domain/ministry_context.dart';
 /// 2026-10-05). Set to false for the plain white card.
 const _useGreen = true;
 
-/// Colours for the card: a plain pastel green with black content in light
-/// mode, a deep green with white content in dark mode, so the content is
-/// always clearly visible.
+/// Colours for the card: a plain pastel green with black content, in both
+/// modes (user request of 2026-10-06).
 typedef _Ink = ({Color card, Color text, Color muted, Color button});
 
 /// The person's D Group on Home, kept minimal: the group's name, the
@@ -27,24 +27,26 @@ class GroupSummaryCard extends StatelessWidget {
 
   final MinistryContext ministry;
 
+  // In dark mode the light green card is drawn under the light theme, so its
+  // pills and faces keep their light colours on the light card.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      _useGreen && Theme.of(context).brightness == Brightness.dark
+      ? Theme(
+          data: AppTheme.light(),
+          child: Builder(builder: _card),
+        )
+      : _card(context);
+
+  Widget _card(BuildContext context) {
     final p = context.palette;
     final text = Theme.of(context).textTheme;
-    final dark = Theme.of(context).brightness == Brightness.dark;
     final _Ink ink = !_useGreen
         ? (
             card: p.surface,
             text: p.textPrimary,
             muted: p.muted,
             button: p.textPrimary,
-          )
-        : dark
-        ? (
-            card: const Color(0xFF1E2C11),
-            text: Colors.white,
-            muted: Colors.white.withValues(alpha: 0.7),
-            button: Colors.white,
           )
         : (
             card: const Color(0xFFE6FBC8),

@@ -160,6 +160,7 @@ class _Discipleships extends ConsumerWidget {
           const SizedBox(height: AppSpacing.sm),
           AppButton(
             label: 'Record a meeting',
+            variant: AppButtonVariant.record,
             requiresConnection: true,
             offlineAction: 'record a meeting',
             onPressed: () => recordable.length == 1

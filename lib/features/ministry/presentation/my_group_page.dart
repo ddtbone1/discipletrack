@@ -172,7 +172,10 @@ class _Roster extends ConsumerWidget {
                 _PersonTile(
                   name: d.fullName,
                   phone: d.phone,
-                  pills: _progressPills(progress[d.churchMembershipId]),
+                  pills: _progressPills(
+                    context,
+                    progress[d.churchMembershipId],
+                  ),
                   onTap: () => context.push(
                     Routes.discipleDetailFor(d.churchMembershipId),
                   ),
@@ -195,7 +198,10 @@ class _Roster extends ConsumerWidget {
   }
 
   /// Where a Disciple is: their lesson and their last recorded meeting.
-  static List<Widget> _progressPills(DiscipleProgressSummary? d) {
+  static List<Widget> _progressPills(
+    BuildContext context,
+    DiscipleProgressSummary? d,
+  ) {
     if (d == null) return const [];
     return [
       AppPill(
@@ -204,11 +210,9 @@ class _Roster extends ConsumerWidget {
             ? 'Every lesson completed'
             : 'Lesson ${d.currentLessonNumber} of ${d.lessonsTotal}',
       ),
-      AppPill(
-        icon: d.lastRecordedMeetingAt == null
-            ? Icons.event_busy_rounded
-            : Icons.event_available_rounded,
-        label: d.lastMeetingLine,
+      Padding(
+        padding: const EdgeInsets.only(top: 3),
+        child: Text(d.lastMeetingLine, style: context.supportingStyle),
       ),
     ];
   }

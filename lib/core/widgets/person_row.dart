@@ -26,11 +26,11 @@ class SectionHeading extends StatelessWidget {
             child: Semantics(
               header: true,
               child: Text(
-                title.toUpperCase(),
-                style: AppTypography.body.copyWith(
+                title,
+                style: AppTypography.sectionTitle.copyWith(
                   color: context.palette.textPrimary,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
                 ),
               ),
             ),

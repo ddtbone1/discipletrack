@@ -10,7 +10,9 @@ import '../../../core/widgets/person_row.dart';
 import '../../ministry/application/ministry_providers.dart';
 import '../application/discipleship_providers.dart';
 import '../domain/journey.dart';
+import '../domain/journey_activity.dart';
 import '../domain/meeting_history_entry.dart';
+import 'activity_timeline.dart';
 import 'current_lesson_card.dart';
 import 'meeting_calendar.dart';
 
@@ -121,10 +123,6 @@ class _Journey extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.lg),
         const SectionHeading('Meetings'),
-        if (summary != null) ...[
-          MeetingFactPills(summary: summary!),
-          const SizedBox(height: AppSpacing.sm),
-        ],
         history.when(
           loading: () => const SizedBox(height: 160, child: LoadingState()),
           error: (e, _) => SizedBox(
@@ -142,8 +140,23 @@ class _Journey extends StatelessWidget {
                 'first meeting, your progress starts here.',
           ),
         ),
+        if (summary != null) ...[
+          const SizedBox(height: AppSpacing.sm),
+          MeetingFactPills(summary: summary!),
+        ],
         const SizedBox(height: AppSpacing.lg),
         AllLessonsList(journey: journey, ownJourney: true),
+        if (kShowJourneyActivity) ...[
+          const SizedBox(height: AppSpacing.lg),
+          JourneyActivitySection(
+            title: 'Journey activity',
+            events: journeyActivity(
+              journey,
+              history.value ?? const [],
+              ownJourney: true,
+            ),
+          ),
+        ],
       ],
     );
   }

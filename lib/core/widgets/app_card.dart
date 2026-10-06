@@ -25,10 +25,6 @@ enum AppCardFill {
 
   /// White surface. The default for plain grouped content.
   plain,
-
-  /// The brand lime with black text, in both modes. The single most lively
-  /// card on a screen, such as the D Group card on Home.
-  lime,
 }
 
 extension AppCardFillColors on AppCardFill {
@@ -38,7 +34,6 @@ extension AppCardFillColors on AppCardFill {
     AppCardFill.sky => p.sky,
     AppCardFill.pastel => p.pastel,
     AppCardFill.plain => p.surface,
-    AppCardFill.lime => p.brand,
   };
 
   Color foreground(AppPalette p) => switch (this) {
@@ -47,7 +42,6 @@ extension AppCardFillColors on AppCardFill {
     AppCardFill.sky => p.onSky,
     AppCardFill.pastel => p.onPastel,
     AppCardFill.plain => p.textPrimary,
-    AppCardFill.lime => p.onBrand,
   };
 
   /// Muted foreground, for supporting lines inside the card.
@@ -57,7 +51,6 @@ extension AppCardFillColors on AppCardFill {
     AppCardFill.sky => p.onSky.withValues(alpha: 0.7),
     AppCardFill.pastel => p.onPastel.withValues(alpha: 0.65),
     AppCardFill.plain => p.muted,
-    AppCardFill.lime => p.onBrand.withValues(alpha: 0.62),
   };
 }
 
@@ -72,6 +65,7 @@ class AppCard extends StatelessWidget {
     this.fill = AppCardFill.plain,
     this.padding = const EdgeInsets.all(AppSpacing.cardPadding),
     this.onTap,
+    this.color,
     super.key,
   });
 
@@ -79,6 +73,10 @@ class AppCard extends StatelessWidget {
   final AppCardFill fill;
   final EdgeInsets padding;
   final VoidCallback? onTap;
+
+  /// Overrides the fill's background, for a tinted card that still carries
+  /// the fill's text colour (the Home group card's light green).
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +95,7 @@ class AppCard extends StatelessWidget {
     );
 
     return Material(
-      color: fill.background(p),
+      color: color ?? fill.background(p),
       // Flat: no border and no shadow; white on the light page is enough.
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
       clipBehavior: Clip.antiAlias,

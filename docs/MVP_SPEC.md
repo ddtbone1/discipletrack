@@ -3,7 +3,8 @@
 *Document Status:* MVP Baseline  
 *Last Updated:* October 2026 (revision 2026-10-02: lesson content, ADR-010; explicit lesson completion, ADR-011; monthly meeting history; see sections 9, 10, 18 to 21, 33 and 34)  
 *Revision 2026-10-05:* D Group gatherings and gathering attendance removed; attendance exists only as a discipleship meeting outcome; one monitoring condition, consecutive recorded absences, for Disciples only; missed-meeting and inactivity conditions withdrawn (ADR-014). Discipler eligibility after confirmed Lesson 5, direct appointment, concurrent Disciple and Discipler responsibilities (ADR-012). Relationship-scoped Discipler progress visibility (N7); relationship-aware Journey (N8); factual 12-segment progress and no percentages (decisions 8, 22); read-only monthly meeting indicator (decisions 10, 11); "lessons completed this month" recorded as a candidate Reporting metric only (decision 9). Sections changed: 1, 2, 7 to 10, 15 and 16 (withdrawn, headings kept), 17, 19 to 24, 28 to 30, 32 to 34. Section 34 steps renumbered (simple numbered list; gathering steps removed, appointment steps rewritten).  
-*Revision 2026-10-05 (ADR-015):* the Discipler marks a lesson completed in one step; no Leader confirmation and no "awaiting confirmation" state; Leader and Coordinator fallback; undo within a window, then Coordinator reopen to In Progress. Recorded meeting history on Disciple detail and My Journey shown as a month calendar with outcome-marked dates. Sections changed: 8 to 10, 18 to 22, 29 (Leader Home focus), 34 (steps 9, 10, 17).  
+*Revision 2026-10-05 (ADR-015):* the Discipler marks a lesson completed in one step; no Leader confirmation and no "awaiting confirmation" state; Leader and Coordinator fallback; undo within a window, then Coordinator reopen to In Progress. Recorded meeting history on Disciple detail and My Journey shown as a month calendar with outcome-marked dates. Sections changed: 8 to 10, 18 to 22, 29 (Leader Home focus), 34 (steps 9, 10, 17).
+*Revision 2026-10-06 (ADR-016):* a completion is locked once legitimate progress exists in a later lesson; undo is the normal correction; void corrects only erroneous records; the Coordinator's reopen is database-level recovery with no app action; deeper correction is outside the MVP. Sections 19 and 20.  
 *Revision 2026-10-05 (user decision, ninth):* the curriculum has ten lessons, not twelve. Sections changed: 18, 21, 22, 28, 29, 34 (steps 11, 19).
 
 ---
@@ -526,10 +527,9 @@ Curriculum
 
 └── Lesson 10
 
-Whether a minimum number of credited meetings applies before a lesson
-can be marked completed is an open product decision (section 20).
-The existing required_meetings value, seeded as four, is kept unchanged
-until that decision.
+There is no minimum number of meetings before a lesson can be marked
+completed (ADR-017; section 20). The legacy required_meetings value,
+seeded as four, drives nothing.
 
 Lesson names and content are church-owned curriculum data. DiscipleTrack
 delivers the lesson material in the app (ADR-010): it originates as
@@ -610,8 +610,9 @@ Recorded meetings are not edited. A mistake is corrected by voiding the
 record and recording it again. The Discipler may void meetings and
 outcomes they recorded themselves. The D Group Leader and the
 Coordinator retain oversight and fallback void authority. Every void is
-audited, and a void may not undo a Completed lesson without the reopen
-step in section 20.
+audited, and a void may not undo a Completed lesson: the completion must
+be undone first while its window holds (section 20). A void corrects an
+erroneous record; it is never used to unlock a completion.
 
 The Discipler is the normal recorder. The D Group Leader or Coordinator
 may record on behalf of the Discipler as a fallback.
@@ -644,21 +645,15 @@ lesson meetings. Absent and Excused are attendance outcomes and never
 indicate that material was covered.
 
 Meeting counts are shown as counts, for example "5 meetings recorded",
-never "5 / 4". Where a typical number is defined it may be shown beside
-the count, "5 meetings recorded · Typical: 4"; more meetings than typical
-is never exceptional. There is no maximum.
+never "5 / 4", and never beside a typical number. There is no maximum.
 
-Open product decision, still blocked and blocking for lesson completion
-(ADR-011; decision 23): "Is there a minimum number of credited meetings
-required before a lesson can be marked finished, or is the number only
-recommended / completely flexible depending on when the lesson material
-is actually completed?" The options are A, no minimum; B, a minimum
-number of credited meetings; C, a recommended number only. In every
-case the meeting count never completes a lesson automatically: the
-Discipler explicitly marks the lesson completed when it is fully
-covered, and that sets Completed. Until it is answered, a lesson can be
-marked completed once it has at least one credited meeting, and the
-rule is held in one policy point so the answer is a contained change.
+Decided 2026-10-06 (ADR-017; closes the open decision 23, N1): meeting
+count does not determine lesson completion. The authorized Discipler
+decides when the Disciple has completed the lesson, based on the actual
+discipleship process. There is no minimum: a lesson can be marked
+completed with zero, one or any number of counted meetings, and no count
+ever completes a lesson automatically. Voiding meeting history never
+changes a completed lesson.
 
 The Disciple's current assigned Discipler normally marks the lesson
 completed. The D Group Leader or the Coordinator may mark it completed
@@ -669,8 +664,10 @@ A completion may be undone by the current assigned Discipler, the
 Leader of the Disciple's current D Group or the Coordinator, only while
 it is the Disciple's latest completed lesson and no meeting has been
 recorded on the next lesson. Undo returns the lesson to In Progress.
-After that, only the Coordinator can reopen it, and reopening also
-returns it to In Progress.
+After that, the completion is locked by later progress (ADR-016). The
+MVP offers no further correction, and legitimate later meetings are
+never voided to unlock it. The Coordinator's reopen operation exists only
+as database-level recovery, not as an action in the app.
 
 Lessons are worked through in order. A Disciple may begin lesson N only
 once lesson N-1 is completed. Lesson 1 is exempt.
@@ -678,7 +675,8 @@ once lesson N-1 is completed. Lesson 1 is exempt.
 A completed lesson is protected. A meeting correction never un-completes
 it. Correcting a meeting record that would leave a completed lesson
 with fewer credited meetings than marking it completed needs requires
-an explicit authorized undo or reopen step first.
+undoing the completion first, while its window holds; after that it is
+refused.
 
 The Disciple does not need to separately confirm each meeting in the MVP.
 

@@ -8,9 +8,9 @@ The system is designed so that a member cannot disengage without a named person 
 
 ## Status
 
-Implementation in vertical slices (status as of 2026-10-05). Completed: Slices 1 to 4 (Auth + Profile; Church Join + Membership Approval + First Entry; Ministry Structure; Offline read-only). Planned next: Slice 5, Journey / Meeting Progress. Local setup is described in `config/README.md`.
+Implementation in vertical slices (status as of 2026-10-06). Completed: Slices 1 to 5 (Auth + Profile; Church Join + Membership Approval + First Entry; Ministry Structure; Offline read-only; Journey / Meeting Progress). Next: Slice 6, Discipler Progression. Local setup is described in `config/README.md`.
 
-Roadmap, eleven slices, re-checked before each slice: 5 Journey / Meeting Progress; 6 Discipler Progression; 7 Curriculum / Lesson Content; 8 Workbook / Guide; 9 Monitoring / Follow-ups; 10 Announcements; 11 Reporting / Oversight. D Group gatherings and gathering attendance are not part of the MVP ([ADR-014](docs/adr/ADR-014-remove-d-group-gathering-attendance.md)); attendance is recorded only as the outcome of a discipleship meeting. The working roadmap and current phase are kept in [AGENTS.md](AGENTS.md).
+Remaining roadmap, re-checked before each slice: 6 Discipler Progression; 7 Curriculum / Lesson Content; 8 Workbook / Guide; 9 Monitoring / Follow-ups; 10 Announcements; 11 Reporting / Oversight. D Group gatherings and gathering attendance are not part of the MVP ([ADR-014](docs/adr/ADR-014-remove-d-group-gathering-attendance.md)); attendance is recorded only as the outcome of a discipleship meeting. The working roadmap and current phase are kept in [AGENTS.md](AGENTS.md).
 
 ## Platform
 

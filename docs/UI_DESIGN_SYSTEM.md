@@ -6,6 +6,36 @@
 > confirmation). The curriculum has ten lessons (user decision
 > 2026-10-05); examples below that say "of 12" or "12 segments" are
 > historical.
+>
+> **No meeting minimum (ADR-017, 2026-10-06).** Meeting count never
+> determines completion, and no "Typical" number is shown. Lines below
+> about a typical number, or a minimum still being open, are historical.
+>
+> **No reopen action (ADR-016, 2026-10-06).** The app has no Reopen
+> action for any role. Undo on the lesson card is the normal correction
+> while its window holds; after that the completion is locked by later
+> progress, and refusals say so without suggesting voiding or undoing
+> later progress. Rows and examples below that mention Reopen (dialog,
+> overflow menu, Coordinator on Disciple detail) are historical.
+>
+> **Vertical activity timeline (UX decision, 2026-10-06).** A reusable
+> pattern for chronological storytelling only: what happened, and in what
+> order. Each visualization has one job: the progress ring and bars show how
+> far a journey has come; the monthly calendar shows on what dates meetings
+> occurred; the timeline shows the sequence of events; cards hold one item's
+> details; pills state a current fact. The timeline never replaces the
+> monthly meeting calendar, progress components or member lists. It shows
+> factual events only (lesson started, meeting recorded with its outcome,
+> lesson completed, meeting voided, and later approved events such as a
+> Discipler assignment or reopening when the data supports them), never
+> inferred ones such as missed meetings or inactivity, and never raw audit
+> terminology. It is limited to recent events, with "View journey history"
+> for the rest. Compact styling: small dots, a thin connector, bold event
+> titles, muted dates and context, colour only where it means something, and
+> the newest event slightly emphasised. Not for member lists, member
+> selection, lesson reading, profile facts or statistics. A compact Home
+> "Recent activity" and an administrative member history are possible later
+> uses, each only with a clear purpose and within existing access rules.
 
 *Document Status:* MVP Baseline  
 *Last Updated:* October 2026

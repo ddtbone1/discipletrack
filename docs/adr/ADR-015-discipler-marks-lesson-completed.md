@@ -4,6 +4,21 @@
 
 Accepted (2026-10-05, user decision "fourth").
 
+Decision 3's count precondition ("credited meetings are at least
+`submission_minimum`") and the count basis of decision 8 are superseded
+by [ADR-017](ADR-017-no-minimum-meetings.md) (2026-10-06): no minimum
+number of meetings; the current lesson may be completed whatever its
+count, and a void never changes a completed lesson. The open N1 decision
+mentioned below is closed.
+
+Decision 6 ("After the window, Coordinator reopen") and the reopen
+statements in "Alternatives Considered" and "Why" are partially
+superseded by
+[ADR-016](ADR-016-completion-locked-by-later-progress.md) (2026-10-06):
+after the window the completion is locked by later progress, and
+`reopen_lesson_completion()` is a database-only recovery operation with
+no MVP action. Decisions 1 to 5 and 7 to 9 remain accepted.
+
 Partially supersedes
 [ADR-011](ADR-011-explicit-lesson-completion.md) for the Leader
 confirmation step, listed under "Superseded statements". ADR-011's

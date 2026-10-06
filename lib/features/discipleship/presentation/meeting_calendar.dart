@@ -3,16 +3,14 @@ import 'package:flutter/material.dart';
 import '../../../core/format/app_format.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/widgets/app_pill.dart';
-import '../../../core/widgets/app_text_link.dart';
 import '../domain/attendance_outcome.dart';
 import '../domain/meeting_history_entry.dart';
 import 'discipleship_ui.dart';
 
 /// A person's recorded meetings as a month calendar (user decision of
 /// 2026-10-05): each date with a recorded meeting carries a marker for its
-/// outcome; tapping a date shows that day's meetings below; the full list
-/// opens in a sheet.
+/// outcome; tapping a date shows that day's meetings below. The full
+/// history is told by the journey activity timeline, not a list here.
 ///
 /// Read-only history. Dates without a record are plain: no record is never
 /// an absence (ADR-014), so a blank date is not styled as a warning.
@@ -22,6 +20,7 @@ class MeetingCalendar extends StatefulWidget {
     required this.emptyMessage,
     this.clock,
     this.actionBuilder,
+    this.entryActionBuilder,
     super.key,
   });
 
@@ -29,6 +28,10 @@ class MeetingCalendar extends StatefulWidget {
   /// day (null when none) and whether a meeting is recorded on it. Used for
   /// "Record a meeting today" and "Record a meeting on Oct 3".
   final Widget? Function(DateTime? selectedDay, bool hasMeeting)? actionBuilder;
+
+  /// An action beside each of the selected day's meetings, such as the
+  /// void menu; null for none.
+  final Widget? Function(MeetingHistoryEntry entry)? entryActionBuilder;
 
   /// Newest first, as `get_meeting_history()` returns them.
   final List<MeetingHistoryEntry> entries;
@@ -49,15 +52,21 @@ DateTime _day(DateTime utc) {
 /// The marker colour for a day: voided rows are muted, counted meetings
 /// use the primary colour, a recorded absence the error colour, Excused a
 /// neutral outline colour.
-Color _markerColor(BuildContext context, MeetingHistoryEntry e) {
-  if (e.isVoided) return Theme.of(context).colorScheme.outlineVariant;
-  return switch (e.outcome) {
-    AttendanceOutcome.present => progressColor(context),
-    AttendanceOutcome.late => pillColors(context, PillTone.warning).$2,
-    AttendanceOutcome.absent => pillColors(context, PillTone.error).$2,
-    AttendanceOutcome.excused => pillColors(context, PillTone.neutral).$2,
-  };
-}
+/// Pastel fills for a day with a meeting, with the day number in the same
+/// hue, deep; the same in both modes (user request of 2026-10-06). They
+/// match the light pill palette.
+const _presentFill = Color(0xFFDDF9B5);
+const _lateFill = Color(0xFFFFEDB0);
+const _absentFill = Color(0xFFFFD6D6);
+const _excusedFill = Color(0xFFE4E7EB);
+
+(Color fill, Color number) _solid(AttendanceOutcome outcome) =>
+    switch (outcome) {
+      AttendanceOutcome.present => (_presentFill, const Color(0xFF2F5600)),
+      AttendanceOutcome.late => (_lateFill, const Color(0xFF7A5A00)),
+      AttendanceOutcome.absent => (_absentFill, const Color(0xFFA4231C)),
+      AttendanceOutcome.excused => (_excusedFill, const Color(0xFF4A5159)),
+    };
 
 class _MeetingCalendarState extends State<MeetingCalendar> {
   late DateTime _month;
@@ -85,14 +94,15 @@ class _MeetingCalendarState extends State<MeetingCalendar> {
     if (old.entries.length != widget.entries.length) _openLatest();
   }
 
-  /// Opens on the month of the latest meeting, with that day selected.
+  /// Opens on the month of the latest meeting with no day selected: the
+  /// coloured days tell the outcomes, and a tap shows a day's details.
   void _openLatest() {
     final latest = widget.entries.isEmpty
         ? null
         : _day(widget.entries.first.occurredAt);
     final base = latest ?? _now;
     _month = DateTime(base.year, base.month);
-    _selected = latest;
+    _selected = null;
   }
 
   DateTime get _firstMonth {
@@ -197,22 +207,41 @@ class _MeetingCalendarState extends State<MeetingCalendar> {
                   spacing: AppSpacing.md,
                   runSpacing: AppSpacing.xxs,
                   children: [
-                    _Legend(color: progressColor(context), label: 'Present'),
-                    _Legend(
-                      color: pillColors(context, PillTone.warning).$2,
-                      label: 'Late',
-                    ),
-                    _Legend(
-                      color: pillColors(context, PillTone.error).$2,
+                    const _Legend(color: _presentFill, label: 'Present'),
+                    const _Legend(color: _lateFill, label: 'Late'),
+                    const _Legend(
+                      color: _absentFill,
                       label: 'Recorded absence',
                     ),
+                    const _Legend(color: _excusedFill, label: 'Excused'),
                     _Legend(
-                      color: pillColors(context, PillTone.neutral).$2,
-                      label: 'Excused',
+                      color: Colors.transparent,
+                      border: scheme.outline,
+                      label: 'Voided',
                     ),
-                    _Legend(color: scheme.outlineVariant, label: 'Voided'),
                   ],
                 ),
+                if (_selected != null) ...[
+                  const Divider(height: AppSpacing.lg),
+                  if (selectedEntries.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                      ),
+                      child: Text(
+                        'No meeting recorded on '
+                        '${AppFormat.shortDate(_selected!.toUtc())}.',
+                        style: text.bodyMedium?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  for (final e in selectedEntries)
+                    MeetingHistoryRow(
+                      entry: e,
+                      trailing: widget.entryActionBuilder?.call(e),
+                    ),
+                ],
                 if (action != null) ...[
                   const SizedBox(height: AppSpacing.md),
                   Padding(
@@ -226,88 +255,7 @@ class _MeetingCalendarState extends State<MeetingCalendar> {
             ),
           ),
         ),
-        const SizedBox(height: AppSpacing.sm),
-        if (_selected != null)
-          Padding(
-            padding: const EdgeInsets.only(
-              left: AppSpacing.xxs,
-              bottom: AppSpacing.xxs,
-            ),
-            child: Text(
-              AppFormat.shortDate(_selected!.toUtc()),
-              style: text.labelLarge,
-            ),
-          ),
-        if (_selected != null && selectedEntries.isEmpty)
-          Padding(
-            padding: const EdgeInsets.only(left: AppSpacing.xxs),
-            child: Text(
-              'No meeting recorded on this date.',
-              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          ),
-        for (final e in selectedEntries)
-          Card.filled(
-            color: context.palette.surface,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-            ),
-            margin: EdgeInsets.zero,
-            child: MeetingHistoryRow(entry: e),
-          ),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.xs),
-            child: AppTextLink(
-              label: widget.entries.length == 1
-                  ? 'View full history · 1 meeting'
-                  : 'View full history · ${widget.entries.length} meetings',
-              onTap: () => _showAll(context),
-            ),
-          ),
-        ),
       ],
-    );
-  }
-
-  void _showAll(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (sheet) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.7,
-        minChildSize: 0.4,
-        maxChildSize: 0.95,
-        builder: (sheet, controller) => ListView.separated(
-          controller: controller,
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.md,
-            0,
-            AppSpacing.md,
-            AppSpacing.lg,
-          ),
-          itemCount: widget.entries.length + 1,
-          separatorBuilder: (_, i) =>
-              SizedBox(height: i == 0 ? 0 : AppSpacing.xs),
-          itemBuilder: (sheet, i) => i == 0
-              ? Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                  child: Text(
-                    'Meeting history',
-                    style: Theme.of(sheet).textTheme.titleLarge,
-                  ),
-                )
-              : Material(
-                  color: neutralFill(sheet),
-                  borderRadius: BorderRadius.circular(18),
-                  clipBehavior: Clip.antiAlias,
-                  child: MeetingHistoryRow(entry: widget.entries[i - 1]),
-                ),
-        ),
-      ),
     );
   }
 }
@@ -382,6 +330,17 @@ class _MonthGrid extends StatelessWidget {
     final isSelected = date == selected;
     final isToday = date == today;
     final isFuture = date.isAfter(today);
+    // The latest meeting that stands sets the fill; a day with only voided
+    // meetings gets an outline.
+    MeetingHistoryEntry? standing;
+    for (final e in entries) {
+      if (!e.isVoided) {
+        standing = e;
+        break;
+      }
+    }
+    final solid = standing == null ? null : _solid(standing.outcome);
+    final onlyVoided = entries.isNotEmpty && standing == null;
 
     final label = [
       MaterialLocalizations.of(context).formatFullDate(date),
@@ -401,52 +360,44 @@ class _MonthGrid extends StatelessWidget {
         onTap: isFuture ? null : () => onSelect(date),
         child: SizedBox(
           height: 48,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
+          child: Center(
+            // Selected: a ring around the day, outside any fill.
+            child: Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: isSelected
+                    ? Border.all(color: scheme.onSurface, width: 2)
+                    : null,
+              ),
+              child: Container(
                 width: 32,
                 height: 32,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isSelected ? scheme.primaryContainer : null,
-                  border: isToday && !isSelected
+                  color: solid?.$1,
+                  border: onlyVoided
+                      ? Border.all(color: scheme.outline)
+                      : isToday && solid == null
                       ? Border.all(color: scheme.primary)
                       : null,
                 ),
                 child: Text(
                   '$dayNumber',
                   style: text.bodyMedium?.copyWith(
-                    color: isFuture
+                    color: solid != null
+                        ? solid.$2
+                        : isFuture
                         ? scheme.onSurface.withValues(alpha: 0.38)
-                        : isSelected
-                        ? scheme.onPrimaryContainer
                         : scheme.onSurface,
-                    fontWeight: entries.isEmpty ? null : FontWeight.w600,
+                    fontWeight: entries.isEmpty ? null : FontWeight.w700,
                   ),
                 ),
               ),
-              const SizedBox(height: 2),
-              SizedBox(
-                height: 6,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (final e in entries.take(3))
-                      Container(
-                        width: 6,
-                        height: 6,
-                        margin: const EdgeInsets.symmetric(horizontal: 1),
-                        decoration: BoxDecoration(
-                          color: _markerColor(context, e),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -455,10 +406,11 @@ class _MonthGrid extends StatelessWidget {
 }
 
 class _Legend extends StatelessWidget {
-  const _Legend({required this.color, required this.label});
+  const _Legend({required this.color, required this.label, this.border});
 
   final Color color;
   final String label;
+  final Color? border;
 
   @override
   Widget build(BuildContext context) {
@@ -468,7 +420,11 @@ class _Legend extends StatelessWidget {
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: border == null ? null : Border.all(color: border!),
+          ),
         ),
         const SizedBox(width: 4),
         Text(label, style: Theme.of(context).textTheme.labelSmall),

@@ -74,7 +74,7 @@ class CurrentLessonCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      lesson == null ? 'JOURNEY' : 'CURRENT LESSON',
+                      lesson == null ? 'Journey' : 'Current lesson',
                       style: text.labelSmall?.copyWith(
                         color: scheme.onSurfaceVariant,
                         letterSpacing: 0.8,
@@ -124,24 +124,14 @@ class CurrentLessonCard extends StatelessWidget {
           ),
           if (lesson != null) ...[
             const SizedBox(height: AppSpacing.sm),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                _statePill(lesson),
-                if (lastRecordedMeetingAt != null)
-                  AppPill(
-                    icon: Icons.event_available_rounded,
-                    label:
-                        'Last recorded meeting '
+            Wrap(spacing: 6, runSpacing: 6, children: [_statePill(lesson)]),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              lastRecordedMeetingAt == null
+                  ? 'No meeting recorded yet'
+                  : 'Last recorded meeting '
                         '${AppFormat.shortDate(lastRecordedMeetingAt!)}',
-                  )
-                else
-                  const AppPill(
-                    icon: Icons.event_busy_rounded,
-                    label: 'No meeting recorded yet',
-                  ),
-              ],
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
             ),
             const Divider(height: AppSpacing.lg * 1.5),
             Text(
@@ -299,7 +289,7 @@ class LessonRing extends StatelessWidget {
           children: [
             CircularProgressIndicator(
               value: total == 0 ? 0 : completed / total,
-              strokeWidth: 8,
+              strokeWidth: size * 0.1,
               strokeCap: StrokeCap.round,
               color: progressColor(context),
               backgroundColor: neutralFill(context),
@@ -311,6 +301,7 @@ class LessonRing extends StatelessWidget {
                   Text(
                     '${currentNumber ?? completed}',
                     style: text.titleLarge?.copyWith(
+                      fontSize: size * 0.28,
                       fontWeight: FontWeight.w700,
                       height: 1,
                     ),
@@ -318,6 +309,8 @@ class LessonRing extends StatelessWidget {
                   Text(
                     'of $total',
                     style: text.labelSmall?.copyWith(
+                      fontSize: size * 0.14,
+                      height: 1.1,
                       color: scheme.onSurfaceVariant,
                     ),
                   ),

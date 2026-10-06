@@ -16,15 +16,12 @@ Map<String, dynamic> _lesson(
   bool current = false,
   bool locked = false,
   int credited = 0,
-  int? recommended,
 }) => {
   'lesson_id': 'l$n',
   'lesson_number': n,
   'title': 'Lesson $n',
   'status': status,
   'credited_count': credited,
-  'submission_minimum': 1,
-  'recommended_meetings': recommended,
   'started_at': null,
   'ready_at': null,
   'submitted_by_name': null,
@@ -37,19 +34,15 @@ Map<String, dynamic> _lesson(
 
 void main() {
   group('meeting count line', () {
-    test(
-      'a count, never a fraction; typical only when the policy gives one',
-      () {
-        expect(meetingCountLine(0), 'No meetings recorded yet');
-        expect(meetingCountLine(1), '1 meeting recorded');
-        expect(meetingCountLine(5), '5 meetings recorded');
-        expect(
-          meetingCountLine(5, recommended: 4),
-          '5 meetings recorded · Typical: 4',
-        );
-        expect(meetingCountLine(5, recommended: 4), isNot(contains('/')));
-      },
-    );
+    test('a count, never a fraction or a target (ADR-017)', () {
+      expect(meetingCountLine(0), 'No counted meetings yet');
+      expect(meetingCountLine(1), '1 counted meeting');
+      expect(meetingCountLine(5), '5 counted meetings');
+      for (final n in [0, 1, 5, 12]) {
+        expect(meetingCountLine(n), isNot(contains('/')));
+        expect(meetingCountLine(n).toLowerCase(), isNot(contains('typical')));
+      }
+    });
   });
 
   group('AttendanceOutcome', () {
@@ -159,6 +152,27 @@ void main() {
       for (final o in ['PRESENT', 'LATE', 'ABSENT', 'EXCUSED']) {
         expect(entry(o).outcomeLine.toLowerCase(), isNot(contains('missed')));
       }
+    });
+
+    test('void permissions come from the server, and default to none', () {
+      expect(entry('PRESENT').canVoid, isFalse);
+      final row = MeetingHistoryEntry.fromMap({
+        'meeting_id': 'm',
+        'participant_id': 'p',
+        'occurred_at': '2026-09-20T12:00:00Z',
+        'lesson_number': 2,
+        'lesson_title': 'Lesson 2',
+        'meeting_status': 'RECORDED',
+        'participant_status': 'RECORDED',
+        'attendance_status': 'PRESENT',
+        'is_credited': true,
+        'ordinal': 1,
+        'can_void_meeting': true,
+        'can_void_participant': false,
+      });
+      expect(row.canVoidMeeting, isTrue);
+      expect(row.canVoidParticipant, isFalse);
+      expect(row.canVoid, isTrue);
     });
   });
 
@@ -285,16 +299,70 @@ void main() {
         'cannot_record_own_meeting',
         'not_authorized',
         'lesson_not_found',
-        'lesson_not_in_progress',
-        'below_submission_minimum',
         'lesson_not_completed',
         'later_lesson_completed',
         'next_lesson_started',
         'cannot_act_on_own_lesson',
+        'later_lesson_has_meetings',
+        'eligibility_lesson_protected',
+        'cannot_void_own_meeting',
+        'meeting_not_recorded',
+        'participant_not_recorded',
+        'void_meeting_instead',
+        'meeting_not_found',
+        'participant_not_found',
       ]) {
         final f = map(reason);
         expect(f.message, isNot('fallback'), reason: reason);
         expect(f.reason, reason);
+      }
+    });
+
+    test('a lock by later progress is stated as a fact, never as something '
+        'to void or undo around', () {
+      final messages = [
+        map(
+          'later_lesson_has_meetings',
+          details: '{"lesson_number": 3, "later_lesson_number": 4}',
+        ).message,
+        map(
+          'later_lesson_completed',
+          details: '{"lesson_number": 3, "later_lesson_number": 4}',
+        ).message,
+        map('next_lesson_started', details: '{"lesson_number": 3}').message,
+      ];
+      expect(
+        messages.first,
+        "Lesson 4 already has a recorded meeting, so Lesson 3 can't be "
+        'reopened.',
+      );
+      expect(
+        messages[1],
+        'Lesson 4 is already completed, so Lesson 3 is locked.',
+      );
+      for (final m in messages) {
+        expect(m.toLowerCase(), isNot(contains('void')), reason: m);
+        expect(m, isNot(contains('Undo')), reason: m);
+        expect(
+          m.toLowerCase(),
+          isNot(contains('ask the coordinator')),
+          reason: m,
+        );
+      }
+    });
+
+    test('reasons retired by ADR-017 are no longer mapped', () {
+      for (final reason in [
+        'below_submission_minimum',
+        'lesson_not_in_progress',
+        'lesson_completed_protected',
+      ]) {
+        expect(map(reason).message, isNot(contains('minimum')), reason: reason);
+        expect(
+          map(reason).message,
+          isNot(contains('counted meeting')),
+          reason: reason,
+        );
       }
     });
 

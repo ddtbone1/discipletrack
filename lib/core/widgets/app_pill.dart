@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_spacing.dart';
 
 /// The colours pills, avatars, steps and progress may use: the brand theme
 /// (lime, black, white and grey) plus exactly three hues, blue, amber and
@@ -200,11 +201,11 @@ class TileGroup extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         for (var i = 0; i < children.length; i++) ...[
-          if (i > 0) const SizedBox(height: 8),
+          if (i > 0) const SizedBox(height: AppSpacing.itemGap),
           Material(
             color: p.surface,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(28),
             ),
             clipBehavior: Clip.antiAlias,
             child: children[i],

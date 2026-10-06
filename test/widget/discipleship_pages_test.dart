@@ -188,7 +188,7 @@ void main() {
       expect(find.text('Lesson 8 of 12'), findsNWidgets(2));
       expect(find.text('Last recorded meeting Oct 1'), findsOneWidget);
       expect(find.text('No meeting recorded yet'), findsOneWidget);
-      expect(find.text('LONGEST SINCE LAST MEETING FIRST'), findsOneWidget);
+      expect(find.text('Longest since last meeting first'), findsOneWidget);
       expect(find.text('Record a meeting'), findsOneWidget);
       // Never recorded is listed first.
       expect(
@@ -270,15 +270,29 @@ void main() {
       );
       expect(find.text('Diana Cruz'), findsOneWidget);
       // The current lesson comes first: number, title, Discipler, count.
-      expect(find.text('CURRENT LESSON'), findsOneWidget);
+      expect(find.text('Current lesson'), findsOneWidget);
       expect(find.text('Lesson 4'), findsOneWidget);
       expect(find.text('Lesson title 4'), findsOneWidget);
       expect(find.text('Discipler: Mark Reyes'), findsOneWidget);
-      expect(find.text('2 meetings recorded'), findsOneWidget);
+      expect(find.text('2 counted meetings'), findsOneWidget);
       expect(
         find.bySemanticsLabel('Lesson 4 of 12. 3 lessons completed.'),
         findsOneWidget,
       );
+      // The calendar tells the latest meeting on its day, not in a panel.
+      expect(
+        find.bySemanticsLabel(RegExp('Meeting 2 · Present · Counted')),
+        findsWidgets,
+      );
+      expect(find.text('Meeting 2 · Present · Counted'), findsNothing);
+      // A tap on the day shows its meetings.
+      // Calendar days are labelled with the full date first.
+      final day = find.bySemanticsLabel(
+        RegExp(r'\d{4}, .*Meeting 2 · Present · Counted'),
+      );
+      await tester.ensureVisible(day);
+      await tester.tap(day);
+      await tester.pump();
       expect(find.text('Meeting 2 · Present · Counted'), findsOneWidget);
       expect(
         find.text('Absent · Not counted · Recorded absence'),
@@ -302,7 +316,7 @@ void main() {
     ) async {
       await pump(tester, repo(), ministry: _leaderContext());
       expect(find.text('Record a meeting today'), findsOneWidget);
-      expect(find.text("On Mark Reyes's behalf"), findsOneWidget);
+      expect(find.text("Recorded on Mark Reyes's behalf"), findsOneWidget);
     });
 
     testWidgets('no recording action without the courtesy flag, and an empty '
@@ -386,7 +400,7 @@ void main() {
       tester,
     ) async {
       await pump(tester, repo());
-      expect(find.text('LESSON 4'), findsOneWidget);
+      expect(find.text('Lesson 4'), findsOneWidget);
       expect(find.text('Lesson title 4'), findsOneWidget);
       expect(
         find.text('On Lesson 3. Record their meeting separately.'),

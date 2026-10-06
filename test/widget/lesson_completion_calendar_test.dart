@@ -58,18 +58,20 @@ void main() {
           ),
         );
 
-    testWidgets('opens on the latest meeting\'s month with that day selected', (
+    testWidgets('opens on the latest meeting\'s month with no day selected', (
       tester,
     ) async {
       await pump(tester, entries);
       expect(find.text('October 2026'), findsOneWidget);
+      // The coloured days tell the outcomes; details show only on a tap.
       expect(
         find.text('Absent · Not counted · Recorded absence'),
-        findsOneWidget,
+        findsNothing,
       );
       expect(find.text('Present'), findsOneWidget);
       expect(find.text('Recorded absence'), findsOneWidget);
-      expect(find.text('View full history · 3 meetings'), findsOneWidget);
+      // The full history is told by the activity timeline, not a list here.
+      expect(find.textContaining('View full history'), findsNothing);
     });
 
     testWidgets('moves between months, never past the current month or before '
@@ -107,17 +109,8 @@ void main() {
       // A blank date is plain, with no warning wording.
       await tester.tap(find.bySemanticsLabel(RegExp(r'September 15, 2026')));
       await tester.pump();
-      expect(find.text('No meeting recorded on this date.'), findsOneWidget);
+      expect(find.textContaining('No meeting recorded on '), findsOneWidget);
       handle.dispose();
-    });
-
-    testWidgets('See all lists every meeting in a sheet', (tester) async {
-      await pump(tester, entries);
-      await tester.tap(find.text('View full history · 3 meetings'));
-      await tester.pumpAndSettle();
-      expect(find.text('Meeting history'), findsOneWidget);
-      expect(find.text('Meeting 1 · Late · Counted'), findsOneWidget);
-      expect(find.text('Meeting 2 · Present · Counted'), findsOneWidget);
     });
 
     testWidgets('with nothing recorded it shows the empty message', (
@@ -177,19 +170,14 @@ void main() {
       expect(find.text('Mark Lesson 4 completed?'), findsOneWidget);
       expect(
         find.descendant(
-          of: find.byType(AlertDialog),
-          matching: find.textContaining('2 meetings recorded'),
+          of: find.byType(Dialog),
+          matching: find.textContaining('2 counted meetings'),
         ),
         findsOneWidget,
       );
-      expect(
-        find.textContaining('Lesson 5 becomes the current lesson'),
-        findsOneWidget,
-      );
-      expect(
-        find.textContaining('only the Coordinator can reopen'),
-        findsOneWidget,
-      );
+      // Minimal text: the step reads in words to a screen reader.
+      expect(find.text('Lesson 5'), findsOneWidget);
+      expect(find.textContaining("Undo until the next lesson"), findsOneWidget);
 
       // Cancel sends nothing.
       await tester.tap(find.text('Cancel'));
@@ -198,13 +186,21 @@ void main() {
 
       await tester.tap(button);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Mark completed'));
+      await tester.tap(
+        find.descendant(
+          of: find.byType(Dialog),
+          matching: find.text('Mark completed'),
+        ),
+      );
       await tester.pump();
       expect(repo.completed, ['lesson-4']);
       expect(
         find.text('Lesson 4 completed. Lesson 5 is now current.'),
         findsOneWidget,
       );
+      // It dismisses itself; the lesson card keeps Undo while the window
+      // is open (walkthrough finding, step 10).
+      expect(tester.widget<SnackBar>(find.byType(SnackBar)).persist, isFalse);
 
       await tester.pump(const Duration(milliseconds: 750));
       await tester.tap(find.text('Undo'));
@@ -252,7 +248,7 @@ void main() {
 
     testWidgets('no action without the courtesy flags', (tester) async {
       await pump(tester);
-      expect(find.text('CURRENT LESSON'), findsOneWidget);
+      expect(find.text('Current lesson'), findsOneWidget);
       expect(find.text('Mark Lesson 4 completed'), findsNothing);
       expect(find.textContaining('Undo Lesson'), findsNothing);
     });
@@ -271,7 +267,12 @@ void main() {
       await tester.ensureVisible(button);
       await tester.tap(button);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Mark completed'));
+      await tester.tap(
+        find.descendant(
+          of: find.byType(Dialog),
+          matching: find.text('Mark completed'),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(
         find.text('A meeting is already recorded on the next lesson.'),

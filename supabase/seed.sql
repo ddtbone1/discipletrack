@@ -269,20 +269,31 @@ $$;
 --
 --   Dino Reyes (discipler@), three Disciples:
 --     Diana Cruz (disciple1)     Lesson 1 completed by Dino (5 counted,
---                                one of them Late, and 1 Absent); Lesson
---                                2 in progress: 2 counted, then 3 Absent
---                                in a row. No condition is raised; the
---                                run is shown as a fact.
---     Daniel Bautista (disciple2) Lesson 1 in progress with 6 counted
+--                                one of them Late, and 1 Absent) and
+--                                locked (ADR-016): Lesson 2 already has
+--                                meetings, so it can no longer be undone.
+--                                Lesson 2 in progress: 2 counted, then 3
+--                                Absent in a row. No condition is raised;
+--                                the run is shown as a fact.
+--     Daniel Bautista (disciple2) Lesson 1 in progress with 7 counted
 --                                meetings, ready for Dino to mark it
 --                                completed. His first two meetings were
---                                shared with Diana.
---     Ella Navarro (disciple3)   paired, no meeting recorded yet.
+--                                shared with Diana. One meeting was
+--                                recorded twice by mistake; Dino voided
+--                                the duplicate (it stays in history as
+--                                voided and counts for nothing).
+--     Ella Navarro (disciple3)   paired, no counted meeting. She was listed
+--                                in one of Daniel's meetings by mistake and
+--                                Dino removed her from it (a participant
+--                                void); Daniel's outcome there still counts.
 --   Grace Lim (discipler2), one Disciple:
---     Hana Torres (disciple5)    Lesson 1 in progress: Present, Excused,
---                                then Late, the last recorded by the
---                                Leader on Grace's behalf, with notes.
+--     Hana Torres (disciple5)    Lesson 1: Present, Excused, then Late, the
+--                                last recorded by the Leader on Grace's
+--                                behalf, with notes. Grace then marked
+--                                Lesson 1 completed; Lesson 2 has no
+--                                meeting yet, so Undo is still available.
 --   Felix Ramos (disciple4)      placed, never paired.
+--   Mara Villanueva (member@)    not placed; sees no one's progress.
 --   Lea Santos (leader@)         leads the group; sees all of the above.
 --   Dev Admin (admin@)           Coordinator; church-wide.
 --
@@ -292,7 +303,10 @@ $$;
 -- update (plan decision 14) so meetings can carry past dates; the
 -- integrity triggers still check every write.
 -- Lesson completion goes through complete_lesson() too (ADR-015: the
--- Discipler marks a lesson completed; there is no Leader confirmation).
+-- Discipler marks a lesson completed; there is no Leader confirmation),
+-- and voids through void_discipleship_meeting() and
+-- void_meeting_participant(), each correcting a genuinely erroneous
+-- record (ADR-016).
 
 do $$
 declare
@@ -307,6 +321,7 @@ declare
   v_daniel   uuid;
   v_ella     uuid;
   v_hana     uuid;
+  v_wrong    uuid;
 begin
   if exists (
     select 1 from public.discipleship_meetings dm
@@ -381,8 +396,16 @@ begin
   perform public.record_discipleship_meeting(v_dino_dgm, v_lessons[1], now() - interval '35 days',
     jsonb_build_array(jsonb_build_object('church_membership_id', v_diana, 'attendance_status', 'PRESENT')));
 
-  -- Dino marks Diana's Lesson 1 completed.
+  -- Dino marks Diana's Lesson 1 completed. complete_lesson() stamps now(),
+  -- so the completion is backdated by trusted direct update (as the D Group
+  -- rows are above) to fall between her last Lesson 1 meeting and her first
+  -- Lesson 2 meeting; otherwise her history would show the completion after
+  -- the Lesson 2 meetings. ready_at equals completed_at (ADR-015 decision 4).
   perform public.complete_lesson(v_diana, v_lessons[1]);
+  update public.disciple_lesson_progress
+  set completed_at = now() - interval '32 days',
+      ready_at     = now() - interval '32 days'
+  where church_membership_id = v_diana and lesson_id = v_lessons[1];
 
   -- Diana, Lesson 2: two counted meetings, then three recorded absences.
   perform public.record_discipleship_meeting(v_dino_dgm, v_lessons[2], now() - interval '28 days',
@@ -407,6 +430,24 @@ begin
     jsonb_build_array(jsonb_build_object('church_membership_id', v_daniel, 'attendance_status', 'PRESENT')),
     'Finished the last section of Lesson 1.');
 
+  -- The 20-day meeting was entered a second time by mistake; Dino voids
+  -- the duplicate.
+  select r.meeting_id into v_wrong
+  from public.record_discipleship_meeting(v_dino_dgm, v_lessons[1], now() - interval '19 days',
+    jsonb_build_array(jsonb_build_object('church_membership_id', v_daniel, 'attendance_status', 'PRESENT'))) r;
+  perform public.void_discipleship_meeting(v_wrong);
+
+  -- Ella was listed in Daniel's 15-day meeting by mistake; Dino removes
+  -- her, and Daniel's outcome there still counts.
+  select r.meeting_id into v_wrong
+  from public.record_discipleship_meeting(v_dino_dgm, v_lessons[1], now() - interval '15 days',
+    jsonb_build_array(
+      jsonb_build_object('church_membership_id', v_daniel, 'attendance_status', 'PRESENT'),
+      jsonb_build_object('church_membership_id', v_ella,   'attendance_status', 'PRESENT'))) r;
+  perform public.void_meeting_participant((
+    select p.id from public.discipleship_meeting_participants p
+    where p.meeting_id = v_wrong and p.church_membership_id = v_ella));
+
   -- Grace records for Hana; the Leader records the third on her behalf.
   perform set_config('request.jwt.claims', json_build_object('sub', v_grace)::text, true);
   perform public.record_discipleship_meeting(v_grace_dgm, v_lessons[1], now() - interval '20 days',
@@ -419,6 +460,11 @@ begin
   perform public.record_discipleship_meeting(v_grace_dgm, v_lessons[1], now() - interval '6 days',
     jsonb_build_array(jsonb_build_object('church_membership_id', v_hana, 'attendance_status', 'LATE')),
     'Recorded by Lea while Grace was away.');
+
+  -- Grace marks Hana's Lesson 1 completed; nothing is recorded on Lesson
+  -- 2 yet, so the undo window is open.
+  perform set_config('request.jwt.claims', json_build_object('sub', v_grace)::text, true);
+  perform public.complete_lesson(v_hana, v_lessons[1]);
 
   perform set_config('request.jwt.claims', '', true);
 end

@@ -1,8 +1,8 @@
 /// ADR-015: the Discipler marks a lesson completed in one step, with an
 /// undo window that closes when a meeting is recorded on the next lesson.
-/// There is no Leader confirmation. A meeting count never completes a
-/// lesson; marking it completed is gated only by the meeting policy's
-/// minimum (the placeholder floor of 1 until N1 is decided).
+/// There is no Leader confirmation. Meeting count never determines
+/// completion (ADR-017, N1 closed): no count completes a lesson, and none
+/// is required before the Discipler marks it completed.
 library;
 
 import 'package:flutter_test/flutter_test.dart';
@@ -160,14 +160,54 @@ void main() {
       },
     );
 
-    test('a lesson with no counted meeting cannot be completed', () async {
+    test('a lesson with zero counted meetings can be completed: the '
+        'Discipler decides, not the count (ADR-017)', () async {
+      // No meeting at all: the lesson is NOT_STARTED.
+      expect((await journey()).first['status'], 'NOT_STARTED');
+      expect((await journey()).first['can_complete'], isTrue);
+      final result = await complete(discipler());
+      expect(result['next_lesson_id'], lessons()[1]);
+      final row = (await progressRow(a1Id(), lessons().first))!;
+      expect(row['status'], 'COMPLETED');
+      // Taken up no later than it was completed (Progress State Check).
+      expect(row['started_at'], row['completed_at']);
+      final audit = await service
+          .from('audit_events')
+          .select('metadata')
+          .eq('entity_id', row['id'] as String)
+          .eq('action', 'LESSON_COMPLETED')
+          .single();
+      expect((audit['metadata'] as Map)['credited_meetings'], 0);
+    });
+
+    test('only uncounted outcomes still allow completion', () async {
       await record('ABSENT');
-      expect((await journey()).first['can_complete'], isFalse);
-      await expectLater(
-        complete(discipler()),
-        refused('PT409', 'lesson_not_in_progress'),
+      await record('EXCUSED', day: 3);
+      expect((await journey()).first['can_complete'], isTrue);
+      await complete(discipler());
+      expect(
+        (await progressRow(a1Id(), lessons().first))!['status'],
+        'COMPLETED',
       );
     });
+
+    test('one counted meeting does not complete a lesson by itself', () async {
+      await record('PRESENT');
+      final row = (await progressRow(a1Id(), lessons().first))!;
+      expect(row['status'], 'IN_PROGRESS');
+      expect((await journey()).first['is_current'], isTrue);
+    });
+
+    test(
+      'undoing a zero-meeting completion returns it to NOT_STARTED',
+      () async {
+        await complete(discipler());
+        await undo(discipler());
+        final row = (await progressRow(a1Id(), lessons().first))!;
+        expect(row['status'], 'NOT_STARTED');
+        expect(row['started_at'], isNull);
+      },
+    );
 
     test('only the current lesson, once', () async {
       await record('PRESENT');

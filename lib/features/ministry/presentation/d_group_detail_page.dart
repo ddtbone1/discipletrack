@@ -16,6 +16,9 @@ import '../../../core/widgets/app_text_link.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/status_pill.dart';
+import '../../discipleship/application/discipleship_providers.dart';
+import '../../discipleship/domain/disciple_progress_summary.dart';
+import '../../discipleship/presentation/current_lesson_card.dart';
 import '../application/ministry_providers.dart';
 import '../application/ministry_structure_controller.dart';
 import '../domain/d_group_detail.dart';
@@ -209,6 +212,11 @@ class _DetailBody extends ConsumerWidget {
         myContext.dGroupId == _groupId;
     final myUserId = ref.watch(currentUserIdProvider);
     final canManage = isCoordinator || isLeaderHere;
+    // Members' progress, for the group's Leader and the Coordinator only
+    // (step 8). Rows fall back to plain faces while it loads or if refused.
+    final progress = canManage
+        ? ref.watch(groupProgressProvider(_groupId)).value
+        : null;
 
     final leader = detail.leader;
     final disciplers = detail.disciplers;
@@ -368,6 +376,7 @@ class _DetailBody extends ConsumerWidget {
               _DiscipleRow(
                 disciple: d,
                 discipler: detail.disciplerOf(d),
+                progress: progress?[d.churchMembershipId],
                 canManage: canManage,
                 busy: structure.isRunning('pair:${d.dGroupMembershipId}'),
                 enabled: !structure.isBusy,
@@ -447,6 +456,7 @@ class _DiscipleRow extends StatelessWidget {
   const _DiscipleRow({
     required this.disciple,
     required this.discipler,
+    this.progress,
     required this.canManage,
     required this.busy,
     required this.enabled,
@@ -456,6 +466,9 @@ class _DiscipleRow extends StatelessWidget {
 
   final DGroupMember disciple;
   final DGroupMember? discipler;
+
+  /// The Disciple's progress, when the viewer may see it.
+  final DiscipleProgressSummary? progress;
   final bool canManage;
   final bool busy;
   final bool enabled;
@@ -503,7 +516,15 @@ class _DiscipleRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            InitialsAvatar(name: disciple.fullName),
+            if (progress == null)
+              InitialsAvatar(name: disciple.fullName)
+            else
+              LessonRing(
+                total: progress!.lessonsTotal,
+                completed: progress!.lessonsCompleted,
+                currentNumber: progress!.currentLessonNumber,
+                size: 44,
+              ),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(
@@ -515,6 +536,13 @@ class _DiscipleRow extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                  if (progress != null)
+                    Text(
+                      progress!.lessonLine,
+                      style: text.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
                   const SizedBox(height: 4),
                   if (paired)
                     Row(

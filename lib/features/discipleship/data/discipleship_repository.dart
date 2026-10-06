@@ -49,6 +49,16 @@ class DiscipleshipRepository {
         return [for (final r in rows) DiscipleProgressSummary.fromMap(r)];
       });
 
+  /// The current Disciples of a D Group with their progress, for the
+  /// group's Leader and the Coordinator (`list_group_progress()`).
+  Future<List<DiscipleProgressSummary>> fetchGroupProgress(String groupId) =>
+      _guard("Could not load the group's progress.", () async {
+        final rows = await _rows('list_group_progress', {
+          'p_d_group_id': groupId,
+        });
+        return [for (final r in rows) DiscipleProgressSummary.fromMap(r)];
+      });
+
   Future<DiscipleContext> fetchContext(String membershipId) =>
       _guard('Could not load this person.', () async {
         final rows = await _rows('get_disciple_context', {
@@ -140,6 +150,31 @@ class DiscipleshipRepository {
         }),
       );
 
+  /// `reopen_lesson_completion()`: Coordinator only; refused while a later
+  /// lesson is completed or has a recorded meeting.
+  Future<void> reopenLessonCompletion(String membershipId, String lessonId) =>
+      _guard(
+        'Could not reopen the lesson.',
+        () => _rows('reopen_lesson_completion', {
+          'p_membership_id': membershipId,
+          'p_lesson_id': lessonId,
+        }),
+      );
+
+  /// `void_discipleship_meeting()`: the whole meeting, for everyone in it.
+  Future<void> voidMeeting(String meetingId) => _guard(
+    'Could not void the meeting.',
+    () => _rows('void_discipleship_meeting', {'p_meeting_id': meetingId}),
+  );
+
+  /// `void_meeting_participant()`: one person who should not have been
+  /// listed. The meeting stays as recorded for everyone else.
+  Future<void> voidParticipant(String participantId) => _guard(
+    'Could not remove them from the meeting.',
+    () =>
+        _rows('void_meeting_participant', {'p_participant_id': participantId}),
+  );
+
   Future<List<Map<String, dynamic>>> _rows(
     String fn,
     Map<String, dynamic> params,
@@ -208,21 +243,37 @@ class DiscipleshipRepository {
       'cannot_record_own_meeting' =>
         "You can't record a meeting you took part in as a Disciple. Ask your "
             'Discipler or Leader.',
-      'lesson_not_in_progress' =>
-        'Lesson ${detail['lesson_number'] ?? ''} has no counted meeting yet, '
-            "so it can't be marked completed.",
-      'below_submission_minimum' =>
-        'Lesson ${detail['lesson_number'] ?? ''} needs at least '
-            '${detail['minimum']} counted meetings before it can be marked '
-            'completed. It has ${detail['count']}.',
       'lesson_not_completed' =>
-        "That lesson isn't completed, so there's nothing to undo.",
+        "That lesson isn't completed, so there's nothing to undo or reopen.",
+      // A later completed lesson or a later recorded meeting locks an
+      // earlier lesson. The refusals state the lock; they never suggest
+      // voiding or undoing later progress to get around it.
       'later_lesson_completed' =>
-        'A later lesson is already completed. Undo the latest one first.',
+        detail['later_lesson_number'] == null
+            ? "A later lesson is already completed, so this lesson's "
+                  'completion is locked.'
+            : 'Lesson ${detail['later_lesson_number']} is already completed, '
+                  'so Lesson ${detail['lesson_number']} is locked.',
       'next_lesson_started' =>
-        'A meeting is already recorded on the next lesson, so this can no '
-            'longer be undone. Ask the Coordinator to reopen Lesson '
-            '${detail['lesson_number'] ?? ''}.',
+        'A meeting is already recorded on the next lesson, so Lesson '
+            "${detail['lesson_number'] ?? ''}'s completion is locked and "
+            "can't be undone.",
+      'later_lesson_has_meetings' =>
+        'Lesson ${detail['later_lesson_number'] ?? ''} already has a '
+            "recorded meeting, so Lesson ${detail['lesson_number'] ?? ''} "
+            "can't be reopened.",
+      'eligibility_lesson_protected' =>
+        "Lesson ${detail['lesson_number'] ?? ''} can't be reopened: this "
+            "person's appointment as a Discipler rests on Lesson "
+            "${detail['eligibility_lesson_number'] ?? ''}.",
+      'cannot_void_own_meeting' =>
+        "You can't void a meeting you took part in. Ask your Leader or the "
+            'Coordinator.',
+      'meeting_not_recorded' || 'participant_not_recorded' =>
+        'This was already voided. Refresh to see the latest.',
+      'void_meeting_instead' =>
+        'This is the only person in the meeting. Void the whole meeting '
+            'instead.',
       'cannot_act_on_own_lesson' =>
         "You can't mark or undo your own lesson. Your Discipler, Leader or "
             'the Coordinator can.',

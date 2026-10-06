@@ -34,6 +34,18 @@ changed, numbering stable): Leader and Coordinator fallback, a
 time-bounded undo, Coordinator reopen to In Progress, Ready for
 Completion no longer entered.
 
+Revision 2026-10-06 (ADR-016): a completion is locked once legitimate
+progress exists in a later lesson (a recorded later meeting or a later
+completed lesson). Undo is the normal correction; void corrects only
+erroneous records and is never a way to unlock a completion; reopen is a
+database-only recovery operation with no MVP action; deeper correction is
+outside the MVP. BR-033 and BR-033a revised.
+
+Revision 2026-10-06 (ADR-017, N1 closed): there is no minimum number of
+meetings. Meeting count does not determine lesson completion; the
+authorized Discipler decides. A void never implicitly changes a
+Completed lesson. BR-030, BR-032, BR-033 and BR-033a revised.
+
 Revision 2026-10-05 (user decision, ninth): the curriculum has ten
 lessons, not twelve. BR-029 retitled (numbering stable); examples in
 BR-035 and BR-037.
@@ -435,11 +447,13 @@ A meeting for another lesson does not count toward the current lesson.
 
 There is no maximum number of meetings per lesson.
 
-Whether a minimum number of credited meetings must exist before a
-lesson can be marked completed is an open product decision
-(ADR-011; ADR-015). Until it is decided, no rule may assume a fixed number.
-Counts are shown as counts ("5 meetings recorded"), never as a fraction
-of a target ("5 / 4").
+There is no minimum number of meetings (ADR-017, 2026-10-06; N1 closed).
+Meeting count does not determine lesson completion: the authorized
+Discipler decides when the Disciple has completed the lesson, based on
+the actual discipleship process. A lesson never completes because of a
+count, and is never kept from completion because of one. Counts are
+factual history, shown as counts ("5 meetings recorded"), never as a
+fraction of a target ("5 / 4") or against a typical number.
 
 ---
 
@@ -567,10 +581,9 @@ assigned Discipler, decides when the lesson material has been covered.
 That judgement is recorded by marking the lesson completed (BR-033); no
 separate submission step exists.
 
-A lesson can be marked completed only while it is In Progress, so it
-has at least one credited meeting. Whether a larger minimum applies is
-the open decision in BR-030. A Disciple never marks, undoes or reopens
-their own lesson.
+The current lesson can be marked completed whether it is Not Started or
+In Progress, whatever its meeting count (BR-030, ADR-017). A Disciple
+never marks, undoes or reopens their own lesson.
 
 ---
 
@@ -589,10 +602,9 @@ mark a lesson completed on the Discipler's behalf, as they may record
 meetings on the Discipler's behalf. Without this fallback, a gap in the
 Discipler relationship would block progression.
 
-Marking completed requires that the lesson is the Disciple's current
-lesson, that it is In Progress, and that its credited meetings meet the
-lesson meeting policy minimum at that moment (BR-030). The completion
-records who marked it and when, and is audited.
+Marking completed requires only that the lesson is the Disciple's
+current lesson; no meeting count is required (BR-030, ADR-017). The
+completion records who marked it and when, and is audited.
 
 A completion may be undone by the current assigned Discipler, the
 Leader of the Disciple's current D Group or the Coordinator, only while
@@ -607,33 +619,45 @@ credited meeting), clears the completion attribution and is audited
 with the prior values. From Slice 6, the eligibility-lesson protection
 for an appointed Discipler (BR-036, ADR-012) also applies to undo.
 
-After that window, only the Coordinator can reopen a completed lesson
-(BR-033a).
+After that window the completion is locked (ADR-016): legitimate
+progress now exists in a later lesson, either a recorded meeting on the
+next lesson or a later completed lesson. Nothing voids, moves or deletes
+that later history to unlock it, and the MVP offers no further
+correction. The Coordinator's reopen operation exists only as a
+database-level recovery capability, with the same locks, and is not an
+action in the app (BR-033a).
 
 ---
 
 ## BR-033a — Completed Lessons Are Protected
 
-*Revised 2026-10-05 (ADR-015).*
+*Revised 2026-10-05 (ADR-015); 2026-10-06 (ADR-016, ADR-017).*
 
 A Completed lesson must not be silently invalidated.
 
-A void never changes a Completed status. Voiding a meeting or
-participation record that would leave a Completed lesson with fewer
-credited meetings than marking completed needs (BR-033, and the open
-minimum in BR-030) must be rejected. Voiding an Absent or Excused
-outcome never affects progress.
+Voiding meeting history never implicitly undoes or changes an explicitly
+Completed lesson (ADR-017). Voiding a meeting or a participant on a
+Completed lesson is allowed, under the usual void authority, and the
+lesson stays Completed with its completion attribution; recomputation
+from meeting history never downgrades Completed. No count has to be
+preserved, because completion does not rest on a count.
 
-Correcting such a case requires an explicit authorized reopen operation
-first (Coordinator only, outside the undo window of BR-033). Reopening
+A Completed lesson changes only through the correction mechanisms of
+ADR-016: undo while the window of BR-033 holds, or the database-only
+reopen below. Voiding is only ever the correction of an erroneous
+record; it is never used to unlock a completion.
+
+The Coordinator's reopen operation is a database-only recovery
+capability, not an action in the app. It is refused while any later
+lesson is Completed or has a recorded meeting, and for an appointed
+Discipler's eligibility lesson or earlier (BR-036). When it succeeds it
 returns the lesson to In Progress, or Not Started when no credited
-meeting remains.
+meeting remains, and is audited with the prior completion.
 
 Progress that is not Completed recomputes only from credited presence:
 a lesson with no credited meeting is Not Started. Recomputation never
-makes a lesson Completed. The automatic withdrawal of a Ready for
-Completion submission that a void leaves below the minimum is dormant,
-because that state is no longer entered (ADR-015).
+makes a lesson Completed. Ready for Completion is no longer entered
+(ADR-015); with no minimum (ADR-017) a row found in that state keeps it.
 
 ---
 

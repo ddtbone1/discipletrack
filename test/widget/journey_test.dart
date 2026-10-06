@@ -130,7 +130,7 @@ void main() {
       );
       expect(find.byType(TabBar), findsNothing);
       // The current lesson is the first thing on the page.
-      expect(find.text('CURRENT LESSON'), findsOneWidget);
+      expect(find.text('Current lesson'), findsOneWidget);
     });
 
     testWidgets('a Discipler with no journey of their own sees My Disciples '
@@ -242,12 +242,12 @@ void main() {
   group('Home', () {
     testWidgets('a Disciple sees their journey block', (tester) async {
       await _pump(tester, const HomePage(), _context(disciple: true), _repo());
-      expect(find.text('YOUR JOURNEY'), findsOneWidget);
-      expect(find.text('Lesson 4 · 2 meetings recorded'), findsOneWidget);
+      expect(find.text('Your journey'), findsOneWidget);
+      expect(find.text('Lesson 4 · 2 counted meetings'), findsOneWidget);
       // Once, on the D Group card; not repeated in the journey block.
       expect(find.text('Mark Reyes'), findsOneWidget);
       expect(find.text('Your Discipler'), findsOneWidget);
-      expect(find.text('YOUR DISCIPLESHIPS'), findsNothing);
+      expect(find.text('Your discipleships'), findsNothing);
     });
 
     testWidgets('a Discipler sees their discipleships with Record a meeting', (
@@ -259,10 +259,10 @@ void main() {
         _context(discipler: true, disciples: ['Ana Lim', 'Ben Cruz']),
         _repo(disciples: ['Ana Lim', 'Ben Cruz']),
       );
-      expect(find.text('YOUR DISCIPLESHIPS'), findsOneWidget);
+      expect(find.text('Your discipleships'), findsOneWidget);
       expect(find.text('Ana Lim'), findsOneWidget);
       expect(find.text('Record a meeting'), findsOneWidget);
-      expect(find.text('YOUR JOURNEY'), findsNothing);
+      expect(find.text('Your journey'), findsNothing);
     });
 
     testWidgets('the Coordinator sees active discipleships as a figure', (

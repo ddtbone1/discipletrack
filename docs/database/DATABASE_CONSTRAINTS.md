@@ -14,6 +14,10 @@ Revision 2026-10-05: D Group gatherings and gathering attendance removed from th
 
 Revision 2026-10-05 (ADR-015): the Discipler marks a lesson completed in one step, with no Leader confirmation. Section 4: "Lesson Submission" replaced by "Lesson Completion" (complete_lesson(), column reuse, undo_lesson_completion() and its window); Progress State Check and Progress Timestamps notes; the READY_FOR_COMPLETION void rule dormant; reopen_lesson_completion() returns to IN_PROGRESS or NOT_STARTED. Sections 5, 11 and 12: "confirmed COMPLETED" wording and the operation list.
 
+Revision 2026-10-06 (ADR-016): a completion is locked once legitimate progress exists in a later lesson (a recorded later meeting or a later completed lesson). Section 4: Lesson Completion's closing paragraph, COMPLETED Is Protected (correction path), reopen_lesson_completion() (database-level recovery only, no MVP action; precondition 3 no longer tells the Coordinator to void later meetings first; Ordering replaced; Out of scope widened). Undo is the normal correction; void corrects only erroneous records and is never a way to unlock a completion.
+
+Revision 2026-10-06 (ADR-017, N1 closed): there is no minimum number of meetings; meeting count never determines completion. Section 0 (required_meetings note), section 4 (Lesson Meeting Policy withdrawn and replaced by No Meeting Minimum; Lesson Completion preconditions; Progress Timestamps; COMPLETED Is Protected: a void never changes a COMPLETED lesson and is no longer refused to protect it), section 11 (count presentation).
+
 Revision 2026-10-05 (user decision, ninth): the curriculum has ten lessons, not twelve. Section 0: ten lesson rows and postconditions, and the Slice 5 migration's replacement of the bootstrap functions; examples in sections 4, 5, 11 and 12.
 
 ---
@@ -88,8 +92,8 @@ The two thresholds in step 2 (ADR-014 decisions 12 and 13):
   test/integration/bootstrap_test.dart. It is not dropped now.
 
 required_meetings = 4 is the value bootstrap seeds (Migration 004). It
-no longer drives progression (ADR-011); what it will mean is an open
-product decision (section 4, Lesson Meeting Policy).
+drives nothing (ADR-011, ADR-017): no function reads it and clients are
+denied it. It is legacy data, not a completion rule.
 
 The curriculum has ten lessons (user decision 2026-10-05). Migration
 004 seeded and asserted twelve; it is applied and unchanged. The Slice 5
@@ -670,52 +674,29 @@ elsewhere may hard-code a lesson count.
 
 ## Check Constraint
 
-required_meetings > 0 (Migration 001; unchanged while its meaning is
-open, see Lesson Meeting Policy)
+required_meetings > 0 (Migration 001; legacy, unread, see No Meeting
+Minimum)
 
-## Lesson Meeting Policy
+## No Meeting Minimum
 
-ADR-011 makes one numeric rule a product decision that is still open:
+ADR-017 (2026-10-06) closes N1: there is no minimum number of meetings.
+Meeting count does not determine lesson completion. The authorized
+Discipler decides when the Disciple has completed the lesson, based on
+the actual discipleship process (Lesson Completion).
 
-> Is there a minimum number of credited meetings required before a
-> lesson can be marked finished, or is the number only recommended /
-> completely flexible depending on when the lesson material is actually
-> completed?
+- A lesson never completes, and never advances, because of a count.
+- A lesson is never kept from completion because of a count: zero, one
+  or any number of credited participations.
+- Outcomes and counts remain factual history, displayed and summarised,
+  and usable by monitoring rules where separately approved.
+- No rule reads required_meetings, and no client reads it at all. No
+  rule defines a maximum.
 
-The question is still open and blocks Slice 5 (N1, decision 23). The
-options are A (no minimum), B (a minimum number of credited meetings)
-and C (a recommended number only). In every case: a meeting count never
-completes a lesson automatically; the Discipler explicitly marks the
-lesson completed when it is fully covered (Lesson Completion), which
-sets COMPLETED with no Leader confirmation (ADR-015).
-
-Every count-dependent rule reads the answer from one place, a trusted
-policy function resolved per lesson, which yields:
-
-- submission_minimum: credited participations a lesson needs before it
-  may be marked completed (the name is kept from ADR-011). Never below 1, because a lesson with no
-  credited participation is NOT_STARTED.
-- recommended_meetings: a guidance number for display only, or NULL.
-
-| Model | submission_minimum | recommended_meetings |
-|---|---|---|
-| A, fully flexible | 1 | NULL |
-| B, minimum + flexible | the decided minimum | optional |
-| C, recommended only | 1 | the decided recommendation |
-
-Rules that read the policy, and nothing else: Lesson Completion, the
-COMPLETED void protection (and the dormant READY_FOR_COMPLETION rule),
-and every read RPC that reports counts.
-No rule reads required_meetings directly, and no client reads it at
-all. No rule defines a maximum.
-
-As built (Slice 5 migration): `private.lesson_meeting_policy(lesson)`
-returns the placeholder floor shared by all three models
-(submission_minimum 1, recommended_meetings NULL) until N1 is decided.
-The placeholder is not a choice of model A; a forward migration replaces
-the body once N1 is answered. Clients are denied the required_meetings
-column by a column-level grant, and only trusted operations may call the
-policy function.
+As built: Migration 011 (20261006000004) drops the placeholder
+`private.lesson_meeting_policy()` (formerly submission_minimum 1,
+recommended_meetings NULL) and every rule that read it. The former
+Lesson Meeting Policy section, its models A, B and C and its
+submission_minimum and recommended_meetings values are withdrawn.
 
 ## Attendance Outcome and Credit
 
@@ -870,11 +851,10 @@ Preconditions, all required, otherwise reject:
    Refusal: not_authorized.
 2. The caller is not the Disciple. Refusal: cannot_act_on_own_lesson
    (checked before authority).
-3. The lesson is the Disciple's eligible lesson and its status is
-   IN_PROGRESS. Refusals: lesson_not_eligible, lesson_not_in_progress.
-4. Credited participations for the lesson >= submission_minimum,
-   evaluated at the moment of marking completed. Refusal:
-   below_submission_minimum.
+3. The lesson is the Disciple's eligible (current) lesson, NOT_STARTED
+   or IN_PROGRESS. Refusal: lesson_not_eligible. No meeting count is
+   required (No Meeting Minimum, ADR-017); the former refusals
+   lesson_not_in_progress and below_submission_minimum are withdrawn.
 
 Effect, reusing the existing columns (no schema change):
 
@@ -883,6 +863,8 @@ completed_at → now()
 confirmed_by → the caller
 ready_at     → completed_at
 submitted_by → the caller
+started_at   → unchanged, or completed_at when no credited
+               participation exists (Progress Timestamps)
 updated_at   → now()
 
 The action is audited as LESSON_COMPLETED. The next lesson in sequence
@@ -913,9 +895,10 @@ remains; ready_at, submitted_by, completed_at and confirmed_by → NULL;
 started_at unchanged (NULL when NOT_STARTED); updated_at → now(). An
 audit_events row (LESSON_COMPLETION_UNDONE) records the prior values.
 
-After the undo window (preconditions 3 and 4) has closed, only the
-Coordinator can change a COMPLETED lesson, through
-reopen_lesson_completion() below.
+After the undo window (preconditions 3 and 4) has closed, the
+completion is locked by later progress (ADR-016). No MVP operation
+changes it; reopen_lesson_completion() below refuses it for the same
+reasons and exists only as database-level recovery.
 
 ## Progress State Check
 
@@ -938,7 +921,11 @@ the check without a separate submission step.
 
 started_at
 = occurred_at of the earliest credited participation for that lesson.
-  Recomputed when backdated participation changes the chronology.
+  Recomputed when backdated participation changes the chronology. A
+  lesson marked completed with no credited participation gets
+  started_at = completed_at (it was taken up no later than it was
+  completed), because the Progress State Check requires started_at for
+  COMPLETED (ADR-017). Undo and reopen recompute it.
 
 ready_at
 = for a completion, equal to completed_at (ADR-015; Lesson Completion).
@@ -966,6 +953,14 @@ When meeting participation is VOIDED:
 Voided records remain historical but do not contribute to progress or
 monitoring.
 
+As built (Migration 008, 20261006000001): void_discipleship_meeting()
+sets only the meeting row VOIDED (participant rows are not modified);
+void_meeting_participant() sets only that row VOIDED and refuses the
+meeting's last RECORDED participant (void_meeting_instead). Neither may
+void the caller's own outcome (cannot_void_own_meeting). Both recompute
+the credited people's progress, never touch COMPLETED, and are audited
+(DISCIPLESHIP_MEETING_VOIDED, MEETING_PARTICIPANT_VOIDED).
+
 ## COMPLETED Is Protected
 
 An ordinary void must not retroactively invalidate a COMPLETED lesson.
@@ -976,30 +971,33 @@ and would silently change the progress the Journey shows.
 A void never changes a COMPLETED status: completion is an explicit
 judgement, not a count, so recomputation never touches COMPLETED rows.
 
-A void that would leave a COMPLETED lesson with fewer credited
-participations than submission_minimum (Lesson Meeting Policy) must be
-REJECTED, so a completed lesson never rests on fewer meetings than
-marking it completed would need. Under a minimum of 1 this refuses only a void
-that would remove the lesson's last credited participation.
+Voiding meeting history never implicitly undoes or changes an
+explicitly COMPLETED lesson (ADR-017). A void on a COMPLETED lesson is
+allowed under the usual void authority, whatever it leaves of the
+lesson's credited participations, and the lesson stays COMPLETED with
+its completion attribution. No count is preserved, because completion
+does not rest on a count. The former lesson_completed_protected refusal
+is withdrawn (Migration 011).
 
-Voiding an uncredited (ABSENT or EXCUSED) participation never affects
-progress, so it is never rejected on these grounds. A COMPLETED lesson
-whose credited count stays at or above submission_minimum may lose
-meetings to a void without rejection.
-
-Correcting such a case requires an explicit controlled operation first:
-undo_lesson_completion() while its window holds (Lesson Completion), or
-otherwise reopen_lesson_completion(), which is Coordinator-only for the
-MVP. Both are audited.
+A COMPLETED lesson changes only through undo_lesson_completion() while
+its window holds (Lesson Completion), or the database-only
+reopen_lesson_completion() below (ADR-016). A void is only ever the
+correction of an erroneous record; it is never used to unlock a
+completion.
 
 For progress that is not COMPLETED:
 
-- Dormant (ADR-015): a void that leaves a READY_FOR_COMPLETION lesson below submission_minimum withdraws the submission in the same transaction: IN_PROGRESS, or NOT_STARTED when no credited participation remains, with ready_at and submitted_by cleared. The void's audit event records the withdrawal. No operation enters READY_FOR_COMPLETION any more, so this rule applies only to a row found in that state; it is kept so that such a row is still handled deterministically.
+- READY_FOR_COMPLETION is not entered by any operation (ADR-015). With no minimum (ADR-017) there is nothing to fall below, so a row found in that state keeps it; only its started_at is refreshed.
 - IN_PROGRESS returns to NOT_STARTED when no credited participation remains.
 - Backdated credited participation may recompute started_at.
 - No recomputation ever sets READY_FOR_COMPLETION or COMPLETED.
 
 ## reopen_lesson_completion()
+
+A Coordinator-only, database-level recovery operation (ADR-016). It is
+not an action in the MVP app: the normal correction of a recently
+completed lesson is undo_lesson_completion(), and a completion is locked
+once legitimate progress exists in a later lesson.
 
 Reopening never cascades. It is permitted only when it cannot invalidate
 anything downstream.
@@ -1012,11 +1010,15 @@ Preconditions, all required, otherwise reject:
 3. No lesson of the same curriculum with a higher lesson_number is
    COMPLETED for this church_membership_id, and none has a RECORDED
    participant row in a RECORDED meeting for this church_membership_id,
-   whatever the outcome (revised 2026-10-05, user decision). Reopening
-   never moves, voids or deletes later meeting history: the Coordinator
-   voids the conflicting later meetings first, then reopens. Refusal
-   reasons: later_lesson_completed, later_lesson_has_meetings. This keeps
-   sequential progression intact: at most one lesson is ever current.
+   whatever the outcome (revised 2026-10-05, user decision). A later
+   recorded meeting or a later completed lesson locks the earlier lesson
+   (ADR-016). Reopening never moves, voids or deletes later history, and
+   nothing voids, moves or deletes legitimate later history in order to
+   reopen. Refusal reasons: later_lesson_completed,
+   later_lesson_has_meetings. This keeps sequential progression intact:
+   at most one lesson is ever current. These are the conditions that
+   close the undo window, so reopen never applies once that window has
+   closed.
 4. If a ministry_role_transitions row exists for this
    church_membership_id with to_responsibility = DISCIPLER (the person
    has been appointed as a Discipler), the target lesson is not the
@@ -1040,8 +1042,8 @@ the lesson to READY_FOR_COMPLETION:
 credited count > 0  → IN_PROGRESS
 credited count = 0  → NOT_STARTED
 
-In the normal case the void has not happened yet, so the result is
-IN_PROGRESS. The lesson can then be marked completed again through
+A COMPLETED lesson keeps at least one credited meeting (COMPLETED Is
+Protected), so the result is normally IN_PROGRESS. The lesson can then be marked completed again through
 complete_lesson() once it is finished.
 
 Also:
@@ -1068,15 +1070,18 @@ Sequential progression stays consistent, because precondition 3
 guarantees no later lesson is COMPLETED or has any recorded meeting, so
 the reopened lesson is the only current lesson.
 
-Ordering: void any recorded meetings on later lessons first, then
-reopen (or undo, while its window holds), then void on the reopened
-lesson if needed, then normal recomputation. After reopening the lesson is no longer COMPLETED, so the void rejection above no longer
-applies.
+Correction path (ADR-016): undo the completion while its window holds;
+then, if a meeting on that lesson was recorded in error, void it as a
+correction of that record. After undoing (or a recovery reopen) the
+lesson is no longer COMPLETED, so the void rejection above no longer
+applies. Legitimate later meetings are never voided to unlock an earlier
+lesson.
 
-Out of scope: historical correction of an early lesson for someone with
-later completed lessons, or of the eligibility lesson or an earlier
-lesson for someone with an existing Discipler appointment. That is an exceptional
-correction workflow and is not part of the MVP.
+Out of scope (ADR-016): historical correction of a lesson once
+legitimate later progress exists for the person (a recorded meeting on a
+later lesson, or a later completed lesson), or of the eligibility lesson
+or an earlier lesson for someone with an existing Discipler appointment.
+That is an exceptional correction workflow and is not part of the MVP.
 
 ---
 
@@ -1561,9 +1566,8 @@ credited_meetings(member, lesson)
 
 The count has no upper limit and is never clamped. It is presented as a
 count ("5 meetings recorded"), never as a fraction of a target
-("5 / 4"). Where the meeting policy defines recommended_meetings it may
-be shown beside the count ("5 meetings recorded · Typical: 4"); a count
-above it is never exceptional.
+("5 / 4"), and never beside a typical or recommended number (ADR-017).
+It is a fact, not a progression gate.
 
 meeting_ordinal
 = position of a credited participation among that lesson's credited

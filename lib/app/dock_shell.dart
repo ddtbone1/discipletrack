@@ -105,6 +105,8 @@ class DockShell extends ConsumerWidget {
         ? 0.0
         : FloatingDock.height + FloatingDock.gap * 2;
 
+    final theme = Theme.of(context);
+
     return DockScope(
       child: Stack(
         children: [
@@ -114,7 +116,15 @@ class DockShell extends ConsumerWidget {
                 bottom: media.padding.bottom + footprint,
               ),
             ),
-            child: child,
+            // Floating snackbars sit above the dock rather than under it.
+            child: Theme(
+              data: theme.copyWith(
+                snackBarTheme: theme.snackBarTheme.copyWith(
+                  insetPadding: EdgeInsets.fromLTRB(16, 5, 16, footprint + 10),
+                ),
+              ),
+              child: child,
+            ),
           ),
           if (!keyboardOpen)
             Positioned(

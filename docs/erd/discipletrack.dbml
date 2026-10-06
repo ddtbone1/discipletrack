@@ -65,6 +65,25 @@
 // migration replaces the bootstrap functions for the count (see
 // curricula and curriculum_lessons).
 //
+// As built, Vertical Slice 5 (Journey / Meeting Progress), no table,
+// column or type added beyond what is noted on each table:
+// - Migration 007 (20261002000001): schema revisions (participation
+//   status RECORDED, attendance_status, submitted_by, the Progress
+//   State Check), RLS, recording, completion and undo, reads.
+// - Migration 008 (20261006000001): meeting and participant voids;
+//   get_meeting_history() returns per-row void permissions.
+// - Migration 009 (20261006000002): reopen_lesson_completion(), a
+//   database-only recovery operation (ADR-016).
+// - Migration 010 (20261006000003): list_group_progress() for the
+//   group's Leader and the Coordinator.
+// - Migration 011 (20261006000004): no meeting minimum (ADR-017);
+//   the placeholder lesson_meeting_policy() and the count-based void
+//   protection are dropped.
+// Revised 2026-10-06 (ADR-016): a completion is locked once
+// legitimate progress exists in a later lesson.
+// Revised 2026-10-06 (ADR-017): N1 closed, no minimum number of
+// meetings; meeting count never determines completion.
+//
 // ============================================================
 
 
@@ -1094,11 +1113,10 @@ Table curriculum_lessons {
   required_meetings (applied in Migration 001, seeded as 4) no
   longer drives progression (ADR-011). A lesson is completed
   when the Discipler marks it completed (ADR-015), not when a
-  count is reached. Whether this column becomes a minimum
-  (minimum_meetings), a recommendation (recommended_meetings) or is
-  retired is an open product decision. Until then it is not renamed,
-  and only the meeting policy function may give it meaning; no other
-  rule or client reads it directly.
+  count is reached. There is no minimum number of meetings
+  (ADR-017, N1 closed): this column is legacy data, read by no rule
+  and denied to clients. It is not renamed and not dropped while the
+  bootstrap functions still seed and assert it.
 
   Lesson progression is sequential.
   '''
@@ -1418,10 +1436,10 @@ Table disciple_lesson_progress {
   All four are cleared by undo_lesson_completion() and by
   reopen_lesson_completion().
 
-  Marking completed needs the lesson to be the eligible lesson,
-  IN_PROGRESS, with at least the meeting policy's submission_minimum
-  credited participations (ADR-011: never below 1; the numeric rule
-  is an open product decision). See DATABASE_CONSTRAINTS.md section 4.
+  Marking completed needs only the lesson to be the eligible
+  (current) lesson, NOT_STARTED or IN_PROGRESS; meeting count is never
+  a condition (ADR-017). With no credited participation, started_at is
+  set to completed_at. See DATABASE_CONSTRAINTS.md section 4.
 
   Undo (ADR-015): the current assigned Discipler, the Leader of the
   current D Group or the Coordinator, only while the lesson is the
@@ -1430,15 +1448,18 @@ Table disciple_lesson_progress {
   when no credited participation remains); audited with the prior
   values.
 
-  COMPLETED is protected. A void never changes a COMPLETED status. A
-  void that would leave a COMPLETED lesson with fewer than
-  submission_minimum credited participations is rejected; an explicit
-  controlled undo or reopen operation must run first. Voiding an
-  uncredited (ABSENT or EXCUSED) row never affects progress.
+  COMPLETED is protected. A void never changes a COMPLETED status and
+  is never refused to protect one (ADR-017): recomputation leaves
+  COMPLETED as it is. A completed lesson changes only through undo
+  while its window holds, or the database-only reopen (ADR-016). Voiding an uncredited (ABSENT or EXCUSED)
+  row never affects progress, and a void is never used to unlock a
+  completion.
 
-  Reopening (Coordinator only) never cascades. It is permitted only
-  when no later lesson is COMPLETED for the same church membership
-  and, for a person appointed as a Discipler, the lesson is later than
+  Reopening (Coordinator only) is a database-level recovery operation
+  with no MVP action (ADR-016). It never cascades. It is permitted only
+  when no later lesson is COMPLETED for the same church membership, no
+  later lesson has a recorded meeting for the person, and, for a person
+  appointed as a Discipler, the lesson is later than
   the eligibility lesson (Lesson 5): the eligibility lesson and
   earlier lessons cannot be reopened for an appointed person; later
   lessons can, subject to the other preconditions (ADR-012 decision 9,
@@ -1452,10 +1473,8 @@ Table disciple_lesson_progress {
   active curriculum, marked by the Discipler (ADR-015; completed_at is
   the "eligible since" date). It is never stored here (ADR-012).
 
-  Dormant (ADR-015): a void that would leave a READY_FOR_COMPLETION
-  lesson below submission_minimum withdraws the submission
-  (IN_PROGRESS, or NOT_STARTED when no credited participation
-  remains). Nothing enters that state any more.
+  READY_FOR_COMPLETION is dormant (ADR-015): nothing enters it, and
+  with no minimum (ADR-017) a row found in it keeps it.
 
   Progression is sequential: lesson N requires lesson N-1 COMPLETED.
   Lesson 1 is exempt.

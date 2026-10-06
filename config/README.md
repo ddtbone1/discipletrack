@@ -53,20 +53,20 @@ and uses the password `dev-password-123`:
 | `admin@discipletrack.local` | Dev Admin | Admin and Coordinator, not in a group | Home figures, including 4 active discipleships; any Disciple's detail by deep link |
 | `leader@discipletrack.local` | Lea Santos | Leader of Young Adults A | Every Disciple's detail in the group; recording on a Discipler's behalf |
 | `discipler@discipletrack.local` | Dino Reyes | Discipler of Diana, Daniel and Ella | My Disciples with three rows; Record a meeting with the choose-Disciple sheet |
-| `disciple1@discipletrack.local` | Diana Cruz | Disciple of Dino | Lesson 1 completed; Lesson 2 in progress with 3 recorded absences in a row |
-| `disciple2@discipletrack.local` | Daniel Bautista | Disciple of Dino | Lesson 1 marked finished, awaiting confirmation (6 counted meetings) |
-| `disciple3@discipletrack.local` | Ella Navarro | Disciple of Dino | Paired, no meeting recorded yet |
+| `disciple1@discipletrack.local` | Diana Cruz | Disciple of Dino | Lesson 1 completed and locked (Lesson 2 already has meetings, so no Undo); Lesson 2 in progress with 3 recorded absences in a row |
+| `disciple2@discipletrack.local` | Daniel Bautista | Disciple of Dino | Lesson 1 in progress with 7 counted meetings, ready for Dino to mark completed; one duplicate meeting voided |
+| `disciple3@discipletrack.local` | Ella Navarro | Disciple of Dino | Paired, no counted meeting; removed from one of Daniel's meetings where she was listed by mistake |
 | `discipler2@discipletrack.local` | Grace Lim | Discipler of Hana | My Disciples with one row; cannot see Dino's Disciples |
-| `disciple5@discipletrack.local` | Hana Torres | Disciple of Grace | Present, Excused, then Late (recorded by Lea), with notes |
+| `disciple5@discipletrack.local` | Hana Torres | Disciple of Grace | Present, Excused, then Late (recorded by Lea), with notes; Lesson 1 just marked completed by Grace, so Undo is available |
 | `disciple4@discipletrack.local` | Felix Ramos | Disciple, never paired | "Not paired yet" on My Journey |
-| `member@discipletrack.local` | Mara Villanueva | Not placed, with a pending invitation to accept | No Journey in the dock |
+| `member@discipletrack.local` | Mara Villanueva | Not placed, with a pending invitation to accept | No Journey in the dock; out of scope for everyone's progress |
 
 Meetings are dated over the last 60 days relative to the reset, so dates move
 with each `db reset`. Every meeting is recorded through
-`record_discipleship_meeting()`. Until Slice 5 step 7 adds the submission and
-confirmation operations, Diana's completed Lesson 1 and Daniel's submitted
-Lesson 1 are written directly by the seed; they satisfy every database
-constraint. The seed is for looking at the app by hand; integration tests
+`record_discipleship_meeting()`, completions through `complete_lesson()` and
+voids through `void_discipleship_meeting()` and `void_meeting_participant()`,
+with each account impersonated, so every seeded state is one the app could
+have produced. The seed is for looking at the app by hand; integration tests
 never read it.
 
 Use a separate browser profile per account to walk through the roles side by

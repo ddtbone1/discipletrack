@@ -1,4 +1,5 @@
 import 'package:discipletrack/core/widgets/app_text_link.dart';
+import 'package:discipletrack/features/discipleship/domain/disciple_progress_summary.dart';
 import 'package:discipletrack/features/home/presentation/home_page.dart';
 import 'package:discipletrack/features/membership/domain/church_membership.dart';
 import 'package:discipletrack/features/ministry/domain/d_group.dart';
@@ -221,6 +222,51 @@ void main() {
       expect(find.text('Withdraw'), findsOneWidget);
     });
 
+    testWidgets('the Coordinator sees each Disciple\'s progress (step 8)', (
+      tester,
+    ) async {
+      final repo = FakeMinistryRepository()..details = {_groupId: _detail()};
+      await pumpPage(
+        tester,
+        DGroupDetailPage(groupId: _groupId, now: _now),
+        membership: active,
+        roles: const {ChurchRole.coordinator},
+        ministryRepo: repo,
+        discipleshipRepo: FakeDiscipleshipRepository()
+          ..groupProgress = {
+            _groupId: [
+              const DiscipleProgressSummary(
+                membershipId: 'cm-dgm-cara',
+                fullName: 'Cara Disciple',
+                lessonsTotal: 10,
+                lessonsCompleted: 3,
+                creditedCount: 1,
+                recordedAbsences: 0,
+                currentLessonNumber: 4,
+              ),
+            ],
+          },
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Lesson 4 of 10'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel(RegExp('Lesson 4 of 10. 3 lessons completed')),
+        findsOneWidget,
+      );
+      // Dan has no progress row, so his row stays a plain face.
+      expect(find.text('Dan Disciple'), findsOneWidget);
+    });
+
+    testWidgets('a refused progress read leaves plain rows, with no error', (
+      tester,
+    ) async {
+      await pumpDetail(tester, roles: const {ChurchRole.coordinator});
+      expect(find.text('Cara Disciple'), findsWidgets);
+      expect(find.textContaining('Lesson '), findsNothing);
+      expect(find.textContaining("can't"), findsNothing);
+    });
+
     testWidgets('anyone else gets a refusal, not data', (tester) async {
       await pumpPage(
         tester,
@@ -330,7 +376,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('NOT IN A D GROUP'), findsOneWidget);
+      expect(find.text('Not in a D Group'), findsOneWidget);
       expect(find.text('Mara Villanueva'), findsOneWidget);
       expect(find.text('Invited'), findsOneWidget);
       expect(find.text('Paolo Lim'), findsOneWidget);
@@ -479,12 +525,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('YOUR LEADER'), findsOneWidget);
+      expect(find.text('Your Leader'), findsOneWidget);
       expect(find.text('+63 900 111'), findsOneWidget);
-      expect(find.text('YOUR DISCIPLER'), findsOneWidget);
+      expect(find.text('Your Discipler'), findsOneWidget);
       expect(find.text('+63 900 222'), findsOneWidget);
       expect(find.text('Dan Disciple'), findsOneWidget);
-      expect(find.text('YOUR DISCIPLES'), findsNothing);
+      expect(find.text('Your Disciples'), findsNothing);
     });
 
     testWidgets('an unpaired Disciple is told so', (tester) async {
@@ -511,10 +557,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('YOUR DISCIPLES'), findsOneWidget);
+      expect(find.text('Your Disciples'), findsOneWidget);
       expect(find.text('Cara Disciple'), findsOneWidget);
       expect(find.text('+63 900 333'), findsOneWidget);
-      expect(find.text('YOUR DISCIPLER'), findsNothing);
+      expect(find.text('Your Discipler'), findsNothing);
     });
   });
 

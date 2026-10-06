@@ -11,6 +11,7 @@ import '../domain/attendance_outcome.dart';
 import '../domain/disciple_progress_summary.dart';
 import '../domain/journey.dart';
 import '../domain/meeting_history_entry.dart';
+import 'current_lesson_card.dart';
 
 /// Factual journey progress as one continuous bar: the share of the ACTIVE
 /// curriculum's lessons that are COMPLETED. Not a stepper (user decision of
@@ -109,7 +110,12 @@ class DiscipleProgressRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          InitialsAvatar(name: d.fullName),
+          LessonRing(
+            total: d.lessonsTotal,
+            completed: d.lessonsCompleted,
+            currentNumber: d.currentLessonNumber,
+            size: 48,
+          ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
@@ -152,14 +158,10 @@ class DiscipleProgressRow extends StatelessWidget {
                         icon: Icons.hourglass_empty_rounded,
                         label: 'Lesson ${d.currentLessonNumber} not started',
                       ),
-                    AppPill(
-                      icon: d.lastRecordedMeetingAt == null
-                          ? Icons.event_busy_rounded
-                          : Icons.event_available_rounded,
-                      label: d.lastMeetingLine,
-                    ),
                   ],
                 ),
+                const SizedBox(height: 4),
+                Text(d.lastMeetingLine, style: context.supportingStyle),
               ],
             ),
           ),
@@ -228,9 +230,12 @@ class LessonStepper extends StatelessWidget {
 /// One recorded outcome in a person's meeting history. Voided rows stay,
 /// greyed, with who voided them. Shared notes open on request.
 class MeetingHistoryRow extends StatefulWidget {
-  const MeetingHistoryRow({required this.entry, super.key});
+  const MeetingHistoryRow({required this.entry, this.trailing, super.key});
 
   final MeetingHistoryEntry entry;
+
+  /// An action beside the row, such as the void menu.
+  final Widget? trailing;
 
   @override
   State<MeetingHistoryRow> createState() => _MeetingHistoryRowState();
@@ -258,26 +263,35 @@ class _MeetingHistoryRowState extends State<MeetingHistoryRow> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          MergeSemantics(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${AppFormat.shortDate(e.occurredAt)} · Lesson ${e.lessonNumber}',
-                  style: AppTypography.body.copyWith(
-                    color: faded,
-                    fontWeight: FontWeight.w600,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: MergeSemantics(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${AppFormat.shortDate(e.occurredAt)} · '
+                        'Lesson ${e.lessonNumber}',
+                        style: AppTypography.body.copyWith(
+                          color: faded,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        e.outcomeLine,
+                        style: AppTypography.supporting.copyWith(color: faded),
+                      ),
+                      if (recorder != null)
+                        Text(recorder, style: context.captionStyle),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  e.outcomeLine,
-                  style: AppTypography.supporting.copyWith(color: faded),
-                ),
-                if (recorder != null)
-                  Text(recorder, style: context.captionStyle),
-              ],
-            ),
+              ),
+              ?widget.trailing,
+            ],
           ),
           if (e.notes != null) ...[
             AppTextLink(

@@ -256,7 +256,7 @@ class _RecordMeetingFormState extends ConsumerState<RecordMeetingForm> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'LESSON ${_target.lessonNumber}',
+                      'Lesson ${_target.lessonNumber}',
                       style: text.labelSmall?.copyWith(
                         color: p.muted,
                         letterSpacing: 0.8,
@@ -413,6 +413,7 @@ class _RecordMeetingFormState extends ConsumerState<RecordMeetingForm> {
         const SizedBox(height: AppSpacing.md),
         AppButton(
           label: 'Record meeting',
+          variant: AppButtonVariant.record,
           icon: Icons.check_rounded,
           isLoading: state.isSending,
           requiresConnection: true,

@@ -28,7 +28,14 @@ class InfoGroup extends StatelessWidget {
           ),
           child: Semantics(
             header: true,
-            child: Text(title.toUpperCase(), style: context.captionStyle),
+            child: Text(
+              title,
+              style: AppTypography.sectionTitle.copyWith(
+                color: context.palette.textPrimary,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ),
         AppCard(

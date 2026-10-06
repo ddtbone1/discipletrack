@@ -242,16 +242,17 @@ Lesson
 There is no Leader confirmation (ADR-015). The Leader and the
 Coordinator may mark a lesson completed as fallback. A completion can be
 undone while it is the latest and no meeting has been recorded on the
-next lesson; after that only the Coordinator can reopen it.
+next lesson; after that the completion is locked by later progress
+(ADR-016). The Coordinator's reopen is database-level recovery with no
+app action.
 
 Absent and Excused outcomes stay in the Disciple's meeting history but
 never count as lesson meetings. There is no maximum.
 
-Every count-dependent rule (whether a minimum applies before marking
-completed,
-and whether a typical number is shown) reads one meeting policy
-function in the database. Its numeric answer is an open product
-decision; nothing else in the client or the database encodes a number.
+No rule depends on a meeting count (ADR-017): there is no minimum
+before marking completed and no typical number. Counts are factual
+history; neither the client nor the database encodes a progression
+threshold.
 
 Lesson content is a separate concern again (ADR-010). It is read, never
 written by the client, and reading it never changes progress.

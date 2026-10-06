@@ -17,6 +17,9 @@ enum AppButtonVariant {
 
   /// No fill or border. Tertiary actions and inline links.
   text,
+
+  /// Recording a meeting: the brand lime with black text in both modes.
+  record,
 }
 
 /// The single button in DiscipleTrack.
@@ -35,8 +38,12 @@ class AppButton extends StatelessWidget {
     this.requiresConnection = false,
     this.offlineAction,
     this.pill = true,
+    this.dense = false,
     super.key,
   });
+
+  /// A smaller button that fits its label, for an action inside a card.
+  final bool dense;
 
   final String label;
 
@@ -63,6 +70,9 @@ class AppButton extends StatelessWidget {
   /// Minimum 44px tall, per UI_DESIGN_SYSTEM section 47 (accessibility).
   static const _minHeight = 48.0;
 
+  /// Dense buttons stay at 40px, close to the 44px touch target.
+  static const _denseHeight = 40.0;
+
   @override
   Widget build(BuildContext context) {
     final blocked = requiresConnection && ConnectionScope.isOffline(context);
@@ -85,6 +95,11 @@ class AppButton extends StatelessWidget {
       AppButtonVariant.text => (
         Colors.transparent,
         enabled ? p.textPrimary : p.disabled,
+        null,
+      ),
+      AppButtonVariant.record => (
+        enabled ? p.brand : p.surfaceAlt,
+        enabled ? p.onBrand : p.disabled,
         null,
       ),
     };
@@ -116,9 +131,13 @@ class AppButton extends StatelessWidget {
                 : Colors.transparent,
           ),
           child: Container(
-            constraints: const BoxConstraints(minHeight: _minHeight),
+            constraints: BoxConstraints(
+              minHeight: dense ? _denseHeight : _minHeight,
+            ),
             width: expand ? double.infinity : null,
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            padding: EdgeInsets.symmetric(
+              horizontal: dense ? AppSpacing.md : AppSpacing.lg,
+            ),
             decoration: border == null
                 ? null
                 : BoxDecoration(
@@ -141,8 +160,8 @@ class AppButton extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (icon != null) ...[
-                          Icon(icon, size: 18, color: fg),
-                          const SizedBox(width: AppSpacing.xs),
+                          Icon(icon, size: dense ? 16 : 18, color: fg),
+                          SizedBox(width: dense ? 6 : AppSpacing.xs),
                         ],
                         // Flexible so a long label at large text sizes wraps
                         // instead of overflowing a narrow button.

@@ -623,7 +623,8 @@ The number four should exist as curriculum/domain data rather than being
 scattered as magic numbers throughout Flutter.
 
 (Superseded rationale: under ADR-011 required_meetings no longer drives
-progression, and its future meaning is an open product decision.)
+progression, and under ADR-017 there is no meeting minimum at all; the
+column is legacy data that drives nothing.)
 
 ---
 
@@ -817,7 +818,8 @@ before that a count threshold), the progress record is set in one step:
 
 READY_FOR_COMPLETION is no longer entered. A completion can be undone
 within a short window (latest completed lesson, no meeting yet on the
-next lesson); afterwards only the Coordinator can reopen it.
+next lesson); afterwards the completion is locked by later progress
+(ADR-016), and the Coordinator's reopen is database-level recovery only.
 
 This provides accountability for the completion decision.
 

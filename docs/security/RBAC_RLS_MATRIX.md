@@ -38,6 +38,12 @@ confirmation; reopen (Coordinator only) returns to IN_PROGRESS. The open
 question whether submission and confirmation must be made by different
 people no longer arises.
 
+Revision 2026-10-06 (ADR-016): after the undo window a completion is
+locked by later progress. reopen_lesson_completion() stays COORDINATOR
+only, as a database-level recovery operation with no MVP action; its
+locks and audit are unchanged. Section 2 row and note, section 5
+`disciple_lesson_progress`, section 10.
+
 ---
 
 # 1. Role Model
@@ -188,7 +194,7 @@ D Group responsibility. This is a valid state, not a stored role.
 | View active discipleships (section 2b) | No | Church-wide | Own D Group | Own assignments | No | No |
 | Mark lesson completed (ADR-015) | No | Fallback | Fallback, own D Group | Assigned Disciples | No | No |
 | Undo lesson completion, within the undo window (ADR-015) | No | Yes | Own D Group | Assigned Disciples | No | No |
-| Reopen lesson completion | No | Yes | No | No | No | No |
+| Reopen lesson completion (database-level recovery only, no MVP action; ADR-016) | No | Yes | No | No | No | No |
 | View attention conditions | No | Church-wide | Own D Group | Assigned Disciples | Self summary | No |
 | View internal follow-up notes | No | Church-wide | Own D Group | Assigned Follow-ups | No | No |
 | Add follow-up action | No | Yes | Own D Group | Assigned Follow-ups | No | No |
@@ -307,7 +313,13 @@ Discipler, the Leader of the Disciple's current D Group and the
 COORDINATOR, only while the lesson is the person's latest COMPLETED
 lesson and no meeting has been recorded for them on the next lesson
 (DATABASE_CONSTRAINTS.md section 4, Lesson Completion). After that
-window only the COORDINATOR can reopen. Every undo is audited.
+window the completion is locked by later progress (ADR-016): no role
+corrects it in the MVP, and no one voids legitimate later meetings to
+unlock it. Every undo is audited.
+
+*Reopen lesson completion* is a COORDINATOR-only database-level recovery
+capability, not an action in the app (ADR-016). It is refused while any
+later lesson is COMPLETED or has a recorded meeting for the person.
 
 *Create D Group announcement* shows "Oversight" for COORDINATOR. The D
 Group Leader is the normal authority. Coordinator capability exists as a
@@ -846,9 +858,12 @@ audit_events with the prior values) and audited.
 No caller ever marks completed, undoes or reopens a lesson in which they
 are the Disciple.
 
-Reopening a COMPLETED lesson after the undo window:
+Reopening a COMPLETED lesson (ADR-016):
 
 - COORDINATOR only, through reopen_lesson_completion(), audited
+- a database-level recovery operation, not an MVP action
+- refused while any later lesson is COMPLETED or has a recorded meeting
+  for the person, so it never applies once the undo window has closed
 
 ---
 
@@ -1139,26 +1154,38 @@ record_discipleship_meeting()
 void_discipleship_meeting() / void_meeting_participant()
 → COORDINATOR, own-D-Group LEADER, or the DISCIPLER who recorded it
   under their own active DISCIPLER membership
-→ reject any void that would leave a COMPLETED lesson below the meeting
-  policy's submission_minimum credited participations
-→ dormant (ADR-015): withdraw, in the same transaction, a
-  READY_FOR_COMPLETION submission that the void leaves below
-  submission_minimum; no operation enters that state any more
+→ never changes a COMPLETED lesson: recomputation leaves COMPLETED as
+  it is, so no void is refused to protect it (ADR-017; the earlier
+  lesson_completed_protected refusal is withdrawn)
 → audited
 → trigger CONSECUTIVE_ABSENCE recalculation (from the monitoring
   slice on; ADR-014)
+→ never the caller's own outcome, in any role (cannot_void_own_meeting)
+→ as built: Migration 008 (20261006000001); a meeting outside the
+  caller's view is reported as not found; get_meeting_history() returns
+  can_void_meeting and can_void_participant for the caller, and the app
+  shows void actions only from them
+
+list_group_progress(p_d_group_id) (Slice 5 step 8)
+→ the Leader of that D Group, or a COORDINATOR of its church
+→ refused for everyone else, a DISCIPLER of that group included (N7:
+  a Discipler reads only their own assigned Disciples, through
+  list_disciple_progress())
+→ derived figures only; as built: Migration 010 (20261006000003)
 
 complete_lesson(p_membership_id, p_lesson_id) (ADR-015)
 → the Disciple's current assigned DISCIPLER; own-D-Group LEADER or
   COORDINATOR as fallback
 → never the Disciple themselves
-→ requires the Disciple's eligible lesson, status IN_PROGRESS and
-  credited participations >= submission_minimum at that moment
+→ requires the Disciple's eligible (current) lesson only, NOT_STARTED or
+  IN_PROGRESS; no meeting count is required (ADR-017)
 → sets COMPLETED, completed_at = now(), confirmed_by = caller,
-  ready_at = completed_at, submitted_by = caller; audited as
-  LESSON_COMPLETED
-→ refusals: cannot_act_on_own_lesson, not_authorized, lesson_not_eligible,
-  lesson_not_in_progress, below_submission_minimum
+  ready_at = completed_at, submitted_by = caller, started_at kept or,
+  with no credited meeting, = completed_at; audited as LESSON_COMPLETED
+  with the credited count as a fact
+→ refusals: cannot_act_on_own_lesson, not_authorized, lesson_not_found,
+  lesson_not_eligible (lesson_not_in_progress and below_submission_minimum
+  are withdrawn by ADR-017)
 → the next lesson becomes current by derivation
 
 undo_lesson_completion(p_membership_id, p_lesson_id) (ADR-015)
@@ -1177,10 +1204,16 @@ undo_lesson_completion(p_membership_id, p_lesson_id) (ADR-015)
   later_lesson_completed, next_lesson_started
 
 reopen_lesson_completion()
-→ COORDINATOR only for the MVP
-→ audited
-→ required before correcting a COMPLETED lesson
+→ COORDINATOR only; a database-level recovery operation with no MVP
+  action (ADR-016)
+→ audited as LESSON_COMPLETION_REOPENED with the prior completion
+→ never the caller's own lesson (cannot_act_on_own_lesson)
 → rejected when any later lesson is COMPLETED for the same membership
+  (later_lesson_completed)
+→ rejected when any later lesson has a RECORDED participant row for the
+  person in a RECORDED meeting, whatever the outcome
+  (later_lesson_has_meetings). Legitimate later history is never voided,
+  moved or deleted to get past this refusal
 → for a person appointed as Discipler, rejected for the eligibility
   lesson (Lesson 5) and earlier lessons; later lessons may be reopened,
   subject to the other preconditions (ADR-012 decision 9, N9; the

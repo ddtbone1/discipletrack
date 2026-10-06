@@ -10,17 +10,15 @@ import '../../../core/format/app_format.dart';
 /// completed.
 enum LessonState { locked, notStarted, inProgress, submitted, completed }
 
-/// "5 meetings recorded", with "· Typical: n" only when the meeting policy
-/// gives a recommended number. Never a fraction of a target, and a count
-/// above the typical number is not exceptional (DC section 11).
-String meetingCountLine(int count, {int? recommended}) {
-  final base = switch (count) {
-    0 => 'No meetings recorded yet',
-    1 => '1 meeting recorded',
-    _ => '$count meetings recorded',
-  };
-  return recommended == null ? base : '$base · Typical: $recommended';
-}
+/// "5 counted meetings": the lesson's Present and Late meetings, a fact,
+/// never a fraction of a target. Absent, Excused and voided records are
+/// not counted, so the line says "counted" rather than "recorded". Meeting
+/// count does not determine completion (ADR-017).
+String meetingCountLine(int count) => switch (count) {
+  0 => 'No counted meetings yet',
+  1 => '1 counted meeting',
+  _ => '$count counted meetings',
+};
 
 /// One row of `get_disciple_journey()`.
 @immutable
@@ -32,7 +30,6 @@ class JourneyLesson {
     required this.state,
     required this.creditedCount,
     required this.isCurrent,
-    this.recommendedMeetings,
     this.startedAt,
     this.readyAt,
     this.submittedByName,
@@ -60,7 +57,6 @@ class JourneyLesson {
               _ => throw ArgumentError('Unknown lesson status: $status'),
             },
       creditedCount: map['credited_count'] as int,
-      recommendedMeetings: map['recommended_meetings'] as int?,
       isCurrent: map['is_current'] as bool,
       startedAt: _date(map['started_at']),
       readyAt: _date(map['ready_at']),
@@ -80,7 +76,6 @@ class JourneyLesson {
 
   /// Credited meetings for this lesson. A fact; it decides nothing.
   final int creditedCount;
-  final int? recommendedMeetings;
   final bool isCurrent;
   final DateTime? startedAt;
   final DateTime? readyAt;
@@ -101,8 +96,7 @@ class JourneyLesson {
   /// completed lesson and nothing is recorded on the next one yet.
   final bool canUndo;
 
-  String get countLine =>
-      meetingCountLine(creditedCount, recommended: recommendedMeetings);
+  String get countLine => meetingCountLine(creditedCount);
 
   /// Where the lesson stands, in words (plan section F2). [ownJourney] is
   /// the Disciple's own wording on My Journey.

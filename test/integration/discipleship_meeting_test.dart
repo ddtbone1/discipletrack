@@ -509,8 +509,8 @@ void main() {
   });
 
   group('reads', () {
-    test('the journey has one row per lesson with the policy values passed '
-        'through and the courtesy flag for the viewer', () async {
+    test('the journey has one row per lesson, no meeting minimum, and the '
+        'courtesy flag for the viewer', () async {
       await record({a1Id(): 'PRESENT'});
       final rows = await journey(a1Id());
       expect(rows, hasLength(10));
@@ -520,8 +520,9 @@ void main() {
       );
       final current = rows.first;
       expect(current['is_current'], isTrue);
-      expect(current['submission_minimum'], 1);
-      expect(current['recommended_meetings'], isNull);
+      // ADR-017: no minimum and no typical number are returned.
+      expect(current.containsKey('submission_minimum'), isFalse);
+      expect(current.containsKey('recommended_meetings'), isFalse);
       expect(current['can_record'], isTrue);
       expect(rows.skip(1).every((r) => r['can_record'] == false), isTrue);
 

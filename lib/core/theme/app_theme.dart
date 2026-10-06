@@ -109,6 +109,9 @@ abstract final class AppTheme {
       snackBarTheme: SnackBarThemeData(
         backgroundColor: p.ink,
         contentTextStyle: AppTypography.body.copyWith(color: p.onInk),
+        // The action (such as Undo) in the snackbar's own foreground, so it
+        // reads on the ink background in both modes.
+        actionTextColor: p.onInk,
         behavior: SnackBarBehavior.floating,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.control),
       ),

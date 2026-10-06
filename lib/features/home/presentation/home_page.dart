@@ -72,7 +72,7 @@ class HomePage extends ConsumerWidget {
           const SizedBox(height: AppSpacing.lg),
 
           const _MinistryEntry(),
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: AppSpacing.lg),
 
           const JourneyBlocks(),
 

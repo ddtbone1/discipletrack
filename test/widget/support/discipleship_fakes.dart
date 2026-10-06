@@ -1,6 +1,7 @@
 /// Discipleship fakes and sample values for widget tests (Slice 5).
 library;
 
+import 'package:discipletrack/core/supabase/postgrest_failure.dart';
 import 'package:discipletrack/features/discipleship/data/discipleship_repository.dart';
 import 'package:discipletrack/features/discipleship/domain/disciple_progress_summary.dart';
 import 'package:discipletrack/features/discipleship/domain/journey.dart';
@@ -33,6 +34,23 @@ class FakeDiscipleshipRepository implements DiscipleshipRepository {
   @override
   Future<List<DiscipleProgressSummary>> fetchMyDisciples() =>
       _read(() => disciples);
+
+  /// Group progress by group id; a missing group is refused, as the server
+  /// refuses anyone but the Leader and the Coordinator.
+  Map<String, List<DiscipleProgressSummary>> groupProgress = {};
+
+  @override
+  Future<List<DiscipleProgressSummary>> fetchGroupProgress(String groupId) =>
+      _read(() {
+        final rows = groupProgress[groupId];
+        if (rows == null) {
+          throw const DiscipleshipFailure(
+            "You can't do that for this person.",
+            code: DbFailureCode.forbidden,
+          );
+        }
+        return rows;
+      });
 
   @override
   Future<DiscipleContext> fetchContext(String membershipId) =>
@@ -80,6 +98,22 @@ class FakeDiscipleshipRepository implements DiscipleshipRepository {
     if (progressFailure != null) throw progressFailure!;
   }
 
+  final voidedMeetings = <String>[];
+  final voidedParticipants = <String>[];
+  DiscipleshipFailure? voidFailure;
+
+  @override
+  Future<void> voidMeeting(String meetingId) async {
+    if (voidFailure != null) throw voidFailure!;
+    voidedMeetings.add(meetingId);
+  }
+
+  @override
+  Future<void> voidParticipant(String participantId) async {
+    if (voidFailure != null) throw voidFailure!;
+    voidedParticipants.add(participantId);
+  }
+
   @override
   Future<String> recordMeeting(MeetingDraft draft, {DateTime? now}) async {
     recorded.add(draft);
@@ -99,7 +133,6 @@ DiscipleJourney sampleJourney({
   int completed = 3,
   LessonState currentState = LessonState.inProgress,
   int credited = 2,
-  int? recommended,
   bool canRecord = false,
   bool canComplete = false,
   bool canUndoPrevious = false,
@@ -115,7 +148,6 @@ DiscipleJourney sampleJourney({
           ? currentState
           : LessonState.locked,
       creditedCount: n == completed + 1 ? credited : 0,
-      recommendedMeetings: recommended,
       isCurrent: n == completed + 1,
       startedAt: n == completed + 1 ? DateTime.utc(2026, 9, 3, 12) : null,
       readyAt: currentState == LessonState.submitted && n == completed + 1

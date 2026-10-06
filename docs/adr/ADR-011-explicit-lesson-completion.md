@@ -2,6 +2,17 @@
 
 ## Status
 
+N1 is closed and the meeting policy is withdrawn by
+[ADR-017](ADR-017-no-minimum-meetings.md) (2026-10-06): no minimum number
+of meetings; decisions 11 (the "Typical" line), 12 and 13, the count basis
+of 14, 15, the count condition of 16 and the "Open decision (blocking)"
+section are superseded. Meeting count never determines completion.
+
+Decision 14's "reopening must come first" is superseded by
+[ADR-016](ADR-016-completion-locked-by-later-progress.md) (2026-10-06):
+undo comes first while its window holds; after that the completion is
+locked and reopen is database-only.
+
 Accepted (2026-10-02, decision B, from the Discipleship Director).
 
 Partially supersedes [ADR-009](ADR-009-discipleship-meeting-attendance-monitoring.md):

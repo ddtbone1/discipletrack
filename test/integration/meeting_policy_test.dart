@@ -1,10 +1,9 @@
-/// The two policy points of Slice 5 and the derivations they apply to.
+/// The policy point of Slice 5 and the derivations.
 ///
-/// lesson_meeting_policy() is a PLACEHOLDER until N1 (minimum meetings) is
-/// decided. These tests pin the floor every model shares and that nothing
-/// depends on required_meetings. They do not encode a choice of model A, B
-/// or C: when N1 is decided, the model-specific cases are added here and
-/// the floor cases stay.
+/// N1 is closed (ADR-017): there is no meeting minimum, so the placeholder
+/// lesson_meeting_policy() is gone. These tests pin that it stays gone and
+/// that nothing depends on the legacy required_meetings column. The
+/// Discipler eligibility lesson (D2) is the one remaining policy point.
 library;
 
 import 'package:flutter_test/flutter_test.dart';
@@ -40,36 +39,30 @@ void main() {
     await deleteUser(church.approver.userId);
   });
 
-  Future<List<List<String>>> policy(String lessonId) => sqlRows(
-    'select submission_minimum, recommended_meetings '
-    "from private.lesson_meeting_policy('$lessonId')",
-  );
+  group('no meeting minimum (ADR-017, N1 closed)', () {
+    test(
+      'the placeholder policy and the void protection no longer exist',
+      () async {
+        final rows = await sqlRows('''
+        select p.proname
+        from pg_proc p
+        join pg_namespace n on n.oid = p.pronamespace
+        where n.nspname in ('public', 'private')
+          and p.proname in ('lesson_meeting_policy',
+                            'assert_void_keeps_completed')''');
+        expect(rows, isEmpty);
+      },
+    );
 
-  group('lesson_meeting_policy (placeholder until N1)', () {
-    test('every lesson gets the shared floor: submission minimum 1, no '
-        'recommended number', () async {
-      for (final lesson in curriculum.lessonIds) {
-        expect(await policy(lesson), [
-          ['1', ''],
-        ]);
-      }
-    });
-
-    test('required_meetings does not drive the policy', () async {
-      final lesson = curriculum.lessonIds.first;
-      for (final n in [1, 9]) {
-        await service
-            .from('curriculum_lessons')
-            .update({'required_meetings': n})
-            .eq('id', lesson);
-        expect(await policy(lesson), [
-          ['1', ''],
-        ], reason: 'required_meetings = $n');
-      }
-    });
-
-    test('an unknown lesson has no policy', () async {
-      expect(await policy('00000000-0000-4000-8000-000000000000'), isEmpty);
+    test('no database function reads a meeting minimum', () async {
+      final rows = await sqlRows('''
+        select p.proname
+        from pg_proc p
+        join pg_namespace n on n.oid = p.pronamespace
+        where n.nspname in ('public', 'private')
+          and (p.prosrc ilike '%submission_minimum%'
+               or p.prosrc ilike '%lesson_meeting_policy%')''');
+      expect(rows, isEmpty);
     });
 
     test('no database function reads required_meetings; only bootstrap '
@@ -110,18 +103,20 @@ void main() {
     });
   });
 
-  test('policy points and derivations are not callable by clients', () async {
-    for (final call in [
-      "private.lesson_meeting_policy('${curriculum.lessonIds.first}')",
-      'private.discipler_eligibility_lesson()',
-      "private.credited_count('${pair.disciple.membershipId}', "
-          "'${curriculum.lessonIds.first}')",
-      "private.eligible_lesson('${pair.disciple.membershipId}')",
-    ]) {
-      final error = await sqlError('set role authenticated; select $call');
-      expect(error, contains('permission denied'), reason: call);
-    }
-  });
+  test(
+    'the policy point and derivations are not callable by clients',
+    () async {
+      for (final call in [
+        'private.discipler_eligibility_lesson()',
+        "private.credited_count('${pair.disciple.membershipId}', "
+            "'${curriculum.lessonIds.first}')",
+        "private.eligible_lesson('${pair.disciple.membershipId}')",
+      ]) {
+        final error = await sqlError('set role authenticated; select $call');
+        expect(error, contains('permission denied'), reason: call);
+      }
+    },
+  );
 
   group('derivations', () {
     tearDown(

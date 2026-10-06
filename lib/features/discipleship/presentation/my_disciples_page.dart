@@ -80,6 +80,7 @@ class _DiscipleList extends StatelessWidget {
         if (recordable.isNotEmpty) ...[
           AppButton(
             label: 'Record a meeting',
+            variant: AppButtonVariant.record,
             requiresConnection: true,
             offlineAction: 'record a meeting',
             onPressed: () => recordable.length == 1

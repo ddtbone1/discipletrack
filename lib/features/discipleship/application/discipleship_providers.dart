@@ -27,6 +27,21 @@ final myDisciplesProvider = FutureProvider<List<DiscipleProgressSummary>>((
   return [...rows]..sort(DiscipleProgressSummary.byLongestSinceLastMeeting);
 });
 
+/// A D Group's current Disciples with their progress, by church membership
+/// id, for the group's Leader and the Coordinator. Empty when the caller
+/// is not active; refused for anyone else (the server decides).
+final groupProgressProvider =
+    FutureProvider.family<Map<String, DiscipleProgressSummary>, String>((
+      ref,
+      groupId,
+    ) async {
+      if (!_isActive(ref)) return const {};
+      final rows = await ref
+          .watch(discipleshipRepositoryProvider)
+          .fetchGroupProgress(groupId);
+      return {for (final r in rows) r.membershipId: r};
+    });
+
 final discipleContextProvider = FutureProvider.family<DiscipleContext, String>(
   (ref, membershipId) =>
       ref.watch(discipleshipRepositoryProvider).fetchContext(membershipId),
@@ -123,6 +138,7 @@ class RecordMeetingController extends Notifier<RecordMeetingState> {
     }
     ref
       ..invalidate(myDisciplesProvider)
+      ..invalidate(groupProgressProvider)
       ..invalidate(progressSummaryProvider);
   }
 }
@@ -183,9 +199,72 @@ class LessonProgressController extends Notifier<LessonProgressState> {
     ref
       ..invalidate(discipleJourneyProvider(membershipId))
       ..invalidate(recordingOptionsProvider)
-      ..invalidate(myDisciplesProvider);
+      ..invalidate(myDisciplesProvider)
+      ..invalidate(groupProgressProvider);
   }
 }
+
+/// Which void is running, and the last failure.
+@immutable
+class MeetingVoidState {
+  const MeetingVoidState({this.inFlight, this.error});
+
+  /// `meeting:<id>` or `participant:<id>`.
+  final String? inFlight;
+  final DiscipleshipFailure? error;
+
+  bool get isBusy => inFlight != null;
+}
+
+/// Voids a meeting or one participant, one at a time, then refreshes
+/// everything a void can change. A meeting void can change every
+/// participant's progress, so the per-person reads are refreshed for
+/// everyone, not only the person on screen.
+class MeetingVoidController extends Notifier<MeetingVoidState> {
+  @override
+  MeetingVoidState build() => const MeetingVoidState();
+
+  DiscipleshipRepository get _repo => ref.read(discipleshipRepositoryProvider);
+
+  Future<bool> voidMeeting(String meetingId) =>
+      _run('meeting:$meetingId', () => _repo.voidMeeting(meetingId));
+
+  Future<bool> voidParticipant(String participantId) => _run(
+    'participant:$participantId',
+    () => _repo.voidParticipant(participantId),
+  );
+
+  Future<bool> _run(String key, Future<void> Function() action) async {
+    if (state.isBusy) return false;
+    state = MeetingVoidState(inFlight: key);
+    try {
+      await action();
+      _refresh();
+      state = const MeetingVoidState();
+      return true;
+    } on DiscipleshipFailure catch (e) {
+      if (e.code == DbFailureCode.conflict) _refresh();
+      state = MeetingVoidState(error: e);
+      return false;
+    }
+  }
+
+  void _refresh() {
+    ref
+      ..invalidate(discipleJourneyProvider)
+      ..invalidate(meetingHistoryProvider)
+      ..invalidate(meetingSummaryProvider)
+      ..invalidate(recordingOptionsProvider)
+      ..invalidate(myDisciplesProvider)
+      ..invalidate(groupProgressProvider)
+      ..invalidate(progressSummaryProvider);
+  }
+}
+
+final meetingVoidControllerProvider =
+    NotifierProvider<MeetingVoidController, MeetingVoidState>(
+      MeetingVoidController.new,
+    );
 
 final lessonProgressControllerProvider =
     NotifierProvider<LessonProgressController, LessonProgressState>(

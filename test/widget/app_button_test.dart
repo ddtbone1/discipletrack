@@ -1,3 +1,5 @@
+import 'package:discipletrack/core/theme/app_colors.dart';
+import 'package:discipletrack/core/theme/app_theme.dart';
 import 'package:discipletrack/core/widgets/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -94,6 +96,34 @@ void main() {
         );
         expect(find.text('Go'), findsOneWidget, reason: '$variant');
       }
+    });
+
+    testWidgets('a record button is lime with black text in both modes', (
+      tester,
+    ) async {
+      Future<Text> labelIn(ThemeData theme) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: theme,
+            home: const Scaffold(
+              body: Center(
+                child: AppButton(
+                  label: 'Record meeting',
+                  variant: AppButtonVariant.record,
+                  onPressed: _noop,
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        return tester.widget<Text>(find.text('Record meeting'));
+      }
+
+      final light = await labelIn(AppTheme.light());
+      expect(light.style?.color, AppPalette.light.onBrand);
+      final dark = await labelIn(AppTheme.dark());
+      expect(dark.style?.color, AppPalette.dark.onBrand);
     });
   });
 }
