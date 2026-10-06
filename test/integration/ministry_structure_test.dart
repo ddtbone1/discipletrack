@@ -1,5 +1,6 @@
 /// Ministry structure against the real local stack: groups with a Leader,
-/// invitations, pairing and removal, and what the database records.
+/// placement (Add Members), pairing and removal, and what the database
+/// records.
 library;
 
 import 'package:flutter_test/flutter_test.dart';
@@ -35,9 +36,6 @@ void main() {
 
   Future<Map<String, dynamic>> dgm(String id) =>
       service.from('d_group_memberships').select().eq('id', id).single();
-
-  Future<Map<String, dynamic>> invitation(String id) =>
-      service.from('d_group_invitations').select().eq('id', id).single();
 
   Future<List<Map<String, dynamic>>> activeAssignmentsOf(
     String discipleDgmId,
@@ -141,7 +139,7 @@ void main() {
           .single();
       expect(active['church_membership_id'], next.membershipId);
 
-      // The replaced Leader is unplaced again and can be invited.
+      // The replaced Leader is out of the group and can be added again.
       final placeable = await church.approver.client.rpc<List<dynamic>>(
         'list_placeable_members',
         params: {'p_d_group_id': g.groupId},
@@ -201,217 +199,158 @@ void main() {
     });
   });
 
-  group('invitations', () {
-    test('accept creates the responsibility and links it', () async {
-      final g = await newGroup('acc');
-      final m = await member('acc-m');
+  group('placement (add members)', () {
+    Future<Map<String, dynamic>> placement(String id) =>
+        service.from('d_group_placements').select().eq('id', id).single();
 
-      final id = await invite(
-        g.leader.user.client,
-        g.groupId,
-        m.membershipId,
-        'DISCIPLE',
-      );
+    test(
+      'adds several members at once in Needs setup, audited per person',
+      () async {
+        final g = await newGroup('add');
+        final a = await member('add-a');
+        final b = await member('add-b');
 
-      final pending = await m.user.client.rpc<List<dynamic>>(
-        'get_my_pending_invitation',
-      );
-      expect(pending, hasLength(1));
-      final p = pending.single as Map<String, dynamic>;
-      expect(p['invitation_id'], id);
-      expect(p['d_group_id'], g.groupId);
-      expect(p['responsibility'], 'DISCIPLE');
-      expect(p['invited_by_name'], 'Leader acc');
+        final placed = await addMembers(g.leader.user.client, g.groupId, [
+          a.membershipId,
+          b.membershipId,
+        ]);
+        expect(placed.keys, unorderedEquals([a.membershipId, b.membershipId]));
 
-      final dgmId = await accept(m.user.client, id);
-      final inv = await invitation(id);
-      expect(inv['status'], 'ACCEPTED');
-      expect(inv['resulting_d_group_membership_id'], dgmId);
-      expect(inv['responded_at'], isNotNull);
+        final row = await placement(placed[a.membershipId]!);
+        expect(row['d_group_id'], g.groupId);
+        expect(row['placed_by'], g.leader.user.userId);
+        expect(row['ended_at'], isNull);
 
-      final row = await dgm(dgmId);
-      expect(row['responsibility'], 'DISCIPLE');
-      expect(row['d_group_id'], g.groupId);
-      // The placement records the inviter's decision.
-      expect(row['assigned_by'], g.leader.user.userId);
+        // Needs setup: placed, no responsibility yet.
+        final roles = await service
+            .from('d_group_memberships')
+            .select('id')
+            .eq('church_membership_id', a.membershipId);
+        expect(roles, isEmpty);
 
+        expect(await auditActionsFor(placed[a.membershipId]!), [
+          'D_GROUP_MEMBER_PLACED',
+        ]);
+      },
+    );
+
+    test('the addable list holds only ungrouped ACTIVE members and an added '
+        'member leaves every group\'s list', () async {
+      final g = await newGroup('list');
+      final other = await newGroup('list-b');
+      final m = await member('list-m');
+
+      Future<Set<String>> addable(TestGroup grp) async {
+        final rows = await grp.leader.user.client.rpc<List<dynamic>>(
+          'list_addable_members',
+          params: {'p_d_group_id': grp.groupId},
+        );
+        return {
+          for (final r in rows.cast<Map<String, dynamic>>())
+            r['church_membership_id'] as String,
+        };
+      }
+
+      expect(await addable(other), contains(m.membershipId));
       expect(
-        await m.user.client.rpc<List<dynamic>>('get_my_pending_invitation'),
-        isEmpty,
+        await addable(g),
+        isNot(contains(g.leader.membershipId)),
+        reason: 'a Leader is already in a group',
       );
-      expect(await auditActionsFor(id), [
-        'D_GROUP_INVITATION_SENT',
-        'D_GROUP_INVITATION_ACCEPTED',
+
+      await addMembers(g.leader.user.client, g.groupId, [m.membershipId]);
+
+      expect(await addable(g), isNot(contains(m.membershipId)));
+      expect(await addable(other), isNot(contains(m.membershipId)));
+    });
+
+    test('a member already in a group is refused, and the batch is all or '
+        'nothing', () async {
+      final g = await newGroup('dup');
+      final other = await newGroup('dup-b');
+      final m = await member('dup-m');
+      final fresh = await member('dup-fresh');
+
+      await addMembers(g.leader.user.client, g.groupId, [m.membershipId]);
+
+      await expectLater(
+        addMembers(other.leader.user.client, other.groupId, [
+          fresh.membershipId,
+          m.membershipId,
+        ]),
+        throwsPostgrestCode('PT409'),
+      );
+      expect(
+        await activePlacementOf(fresh.membershipId),
+        isNull,
+        reason: 'nobody in a refused batch is added',
+      );
+      await expectLater(
+        addMembers(g.leader.user.client, g.groupId, [m.membershipId]),
+        throwsPostgrestCode('PT409'),
+        reason: 'already in this very group',
+      );
+    });
+
+    test('two Leaders adding the same person at the same time: exactly one '
+        'succeeds', () async {
+      final g1 = await newGroup('race1');
+      final g2 = await newGroup('race2');
+      final m = await member('race-m');
+
+      final results = await Future.wait([
+        addMembers(g1.leader.user.client, g1.groupId, [
+          m.membershipId,
+        ]).then<Object>((v) => v, onError: (Object e) => e),
+        addMembers(g2.leader.user.client, g2.groupId, [
+          m.membershipId,
+        ]).then<Object>((v) => v, onError: (Object e) => e),
       ]);
+
+      final ok = results.whereType<Map<String, String>>().toList();
+      final refused = results.whereType<Exception>().toList();
+      expect(ok, hasLength(1));
+      expect(refused, hasLength(1));
+
+      final active = await service
+          .from('d_group_placements')
+          .select('id')
+          .eq('church_membership_id', m.membershipId)
+          .isFilter('ended_at', null);
+      expect(active, hasLength(1));
     });
 
-    test('decline is visible to the inviter, who may re-invite', () async {
-      final g = await newGroup('dec');
-      final m = await member('dec-m');
-
-      final id = await invite(
-        g.leader.user.client,
-        g.groupId,
-        m.membershipId,
-        'DISCIPLER',
-      );
-      final res = await rpcRow(m.user.client, 'respond_to_d_group_invitation', {
-        'p_invitation_id': id,
-        'p_accept': false,
-      });
-      expect(res['invitation_status'], 'DECLINED');
-
-      final seen = await g.leader.user.client
-          .from('d_group_invitations')
-          .select('status')
-          .eq('id', id)
-          .single();
-      expect(seen['status'], 'DECLINED');
-
-      // Answered once: a second answer is refused.
-      await expectLater(
-        m.user.client.rpc<List<dynamic>>(
-          'respond_to_d_group_invitation',
-          params: {'p_invitation_id': id, 'p_accept': true},
-        ),
-        throwsPostgrestCode('PT409'),
-      );
-
-      final again = await invite(
-        g.leader.user.client,
-        g.groupId,
-        m.membershipId,
-        'DISCIPLER',
-      );
-      expect(again, isNot(id));
-    });
-
-    test(
-      'one pending invitation at a time; withdraw frees the member',
-      () async {
-        final g = await newGroup('one');
-        final other = await newGroup('one-b');
-        final m = await member('one-m');
-
-        final id = await invite(
-          g.leader.user.client,
-          g.groupId,
-          m.membershipId,
-          'DISCIPLE',
-        );
-        await expectLater(
-          invite(
-            other.leader.user.client,
-            other.groupId,
-            m.membershipId,
-            'DISCIPLE',
-          ),
-          throwsPostgrestCode('PT409'),
-        );
-
-        final res = await rpcRow(
-          g.leader.user.client,
-          'withdraw_d_group_invitation',
-          {'p_invitation_id': id},
-        );
-        expect(res['invitation_status'], 'WITHDRAWN');
-        expect((await invitation(id))['status'], 'WITHDRAWN');
-
-        await expectLater(
-          m.user.client.rpc<List<dynamic>>(
-            'respond_to_d_group_invitation',
-            params: {'p_invitation_id': id, 'p_accept': true},
-          ),
-          throwsPostgrestCode('PT409'),
-        );
-
-        await invite(
-          other.leader.user.client,
-          other.groupId,
-          m.membershipId,
-          'DISCIPLE',
-        );
-      },
-    );
-
-    test('an overdue invitation is expired: refused, hidden, and marked by '
-        'the next invitation', () async {
-      final g = await newGroup('exp');
-      final m = await member('exp-m');
-
-      final id = await invite(
-        g.leader.user.client,
-        g.groupId,
-        m.membershipId,
-        'DISCIPLE',
-      );
-      // Age it past 14 days directly; there is no scheduler to wait for.
-      final past = DateTime.now().toUtc().subtract(const Duration(days: 15));
+    test('an empty, inactive or unknown selection is refused', () async {
+      final g = await newGroup('bad');
+      final inactive = await member('bad-inactive');
       await service
-          .from('d_group_invitations')
-          .update({
-            'created_at': past.toIso8601String(),
-            'expires_at': past.add(const Duration(days: 14)).toIso8601String(),
-          })
-          .eq('id', id);
+          .from('church_memberships')
+          .update({'status': 'INACTIVE'})
+          .eq('id', inactive.membershipId);
 
-      expect(
-        await m.user.client.rpc<List<dynamic>>('get_my_pending_invitation'),
-        isEmpty,
+      await expectLater(
+        addMembers(g.leader.user.client, g.groupId, []),
+        throwsPostgrestCode('PT400'),
       );
       await expectLater(
-        m.user.client.rpc<List<dynamic>>(
-          'respond_to_d_group_invitation',
-          params: {'p_invitation_id': id, 'p_accept': true},
-        ),
+        addMembers(g.leader.user.client, g.groupId, [inactive.membershipId]),
         throwsPostgrestCode('PT409'),
       );
-
-      final placeable = await g.leader.user.client.rpc<List<dynamic>>(
-        'list_placeable_members',
-        params: {'p_d_group_id': g.groupId},
-      );
-      final row = placeable.cast<Map<String, dynamic>>().singleWhere(
-        (r) => r['church_membership_id'] == m.membershipId,
-      );
-      expect(row['has_pending_invitation'], isFalse);
-
-      await invite(g.leader.user.client, g.groupId, m.membershipId, 'DISCIPLE');
-      final old = await invitation(id);
-      expect(old['status'], 'EXPIRED');
-      expect(
-        DateTime.parse(old['responded_at'] as String),
-        DateTime.parse(old['expires_at'] as String),
+      await expectLater(
+        addMembers(g.leader.user.client, g.groupId, [
+          '00000000-0000-4000-8000-0000000000ff',
+        ]),
+        throwsPostgrestCode('PT404'),
       );
     });
 
-    test(
-      'accepting is refused when the invitee was placed meanwhile',
-      () async {
-        final g = await newGroup('meanwhile');
-        final m = await member('meanwhile-m');
-
-        final id = await invite(
-          g.leader.user.client,
-          g.groupId,
-          m.membershipId,
-          'DISCIPLE',
-        );
-        // The Coordinator appoints the same person Leader of a new group.
-        final row = await rpcRow(church.approver.client, 'create_d_group', {
-          'p_name': uniqueGroupName('Meanwhile'),
-          'p_description': null,
-          'p_leader_membership_id': m.membershipId,
-        });
-        expect(row['d_group_id'], isNotNull);
-
-        await expectLater(
-          accept(m.user.client, id),
-          throwsPostgrestCode('PT409'),
-        );
-        expect((await invitation(id))['status'], 'PENDING');
-      },
-    );
+    test('pending invitations were retired by the migration', () async {
+      final pending = await service
+          .from('d_group_invitations')
+          .select('id')
+          .eq('status', 'PENDING');
+      expect(pending, isEmpty);
+    });
   });
 
   group('pairing and removal', () {
@@ -500,8 +439,8 @@ void main() {
       );
     });
 
-    test('removing a Discipler unpairs their Disciples; Leader rows cannot be '
-        'ended here', () async {
+    test('removing a Discipler takes them out of the group and unpairs their '
+        'Disciples; the Leader cannot be removed', () async {
       final g = await newGroup('rm');
       final dr = await member('rm-dr');
       final dd = await member('rm-dd');
@@ -519,11 +458,13 @@ void main() {
       );
       await setDiscipler(g.leader.user.client, ddDgm, drDgm);
 
-      await rpcRow(g.leader.user.client, 'end_d_group_membership', {
-        'p_d_group_membership_id': drDgm,
+      final drPlacement = (await activePlacementOf(dr.membershipId))!;
+      await rpcRow(g.leader.user.client, 'remove_from_d_group', {
+        'p_d_group_placement_id': drPlacement,
       });
 
       expect((await dgm(drDgm))['ended_at'], isNotNull);
+      expect(await activePlacementOf(dr.membershipId), isNull);
       expect(await activeAssignmentsOf(ddDgm), isEmpty);
       expect(
         (await dgm(ddDgm))['ended_at'],
@@ -533,30 +474,47 @@ void main() {
 
       await expectLater(
         g.leader.user.client.rpc<List<dynamic>>(
-          'end_d_group_membership',
-          params: {'p_d_group_membership_id': drDgm},
+          'remove_from_d_group',
+          params: {'p_d_group_placement_id': drPlacement},
         ),
         throwsPostgrestCode('PT409'),
-        reason: 'already ended',
+        reason: 'already removed',
       );
       await expectLater(
         church.approver.client.rpc<List<dynamic>>(
-          'end_d_group_membership',
-          params: {'p_d_group_membership_id': g.leaderDgmId},
+          'remove_from_d_group',
+          params: {
+            'p_d_group_placement_id': (await activePlacementOf(
+              g.leader.membershipId,
+            ))!,
+          },
         ),
         throwsPostgrestCode('PT409'),
       );
 
-      // The removed person is unplaced and can be invited again.
-      await invite(
-        g.leader.user.client,
-        g.groupId,
-        dr.membershipId,
-        'DISCIPLE',
-      );
+      // The removed person is ungrouped and can be added again; history
+      // keeps both placements.
+      await addMembers(g.leader.user.client, g.groupId, [dr.membershipId]);
+      final all = await service
+          .from('d_group_placements')
+          .select('id')
+          .eq('church_membership_id', dr.membershipId);
+      expect(all, hasLength(2));
 
-      final audit = await auditActionsFor(drDgm);
-      expect(audit, ['D_GROUP_MEMBER_ENDED']);
+      final audit = await auditActionsFor(drPlacement);
+      expect(audit, ['D_GROUP_MEMBER_PLACED', 'D_GROUP_MEMBER_REMOVED']);
+    });
+
+    test('removing a member who still needs setup', () async {
+      final g = await newGroup('rm-setup');
+      final m = await member('rm-setup-m');
+      final placed = await addMembers(g.leader.user.client, g.groupId, [
+        m.membershipId,
+      ]);
+      await rpcRow(g.leader.user.client, 'remove_from_d_group', {
+        'p_d_group_placement_id': placed[m.membershipId],
+      });
+      expect(await activePlacementOf(m.membershipId), isNull);
     });
 
     test(

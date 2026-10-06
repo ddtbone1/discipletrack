@@ -229,12 +229,14 @@ class MeetingFactPills extends StatelessWidget {
       children: [
         AppPill(
           icon: Icons.check_rounded,
+          iconTone: PillTone.brand,
           label: s.meetingsAttended == 1
               ? '1 meeting attended'
               : '${s.meetingsAttended} meetings attended',
         ),
         AppPill(
           icon: Icons.close_rounded,
+          iconTone: PillTone.error,
           label: s.recordedAbsences == 1
               ? '1 recorded absence'
               : '${s.recordedAbsences} recorded absences',

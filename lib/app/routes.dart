@@ -35,7 +35,7 @@ abstract final class Routes {
   /// One D Group, for its Coordinator or Leader. A pattern: build a concrete
   /// path with [dGroupDetailFor].
   static const dGroupDetail = '/groups/:groupId';
-  static const dGroupInvite = '/groups/:groupId/invite';
+  static const dGroupAddMembers = '/groups/:groupId/add-members';
 
   /// The roster for a Discipler or Disciple.
   static const myGroup = '/my-group';
@@ -68,7 +68,8 @@ abstract final class Routes {
       '${d.day.toString().padLeft(2, '0')}';
 
   static String dGroupDetailFor(String groupId) => '/groups/$groupId';
-  static String dGroupInviteFor(String groupId) => '/groups/$groupId/invite';
+  static String dGroupAddMembersFor(String groupId) =>
+      '/groups/$groupId/add-members';
 
   /// D Group screens. Reachable by any ACTIVE member; what each one shows is
   /// decided by RLS and the controlled operations, so a deep link by someone
@@ -77,7 +78,7 @@ abstract final class Routes {
     dGroups,
     newDGroup,
     dGroupDetail,
-    dGroupInvite,
+    dGroupAddMembers,
     myGroup,
   };
 

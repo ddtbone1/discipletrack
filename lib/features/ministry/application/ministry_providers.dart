@@ -6,7 +6,8 @@ import '../../offline/application/offline_providers.dart';
 import '../data/ministry_repository.dart';
 import '../domain/d_group.dart';
 import '../domain/d_group_detail.dart';
-import '../domain/d_group_invitation.dart';
+import '../domain/d_group_placement.dart';
+import '../domain/discipler_candidate.dart';
 import '../domain/member_option.dart';
 import '../domain/ministry_context.dart';
 
@@ -26,7 +27,7 @@ final isCoordinatorProvider = Provider<bool>((ref) {
 });
 
 /// The caller's group and the people who matter to them in it, or null when
-/// they are unplaced.
+/// they are in no D Group.
 final myMinistryContextProvider = FutureProvider<MinistryContext?>((ref) async {
   if (_activeMembership(ref) == null) return null;
   final repo = ref.watch(ministryRepositoryProvider);
@@ -34,20 +35,6 @@ final myMinistryContextProvider = FutureProvider<MinistryContext?>((ref) async {
     ref,
     live: repo.fetchMyMinistryContext,
     saved: (s) => s.ministry,
-  );
-});
-
-/// The caller's live invitation, or null.
-final myPendingInvitationProvider = FutureProvider<DGroupInvitation?>((
-  ref,
-) async {
-  if (_activeMembership(ref) == null) return null;
-  final repo = ref.watch(ministryRepositoryProvider);
-  // Not saved: answering needs the server, and offline every action is off.
-  return liveOrSaved(
-    ref,
-    live: repo.fetchMyPendingInvitation,
-    saved: (_) => null,
   );
 });
 
@@ -68,9 +55,9 @@ final dGroupDetailProvider = FutureProvider.family<DGroupDetail?, String>((
   return ref.watch(ministryRepositoryProvider).fetchGroupDetail(groupId);
 });
 
-/// The members a Coordinator or Leader can pick from. For a group when given
+/// The members a Coordinator can choose a Leader from. For a group when given
 /// its id; with null, every ACTIVE member of the church (the Leader picker of
-/// a new group, Coordinator only).
+/// a new group).
 final placeableMembersProvider =
     FutureProvider.family<List<MemberOption>, String?>((ref, groupId) async {
       final membership = _activeMembership(ref);
@@ -83,10 +70,57 @@ final placeableMembersProvider =
           );
     });
 
-/// How many ACTIVE members hold no D Group responsibility, for the
-/// Coordinator's Home row (UI_DESIGN_SYSTEM section 27: unassigned members).
+/// The people who can be added to a group: ACTIVE members in no D Group. The
+/// database decides who is listed; the screen only filters by name.
+final addableMembersProvider =
+    FutureProvider.family<List<AddableMember>, String>((ref, groupId) async {
+      if (_activeMembership(ref) == null) return const [];
+      return ref.watch(ministryRepositoryProvider).fetchAddableMembers(groupId);
+    });
+
+/// Whether the church's initial setup window is open, so an Existing
+/// Discipler may still be recognized at setup.
+final initialSetupStatusProvider = FutureProvider<InitialSetupStatus?>((
+  ref,
+) async {
+  final membership = _activeMembership(ref);
+  if (membership == null) return null;
+  return ref
+      .watch(ministryRepositoryProvider)
+      .fetchInitialSetupStatus(membership.churchId);
+});
+
+/// How many ACTIVE members are in no D Group, for the Coordinator's Home row
+/// (UI_DESIGN_SYSTEM section 27: unassigned members).
 final unplacedMemberCountProvider = FutureProvider<int?>((ref) async {
   if (!ref.watch(isCoordinatorProvider)) return null;
   final members = await ref.watch(placeableMembersProvider(null).future);
   return members.where((m) => !m.isPlaced).length;
 });
+
+/// Eligible Disciples (Lesson 5 completed) in one group who are not
+/// Disciplers, for its Leader and the Coordinator. Eligible is not
+/// appointed; the Coordinator decides.
+final groupDisciplerCandidatesProvider =
+    FutureProvider.family<List<DisciplerCandidate>, String>((
+      ref,
+      groupId,
+    ) async {
+      if (_activeMembership(ref) == null) return const [];
+      return ref
+          .watch(ministryRepositoryProvider)
+          .fetchDisciplerCandidates(groupId: groupId);
+    });
+
+/// The same, church-wide, for the Coordinator's review. Empty for anyone
+/// else.
+final churchDisciplerCandidatesProvider =
+    FutureProvider<List<DisciplerCandidate>>((ref) async {
+      final membership = _activeMembership(ref);
+      if (membership == null || !ref.watch(isCoordinatorProvider)) {
+        return const [];
+      }
+      return ref
+          .watch(ministryRepositoryProvider)
+          .fetchDisciplerCandidates(churchId: membership.churchId);
+    });

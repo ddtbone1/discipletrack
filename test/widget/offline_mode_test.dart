@@ -143,7 +143,7 @@ void main() {
     testWidgets('an ordinary member sees the not-placed card', (tester) async {
       await pumpPage(tester, const HomePage(), membership: active);
       await tester.pumpAndSettle();
-      expect(find.text('Not placed in a D Group yet'), findsOneWidget);
+      expect(find.text('Not in a D Group yet'), findsOneWidget);
     });
 
     testWidgets('an Admin or Coordinator does not', (tester) async {
@@ -156,7 +156,7 @@ void main() {
         );
         await tester.pumpAndSettle();
         expect(
-          find.text('Not placed in a D Group yet'),
+          find.text('Not in a D Group yet'),
           findsNothing,
           reason: '$role',
         );

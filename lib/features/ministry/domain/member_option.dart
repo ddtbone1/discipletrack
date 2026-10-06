@@ -5,9 +5,6 @@ import 'd_group_member.dart';
 /// What a member is being picked for. The database decides in the end; this
 /// only explains up front why a choice would be refused.
 enum MemberPickPurpose {
-  /// Invite as Discipler or Disciple (`invite_to_d_group()`).
-  invite,
-
   /// Leader of a new group (`create_d_group()`), or the replacement Leader of
   /// an existing one (`assign_d_group_leader()`).
   appointLeader,
@@ -20,7 +17,6 @@ class MemberOption {
   const MemberOption({
     required this.churchMembershipId,
     required this.fullName,
-    required this.hasPendingInvitation,
     this.currentDGroupId,
     this.currentDGroupName,
     this.currentResponsibilities = const {},
@@ -36,7 +32,6 @@ class MemberOption {
       currentResponsibilities: {
         for (final r in roles) DGroupResponsibility.fromDb(r as String),
       },
-      hasPendingInvitation: map['has_pending_invitation'] as bool,
     );
   }
 
@@ -44,42 +39,42 @@ class MemberOption {
   final String fullName;
   final String? currentDGroupId;
   final String? currentDGroupName;
+
+  /// Empty while placed: the person still needs setup.
   final Set<DGroupResponsibility> currentResponsibilities;
-  final bool hasPendingInvitation;
 
   bool get isPlaced => currentDGroupId != null;
 
-  /// "Leader and Discipler in Young Adults A", or null when unplaced.
+  /// "Leader and Discipler in Young Adults A", "In Young Adults A, not set
+  /// up yet", or null when in no group.
   String? get placementLabel {
     if (!isPlaced) return null;
+    final group = currentDGroupName ?? 'a D Group';
+    if (currentResponsibilities.isEmpty) return 'In $group, not set up yet';
     final roles = DGroupResponsibility.values
         .where(currentResponsibilities.contains)
         .map((r) => r.label)
         .join(' and ');
-    return '$roles in ${currentDGroupName ?? 'a D Group'}';
+    return '$roles in $group';
   }
 
   /// Why this member cannot be chosen for [purpose], or null when they can.
   ///
-  /// [dGroupId] is the group being acted on, if any: a Discipler of that
-  /// group may become its Leader (Migration 006, assign_d_group_leader()).
+  /// [dGroupId] is the group being acted on, if any: someone in that group
+  /// holding nothing but DISCIPLER, or nothing yet, may become its Leader
+  /// (Migration 012, assign_d_group_leader()).
   String? ineligibilityReason(MemberPickPurpose purpose, {String? dGroupId}) {
     switch (purpose) {
-      case MemberPickPurpose.invite:
-        if (isPlaced) return 'Already ${placementLabel!}';
-        if (hasPendingInvitation) return 'Has a pending invitation';
-        return null;
       case MemberPickPurpose.appointLeader:
         if (!isPlaced) return null;
-        final onlyDisciplerHere =
-            dGroupId != null &&
-            currentDGroupId == dGroupId &&
-            currentResponsibilities.length == 1 &&
-            currentResponsibilities.single == DGroupResponsibility.discipler;
-        if (onlyDisciplerHere) return null;
-        if (currentDGroupId == dGroupId &&
-            currentResponsibilities.contains(DGroupResponsibility.leader)) {
-          return 'Already leads this group';
+        if (dGroupId != null && currentDGroupId == dGroupId) {
+          if (currentResponsibilities.contains(DGroupResponsibility.leader)) {
+            return 'Already leads this group';
+          }
+          if (currentResponsibilities.contains(DGroupResponsibility.disciple)) {
+            return 'A Disciple cannot also lead the group';
+          }
+          return null;
         }
         return 'Already ${placementLabel!}';
     }
@@ -92,8 +87,7 @@ class MemberOption {
           other.churchMembershipId == churchMembershipId &&
           other.fullName == fullName &&
           other.currentDGroupId == currentDGroupId &&
-          setEquals(other.currentResponsibilities, currentResponsibilities) &&
-          other.hasPendingInvitation == hasPendingInvitation;
+          setEquals(other.currentResponsibilities, currentResponsibilities);
 
   @override
   int get hashCode => Object.hash(
@@ -101,6 +95,5 @@ class MemberOption {
     fullName,
     currentDGroupId,
     Object.hashAllUnordered(currentResponsibilities),
-    hasPendingInvitation,
   );
 }

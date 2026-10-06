@@ -431,8 +431,7 @@ memberships.
 
 *Historical (ADR-012): DISCIPLE and DISCIPLER may now be held at the
 same time, in the same D Group; DISCIPLE still excludes LEADER
-(enforced from Slice 6; until then Migration 006 still refuses
-DISCIPLE with DISCIPLER). See the ERD `d_group_memberships` note.*
+(enforced since Migration 013, Slice 6; ADR-018). See the ERD `d_group_memberships` note.*
 
 A person must not simultaneously have active:
 

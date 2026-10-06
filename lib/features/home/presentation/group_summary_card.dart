@@ -56,7 +56,8 @@ class GroupSummaryCard extends StatelessWidget {
           );
     final c = ministry;
     final mates = c.groupMates;
-    final members = {for (final e in c.roster) e.churchMembershipId}.length;
+    // Everyone placed in the group, set up or not (ADR-018).
+    final members = c.groupSize;
     final leader = c.leader;
     final discipler = c.myDiscipler;
     final disciples = c.myDisciples;

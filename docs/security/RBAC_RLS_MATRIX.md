@@ -44,6 +44,17 @@ only, as a database-level recovery operation with no MVP action; its
 locks and audit are unchanged. Section 2 row and note, section 5
 `disciple_lesson_progress`, section 10.
 
+Revision 2026-10-06 (ADR-018, Slice 6, Migrations 012 to 015): placement
+by invitation retired and replaced by direct placement
+(d_group_placements) with the derived "Needs setup" state; setup of a
+responsibility, the initial setup window and Existing Discipler
+recognition; Discipler appointment and candidates built; an appointment
+also locks undo of the eligibility lesson and earlier. Section 1
+Needs-setup member, section 2 rows and notes, section 3
+`profiles`, `church_memberships`, `d_groups`, `d_group_placements`,
+`d_group_memberships`, `discipler_assignments`, `d_group_invitations`
+(historical), section 5 `ministry_role_transitions`, section 10.
+
 ---
 
 # 1. Role Model
@@ -75,7 +86,8 @@ Examples:
 - Transfers
 - Progress oversight
 - Follow-ups
-- Discipler appointments (ADR-012; from Slice 6)
+- Discipler appointments (ADR-012)
+- The church's initial setup period (ADR-018)
 - Church announcements
 
 Gathering "attendance oversight" is withdrawn (ADR-014). Attendance
@@ -124,6 +136,12 @@ progress, attention conditions, follow-ups or D Group announcements
 until the relevant relationship exists. (The former "D Group
 attendance" item referred to gathering attendance, withdrawn by
 ADR-014.)
+
+A member placed in a D Group who holds no responsibility there yet is
+in the derived "Needs setup" state (ADR-018, DATABASE_CONSTRAINTS.md
+section 11). In addition to the above, they may read their group's
+row (its name) and, through get_my_d_group_roster(), their Leader's
+name only: no roster and no phone number.
 
 ---
 
@@ -180,13 +198,16 @@ D Group responsibility. This is a valid state, not a stored role.
 | View D Group roster by name | No | Church-wide | Own D Group | Own D Group | Own D Group | No |
 | Create/manage D Groups | No | Yes | No | No | No | No |
 | Assign Leader | No | Yes | No | No | No | No |
-| Invite to D Group as Discipler or Disciple | No | Yes | Own D Group | No | No | No |
-| Accept or decline a D Group invitation | Own | Own | Own | Own | Own | Own |
+| Add members to D Group | No | Yes | Own D Group | No | No | No |
+| Set up member responsibility (Disciple) | No | Yes | Own D Group | No | No | No |
+| Recognize Existing Discipler (setup window) | No | Yes | Own D Group | No | No | No |
+| Open or close the initial setup period | No | Yes | No | No | No | No |
 | Add self as Discipler | No | If Leader | Own D Group | No | No | No |
 | Assign Disciple to Discipler | No | Yes | Own D Group | No | No | No |
-| Remove Discipler or Disciple from D Group | No | Yes | Own D Group | No | No | No |
+| Remove member from D Group (not the Leader) | No | Yes | Own D Group | No | No | No |
 | Transfer Disciple | No | Yes | No | No | No | No |
-| Appoint eligible Disciple as Discipler (ADR-012; from Slice 6) | No | Yes | No | No | No | No |
+| View Discipler candidates | No | Church-wide | Own D Group | No | No | No |
+| Appoint eligible Disciple as Discipler (ADR-012) | No | Yes | No | No | No | No |
 | Record discipleship meeting, with each Disciple's attendance outcome | No | Fallback | Fallback, own D Group | Assigned Disciples | No | No |
 | Void discipleship meeting or participant | No | Yes | Own D Group | Self-recorded | No | No |
 | View discipleship meeting history | No | Church-wide | Own D Group | Own Discipler meetings | Self (own participant rows) | No |
@@ -223,19 +244,26 @@ workflow. Eligibility (COMPLETED of Lesson 5 of the active curriculum,
 marked by the Discipler, ADR-015) is derived, never stored and never automatic, and is not
 appointment. Appointment creates a DISCIPLER responsibility in the same
 D Group and does not end the person's DISCIPLE responsibility, their own
-discipler assignment or their progress. Built in Slice 6; until then
-Migration 006 still refuses DISCIPLE with DISCIPLER.
+discipler assignment or their progress. Built by Migration 014
+(appoint_discipler()). Appointment is refused before eligibility (D5),
+once the person's DISCIPLE row has ended (D8) and for the COORDINATOR
+themselves (D9) (ADR-018). *View Discipler candidates* lists eligible
+Disciples who are not Disciplers: for one group to its LEADER or the
+COORDINATOR, church-wide to the COORDINATOR. The LEADER sees
+eligibility but does not appoint.
 
-*D Group placement* (Vertical Slice 3, Plan decisions 2 to 8). The
-former single "Assign Discipler" and "Assign Disciple to D Group" rows
-are replaced by confirmed placement: a COORDINATOR (any group in the
-church) or the group's LEADER invites an unplaced ACTIVE member as
-DISCIPLER or DISCIPLE, and the member accepts or declines. Nobody is
-placed without their own acceptance, and a member cannot request to
-join or leave a group. LEADER is never invited; it is a direct
-COORDINATOR appointment, made when the group is created and changed
-only by replacement. The LEADER of a group also pairs, re-pairs,
-unpairs and removes its Disciplers and Disciples directly; a
+*D Group placement* (ADR-018, superseding the Vertical Slice 3
+invitation and acceptance rule). A COORDINATOR (any group in the
+church) or the group's LEADER adds ACTIVE members who are in no D Group
+directly; there is no acceptance step, and a member cannot request to
+join or leave a group. A person added this way needs setup until the
+COORDINATOR or the group's LEADER sets them up as a Disciple, or, while
+the church's initial setup period is open, recognizes them as an
+Existing Discipler. Only the COORDINATOR closes or reopens that period.
+LEADER is never added this way; it is a direct COORDINATOR appointment,
+made when the group is created and changed only by replacement. The
+LEADER of a group also pairs, re-pairs, unpairs and removes its members
+directly, and keeps pairing authority for appointed Disciplers (D6); a
 DISCIPLER can do none of these. A COORDINATOR may hold a D Group
 responsibility like anyone else, and gains Leader-only actions such as
 *Add self as Discipler* only by being that group's Leader.
@@ -294,8 +322,8 @@ every Disciple in the D Group (Slice 5 decision 13). Recording, voiding,
 marking completed, undoing a completion and meeting-record detail are likewise limited to their own
 assigned Disciples. Each capability is decided for the pair (caller,
 person viewed), not from holding a responsibility in general (ADR-012
-decision 8): a person who is both a Disciple and a Discipler (ADR-012;
-from Slice 6) reads their own progress as "Self" and their assigned
+decision 8): a person who is both a Disciple and a Discipler (ADR-012)
+reads their own progress as "Self" and their assigned
 Disciples' progress as their Discipler, and nothing more.
 
 *Mark lesson completed* (ADR-015, replacing *Submit lesson as finished*,
@@ -315,7 +343,9 @@ lesson and no meeting has been recorded for them on the next lesson
 (DATABASE_CONSTRAINTS.md section 4, Lesson Completion). After that
 window the completion is locked by later progress (ADR-016): no role
 corrects it in the MVP, and no one voids legitimate later meetings to
-unlock it. Every undo is audited.
+unlock it. Once the person has been appointed as a Discipler, undo is
+also refused for the eligibility lesson and earlier lessons (ADR-018
+decision 9). Every undo is audited.
 
 *Reopen lesson completion* is a COORDINATOR-only database-level recovery
 capability, not an action in the app (ADR-016). It is refused while any
@@ -333,8 +363,8 @@ COORDINATOR separately.
 
 No person may record their own meeting outcome, in any role: a recorder
 is never a participant in a meeting they record (explicit check from
-Slice 5), and nobody is paired with themselves (ADR-012, enforced from
-Slice 6).
+Slice 5), and nobody is paired with themselves (ADR-012, enforced
+since Migration 013).
 
 ---
 
@@ -465,10 +495,12 @@ Implemented: own profile; for ADMIN and COORDINATOR the profiles of
 anyone holding a membership row (any status) in a church they
 administer, which is what the membership-request list needs; and,
 since Migration 006, the ministry scope
-(private.can_view_profile_in_ministry): a LEADER sees the people with
-an active responsibility in their group and the people invited to it;
-a DISCIPLER sees their assigned Disciples and their own Leader; a
-DISCIPLE sees their own Leader and their own Discipler. Other group
+(private.can_view_profile_in_ministry): a LEADER sees everyone actively
+placed in their group, including people who still need setup
+(private.leads_group_of_membership, on placements since Migration 012;
+the Migration 006 invitee clause is removed); a DISCIPLER sees their
+assigned Disciples and their own Leader; a DISCIPLE sees their own
+Leader and their own Discipler. Other group
 mates are visible by name only, through get_my_d_group_roster().
 
 INSERT:
@@ -521,13 +553,15 @@ SELECT:
 
 - ADMIN → own church
 - COORDINATOR → own church
-- LEADER → members of own D Group, and people invited to it
+- LEADER → everyone actively placed in own D Group, including people
+  who still need setup
 - DISCIPLER → assigned Disciples, own Leader
 - DISCIPLE → self, own Leader and own Discipler
 
 The LEADER, DISCIPLER and DISCIPLE scopes are implemented by
 church_memberships_select_ministry (Migration 006), with the same
-predicate as the profiles ministry scope.
+predicate as the profiles ministry scope. The LEADER scope follows
+placements since Migration 012.
 
 INSERT / UPDATE:
 
@@ -589,6 +623,37 @@ ADMIN without COORDINATOR has no scope. Writes: create_d_group() and
 assign_d_group_leader(); set_d_group_status() is not built yet.
 Clients hold SELECT only; anon holds nothing.
 
+Since Migration 012, a person actively placed in a group can read its
+row whether or not they hold a responsibility there (policy
+d_groups_select_placed), so a member who needs setup sees their group's
+name.
+
+---
+
+## d_group_placements
+
+Added by Migration 012 (ADR-018).
+
+SELECT:
+
+- COORDINATOR → church-wide, history included
+- LEADER → own D Group's, history included
+- Person → own placements
+- Anyone else, including ADMIN without COORDINATOR → none
+
+Implemented by d_group_placements_select_manager
+(private.can_manage_d_group_members) and d_group_placements_select_own.
+
+WRITE:
+
+- add_members_to_d_group() → COORDINATOR, or the group's LEADER
+- remove_from_d_group() → COORDINATOR, or the group's LEADER; the
+  LEADER's own placement is refused
+- create_d_group() and assign_d_group_leader() → COORDINATOR, for the
+  Leader's placement
+
+Clients hold SELECT only; anon holds nothing.
+
 ---
 
 ## d_group_memberships
@@ -612,13 +677,16 @@ Use controlled operations for:
 - assignment
 - transfer
 - responsibility change
-- Discipler appointment (ADR-012; from Slice 6)
+- Discipler appointment (ADR-012)
 
 Do not allow arbitrary direct client mutation.
 
 Implemented: create_d_group(), assign_d_group_leader(),
-respond_to_d_group_invitation(), add_self_as_discipler() and
-end_d_group_membership(). Clients hold SELECT only.
+set_up_member() (Migration 013), add_self_as_discipler(),
+appoint_discipler() (Migration 014) and remove_from_d_group()
+(Migration 012). respond_to_d_group_invitation() and
+end_d_group_membership() were dropped by Migration 012. Clients hold
+SELECT only.
 
 ---
 
@@ -636,13 +704,19 @@ WRITE:
 Use controlled operations for assignment and reassignment.
 
 Implemented (Migration 006): the SELECT scopes above as written;
-writes through set_discipler() and end_d_group_membership() only.
+writes through set_discipler() and remove_from_d_group() (Migration
+012, replacing end_d_group_membership()) only.
 
 ---
 
 ## d_group_invitations
 
-Added by Migration 006.
+Added by Migration 006. Historical since Migration 012 (ADR-018):
+pending rows were withdrawn, invite_to_d_group(),
+withdraw_d_group_invitation(), respond_to_d_group_invitation() and
+get_my_pending_invitation() were dropped, and no operation writes the
+table. The SELECT policies below still apply to the history; the WRITE
+list records what Migration 006 allowed.
 
 SELECT:
 
@@ -652,9 +726,9 @@ SELECT:
 - Invitee → own
 - DISCIPLER, DISCIPLE, ADMIN without COORDINATOR → none
 
-The invitee reads their live invitation, with the group name and
-inviter name, through get_my_pending_invitation(); they have no
-d_groups scope before accepting.
+Until Migration 012 the invitee read their live invitation, with the
+group name and inviter name, through get_my_pending_invitation(), now
+dropped.
 
 WRITE:
 
@@ -824,7 +898,7 @@ SELECT:
 Capabilities are relationship-scoped: each read or action is decided
 for the pair (caller, person viewed), never from holding a
 responsibility in general (ADR-012 decision 8, N7). A person who is
-both a Disciple and a Discipler (ADR-012; from Slice 6) reads their own
+both a Disciple and a Discipler (ADR-012) reads their own
 progress as DISCIPLE and their assigned Disciples' progress as
 DISCIPLER, and no other Disciple's progress in the group.
 
@@ -852,6 +926,12 @@ lesson; DATABASE_CONSTRAINTS.md section 4):
 - LEADER → own D Group
 - COORDINATOR
 
+Once the person has been appointed (a ministry_role_transitions row to
+DISCIPLER), undo of the eligibility lesson and earlier lessons is
+refused for every caller (eligibility_lesson_protected, Migration 015,
+ADR-018 decision 9). Initial rollout recognition writes no transition
+row and locks nothing.
+
 Completion and undo are attributable (confirmed_by and submitted_by;
 audit_events with the prior values) and audited.
 
@@ -878,13 +958,16 @@ SELECT:
 - relevant LEADER
 - affected user for appropriate personal history
 
-Not built: the table has RLS enabled and no policy; Slice 6 adds the
-read policies.
+Implemented (Migration 014): ministry_role_transitions_select_manager
+gives the COORDINATOR church-wide and the group's LEADER their own
+group (private.can_manage_d_group_members);
+ministry_role_transitions_select_own gives the person their own rows.
 
 INSERT:
 
-Only through the controlled Discipler appointment operation (ADR-012;
-from Slice 6). No client write path.
+Only through appoint_discipler() (Migration 014). No client write
+grants. Initial rollout recognition and a Leader adding themselves
+write no row here (ADR-018 decision 6).
 
 ---
 
@@ -1022,6 +1105,12 @@ no rule reads it, because the missed-meeting condition it was added for
 is withdrawn. It is retained, not dropped, and changing it has no
 effect.
 
+initial_setup_closed_at (Migration 013, ADR-018) records when the
+COORDINATOR closed the church's initial setup period (NULL while open).
+It is changed only through set_initial_setup_open() (COORDINATOR,
+audited); any ACTIVE member reads the period's state through
+get_initial_setup_status().
+
 SELECT:
 
 - COORDINATOR
@@ -1079,11 +1168,13 @@ Recommended operations:
 - create_d_group()
 - set_d_group_status()
 - assign_d_group_leader()
-- invite_to_d_group()
-- withdraw_d_group_invitation()
-- respond_to_d_group_invitation()
+- list_addable_members() (ADR-018)
+- add_members_to_d_group() (ADR-018)
+- remove_from_d_group() (ADR-018; replaces end_d_group_membership())
+- set_up_member() (ADR-018)
+- set_initial_setup_open() (ADR-018)
+- get_initial_setup_status() (ADR-018)
 - add_self_as_discipler()
-- end_d_group_membership()
 - set_discipler()
 - transfer_disciple()
 - record_discipleship_meeting()
@@ -1092,8 +1183,8 @@ Recommended operations:
 - complete_lesson(p_membership_id, p_lesson_id) (ADR-015; replaces submit_lesson_finished())
 - undo_lesson_completion(p_membership_id, p_lesson_id) (ADR-015)
 - reopen_lesson_completion()
-- Discipler appointment operation (ADR-012; from Slice 6; replaces
-  promote_disciple_to_discipler(); name fixed by Slice 6)
+- appoint_discipler() (ADR-012; replaces promote_disciple_to_discipler())
+- list_discipler_candidates() (ADR-018)
 - add_follow_up_action()
 - resolve_follow_up()
 - reassign_follow_up()
@@ -1106,6 +1197,11 @@ None was built, and none will be.
 withdraw_lesson_submission() and confirm_lesson_completion() are no
 longer planned, and submit_lesson_finished() is replaced by
 complete_lesson() (ADR-015).
+
+invite_to_d_group(), withdraw_d_group_invitation(),
+respond_to_d_group_invitation(), get_my_pending_invitation() and
+end_d_group_membership() were built by Migration 006 and dropped by
+Migration 012 with placement by invitation (ADR-018).
 
 Operation notes:
 
@@ -1195,13 +1291,15 @@ undo_lesson_completion(p_membership_id, p_lesson_id) (ADR-015)
 → requires COMPLETED, no later lesson COMPLETED, and no RECORDED
   participant row for the person in a RECORDED meeting for the next
   lesson
-→ from Slice 6, the eligibility-lesson refusal for an appointed person
-  (as for reopen) also applies
+→ for a person appointed as Discipler, refused for the eligibility
+  lesson and earlier lessons, as for reopen (ADR-018 decision 9;
+  Migration 015); get_disciple_journey() reports can_undo false for them
 → returns to IN_PROGRESS (NOT_STARTED when no credited participation
   remains); clears ready_at, submitted_by, completed_at and
   confirmed_by; audited as LESSON_COMPLETION_UNDONE with the prior values
 → refusals: cannot_act_on_own_lesson, not_authorized, lesson_not_completed,
-  later_lesson_completed, next_lesson_started
+  later_lesson_completed, next_lesson_started,
+  eligibility_lesson_protected
 
 reopen_lesson_completion()
 → COORDINATOR only; a database-level recovery operation with no MVP
@@ -1223,20 +1321,29 @@ reopen_lesson_completion()
   remains; never to READY_FOR_COMPLETION (ADR-015)
 → never cascades; see DATABASE_CONSTRAINTS.md section 4
 
-Discipler appointment (ADR-012; from Slice 6; replaces
-promote_disciple_to_discipler())
-→ COORDINATOR only; no acceptance workflow
+appoint_discipler(p_membership_id) (ADR-012; replaces
+promote_disciple_to_discipler(); Migration 014)
+→ COORDINATOR of the person's church only, never for themselves
+  (cannot_appoint_self, D9); no acceptance workflow
 → requires derived eligibility: Lesson 5 of the active curriculum at
-  COMPLETED (ADR-015; never stored)
-→ creates a DISCIPLER responsibility in the same D Group as the
-  person's DISCIPLE responsibility, and the appointment record in
-  ministry_role_transitions
+  COMPLETED (ADR-015; never stored; not_eligible before it, D5)
+→ requires an ACTIVE membership, an active DISCIPLE row in an ACTIVE
+  group (not_an_active_disciple once it has ended, D8) and no active
+  DISCIPLER row (already_discipler)
+→ creates a DISCIPLER responsibility with discipler_basis APPOINTMENT
+  in the same D Group as the person's DISCIPLE responsibility, and the
+  appointment record in ministry_role_transitions
 → does not end the person's DISCIPLE responsibility, their own discipler
   assignment or their lesson progress
 → is not a monitoring recalculation trigger or episode boundary
-→ attributed and audited
-→ until the Slice 6 forward migration, Migration 006 still refuses
-  DISCIPLE with DISCIPLER
+→ attributed and audited as DISCIPLER_APPOINTED
+
+list_discipler_candidates(p_d_group_id, p_church_id) (Migration 014)
+→ read-only; eligible Disciples who are not Disciplers, with the date
+  they became eligible
+→ for one group: its LEADER or the COORDINATOR; church-wide (no
+  group): the COORDINATOR
+→ eligibility is not appointment
 
 regenerate_join_code()
 → ADMIN only
@@ -1247,56 +1354,101 @@ assign_church_role() and any role-ending operation
 
 create_d_group()
 → COORDINATOR only
-→ creates the group and its LEADER row together; the Leader must be an
-  unplaced ACTIVE member of the church
+→ creates the group, its LEADER row and the Leader's placement
+  together; the Leader must be an unplaced ACTIVE member of the church
 → audited as D_GROUP_CREATED
 
 assign_d_group_leader()
 → COORDINATOR only
 → ends the current LEADER row and creates the new one in one
-  transaction; the new Leader is unplaced or already a DISCIPLER in the
-  same group
+  transaction; the new Leader is unplaced, or placed in this group
+  holding no responsibility other than DISCIPLER (leader_not_eligible
+  otherwise)
+→ the replaced Leader leaves the group (placement ended) unless they
+  also hold a DISCIPLER row there
 → audited as D_GROUP_LEADER_ASSIGNED
 
-invite_to_d_group() / withdraw_d_group_invitation() /
-respond_to_d_group_invitation()
-→ placement by confirmed invitation; see section 3, d_group_invitations
-→ the invitee must be unplaced with no pending invitation, and is
-  re-checked on accept
-→ an expired invitation is refused on response; withdrawing one that
-  has lapsed reports EXPIRED
-→ audited as D_GROUP_INVITATION_SENT / _WITHDRAWN / _ACCEPTED /
-  _DECLINED
+list_addable_members(p_d_group_id) (Migration 012)
+→ read-only; COORDINATOR or the group's LEADER
+→ ACTIVE members of the group's church with no active placement; names
+  only, never phone numbers
+
+add_members_to_d_group(p_d_group_id, p_membership_ids) (Migration 012)
+→ COORDINATOR (any group in the church) or the group's LEADER; the
+  group must be ACTIVE
+→ places ACTIVE members of the church who have no active placement;
+  no acceptance step; they hold no responsibility until set up (Needs
+  setup)
+→ all or nothing: if any chosen person is not ACTIVE or is already
+  placed, nobody is added (member_not_active, member_already_placed);
+  at most 100 per call (too_many_members)
+→ audited as D_GROUP_MEMBER_PLACED, one event per person
+
+remove_from_d_group(p_d_group_placement_id) (Migration 012; replaces
+end_d_group_membership())
+→ COORDINATOR or the group's LEADER; unknown and not-yours are refused
+  alike
+→ ends every active discipler assignment on either side of the
+  person's rows, then every responsibility they hold in the group, then
+  the placement
+→ the LEADER is refused (leader_cannot_be_removed); replace instead
+→ audited as D_GROUP_MEMBER_REMOVED
+
+set_up_member(p_d_group_placement_id, p_responsibility) (Migration 013)
+→ COORDINATOR or the group's LEADER; active placement, ACTIVE group
+  and ACTIVE member
+→ DISCIPLE: refused for the group's Leader (leader_cannot_be_disciple)
+  or when already a Disciple
+→ DISCIPLER: recognition as an Existing Discipler, only while the
+  church's initial setup period is open (initial_setup_closed
+  otherwise); recorded with discipler_basis INITIAL_ROLLOUT and no
+  ministry_role_transitions row
+→ also adds a second responsibility to a person already set up
+→ audited as D_GROUP_MEMBER_SET_UP
+
+set_initial_setup_open(p_church_id, p_open) (Migration 013)
+→ COORDINATOR only
+→ closes or reopens the initial setup period
+  (church_settings.initial_setup_closed_at)
+→ audited as INITIAL_SETUP_CLOSED / INITIAL_SETUP_REOPENED
+
+get_initial_setup_status(p_church_id) (Migration 013)
+→ read-only; any ACTIVE member of the church
 
 add_self_as_discipler()
 → the group's LEADER only, for themselves
+→ records discipler_basis LEADER_SELF; not bounded by the initial setup
+  period (a Leader can never be a Disciple, so the Lesson 5 path does
+  not exist for them)
 → audited as D_GROUP_MEMBER_ADDED
 
-end_d_group_membership()
-→ COORDINATOR or the group's LEADER
-→ ends a DISCIPLER or DISCIPLE row and every active assignment on
-  either side of it; LEADER rows are refused (replace instead)
-→ audited as D_GROUP_MEMBER_ENDED
-
 set_discipler()
-→ COORDINATOR or the group's LEADER
+→ COORDINATOR or the group's LEADER, who keeps pairing authority for
+  appointed Disciplers (D6)
 → one operation pairs, re-pairs (ends the old assignment, creates the
   new one) or, with a null Discipler, unpairs; replaces the
   assign_discipler() / reassign_discipler() names listed before
   Vertical Slice 3
+→ refuses pairing a person with themselves (cannot_pair_with_self) and
+  a reciprocal pair (reciprocal_pairing, D7)
 → audited as DISCIPLER_ASSIGNED / _REASSIGNED / _UNASSIGNED
 → CONSECUTIVE_ABSENCE resolution on an ended assignment arrives with
   the monitoring slice; the function marks the place (ADR-014)
 
-list_placeable_members() / get_my_pending_invitation() /
-get_my_d_group_roster()
+list_placeable_members() / get_my_d_group_roster()
 → read-only SECURITY DEFINER reads
 → list_placeable_members(): COORDINATOR (every ACTIVE member with
   placement) or the group's LEADER (unplaced members only); names and
-  placement, never phone numbers
+  placement, never phone numbers; recreated by Migration 012 on
+  placements, without has_pending_invitation
 → get_my_d_group_roster(): the caller's group by name, with phone
   numbers only for their own Leader, own Discipler and, for a
-  Discipler, assigned Disciples
+  Discipler, assigned Disciples; a caller who needs setup gets only
+  their Leader's row, without phone number (Migration 012)
+  and every row carries d_group_member_count, everyone placed in the
+  group including people who still need setup, as a count only, no
+  names (Migration 016)
+→ get_my_pending_invitation() was dropped by Migration 012
 
 set_d_group_status()
 → COORDINATOR only
@@ -1312,7 +1464,7 @@ transfer_disciple()
 → the next assignment's consecutive recorded absence streak never
   carries the previous streak forward
 
-set_discipler() (re-pair or unpair) and end_d_group_membership()
+set_discipler() (re-pair or unpair) and remove_from_d_group()
 → end the Disciple's discipler assignment
 → resolve the ACTIVE CONSECUTIVE_ABSENCE condition belonging to the
   ended assignment

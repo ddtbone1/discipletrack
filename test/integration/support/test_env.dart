@@ -202,8 +202,8 @@ Future<void> deleteDiscipleshipRows({
 }
 
 /// Deletes D Group rows in foreign-key order: discipleship rows,
-/// assignments, invitations, D Group memberships, then the groups
-/// themselves.
+/// assignments, invitations, D Group memberships, placements, then the
+/// groups themselves.
 ///
 /// Rows are selected by any of: belonging to [groupIds], touching one of
 /// [membershipIds] (on either side of an assignment), or having been written
@@ -293,8 +293,44 @@ Future<void> deleteMinistryRows({
         .delete()
         .eq('invited_by', actorId);
   }
+  // Appointment records (Migration 014) reference groups and memberships.
+  if (groupIds.isNotEmpty) {
+    await service
+        .from('ministry_role_transitions')
+        .delete()
+        .inFilter('d_group_id', groupIds);
+  }
+  if (membershipIds.isNotEmpty) {
+    await service
+        .from('ministry_role_transitions')
+        .delete()
+        .inFilter('church_membership_id', membershipIds);
+  }
+  if (actorId != null) {
+    await service
+        .from('ministry_role_transitions')
+        .delete()
+        .eq('approved_by', actorId);
+  }
   if (dgms.isNotEmpty) {
     await service.from('d_group_memberships').delete().inFilter('id', dgms);
+  }
+  // Placements (Migration 012) after the responsibilities they hold.
+  if (groupIds.isNotEmpty) {
+    await service
+        .from('d_group_placements')
+        .delete()
+        .inFilter('d_group_id', groupIds);
+  }
+  if (membershipIds.isNotEmpty) {
+    await service
+        .from('d_group_placements')
+        .delete()
+        .inFilter('church_membership_id', membershipIds);
+  }
+  if (actorId != null) {
+    await service.from('d_group_placements').delete().eq('placed_by', actorId);
+    await service.from('d_group_placements').delete().eq('ended_by', actorId);
   }
   if (groupIds.isNotEmpty) {
     await service.from('d_groups').delete().inFilter('id', groupIds);

@@ -50,16 +50,21 @@ and uses the password `dev-password-123`:
 
 | Email | Name | Role | What to look at |
 |---|---|---|---|
-| `admin@discipletrack.local` | Dev Admin | Admin and Coordinator, not in a group | Home figures, including 4 active discipleships; any Disciple's detail by deep link |
+| `admin@discipletrack.local` | Dev Admin | Admin and Coordinator, not in a group | Closes the initial setup period and appoints Paolo from D Groups; Home figures, including 6 active discipleships; any Disciple's detail by deep link |
 | `leader@discipletrack.local` | Lea Santos | Leader of Young Adults A | Every Disciple's detail in the group; recording on a Discipler's behalf |
-| `discipler@discipletrack.local` | Dino Reyes | Discipler of Diana, Daniel and Ella | My Disciples with three rows; Record a meeting with the choose-Disciple sheet |
+| `discipler@discipletrack.local` | Dino Reyes | Existing Discipler of Diana, Daniel, Ella and Rosa | My Disciples with four rows; Record a meeting with the choose-Disciple sheet |
 | `disciple1@discipletrack.local` | Diana Cruz | Disciple of Dino | Lesson 1 completed and locked (Lesson 2 already has meetings, so no Undo); Lesson 2 in progress with 3 recorded absences in a row |
 | `disciple2@discipletrack.local` | Daniel Bautista | Disciple of Dino | Lesson 1 in progress with 7 counted meetings, ready for Dino to mark completed; one duplicate meeting voided |
 | `disciple3@discipletrack.local` | Ella Navarro | Disciple of Dino | Paired, no counted meeting; removed from one of Daniel's meetings where she was listed by mistake |
-| `discipler2@discipletrack.local` | Grace Lim | Discipler of Hana | My Disciples with one row; cannot see Dino's Disciples |
+| `discipler2@discipletrack.local` | Grace Lim | Existing Discipler of Hana and Paolo | My Disciples with two rows; cannot see Dino's Disciples |
 | `disciple5@discipletrack.local` | Hana Torres | Disciple of Grace | Present, Excused, then Late (recorded by Lea), with notes; Lesson 1 just marked completed by Grace, so Undo is available |
 | `disciple4@discipletrack.local` | Felix Ramos | Disciple, never paired | "Not paired yet" on My Journey |
-| `member@discipletrack.local` | Mara Villanueva | Not placed, with a pending invitation to accept | No Journey in the dock; out of scope for everyone's progress |
+| `member@discipletrack.local` | Mara Villanueva | Approved, in no D Group | Listed by Add Members; no Journey in the dock; out of scope for everyone's progress |
+| `newcomer@discipletrack.local` | Nina Aquino | Added to Young Adults A, Needs setup | Home says her Leader will set up her role; Lea sees "Set up" on her row |
+| `disciple6@discipletrack.local` | Paolo Mendoza | Disciple of Grace, Lessons 1 to 5 completed | Eligible to disciple, not appointed: the Coordinator sees him under Eligible to disciple |
+| `disciple7@discipletrack.local` | Rosa Domingo | Disciple of Dino and appointed Discipler | Both My Journey and My Disciples (none paired yet); Lessons 1 to 5 locked against undo |
+| `leader2@discipletrack.local` | Ramon Garcia | Leader of Men of Faith | Cannot see or act on Young Adults A |
+| `disciple8@discipletrack.local` | Tomas Villa | Disciple in Men of Faith, not paired | Out of scope for Lea and her Disciplers |
 
 Meetings are dated over the last 60 days relative to the reset, so dates move
 with each `db reset`. Every meeting is recorded through

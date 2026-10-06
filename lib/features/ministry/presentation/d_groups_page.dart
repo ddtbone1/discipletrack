@@ -12,9 +12,14 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
-import '../../../core/widgets/status_pill.dart';
+import '../../../core/widgets/app_text_link.dart';
+import '../../membership/application/membership_providers.dart';
 import '../application/ministry_providers.dart';
+import '../application/ministry_structure_controller.dart';
+import '../../../core/connectivity/connection_status.dart';
 import '../domain/d_group.dart';
+import '../domain/discipler_candidate.dart';
+import 'appoint_discipler_dialog.dart';
 import 'ministry_ui.dart';
 import '../../../core/widgets/empty_state.dart';
 
@@ -75,8 +80,8 @@ class DGroupsPage extends ConsumerWidget {
                       title: 'No D Groups yet',
                       message:
                           'Create the first group and appoint its Leader. '
-                          'The Leader can then invite members as Disciplers '
-                          'and Disciples.',
+                          'The Leader then adds members and sets up who '
+                          'disciples whom.',
                     )
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -88,6 +93,9 @@ class DGroupsPage extends ConsumerWidget {
                       ],
                     ),
             ),
+            const SizedBox(height: AppSpacing.lg),
+            const _Candidates(),
+            const _SetupPeriodCard(),
             const SizedBox(height: AppSpacing.lg),
             const _Unplaced(),
           ],
@@ -117,7 +125,12 @@ class _GroupCard extends StatelessWidget {
                 Text(summary.group.name, style: AppTypography.sectionTitle),
                 const SizedBox(height: 2),
                 Text(
-                  'Led by ${summary.leaderName ?? 'no one'}',
+                  [
+                    'Led by ${summary.leaderName ?? 'no one'}',
+                    // Everyone placed, set up or not (ADR-018).
+                    if (summary.memberCount != null)
+                      MinistryFormat.count(summary.memberCount!, 'member'),
+                  ].join(' · '),
                   style: AppTypography.supporting.copyWith(color: p.muted),
                 ),
                 const SizedBox(height: 2),
@@ -136,9 +149,9 @@ class _GroupCard extends StatelessWidget {
   }
 }
 
-/// ACTIVE members who hold no D Group responsibility, so the Coordinator can
-/// see who the count on Home refers to. Names and invitation state only;
-/// placing someone happens from a group's page (Invite a member).
+/// ACTIVE members in no D Group, so the Coordinator can see who the count on
+/// Home refers to. Names only; adding someone happens from a group's page
+/// (Add members).
 class _Unplaced extends ConsumerWidget {
   const _Unplaced();
 
@@ -169,15 +182,8 @@ class _Unplaced extends ConsumerWidget {
                 for (final m in unplaced)
                   PersonRow(
                     name: m.fullName,
-                    detail: m.hasPendingInvitation
-                        ? 'Invitation waiting for an answer'
-                        : 'Not invited yet',
-                    trailing: m.hasPendingInvitation
-                        ? const StatusPill(
-                            label: 'Invited',
-                            tone: StatusTone.waiting,
-                          )
-                        : null,
+                    leading: InitialsAvatar(name: m.fullName),
+                    detail: 'Approved, in no D Group',
                   ),
               ],
             );
@@ -186,11 +192,176 @@ class _Unplaced extends ConsumerWidget {
         if (members.value?.any((m) => !m.isPlaced) ?? false) ...[
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'To place someone, open a group and tap Invite a member.',
+            'To add someone, open a group and tap Add members.',
             style: context.captionStyle,
           ),
         ],
       ],
+    );
+  }
+}
+
+/// The church's initial setup period (Migration 013), for the Coordinator.
+///
+/// While it is open, Leaders may recognize members who already disciple
+/// people in the church as Existing Disciplers when setting them up. Closing
+/// it leaves one path to Discipler: Lesson 5, then the Coordinator's
+/// appointment. Closing is confirmed; it can be reopened, and both are
+/// recorded in the audit log.
+class _SetupPeriodCard extends ConsumerWidget {
+  const _SetupPeriodCard();
+
+  Future<void> _toggle(
+    BuildContext context,
+    WidgetRef ref,
+    String churchId, {
+    required bool open,
+  }) async {
+    final confirmed = await showConfirmDialog(
+      context,
+      title: open ? 'Reopen the setup period?' : 'Close the setup period?',
+      message: open
+          ? 'Leaders will again be able to set members up as Existing '
+                'Disciplers.'
+          : 'Leaders will no longer be able to set members up as Existing '
+                'Disciplers. From then on, a Disciple becomes a Discipler only '
+                'after Lesson 5, when you appoint them. You can reopen it '
+                'later.',
+      confirmLabel: open ? 'Reopen' : 'Close setup period',
+    );
+    if (!confirmed) return;
+    await ref
+        .read(ministryStructureControllerProvider.notifier)
+        .setInitialSetupOpen(churchId, open: open);
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final status = ref.watch(initialSetupStatusProvider).value;
+    final churchId = ref.watch(myMembershipProvider).value?.churchId;
+    final structure = ref.watch(ministryStructureControllerProvider);
+    if (status == null || churchId == null) return const SizedBox.shrink();
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Initial setup period',
+                  style: AppTypography.sectionTitle,
+                ),
+              ),
+              AppPill(
+                tone: status.isOpen ? PillTone.brand : PillTone.outline,
+                label: status.isOpen ? 'Open' : 'Closed',
+                outlined: true,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            status.isOpen
+                ? 'Leaders can set up people who already disciple others in '
+                      'the church as Existing Disciplers. Close it once every '
+                      'group is set up.'
+                : 'Closed ${MinistryFormat.shortDate(status.closedAt!)}. A '
+                      'Disciple becomes a Discipler only after Lesson 5, when '
+                      'you appoint them.',
+            style: context.supportingStyle,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          AppTextLink(
+            label: status.isOpen ? 'Close setup period' : 'Reopen',
+            requiresConnection: true,
+            onTap: structure.isBusy
+                ? null
+                : () => _toggle(context, ref, churchId, open: !status.isOpen),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Disciples across the church who are eligible to be appointed as
+/// Disciplers and are not yet: what the Coordinator reviews. Eligible is
+/// not appointed; nothing happens until the Coordinator appoints. Hidden
+/// when nobody is eligible.
+class _Candidates extends ConsumerWidget {
+  const _Candidates();
+
+  Future<void> _appoint(
+    BuildContext context,
+    WidgetRef ref,
+    DisciplerCandidate c,
+  ) async {
+    if (!await confirmAppointment(context, c)) return;
+    final ok = await ref
+        .read(ministryStructureControllerProvider.notifier)
+        .appointDiscipler(c.churchMembershipId);
+    if (!ok || !context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${c.fullName} is now a Discipler.')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final candidates = ref.watch(churchDisciplerCandidatesProvider).value;
+    final structure = ref.watch(ministryStructureControllerProvider);
+    if (candidates == null || candidates.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SectionHeading('Eligible to disciple'),
+          Padding(
+            padding: const EdgeInsets.only(
+              left: AppSpacing.xxs,
+              bottom: AppSpacing.xs,
+            ),
+            child: Text(
+              'They completed the lessons needed to disciple others. They '
+              'become Disciplers only when you appoint them.',
+              style: context.captionStyle,
+            ),
+          ),
+          TileGroup(
+            children: [
+              for (final c in candidates)
+                PersonRow(
+                  name: c.fullName,
+                  leading: InitialsAvatar(name: c.fullName),
+                  detail:
+                      '${c.dGroupName} · eligible since '
+                      '${MinistryFormat.shortDate(c.eligibleSince)}',
+                  trailing:
+                      structure.isRunning('appoint:${c.churchMembershipId}')
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : FilledButton.tonal(
+                          onPressed:
+                              structure.isBusy ||
+                                  ConnectionScope.isOffline(context)
+                              ? null
+                              : () => _appoint(context, ref, c),
+                          child: const Text('Appoint'),
+                        ),
+                ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

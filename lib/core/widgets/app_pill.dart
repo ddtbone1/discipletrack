@@ -103,6 +103,7 @@ class AppPill extends StatelessWidget {
     this.tone = PillTone.outline,
     this.icon,
     this.outlined = false,
+    this.iconTone,
     super.key,
   });
 
@@ -111,21 +112,44 @@ class AppPill extends StatelessWidget {
   final IconData? icon;
   final bool outlined;
 
+  /// For a grey pill: the tone its icon takes, so the icon alone carries
+  /// the meaning (for example lime for attended, red for an absence).
+  /// Ignored on coloured pills, whose icon already matches the pill.
+  final PillTone? iconTone;
+
+  /// The grey tones carry no meaning of their own, so the pill is not
+  /// filled grey: it is a plain outline with ordinary text, and only the
+  /// icon takes the tone's colour (user decision 2026-10-06).
+  bool get _grey => tone == PillTone.outline || tone == PillTone.neutral;
+
   @override
   Widget build(BuildContext context) {
     final (bg, fg) = pillColors(context, tone);
+    final p = context.palette;
+    final textColor = _grey ? p.textPrimary : fg;
+    final Border? border = _grey
+        ? Border.all(color: p.border)
+        : outlined
+        ? Border.all(color: fg.withValues(alpha: 0.55))
+        : null;
     return Container(
       padding: EdgeInsets.fromLTRB(icon == null ? 10 : 8, 4, 10, 4),
       decoration: BoxDecoration(
-        color: bg,
+        color: _grey ? Colors.transparent : bg,
         borderRadius: BorderRadius.circular(999),
-        border: outlined ? Border.all(color: fg.withValues(alpha: 0.55)) : null,
+        border: border,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 14, color: fg),
+            Icon(
+              icon,
+              size: 14,
+              color: _grey && iconTone != null
+                  ? pillColors(context, iconTone!).$2
+                  : fg,
+            ),
             const SizedBox(width: 4),
           ],
           Flexible(
@@ -133,7 +157,7 @@ class AppPill extends StatelessWidget {
               label,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: fg,
+                color: textColor,
                 fontWeight: outlined ? FontWeight.w600 : null,
               ),
             ),

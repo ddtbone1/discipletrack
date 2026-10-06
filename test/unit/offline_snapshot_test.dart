@@ -44,6 +44,7 @@ OfflineSnapshot _snapshot({String userId = _userId}) => OfflineSnapshot(
   ministry: const MinistryContext(
     dGroupId: 'g1',
     dGroupName: 'Young Adults A',
+    memberCount: 7,
     roster: [
       RosterEntry(
         dGroupMembershipId: 'dgm-lea',
@@ -122,6 +123,7 @@ void main() {
       expect(back.church!.name, 'Liberty Bible Baptist Church - Gensan');
       expect(back.roles, {ChurchRole.coordinator});
       expect(back.ministry!.dGroupName, 'Young Adults A');
+      expect(back.ministry!.memberCount, 7);
       expect(back.ministry!.isDisciple, isTrue);
       expect(back.ministry!.leader!.phone, '+63 900 000 0001');
     });

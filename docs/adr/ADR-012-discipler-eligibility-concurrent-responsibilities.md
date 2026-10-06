@@ -29,6 +29,12 @@ with DISCIPLER. Governing documents state the intended invariant with
 the note "enforced from Slice 6" until the Slice 6 forward migration
 lands.
 
+Implemented (2026-10-06) by Slice 6, Migrations 013 to 015, which
+removed the exclusion described in the previous paragraph;
+[ADR-018](ADR-018-direct-placement-initial-rollout.md) decided the open
+questions D5, D6, D7, D8, D9 and D14 and extended decision 9 from
+reopen to undo.
+
 ## Context
 
 The specification made DISCIPLE and DISCIPLER mutually exclusive,
@@ -114,12 +120,17 @@ the Slice 5 plan (sections M and Q).
   `private.discipler_eligibility_lesson()`, not configurable; built in the
   Slice 5 migration and reused by Slice 6.
 - **D7, reciprocal pairing.** May A disciple B while B disciples A?
-  Proposed default: refuse. Open; if refused, Slice 6 adds the check.
-- D5 (appointment before eligibility as an exception), D6 (Leader
-  pairing authority for appointed Disciplers), D8 (appointment after the
-  DISCIPLE responsibility ended), D9 (Coordinator self-appointment), D14
-  (a Disciple-Discipler conducting a lesson they have not completed):
-  owned by Slice 6.
+  Proposed default: refuse. Decided: refused; Migration 013 adds the
+  check (ADR-018).
+- D5 (appointment before eligibility as an exception). Decided: no
+  (ADR-018).
+- D6 (Leader pairing authority for appointed Disciplers). Decided: the
+  Leader keeps it (ADR-018).
+- D8 (appointment after the DISCIPLE responsibility ended). Decided:
+  no; the person is re-added and set up as a Disciple (ADR-018).
+- D9 (Coordinator self-appointment). Decided: no (ADR-018).
+- D14 (a Disciple-Discipler conducting a lesson they have not
+  completed). Decided: allowed, not enforced (ADR-018).
 
 ## Superseded statements
 

@@ -18,6 +18,8 @@ Revision 2026-10-06 (ADR-016): a completion is locked once legitimate progress e
 
 Revision 2026-10-06 (ADR-017, N1 closed): there is no minimum number of meetings; meeting count never determines completion. Section 0 (required_meetings note), section 4 (Lesson Meeting Policy withdrawn and replaced by No Meeting Minimum; Lesson Completion preconditions; Progress Timestamps; COMPLETED Is Protected: a void never changes a COMPLETED lesson and is no longer refused to protect it), section 11 (count presentation).
 
+Revision 2026-10-06 (ADR-018, Slice 6, Migrations 012 to 015): placement by invitation retired and replaced by direct placement (d_group_placements). Section 2: Rules, Partial Unique Indexes, Temporal Integrity, D Group Lifecycle note, Responsibility Combinations (DISCIPLE excludes LEADER only, enforced; placement required; discipler_basis), "Placement by Invitation" replaced by "Placement" (setup, initial setup period, removal), Leader Presence, Discipler Assignments (self and reciprocal pairing refused), Controlled Operations. Section 4: undo also refused for an appointed person's eligibility lesson and earlier (ADR-018 decision 9). Section 5: enforced by appoint_discipler(), D5, D8 and D9 decided, effects record discipler_basis APPOINTMENT, open items closed. Section 6: recalculation trigger list. Section 11: Discipler Eligibility implementation, Needs Setup added. Section 12: operation list.
+
 Revision 2026-10-05 (user decision, ninth): the curriculum has ten lessons, not twelve. Section 0: ten lesson rows and postconditions, and the Slice 5 migration's replacement of the bootstrap functions; examples in sections 4, 5, 11 and 12.
 
 ---
@@ -371,9 +373,10 @@ state (RBAC section 1a). No other church data is visible until ACTIVE.
 - A person may actively lead only one D Group.
 - A DISCIPLE may belong to only one active D Group.
 - A person cannot simultaneously have active DISCIPLE and LEADER responsibilities.
-- A person MAY simultaneously hold active DISCIPLE and DISCIPLER responsibilities, in the same D Group (ADR-012; enforced from Slice 6; until then Migration 006 still refuses DISCIPLE with DISCIPLER).
-- The two sides of a discipler assignment belong to different church memberships: nobody is paired with themselves (ADR-012; enforced from Slice 6).
-- Whether reciprocal pairing (A disciples B while B disciples A) is allowed is open (D7). It is not decided here.
+- A person MAY simultaneously hold active DISCIPLE and DISCIPLER responsibilities, in the same D Group (ADR-012; enforced since Migration 013).
+- The two sides of a discipler assignment belong to different church memberships: nobody is paired with themselves (ADR-012; enforced since Migration 013).
+- Reciprocal pairing (A disciples B while B disciples A) is refused for overlapping periods (D7, ADR-018; enforced since Migration 013).
+- A person is in at most one D Group at a time (d_group_placements, Migration 012), and an active responsibility requires an active placement in the same group.
 - A person MAY simultaneously hold active LEADER and DISCIPLER responsibilities. A Leader who personally disciples members must hold the DISCIPLER responsibility in order to receive discipler assignments.
 - A DISCIPLER may care for multiple Disciples.
 - A DISCIPLE may have only one active primary Discipler.
@@ -390,6 +393,7 @@ Enforce:
 - one active D Group leadership per person
 - one active DISCIPLE D Group membership per person
 - one active Discipler assignment per Disciple
+- one active D Group placement per person (Migration 012)
 
 ## Temporal Integrity
 
@@ -397,6 +401,8 @@ CHECK:
 
 - d_group_memberships: ended_at IS NULL OR ended_at > started_at
 - discipler_assignments: ended_at IS NULL OR ended_at > started_at
+- d_group_placements: ended_at IS NULL OR ended_at > started_at
+  (Migration 012)
 
 Overlap prevention:
 
@@ -441,10 +447,11 @@ roles.
 
 Note (ADR-014): INACTIVE previously "prevents creation of new
 gatherings". With gatherings removed that clause is withdrawn, and this
-section states no other restriction for INACTIVE. Migration 006 already
-refuses assign_d_group_leader(), invite_to_d_group(),
-respond_to_d_group_invitation() and add_self_as_discipler() for a group
-that is not ACTIVE (d_group_not_active), but that behaviour is not
+section states no other restriction for INACTIVE. assign_d_group_leader(),
+add_self_as_discipler() (Migration 006), add_members_to_d_group()
+(Migration 012), set_up_member() (Migration 013) and appoint_discipler()
+(Migration 014) refuse a group that is not ACTIVE (d_group_not_active),
+as the dropped invitation operations did, but that behaviour is not
 documented as a rule here, and whether an INACTIVE group may record
 discipleship meetings or change pairings is not defined. This is an open
 gap, not a decision; no replacement rule is invented here.
@@ -478,28 +485,38 @@ d_group_memberships integrity trigger for every writer:
   in another.
 - DISCIPLE excludes LEADER, for overlapping periods, not only active
   rows.
-- DISCIPLE with DISCIPLER in the same group is allowed (ADR-012;
-  enforced from Slice 6; until then Migration 006 still refuses
-  DISCIPLE with DISCIPLER through d_group_membership_disciple_conflict).
+- DISCIPLE with DISCIPLER in the same group is allowed (ADR-012).
+  Migration 013 replaced the integrity trigger body so that
+  d_group_membership_disciple_conflict is raised for DISCIPLE with
+  LEADER only.
 - LEADER with DISCIPLER in the same group is allowed.
 - A d_group_memberships row and its D Group belong to the same church.
 - One active row per person, group and responsibility (partial unique
   index WHERE ended_at IS NULL).
+- An active row requires an active placement of the same person in the
+  same D Group (d_group_membership_not_placed, Migration 012).
+- A DISCIPLER row carries discipler_basis (INITIAL_ROLLOUT, LEADER_SELF
+  or APPOINTMENT); LEADER and DISCIPLE rows carry none (CHECK,
+  Migration 013).
 
-"Unplaced" means an ACTIVE member with no active D Group
-responsibility.
+"Unplaced" means an ACTIVE member with no active placement
+(d_group_placements, Migration 012). An active responsibility implies
+an active placement, so this is never looser than the earlier
+definition (no active D Group responsibility).
 
 ## Leader Presence
 
 Every D Group has an active LEADER from the moment it exists.
-create_d_group() creates the group and its LEADER row in one
-transaction, assign_d_group_leader() replaces the Leader in one
-transaction, and end_d_group_membership() refuses LEADER rows. A
-replaced Leader keeps any DISCIPLER row they hold in the group;
-otherwise they become unplaced.
+create_d_group() creates the group, its LEADER row and the Leader's
+placement in one transaction, assign_d_group_leader() replaces the
+Leader in one transaction, and remove_from_d_group() refuses the
+Leader (leader_cannot_be_removed). A replaced Leader keeps any
+DISCIPLER row they hold in the group and stays placed; otherwise their
+placement ends and they become unplaced.
 
 The Leader of a new group must be unplaced. A replacement Leader must
-be unplaced or hold nothing but a DISCIPLER row in that same group.
+be unplaced, or placed in that same group holding nothing but a
+DISCIPLER row (or no responsibility: Needs setup).
 
 Departure of the Leader's membership from ACTIVE is not handled yet;
 see section 1, Effects of Leaving ACTIVE.
@@ -510,26 +527,50 @@ d_groups.name is not blank and is unique within the church ignoring
 case and surrounding spaces, among groups that are not ARCHIVED
 (partial unique index on (church_id, lower(trim(name)))).
 
-## Placement by Invitation
+## Placement
 
-DISCIPLER and DISCIPLE responsibilities are created only by an
-accepted invitation (d_group_invitations), or for a Leader adding
-themselves as Discipler, by add_self_as_discipler().
+Revised 2026-10-06 (ADR-018). This section was "Placement by
+Invitation". Placement by invitation is retired: Migration 012 withdrew
+pending invitations (marking already overdue ones EXPIRED at
+expires_at), dropped the invitation operations and kept
+d_group_invitations as history that no operation writes.
 
-- The invitee is an unplaced ACTIVE member of the group's church with
-  no PENDING invitation. Both conditions are re-checked on acceptance.
-- A member holds at most one PENDING invitation (partial unique index).
-- An invitation is answered once. Status moves PENDING → ACCEPTED,
-  DECLINED, WITHDRAWN or EXPIRED and never back. The state CHECK ties
-  responded_at and resulting_d_group_membership_id to the status.
-- An invitation expires 14 days after it was sent. Expiry is lazy: a
-  PENDING row past expires_at is treated as EXPIRED by every operation
-  and read, and is marked EXPIRED (responded_at = expires_at) by the
-  next successful write that touches it. An operation that refuses an
-  expired invitation cannot persist the mark, because the refusal rolls
-  the transaction back.
-- An invitation and its invitee belong to the same church (integrity
-  trigger).
+A person's membership of a D Group is a d_group_placements row,
+separate from their responsibilities there (d_group_memberships).
+
+- Placement is direct, with no acceptance step. The Coordinator (any
+  group in the church) or the group's Leader adds ACTIVE members of the
+  group's church who have no active placement
+  (add_members_to_d_group()). The call is all or nothing and takes at
+  most 100 people.
+- One active placement per person: partial unique index on
+  church_membership_id WHERE ended_at IS NULL. Two concurrent adds of
+  the same person cannot both commit.
+- A placement and its D Group belong to the same church, and one
+  person's placement periods never overlap (integrity trigger).
+- ended_at IS NULL OR ended_at > started_at, and ended_by is set
+  exactly when ended_at is (CHECKs).
+- A placement cannot end while the person still holds an active
+  responsibility in the group (d_group_placement_has_responsibilities).
+- An active placement with no active responsibility is "Needs setup"
+  (section 11). It is derived and never stored.
+- Setup (set_up_member(), Coordinator or the group's Leader) gives a
+  placed member a DISCIPLE row, or, only while the church's initial
+  setup period is open (church_settings.initial_setup_closed_at IS
+  NULL), recognizes them as an Existing Discipler with a DISCIPLER row
+  whose discipler_basis is INITIAL_ROLLOUT (initial_setup_closed
+  otherwise). Recognition writes no ministry_role_transitions row and
+  is not an appointment.
+- Only the Coordinator closes or reopens the initial setup period
+  (set_initial_setup_open()); both are audited.
+- DISCIPLER rows are otherwise created only by add_self_as_discipler()
+  (the group's Leader for themselves, discipler_basis LEADER_SELF, not
+  bounded by the setup period) and appoint_discipler() (section 5,
+  discipler_basis APPOINTMENT).
+- Removal (remove_from_d_group()) ends every active assignment on
+  either side of the person's rows, then every responsibility they hold
+  in the group, then the placement, in one transaction. The Leader is
+  refused. History is kept.
 
 ## Discipler Assignments
 
@@ -541,10 +582,13 @@ The CHECK (discipler_assignments_distinct_sides_check, Migration 006)
 compares d_group_memberships row ids only. Once DISCIPLE and DISCIPLER
 may coexist, it no longer prevents a person from being paired with
 themselves, so the two sides must also belong to different church
-memberships (ADR-012; enforced from Slice 6 in the assignment
-integrity check and set_discipler()). Reciprocal pairing is open (D7). Removing a Discipler or Disciple from the
-group ends every active assignment on either side in the same
-transaction.
+memberships (ADR-012; enforced since Migration 013 by the assignment
+integrity trigger, assignment_self_pairing, and by set_discipler(),
+cannot_pair_with_self). Reciprocal pairing is refused: no assignment
+may overlap one in which the two people's sides are swapped (D7,
+ADR-018; assignment_reciprocal in the trigger, reciprocal_pairing in
+set_discipler()). Removing a person from the group ends every active
+assignment on either side in the same transaction.
 
 ## Controlled Operations
 
@@ -558,13 +602,20 @@ Use transactional database operations for:
 A transfer must succeed completely or fail completely.
 
 Implemented in Migration 006: create_d_group(),
-assign_d_group_leader(), invite_to_d_group(),
-withdraw_d_group_invitation(), respond_to_d_group_invitation(),
-add_self_as_discipler(), end_d_group_membership() and set_discipler().
-Each locks the affected person's church_memberships row before
-changing their D Group rows, so concurrent operations on one person
-serialise. Transfer between groups is not built; the stopgap is
-removal followed by a new invitation, which keeps history.
+assign_d_group_leader(), add_self_as_discipler() and set_discipler()
+(the last two replaced by Migration 013). Implemented in Migration 012:
+add_members_to_d_group() and remove_from_d_group(), with
+create_d_group() and assign_d_group_leader() replaced to write
+placements. Implemented in Migration 013: set_up_member() and
+set_initial_setup_open(). Implemented in Migration 014:
+appoint_discipler(). invite_to_d_group(), withdraw_d_group_invitation(),
+respond_to_d_group_invitation() and end_d_group_membership() were
+dropped by Migration 012. Each operation locks the affected person's
+church_memberships row before changing their D Group rows (in id order
+when several), so concurrent operations on one person serialise; the
+placement unique index is the final guarantee. Transfer between groups
+is not built; the stopgap is removal followed by adding the person to
+the new group and setting them up again, which keeps history.
 
 ---
 
@@ -785,7 +836,7 @@ operation.
 
 There is no self-crediting risk here: a recorder is never a participant
 in a meeting they record (explicit check from Slice 5), and nobody is
-paired with themselves (ADR-012, enforced from Slice 6). The earlier
+paired with themselves (ADR-012, enforced since Migration 013). The earlier
 rationale, that DISCIPLE and DISCIPLER are mutually exclusive, no longer
 holds once they may coexist (ADR-012).
 
@@ -887,8 +938,13 @@ required, otherwise reject:
 4. No RECORDED participant row for this church_membership_id exists in
    a RECORDED discipleship meeting for the next lesson in sequence.
    Refusal: next_lesson_started.
-5. From Slice 6: reopen precondition 4 below (the eligibility lesson
-   of an appointed person) applies to undo as well.
+5. Reopen precondition 4 below applies to undo as well (ADR-018
+   decision 9, Migration 015): once the person has been appointed (a
+   ministry_role_transitions row to DISCIPLER), the target lesson is
+   not the eligibility lesson or an earlier lesson. Refusal:
+   eligibility_lesson_protected. Initial rollout recognition writes no
+   transition row and locks nothing. get_disciple_journey() reports
+   can_undo false for the protected lessons.
 
 Effect: IN_PROGRESS, or NOT_STARTED when no credited participation
 remains; ready_at, submitted_by, completed_at and confirmed_by → NULL;
@@ -1092,9 +1148,9 @@ ended the person's DISCIPLE responsibility and their own discipler
 assignment. Appointment ends neither. The table name
 ministry_role_transitions is kept; a row now records the appointment.
 
-Enforced from Slice 6. Until Slice 6's forward migration, Migration
-006 refuses DISCIPLE with DISCIPLER (d_group_membership_disciple_conflict),
-so no appointment can exist.
+Enforced since Migration 014 by appoint_discipler(); Migration 013
+relaxed the DISCIPLE / DISCIPLER exclusion it depends on. The open
+items are decided by ADR-018 (2026-10-06).
 
 ## Rules
 
@@ -1110,27 +1166,50 @@ so no appointment can exist.
 All required, otherwise reject:
 
 1. The caller holds an active COORDINATOR role on an ACTIVE membership
-   in the target's church, and the target is not the caller's own
-   membership. Self-appointment is open (D9); this precondition stands
-   until D9 is decided.
-2. The target church membership is ACTIVE.
-3. The target holds an active DISCIPLE d_group_memberships row.
-4. The target is eligible (Discipler eligibility, section 11).
-5. The target holds no active DISCIPLER d_group_memberships row.
+   in the target's church (not_authorized; an unknown target is refused
+   alike), and the target is not the caller's own membership: a
+   Coordinator cannot appoint themselves (D9, ADR-018;
+   cannot_appoint_self).
+2. The target church membership is ACTIVE (member_not_active).
+3. The target holds an active DISCIPLE d_group_memberships row, in an
+   ACTIVE D Group (not_an_active_disciple, d_group_not_active). There
+   is no appointment once the DISCIPLE row has ended (D8, ADR-018): the
+   person is added to a group again and set up as a Disciple; their
+   progress survives because it is keyed to church_memberships.id.
+4. The target is eligible (Discipler eligibility, section 11). There is
+   no appointment before eligibility, even as an exception (D5,
+   ADR-018; not_eligible).
+5. The target holds no active DISCIPLER d_group_memberships row
+   (already_discipler).
 
 ## Effects
 
 In one transaction; either every step succeeds or none is committed:
 
-1. Create a DISCIPLER d_group_memberships row in the same D Group as
-   the target's DISCIPLE row (ADR-012 decision 3; all of a person's
-   responsibilities stay in one D Group).
+1. Create a DISCIPLER d_group_memberships row with discipler_basis
+   APPOINTMENT in the same D Group as the target's DISCIPLE row
+   (ADR-012 decision 3; all of a person's responsibilities stay in one
+   D Group).
 2. Record the appointment in ministry_role_transitions (from DISCIPLE,
    to DISCIPLER, that D Group, the approving Coordinator and time).
 3. Leave the DISCIPLE row, the person's own discipler assignment and
    their lesson progress unchanged. They continue through Lesson 10
    under their own Discipler (ADR-012 decision 4).
-4. Record audit information.
+4. Record audit information (DISCIPLER_APPOINTED).
+
+From then on, the eligibility lesson and earlier lessons can be
+neither undone nor reopened (section 4; ADR-012 decision 9 extended by
+ADR-018 decision 9).
+
+The group's Leader keeps pairing authority for an appointed Discipler
+(D6, ADR-018). A Disciple who is also a Discipler may record lessons
+they have not completed themselves; this is allowed and not enforced
+(D14, ADR-018).
+
+Initial rollout recognition (section 2, Placement) and a Leader adding
+themselves as Discipler are not appointments: they write no
+ministry_role_transitions row and are distinguished by
+discipler_basis.
 
 The appointee's follow-ups and attention conditions as subject are
 scoped to church_membership_id and are untouched. Appointment is not a
@@ -1139,15 +1218,14 @@ Disciple and a Discipler is monitored as a Disciple only (ADR-014).
 
 ## Open Items
 
-Not decided here (ADR-012; owned by Slice 6):
+None remain. Decided:
 
-- D2 is decided (2026-10-05): the eligibility lesson comes from
+- D2 (2026-10-05): the eligibility lesson comes from
   `private.discipler_eligibility_lesson()`, not configurable.
-- D5: whether appointment before eligibility is allowed as an
-  exception.
-- D8: whether appointment is allowed after the person's DISCIPLE
+- D5 (ADR-018): no appointment before eligibility.
+- D8 (ADR-018): no appointment after the person's DISCIPLE
   responsibility has ended.
-- D9: whether a Coordinator may appoint themselves.
+- D9 (ADR-018): a Coordinator cannot appoint themselves.
 
 ---
 
@@ -1226,8 +1304,9 @@ Recalculation triggers:
 - record_discipleship_meeting()
 - void_discipleship_meeting()
 - void_meeting_participant()
-- set_discipler() (re-pair or unpair) and end_d_group_membership(),
-  which replaced reassign_discipler() in Vertical Slice 3
+- set_discipler() (re-pair or unpair), which replaced
+  reassign_discipler() in Vertical Slice 3, and remove_from_d_group(),
+  which replaced end_d_group_membership() in Migration 012
 - transfer_disciple()
 
 Discipler appointment is not a trigger: it does not end the Disciple's
@@ -1516,6 +1595,7 @@ functions and/or constraint triggers.
 ## Relationships That Must Reject Cross-Church Rows
 
 - d_group_memberships vs church_memberships
+- d_group_placements vs church_memberships (Migration 012)
 - discipleship_meetings vs D Group, Discipler and lesson (replaces
   "gathering_attendance vs gathering / D Group", withdrawn with
   gatherings, ADR-014; it follows directly from the rule above)
@@ -1654,7 +1734,25 @@ number comes from `private.discipler_eligibility_lesson()` (D2); no rule hard-co
 
 "Eligible since" is that lesson's completed_at. Eligibility is derived
 at read time and never stored, so an undo or a reopen (section 4) withdraws it
-immediately. It never appoints anyone by itself (section 5).
+immediately. For an appointed person neither is allowed on that lesson
+or earlier (section 4, ADR-018 decision 9). It never appoints anyone by
+itself (section 5).
+
+Implemented by private.eligible_since(membership) (the completed_at
+above, or NULL) and private.is_discipler_eligible(membership)
+(Migration 014).
+
+## Needs Setup
+
+Added 2026-10-06 (ADR-018).
+
+needs_setup(member)
+= true when the member has an active d_group_placements row and no
+  active d_group_memberships row in that D Group
+
+Derived at read time, never stored. A member who needs setup sees their
+group's name and their Leader's name only (RBAC_RLS_MATRIX.md section
+1). "Unplaced" (section 2) is the absence of an active placement.
 
 ## Active Discipleships
 
@@ -1732,7 +1830,8 @@ Examples:
 - void discipleship meeting or participant
 - mark lesson completed, undo a lesson completion (ADR-015)
 - reopen lesson completion
-- appoint Discipler (ADR-012; Slice 6)
+- appoint Discipler (ADR-012; appoint_discipler(), Migration 014)
+- add members to a D Group, set up a member, remove a member (ADR-018)
 - resolve/recalculate monitoring conditions
 - same-church validation where ordinary foreign keys cannot express it
 

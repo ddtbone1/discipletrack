@@ -103,6 +103,5 @@ Future<void> retryConnection(WidgetRef ref) async {
     ..invalidate(myProfileProvider)
     ..invalidate(myChurchProvider)
     ..invalidate(myChurchRolesProvider)
-    ..invalidate(myMinistryContextProvider)
-    ..invalidate(myPendingInvitationProvider);
+    ..invalidate(myMinistryContextProvider);
 }

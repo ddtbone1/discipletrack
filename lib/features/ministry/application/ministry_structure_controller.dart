@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/supabase/postgrest_failure.dart';
+import '../../discipleship/application/discipleship_providers.dart';
 import '../data/ministry_repository.dart';
 import '../domain/d_group_member.dart';
 import 'ministry_providers.dart';
@@ -54,31 +55,38 @@ class MinistryStructureController extends Notifier<MinistryStructureState> {
     () => _repo.assignLeader(groupId: groupId, membershipId: membershipId),
   );
 
-  Future<bool> invite(
-    String groupId,
-    String membershipId,
+  /// Adds every chosen member, or none of them.
+  Future<bool> addMembers(String groupId, List<String> membershipIds) => _run(
+    'add:$groupId',
+    () => _repo.addMembers(groupId: groupId, membershipIds: membershipIds),
+  );
+
+  Future<bool> setUpMember(
+    String placementId,
     DGroupResponsibility responsibility,
   ) => _run(
-    'invite:$membershipId',
-    () => _repo.invite(
-      groupId: groupId,
-      membershipId: membershipId,
+    'setup:$placementId',
+    () => _repo.setUpMember(
+      placementId: placementId,
       responsibility: responsibility,
     ),
   );
 
-  Future<bool> withdrawInvitation(String invitationId) => _run(
-    'withdraw:$invitationId',
-    () => _repo.withdrawInvitation(invitationId),
-  );
+  Future<bool> setInitialSetupOpen(String churchId, {required bool open}) =>
+      _run(
+        'window:$churchId',
+        () => _repo.setInitialSetupOpen(churchId: churchId, open: open),
+      );
+
+  /// Coordinator only: appoints an eligible Disciple as a Discipler.
+  Future<bool> appointDiscipler(String membershipId) =>
+      _run('appoint:$membershipId', () => _repo.appointDiscipler(membershipId));
 
   Future<bool> addSelfAsDiscipler(String groupId) =>
       _run('self:$groupId', () => _repo.addSelfAsDiscipler(groupId));
 
-  Future<bool> endMembership(String dGroupMembershipId) => _run(
-    'end:$dGroupMembershipId',
-    () => _repo.endMembership(dGroupMembershipId),
-  );
+  Future<bool> removeFromGroup(String placementId) =>
+      _run('remove:$placementId', () => _repo.removeFromGroup(placementId));
 
   /// Pairs, re-pairs, or with a null [disciplerDGroupMembershipId] unpairs.
   Future<bool> setDiscipler(
@@ -114,8 +122,14 @@ class MinistryStructureController extends Notifier<MinistryStructureState> {
       ..invalidate(dGroupsProvider)
       ..invalidate(dGroupDetailProvider)
       ..invalidate(placeableMembersProvider)
+      ..invalidate(addableMembersProvider)
+      ..invalidate(initialSetupStatusProvider)
+      ..invalidate(groupDisciplerCandidatesProvider)
+      ..invalidate(churchDisciplerCandidatesProvider)
       ..invalidate(unplacedMemberCountProvider)
-      ..invalidate(myMinistryContextProvider);
+      ..invalidate(myMinistryContextProvider)
+      // A pairing or removal changes whose progress a Leader sees.
+      ..invalidate(groupProgressProvider);
   }
 }
 

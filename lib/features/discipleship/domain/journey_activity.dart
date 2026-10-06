@@ -76,16 +76,20 @@ List<ActivityEvent> journeyActivity(
 
   for (final m in history) {
     // A voided record stays in the story, but never reads as a counted
-    // meeting: it says so, and carries no outcome colour.
+    // meeting: no outcome (it would read as attendance), no outcome colour,
+    // and it says it does not count.
     events.add((
       ActivityEvent(
         at: m.occurredAt,
         kind: ActivityKind.meeting,
-        title: 'Meeting recorded',
+        title: !m.isVoided
+            ? 'Meeting recorded'
+            : m.isRemoved
+            ? 'Listed in a meeting'
+            : 'Meeting recorded',
         detail: [
           'Lesson ${m.lessonNumber}',
-          m.outcome.label,
-          if (m.isVoided) 'Voided',
+          if (!m.isVoided) m.outcome.label else 'Not counted',
         ].join(' · '),
         outcome: m.isVoided ? null : m.outcome,
       ),

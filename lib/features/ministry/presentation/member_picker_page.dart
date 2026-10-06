@@ -13,16 +13,11 @@ import '../../../core/widgets/loading_state.dart';
 import '../application/ministry_providers.dart';
 import '../application/ministry_structure_controller.dart';
 import '../domain/member_option.dart';
-import 'invite_role_sheet.dart';
 import 'ministry_ui.dart';
 
-/// Chooses a member for a group.
-///
-/// - [MemberPickPurpose.invite] (route `/groups/:groupId/invite`): picking a
-///   person asks for the responsibility and sends the invitation, then
-///   returns to the group.
-/// - [MemberPickPurpose.appointLeader]: picking a person pops with the chosen
-///   [MemberOption]; the caller performs the appointment.
+/// Chooses the Leader of a new group, or the replacement Leader of an
+/// existing one ([MemberPickPurpose.appointLeader]). Picking a person pops
+/// with the chosen [MemberOption]; the caller performs the appointment.
 ///
 /// Everyone the database returns is listed. Those who cannot be chosen are
 /// shown disabled with the reason, rather than hidden, so a Coordinator can
@@ -55,32 +50,13 @@ class _MemberPickerPageState extends ConsumerState<MemberPickerPage> {
     super.dispose();
   }
 
-  Future<void> _pick(MemberOption option) async {
-    if (widget.purpose == MemberPickPurpose.appointLeader) {
-      Navigator.of(context).pop(option);
-      return;
-    }
-    final role = await showInviteRoleSheet(context, name: option.fullName);
-    if (role == null || !mounted) return;
-    final ok = await ref
-        .read(ministryStructureControllerProvider.notifier)
-        .invite(widget.groupId!, option.churchMembershipId, role);
-    if (!ok || !mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Invitation sent to ${option.fullName}.')),
-    );
-    Navigator.of(context).pop();
-  }
+  void _pick(MemberOption option) => Navigator.of(context).pop(option);
 
   @override
   Widget build(BuildContext context) {
     final members = ref.watch(placeableMembersProvider(widget.groupId));
     final structure = ref.watch(ministryStructureControllerProvider);
-    final title =
-        widget.title ??
-        (widget.purpose == MemberPickPurpose.invite
-            ? 'Invite a member'
-            : 'Choose a Leader');
+    final title = widget.title ?? 'Choose a Leader';
 
     return AppScaffold(
       title: title,
@@ -106,7 +82,7 @@ class _MemberPickerPageState extends ConsumerState<MemberPickerPage> {
             error: (e, _) => SizedBox(
               height: 240,
               child: ErrorState.load(
-                subject: 'the people you can invite',
+                subject: 'the members you can choose from',
                 error: e,
                 onRetry: () =>
                     ref.invalidate(placeableMembersProvider(widget.groupId)),
@@ -121,9 +97,7 @@ class _MemberPickerPageState extends ConsumerState<MemberPickerPage> {
               ];
               if (all.isEmpty) {
                 return Text(
-                  widget.purpose == MemberPickPurpose.invite
-                      ? 'Everyone in your church is already in a D Group.'
-                      : 'There are no active members to choose from.',
+                  'There are no active members to choose from.',
                   style: context.supportingStyle,
                 );
               }
@@ -142,9 +116,7 @@ class _MemberPickerPageState extends ConsumerState<MemberPickerPage> {
                         widget.purpose,
                         dGroupId: widget.groupId,
                       ),
-                      busy: structure.isRunning(
-                        'invite:${m.churchMembershipId}',
-                      ),
+                      busy: false,
                       // Choosing someone is a change, so not offline.
                       enabled:
                           !structure.isBusy &&

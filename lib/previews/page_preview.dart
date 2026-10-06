@@ -19,14 +19,15 @@ import '../features/membership_review/presentation/pending_members_page.dart';
 import '../features/ministry/application/ministry_providers.dart';
 import '../features/ministry/domain/d_group.dart';
 import '../features/ministry/domain/d_group_detail.dart';
-import '../features/ministry/domain/d_group_invitation.dart';
+import '../features/ministry/domain/d_group_placement.dart';
 import '../features/ministry/domain/d_group_member.dart';
 import '../features/ministry/domain/discipler_assignment.dart';
 import '../features/ministry/domain/member_option.dart';
 import '../features/ministry/domain/ministry_context.dart';
 import '../features/ministry/presentation/d_group_detail_page.dart';
 import '../features/ministry/presentation/d_groups_page.dart';
-import '../features/ministry/presentation/member_picker_page.dart';
+import '../features/ministry/data/ministry_repository.dart';
+import '../features/ministry/presentation/add_members_page.dart';
 import '../features/ministry/presentation/my_group_page.dart';
 import '../features/onboarding/presentation/join_church_page.dart';
 import '../features/onboarding/presentation/no_access_page.dart';
@@ -120,6 +121,21 @@ final _groupDetail = DGroupDetail(
     description: 'Thursday evenings at the fellowship hall.',
     status: DGroupStatus.active,
   ),
+  placements: [
+    for (final p in [
+      ('lea', 'Lea Santos'),
+      ('dino', 'Dino Reyes'),
+      ('diana', 'Diana Cruz'),
+      ('daniel', 'Daniel Bautista'),
+      ('mara', 'Mara Villanueva'),
+    ])
+      DGroupPlacement(
+        placementId: 'pl-${p.$1}',
+        churchMembershipId: 'cm-${p.$1}',
+        fullName: p.$2,
+        startedAt: DateTime(2026, 9, 1),
+      ),
+  ],
   members: [
     _dgm('lea', 'Lea Santos', DGroupResponsibility.leader, '+63 917 555 0102'),
     _dgm(
@@ -137,18 +153,6 @@ final _groupDetail = DGroupDetail(
       disciplerDGroupMembershipId: 'dino',
       discipleDGroupMembershipId: 'diana',
       startedAt: DateTime(2026, 9, 2),
-    ),
-  ],
-  invitations: [
-    DGroupInvitation(
-      id: 'inv1',
-      dGroupId: _groupId,
-      churchMembershipId: 'cm-mara',
-      inviteeName: 'Mara Villanueva',
-      responsibility: DGroupResponsibility.disciple,
-      status: DGroupInvitationStatus.pending,
-      createdAt: DateTime.now().subtract(const Duration(days: 3)),
-      expiresAt: DateTime.now().add(const Duration(days: 11)),
     ),
   ],
 );
@@ -203,15 +207,12 @@ final _leaderContext = MinistryContext(
   ],
 );
 
-final _invitation = DGroupInvitation(
-  id: 'inv1',
+final _needsSetupContext = MinistryContext(
   dGroupId: _groupId,
   dGroupName: 'Young Adults A',
-  responsibility: DGroupResponsibility.disciple,
-  status: DGroupInvitationStatus.pending,
-  invitedByName: 'Lea Santos',
-  createdAt: DateTime.now().subtract(const Duration(days: 3)),
-  expiresAt: DateTime.now().add(const Duration(days: 11)),
+  roster: [
+    _roster('lea', 'Lea Santos', DGroupResponsibility.leader, leader: true),
+  ],
 );
 
 final _groups = [
@@ -229,21 +230,25 @@ final _groups = [
   ),
 ];
 
-const _placeable = [
-  MemberOption(
+final _addable = [
+  AddableMember(
     churchMembershipId: 'm1',
     fullName: 'Mara Villanueva',
-    hasPendingInvitation: true,
+    joinedAt: DateTime(2026, 9, 14),
   ),
-  MemberOption(
+  AddableMember(
     churchMembershipId: 'm2',
     fullName: 'Paolo Lim',
-    hasPendingInvitation: false,
+    joinedAt: DateTime(2026, 8, 30),
   ),
+];
+
+const _placeable = [
+  MemberOption(churchMembershipId: 'm1', fullName: 'Mara Villanueva'),
+  MemberOption(churchMembershipId: 'm2', fullName: 'Paolo Lim'),
   MemberOption(
     churchMembershipId: 'm3',
     fullName: 'Diana Cruz',
-    hasPendingInvitation: false,
     currentDGroupId: _groupId,
     currentDGroupName: 'Young Adults A',
     currentResponsibilities: {DGroupResponsibility.disciple},
@@ -271,7 +276,6 @@ Widget _wrap(
   Set<ChurchRole> roles = const {},
   List<MembershipRequest> requests = const [],
   MinistryContext? ministry,
-  DGroupInvitation? invitation,
   bool dark = false,
 }) {
   return ProviderScope(
@@ -287,7 +291,14 @@ Widget _wrap(
       myChurchRolesProvider.overrideWith((ref) async => roles),
       pendingMembershipRequestsProvider.overrideWith((ref) async => requests),
       myMinistryContextProvider.overrideWith((ref) async => ministry),
-      myPendingInvitationProvider.overrideWith((ref) async => invitation),
+      initialSetupStatusProvider.overrideWith(
+        (ref) async => const InitialSetupStatus(isOpen: true),
+      ),
+      addableMembersProvider.overrideWith((ref, id) async => _addable),
+      groupDisciplerCandidatesProvider.overrideWith(
+        (ref, id) async => const [],
+      ),
+      churchDisciplerCandidatesProvider.overrideWith((ref) async => const []),
       dGroupsProvider.overrideWith((ref) async => _groups),
       unplacedMemberCountProvider.overrideWith((ref) async => 3),
       dGroupDetailProvider.overrideWith((ref, id) async => _groupDetail),
@@ -544,12 +555,16 @@ Widget homeDisciple() => _wrap(
   ministry: _discipleContext,
 );
 
-@Preview(name: '14. Home (invited)', group: 'Ministry', size: Size(390, 844))
-Widget homeInvited() => _wrap(
+@Preview(
+  name: '14. Home (needs setup)',
+  group: 'Ministry',
+  size: Size(390, 844),
+)
+Widget homeNeedsSetup() => _wrap(
   const HomePage(),
   profile: _profile,
   membership: _membership(MembershipStatus.active),
-  invitation: _invitation,
+  ministry: _needsSetupContext,
 );
 
 @Preview(name: '15. D Groups', group: 'Ministry', size: Size(390, 844))
@@ -568,9 +583,9 @@ Widget dGroupDetail() => _wrap(
   roles: const {ChurchRole.coordinator},
 );
 
-@Preview(name: '17. Invite a member', group: 'Ministry', size: Size(390, 844))
-Widget invitePicker() => _wrap(
-  const MemberPickerPage(purpose: MemberPickPurpose.invite, groupId: _groupId),
+@Preview(name: '17. Add members', group: 'Ministry', size: Size(390, 844))
+Widget addMembers() => _wrap(
+  const AddMembersPage(groupId: _groupId),
   profile: _profile,
   membership: _membership(MembershipStatus.active),
   roles: const {ChurchRole.coordinator},

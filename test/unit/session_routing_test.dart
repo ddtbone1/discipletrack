@@ -233,7 +233,7 @@ void main() {
         Routes.dGroups,
         Routes.newDGroup,
         Routes.dGroupDetail,
-        Routes.dGroupInvite,
+        Routes.dGroupAddMembers,
         Routes.myGroup,
       ]) {
         expect(
@@ -243,7 +243,7 @@ void main() {
         );
       }
       expect(Routes.dGroupDetailFor('abc'), '/groups/abc');
-      expect(Routes.dGroupInviteFor('abc'), '/groups/abc/invite');
+      expect(Routes.dGroupAddMembersFor('abc'), '/groups/abc/add-members');
     });
 
     test('a concrete path is not a pattern and is not allowed by itself', () {

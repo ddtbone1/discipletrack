@@ -13,9 +13,9 @@ import '../../discipleship/application/discipleship_providers.dart';
 import '../../membership/application/membership_providers.dart';
 import '../../membership_review/application/membership_review_providers.dart';
 import '../../ministry/application/ministry_providers.dart';
-import '../../ministry/presentation/invitation_card.dart';
 import '../../profile/application/profile_providers.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../ministry/presentation/needs_setup_notice.dart';
 import 'group_summary_card.dart';
 import 'home_greeting.dart';
 import 'journey_blocks.dart';
@@ -27,8 +27,8 @@ import 'journey_blocks.dart';
 /// when Disciples are paired with them, and church figures for Admins and
 /// Coordinators. It shows only facts that exist, never placeholder metrics.
 ///
-/// The ministry entry shows where the person stands in a D Group (or their
-/// invitation). Coordinators see the D Groups entry, and Admins and
+/// The ministry entry shows where the person stands in a D Group, including
+/// "added, not set up yet". Coordinators see the D Groups entry, and Admins and
 /// Coordinators the membership-request entry. Showing an entry is
 /// presentation; the database checks the same authority on every call.
 class HomePage extends ConsumerWidget {
@@ -141,26 +141,22 @@ class HomePage extends ConsumerWidget {
 /// - Leader: a row to their group's detail page.
 /// - Discipler or Disciple: a card with their group, Leader and Discipler
 ///   (or "Not paired yet"), opening the roster.
-/// - Invitee: the invitation, with Accept and Decline.
-/// - Unplaced: a plain notice; nothing is pretended.
-///
-/// Lesson progress joins this card with the meeting slice.
+/// - Added to a group but not set up yet: which group, and that their Leader
+///   sets up their role.
+/// - In no group: a plain notice; nothing is pretended.
 class _MinistryEntry extends ConsumerWidget {
   const _MinistryEntry();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ministry = ref.watch(myMinistryContextProvider);
-    final invitation = ref.watch(myPendingInvitationProvider);
 
     if (ministry.hasError && !ministry.hasValue) {
       return AppListRow(
         title: 'Could not load your D Group',
         subtitle: 'Tap to try again',
         icon: Icons.refresh_rounded,
-        onTap: () => ref
-          ..invalidate(myMinistryContextProvider)
-          ..invalidate(myPendingInvitationProvider),
+        onTap: () => ref.invalidate(myMinistryContextProvider),
       );
     }
     // Nothing yet rather than a guess while the first read is in flight.
@@ -168,9 +164,6 @@ class _MinistryEntry extends ConsumerWidget {
 
     final ctx = ministry.value;
     if (ctx == null) {
-      final inv = invitation.value;
-      if (inv != null) return InvitationCard(invitation: inv);
-      if (!invitation.hasValue) return const SizedBox.shrink();
       // An Admin or Coordinator without a D Group role is not waiting to be
       // placed; their Home is about the church, so the card would mislead.
       // Nothing until the roles are known, so an Admin never sees the card
@@ -180,16 +173,15 @@ class _MinistryEntry extends ConsumerWidget {
         return const SizedBox.shrink();
       }
       return const EmptyState(
-        title: 'Not placed in a D Group yet',
+        title: 'Not in a D Group yet',
         message:
-            'When a D Group Leader invites you, the invitation appears here '
-            'for you to accept.',
+            'A D Group Leader adds members to their group. Once you are '
+            'added, your group appears here.',
       );
     }
+
+    if (ctx.needsSetup) return NeedsSetupNotice(ministry: ctx);
 
     return GroupSummaryCard(ministry: ctx);
   }
 }
-
-/// An ACTIVE member with no D Group responsibility and no invitation. A valid
-/// state (RBAC section 1, Member Without a D Group), stated plainly.

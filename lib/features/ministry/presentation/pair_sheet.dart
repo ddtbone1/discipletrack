@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_pill.dart';
 import '../domain/d_group_detail.dart';
 import '../domain/d_group_member.dart';
 import 'ministry_ui.dart';
@@ -16,8 +17,11 @@ class PairSelection {
 }
 
 /// Lets a Coordinator or Leader choose the Discipler for [disciple]. There is
-/// no limit on how many Disciples one Discipler has (Plan decision 4), so
-/// every Discipler is offered, with their current count for context.
+/// no limit on how many Disciples one Discipler has (Slice 3 decision 4), so
+/// every Discipler they may be paired with is offered, with their current
+/// count for context. A Disciple who is also a Discipler is never offered
+/// themselves, nor someone they disciple (ADR-012; D7); the database
+/// refuses both anyway.
 Future<PairSelection?> showPairSheet(
   BuildContext context, {
   required DGroupDetail detail,
@@ -26,11 +30,13 @@ Future<PairSelection?> showPairSheet(
   final current = detail.disciplerOf(disciple);
   return showModalBottomSheet<PairSelection>(
     context: context,
+    // Above the floating dock, which lives in the shell route.
+    useRootNavigator: true,
     showDragHandle: true,
     isScrollControlled: true,
     builder: (context) {
       final p = context.palette;
-      final disciplers = detail.disciplers;
+      final disciplers = detail.pairableDisciplersFor(disciple);
       return SafeArea(
         child: ConstrainedBox(
           constraints: BoxConstraints(
@@ -54,13 +60,14 @@ Future<PairSelection?> showPairSheet(
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   child: Text(
-                    'This group has no Disciplers yet. Invite someone as '
-                    'Discipler first.',
+                    'There is no Discipler in this group to pair with yet. '
+                    'Set someone up as a Discipler first.',
                     style: context.supportingStyle,
                   ),
                 ),
               for (final d in disciplers)
                 ListTile(
+                  leading: InitialsAvatar(name: d.fullName),
                   title: Text(
                     d.fullName,
                     style: AppTypography.body.copyWith(color: p.textPrimary),

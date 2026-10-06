@@ -13,11 +13,10 @@ import '../features/auth/presentation/start_page.dart';
 import '../features/auth/presentation/verify_email_page.dart';
 import '../features/home/presentation/home_page.dart';
 import '../features/membership_review/presentation/pending_members_page.dart';
-import '../features/ministry/domain/member_option.dart';
+import '../features/ministry/presentation/add_members_page.dart';
 import '../features/ministry/presentation/d_group_detail_page.dart';
 import '../features/ministry/presentation/d_group_form_page.dart';
 import '../features/ministry/presentation/d_groups_page.dart';
-import '../features/ministry/presentation/member_picker_page.dart';
 import '../features/ministry/presentation/my_group_page.dart';
 import '../features/onboarding/presentation/join_church_page.dart';
 import '../features/onboarding/presentation/no_access_page.dart';
@@ -192,12 +191,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                 ),
                 routes: [
                   GoRoute(
-                    path: 'invite',
+                    path: 'add-members',
                     pageBuilder: (c, s) => buildPage(
                       state: s,
-                      child: MemberPickerPage(
-                        purpose: MemberPickPurpose.invite,
-                        groupId: s.pathParameters['groupId'],
+                      child: AddMembersPage(
+                        groupId: s.pathParameters['groupId']!,
                       ),
                     ),
                   ),

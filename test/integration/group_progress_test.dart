@@ -194,9 +194,17 @@ void main() {
           .map((r) => r['church_membership_id']),
       contains(leaver.membershipId),
     );
-    await rpcRow(g1.leader.user.client, 'end_d_group_membership', {
-      'p_d_group_membership_id': leaverDgmId,
+    await rpcRow(g1.leader.user.client, 'remove_from_d_group', {
+      'p_d_group_placement_id': await activePlacementOf(leaver.membershipId),
     });
+    expect(
+      (await service
+          .from('d_group_memberships')
+          .select('ended_at')
+          .eq('id', leaverDgmId)
+          .single())['ended_at'],
+      isNotNull,
+    );
     expect(
       (await progress(g1.leader.user.client))
           .map((r) => r['church_membership_id']),

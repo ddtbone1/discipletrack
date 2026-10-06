@@ -22,10 +22,33 @@ enum DGroupResponsibility {
   };
 }
 
+/// Why a DISCIPLER row exists (`d_group_memberships.discipler_basis`,
+/// Migration 013). Recorded by the database; the app only describes it.
+enum DisciplerBasis {
+  /// Recognized during the church's initial setup window: they already
+  /// disciple people in the church.
+  initialRollout,
+
+  /// The group's Leader added themselves.
+  leaderSelf,
+
+  /// Appointed by the Coordinator after completing Lesson 5.
+  appointment;
+
+  static DisciplerBasis? fromDb(String? value) => switch (value) {
+    null => null,
+    'INITIAL_ROLLOUT' => DisciplerBasis.initialRollout,
+    'LEADER_SELF' => DisciplerBasis.leaderSelf,
+    'APPOINTMENT' => DisciplerBasis.appointment,
+    _ => throw ArgumentError('Unknown discipler_basis: $value'),
+  };
+}
+
 /// One active responsibility in a D Group, as the group's Coordinator or
 /// Leader sees it (`d_group_memberships` with the person's name embedded).
 ///
-/// A Leader who is also a Discipler has two of these, one per row.
+/// A person holding two responsibilities (Leader and Discipler, or Disciple
+/// and Discipler) has two of these, one per row.
 @immutable
 class DGroupMember {
   const DGroupMember({
@@ -35,11 +58,12 @@ class DGroupMember {
     required this.responsibility,
     required this.startedAt,
     this.phone,
+    this.disciplerBasis,
   });
 
   /// Shape of `d_group_memberships?select=id,church_membership_id,
-  /// responsibility,started_at,member:church_memberships!...(profile:
-  /// profiles!...(full_name,phone))`.
+  /// responsibility,started_at,discipler_basis,member:church_memberships!...
+  /// (profile:profiles!...(full_name,phone))`.
   factory DGroupMember.fromMap(Map<String, dynamic> map) {
     final member = map['member'] as Map<String, dynamic>?;
     final profile = member?['profile'] as Map<String, dynamic>?;
@@ -54,6 +78,7 @@ class DGroupMember {
         map['responsibility'] as String,
       ),
       startedAt: DateTime.parse(map['started_at'] as String),
+      disciplerBasis: DisciplerBasis.fromDb(map['discipler_basis'] as String?),
     );
   }
 
@@ -63,6 +88,9 @@ class DGroupMember {
   final String? phone;
   final DGroupResponsibility responsibility;
   final DateTime startedAt;
+
+  /// Set on DISCIPLER rows only.
+  final DisciplerBasis? disciplerBasis;
 
   @override
   bool operator ==(Object other) =>

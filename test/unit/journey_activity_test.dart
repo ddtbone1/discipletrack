@@ -98,12 +98,14 @@ void main() {
     expect(events.where((e) => e.title.contains('Lesson 3')), isEmpty);
   });
 
-  test('a voided record says so and carries no outcome colour', () {
+  test('a voided record shows no outcome, says it does not count, and '
+      'carries no outcome colour', () {
     final events = journeyActivity(journey, history);
     final voidedRecord = events.firstWhere(
       (e) => e.kind == ActivityKind.meeting && e.at == sep8,
     );
-    expect(voidedRecord.detail, 'Lesson 1 · Late · Voided');
+    expect(voidedRecord.detail, 'Lesson 1 · Not counted');
+    expect(voidedRecord.title, 'Meeting recorded');
     expect(voidedRecord.outcome, isNull);
     // A record that stands keeps its outcome.
     expect(events.first.outcome, AttendanceOutcome.absent);
@@ -131,10 +133,11 @@ void main() {
       );
       expect(
         [for (final e in events) e.title],
-        ['Removed from meeting', 'Meeting recorded'],
+        ['Removed from meeting', 'Listed in a meeting'],
       );
       expect(events.first.detail, 'Lesson 1 · by Dino Reyes');
-      expect(events.last.detail, 'Lesson 1 · Present · Voided');
+      expect(events.last.detail, 'Lesson 1 · Not counted');
+      expect(events.last.detail, isNot(contains('Present')));
       expect(events.last.outcome, isNull);
     },
   );

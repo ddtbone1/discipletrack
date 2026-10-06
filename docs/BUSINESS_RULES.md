@@ -46,6 +46,11 @@ meetings. Meeting count does not determine lesson completion; the
 authorized Discipler decides. A void never implicitly changes a
 Completed lesson. BR-030, BR-032, BR-033 and BR-033a revised.
 
+Revision 2026-10-06 (ADR-018, Slice 6): "enforced from Slice 6" caveats
+removed now that Migrations 013 to 015 enforce them; reciprocal pairing
+refused (D7). BR-015, BR-024, BR-033 (undo locked for an appointed
+person's eligibility lesson and earlier) and BR-037 revised.
+
 Revision 2026-10-05 (user decision, ninth): the curriculum has ten
 lessons, not twelve. BR-029 retitled (numbering stable); examples in
 BR-035 and BR-037.
@@ -225,15 +230,14 @@ D Group Leader. Only this pair is mutually exclusive.
 
 DISCIPLE and DISCIPLER may coexist for the same person in one D Group:
 a Disciple appointed as a Discipler continues their own journey as a
-Disciple (BR-037) (ADR-012; enforced from Slice 6; until then Migration
-006 still refuses DISCIPLE with DISCIPLER). LEADER and DISCIPLER may
+Disciple (BR-037) (ADR-012). LEADER and DISCIPLER may
 also coexist, as described in BR-013. All of a person's active
 responsibilities are in one D Group at a time.
 
 Nobody is paired with themselves: the Discipler and the Disciple of a
-discipler assignment belong to different church memberships (ADR-012,
-enforced from Slice 6). Whether two people may disciple each other at
-the same time (reciprocal pairing) is open (D7).
+discipler assignment belong to different church memberships (ADR-012).
+Two people may not disciple each other at the same time (reciprocal
+pairing is refused, D7, ADR-018).
 
 ---
 
@@ -330,8 +334,8 @@ Leader and Discipler, not only to ordinary members.
 
 A Disciple never records or changes their own meeting outcome. A
 recorder is never a participant in a meeting they record (explicit
-check from Slice 5), and nobody is paired with themselves (ADR-012,
-enforced from Slice 6), so nobody can credit themselves.
+check from Slice 5), and nobody is paired with themselves (ADR-012),
+so nobody can credit themselves.
 
 Recording authority always means recording for other eligible members
 within the recorder's authorized scope (BR-031).
@@ -616,8 +620,9 @@ both hold:
 
 Undo returns the lesson to In Progress (or Not Started when it has no
 credited meeting), clears the completion attribution and is audited
-with the prior values. From Slice 6, the eligibility-lesson protection
-for an appointed Discipler (BR-036, ADR-012) also applies to undo.
+with the prior values. Once a person has been appointed as a Discipler
+(BR-037), their eligibility lesson and earlier lessons cannot be undone,
+as they cannot be reopened (BR-036, ADR-012, ADR-018).
 
 After that window the completion is locked (ADR-016): legitimate
 progress now exists in a later lesson, either a recorded meeting on the
@@ -732,7 +737,7 @@ person's DISCIPLE responsibility. It does not end their DISCIPLE
 responsibility, their own discipler assignment or their lesson
 progress: they continue their own journey through the last lesson of
 the curriculum (Lesson 10 in the MVP curriculum) under their own
-Discipler (BR-015; enforced from Slice 6).
+Discipler (BR-015).
 
 Eligibility, appointment and assignment are distinct facts. Eligibility
 is derived (BR-036); appointment is an attributed record; assigning

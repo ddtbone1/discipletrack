@@ -53,10 +53,9 @@ class _DiscipleTrackAppState extends ConsumerState<DiscipleTrackApp> {
           return;
         }
         ref.read(myMembershipProvider.notifier).refresh();
-        // An invitation sent, a placement or pairing made, or a meeting
+        // Being added to a group or set up, a pairing made, or a meeting
         // recorded by someone else, while the app was in the background.
         ref
-          ..invalidate(myPendingInvitationProvider)
           ..invalidate(myMinistryContextProvider)
           ..invalidate(myDisciplesProvider)
           ..invalidate(discipleJourneyProvider)

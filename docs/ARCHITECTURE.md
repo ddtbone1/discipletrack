@@ -18,6 +18,8 @@ with no Leader confirmation; sections 8, 9, 19 and 30.
 Revision 2026-10-05 (user decision, ninth): the curriculum has ten
 lessons, not twelve; sections 8, 9 and 19.
 
+Revision 2026-10-06 (ADR-018): sections 6 and 9, for Slice 6 as built.
+
 ---
 
 ## 1. Architecture Goal
@@ -177,11 +179,12 @@ Core constraints include:
 - Disciple and Leader responsibilities are not simultaneously active for
   the same person
 - Disciple and Discipler responsibilities may be held at the same time,
-  in the same D Group (ADR-012; enforced from Slice 6; until then
-  Migration 006 still refuses DISCIPLE with DISCIPLER)
+  in the same D Group (ADR-012; enforced since Migration 013)
 - nobody is paired with themselves: the two sides of a discipler
-  assignment are different church memberships (ADR-012, enforced from
-  Slice 6)
+  assignment are different church memberships (ADR-012), and no two
+  people disciple each other at the same time (ADR-018)
+- a person is in at most one D Group at a time (d_group_placements,
+  ADR-018); they are added directly, with no acceptance step
 
 Historical assignments should be preserved.
 
@@ -282,8 +285,8 @@ responsibility row, and an assignment row.
 Appointment is an explicit ministry action rather than an automatic
 database side effect. It does not end the person's DISCIPLE
 responsibility, their own discipler assignment or their progress; they
-continue their own journey through Lesson 10. Slice 6 owns the forward
-migration that allows this (ADR-012 decision 10).
+continue their own journey through Lesson 10. Slice 6 built this
+(Migrations 013 and 014; ADR-012 decision 10, ADR-018).
 
 ---
 

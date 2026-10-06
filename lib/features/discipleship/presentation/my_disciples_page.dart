@@ -115,6 +115,8 @@ Future<void> showChooseDiscipleSheet(
 ) {
   return showModalBottomSheet<void>(
     context: context,
+    // Above the floating dock, which lives in the shell route.
+    useRootNavigator: true,
     showDragHandle: true,
     isScrollControlled: true,
     builder: (sheet) {

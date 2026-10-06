@@ -288,8 +288,10 @@ void main() {
         as: c1.discipler.user.client,
         disciplerDgmId: c1.disciplerDgmId,
       );
-      await rpcRow(leader(), 'end_d_group_membership', {
-        'p_d_group_membership_id': c1.disciplerDgmId,
+      await rpcRow(leader(), 'remove_from_d_group', {
+        'p_d_group_placement_id': await activePlacementOf(
+          c1.discipler.membershipId,
+        ),
       });
       await expectLater(
         voidMeeting(c1.discipler.user.client, id),

@@ -37,45 +37,59 @@ Future<TestGroup> createGroupWithLeader(
   );
 }
 
-Future<String> invite(
-  SupabaseClient inviter,
+/// `add_members_to_d_group()`: places [membershipIds] in the group and
+/// returns their placement ids, keyed by church membership id.
+Future<Map<String, String>> addMembers(
+  SupabaseClient caller,
   String groupId,
-  String membershipId,
-  String responsibility,
+  List<String> membershipIds,
 ) async {
-  final row = await rpcRow(inviter, 'invite_to_d_group', {
-    'p_d_group_id': groupId,
-    'p_membership_id': membershipId,
-    'p_responsibility': responsibility,
-  });
-  return row['invitation_id'] as String;
+  final rows = await caller.rpc<List<dynamic>>(
+    'add_members_to_d_group',
+    params: {'p_d_group_id': groupId, 'p_membership_ids': membershipIds},
+  );
+  return {
+    for (final r in rows.cast<Map<String, dynamic>>())
+      r['church_membership_id'] as String: r['d_group_placement_id'] as String,
+  };
 }
 
-/// Accepts [invitationId] as [invitee] and returns the new D Group
-/// membership id.
-Future<String> accept(SupabaseClient invitee, String invitationId) async {
-  final row = await rpcRow(invitee, 'respond_to_d_group_invitation', {
-    'p_invitation_id': invitationId,
-    'p_accept': true,
+/// `set_up_member()`: returns the new D Group membership id. DISCIPLER is
+/// Existing Discipler recognition, refused once the setup window is closed.
+Future<String> setUpMember(
+  SupabaseClient caller,
+  String placementId,
+  String responsibility,
+) async {
+  final row = await rpcRow(caller, 'set_up_member', {
+    'p_d_group_placement_id': placementId,
+    'p_responsibility': responsibility,
   });
   return row['d_group_membership_id'] as String;
 }
 
-/// Invites [member] as [responsibility] and accepts, returning the D Group
-/// membership id.
+/// The person's active placement id, read as the service role.
+Future<String?> activePlacementOf(String membershipId) async {
+  final row = await service
+      .from('d_group_placements')
+      .select('id')
+      .eq('church_membership_id', membershipId)
+      .isFilter('ended_at', null)
+      .maybeSingle();
+  return row?['id'] as String?;
+}
+
+/// Adds [member] to the group and sets them up as [responsibility],
+/// returning the D Group membership id. A DISCIPLER here is an Existing
+/// Discipler (initial setup window), the usual state for fixtures.
 Future<String> place(
-  SupabaseClient inviter,
+  SupabaseClient manager,
   String groupId,
   TestMember member,
   String responsibility,
 ) async {
-  final id = await invite(
-    inviter,
-    groupId,
-    member.membershipId,
-    responsibility,
-  );
-  return accept(member.user.client, id);
+  final placements = await addMembers(manager, groupId, [member.membershipId]);
+  return setUpMember(manager, placements[member.membershipId]!, responsibility);
 }
 
 Future<Map<String, dynamic>> setDiscipler(

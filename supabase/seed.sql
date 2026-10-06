@@ -107,8 +107,8 @@ $$;
 --   discipler@discipletrack.local   Discipler
 --   disciple1@discipletrack.local   Disciple
 --   disciple2@discipletrack.local   Disciple
---   member@discipletrack.local      unplaced, with a pending invitation
---                                   to accept by hand
+--   member@discipletrack.local      approved, in no D Group (ready to be
+--                                   added from Add Members)
 --   discipler2@discipletrack.local  Discipler
 --   disciple3@discipletrack.local   Disciple
 --   disciple4@discipletrack.local   Disciple, never paired
@@ -122,7 +122,7 @@ $$;
 -- request.jwt.claims (which is what auth.uid() reads), so the seeded
 -- state is one the app itself could have produced: join request,
 -- approval by the admin, first-entry completion, group creation,
--- invitations, acceptances and pairing.
+-- adding members, setting them up and pairing.
 
 do $$
 declare
@@ -141,14 +141,19 @@ declare
     ['a0000000-0000-4000-8000-000000000007', 'discipler2@discipletrack.local', 'Grace Lim',      '+63 917 555 0107'],
     ['a0000000-0000-4000-8000-000000000008', 'disciple3@discipletrack.local', 'Ella Navarro',    '+63 917 555 0108'],
     ['a0000000-0000-4000-8000-000000000009', 'disciple4@discipletrack.local', 'Felix Ramos',     '+63 917 555 0109'],
-    ['a0000000-0000-4000-8000-00000000000a', 'disciple5@discipletrack.local', 'Hana Torres',     '+63 917 555 0110']
+    ['a0000000-0000-4000-8000-00000000000a', 'disciple5@discipletrack.local', 'Hana Torres',     '+63 917 555 0110'],
+    -- Slice 6 states (placed by the Slice 6 block at the end of this file).
+    ['a0000000-0000-4000-8000-00000000000b', 'newcomer@discipletrack.local',  'Nina Aquino',     '+63 917 555 0111'],
+    ['a0000000-0000-4000-8000-00000000000c', 'disciple6@discipletrack.local', 'Paolo Mendoza',   '+63 917 555 0112'],
+    ['a0000000-0000-4000-8000-00000000000d', 'disciple7@discipletrack.local', 'Rosa Domingo',    '+63 917 555 0113'],
+    ['a0000000-0000-4000-8000-00000000000e', 'leader2@discipletrack.local',   'Ramon Garcia',    '+63 917 555 0114'],
+    ['a0000000-0000-4000-8000-00000000000f', 'disciple8@discipletrack.local', 'Tomas Villa',     '+63 917 555 0115']
   ];
 
   v_uid        uuid;
   v_email      text;
   v_membership uuid;
   v_group      uuid;
-  v_invitation uuid;
   i            integer;
 
   -- Membership id of seeded user n (1-based index into v_users).
@@ -236,23 +241,23 @@ begin
     v_mids[1]
   ) r;
 
-  -- The Leader invites both Disciplers and every Disciple; each accepts.
-  foreach i in array array[2, 3, 4, 6, 7, 8, 9] loop
-    perform set_config('request.jwt.claims', json_build_object('sub', v_users[1][1])::text, true);
-    select r.invitation_id into v_invitation
-    from public.invite_to_d_group(
-      v_group,
-      v_mids[i],
-      case when i in (2, 6) then 'DISCIPLER' else 'DISCIPLE' end::public.d_group_responsibility
-    ) r;
-
-    perform set_config('request.jwt.claims', json_build_object('sub', v_users[i][1])::text, true);
-    perform public.respond_to_d_group_invitation(v_invitation, true);
-  end loop;
-
-  -- The Leader leaves member@ with a pending invitation.
+  -- The Leader adds both Disciplers and every Disciple to the group in
+  -- one step (Slice 6), then sets each one up: the two Disciplers are
+  -- recognized as Existing Disciplers while the church's initial setup
+  -- window is open. member@ stays ungrouped.
   perform set_config('request.jwt.claims', json_build_object('sub', v_users[1][1])::text, true);
-  perform public.invite_to_d_group(v_group, v_mids[5], 'DISCIPLE');
+  perform public.add_members_to_d_group(
+    v_group,
+    array[v_mids[2], v_mids[3], v_mids[4], v_mids[6], v_mids[7], v_mids[8], v_mids[9]]
+  );
+
+  foreach i in array array[2, 3, 4, 6, 7, 8, 9] loop
+    perform public.set_up_member(
+      (select p.id from public.d_group_placements p
+       where p.church_membership_id = v_mids[i] and p.ended_at is null),
+      case when i in (2, 6) then 'DISCIPLER' else 'DISCIPLE' end::public.d_group_responsibility
+    );
+  end loop;
 
   perform set_config('request.jwt.claims', '', true);
 end
@@ -358,7 +363,14 @@ begin
   perform public.set_discipler(private.current_disciple_row(v_ella), v_dino_dgm);
   perform public.set_discipler(private.current_disciple_row(v_hana), v_grace_dgm);
 
-  -- Backdate: Dino and his Disciples 60 days, Grace and Hana 30.
+  -- Backdate: Dino and his Disciples 60 days, Grace and Hana 30. The
+  -- whole group's placements go back 60 days so they cover every row.
+  update public.d_group_placements p
+  set started_at = now() - interval '60 days'
+  where p.ended_at is null
+    and p.d_group_id = (select dgm.d_group_id from public.d_group_memberships dgm
+                        where dgm.id = v_dino_dgm);
+
   update public.d_group_memberships
   set started_at = now() - interval '60 days'
   where id in (v_dino_dgm, private.current_disciple_row(v_diana),
@@ -465,6 +477,173 @@ begin
   -- 2 yet, so the undo window is open.
   perform set_config('request.jwt.claims', json_build_object('sub', v_grace)::text, true);
   perform public.complete_lesson(v_hana, v_lessons[1]);
+
+  perform set_config('request.jwt.claims', '', true);
+end
+$$;
+
+
+-- ============================================================
+-- D Group assignment and Discipler progression (Vertical Slice 6)
+-- ============================================================
+--
+-- States for the Slice 6 walkthrough, built through the real
+-- operations (add, set up, pair, record, complete, appoint), with the
+-- same trusted backdating as the Slice 5 block so meetings can carry
+-- past dates:
+--
+--   Mara Villanueva (member@)     approved, in no D Group: Add Members
+--                                 lists her
+--   Nina Aquino (newcomer@)       added to Young Adults A, Needs setup
+--   Felix Ramos (disciple4)       Disciple, not paired
+--   Dino Reyes, Grace Lim         Existing Disciplers (initial rollout)
+--   Diana Cruz (disciple1)        Disciple below Lesson 5
+--   Paolo Mendoza (disciple6)     Disciple of Grace; Lessons 1 to 5
+--                                 completed: eligible, not appointed
+--   Rosa Domingo (disciple7)      Disciple of Dino; Lessons 1 to 5
+--                                 completed and appointed Discipler by
+--                                 the Coordinator; her own journey goes
+--                                 on, and no Disciple is paired with her
+--                                 yet
+--   Ramon Garcia (leader2@)       Leader of "Men of Faith": a Leader who
+--                                 cannot see or act on Young Adults A
+--   Tomas Villa (disciple8)       Disciple in Men of Faith, not paired
+--
+-- The church's initial setup period stays open, so Existing Discipler
+-- recognition can be shown; the Coordinator closes it from D Groups.
+
+do $$
+declare
+  v_church  constant uuid := 'c0000000-0000-4000-8000-000000000001';
+  v_admin   constant uuid := 'a0000000-0000-4000-8000-000000000001';
+  v_leader  constant uuid := 'a0000000-0000-4000-8000-000000000002';
+  v_dino    constant uuid := 'a0000000-0000-4000-8000-000000000003';
+  v_grace   constant uuid := 'a0000000-0000-4000-8000-000000000007';
+  v_ramon   constant uuid := 'a0000000-0000-4000-8000-00000000000e';
+  v_lessons  uuid[];
+  v_group    uuid;
+  v_nina     uuid;
+  v_paolo    uuid;
+  v_rosa     uuid;
+  v_ramon_m  uuid;
+  v_tomas    uuid;
+  v_dino_dgm  uuid;
+  v_grace_dgm uuid;
+  v_men      uuid;
+  i          integer;
+begin
+  if exists (
+    select 1 from public.ministry_role_transitions t
+    join public.church_memberships m on m.id = t.church_membership_id
+    where m.church_id = v_church
+  ) then
+    return;
+  end if;
+
+  select array_agg(l.id order by l.lesson_number) into v_lessons
+  from public.curriculum_lessons l
+  join public.curricula c on c.id = l.curriculum_id
+  where c.church_id = v_church and c.status = 'ACTIVE';
+
+  select g.id into v_group from public.d_groups g
+  where g.church_id = v_church and g.name = 'Young Adults A';
+
+  select m.id into v_nina    from public.church_memberships m where m.user_id = 'a0000000-0000-4000-8000-00000000000b';
+  select m.id into v_paolo   from public.church_memberships m where m.user_id = 'a0000000-0000-4000-8000-00000000000c';
+  select m.id into v_rosa    from public.church_memberships m where m.user_id = 'a0000000-0000-4000-8000-00000000000d';
+  select m.id into v_ramon_m from public.church_memberships m where m.user_id = v_ramon;
+  select m.id into v_tomas   from public.church_memberships m where m.user_id = 'a0000000-0000-4000-8000-00000000000f';
+
+  select dgm.id into v_dino_dgm
+  from public.d_group_memberships dgm
+  join public.church_memberships m on m.id = dgm.church_membership_id
+  where m.user_id = v_dino and dgm.ended_at is null;
+
+  select dgm.id into v_grace_dgm
+  from public.d_group_memberships dgm
+  join public.church_memberships m on m.id = dgm.church_membership_id
+  where m.user_id = v_grace and dgm.ended_at is null;
+
+  -- The Leader adds three people at once; Nina is left to set up.
+  perform set_config('request.jwt.claims', json_build_object('sub', v_leader)::text, true);
+  perform public.add_members_to_d_group(v_group, array[v_nina, v_paolo, v_rosa]);
+  perform public.set_up_member(
+    (select p.id from public.d_group_placements p
+     where p.church_membership_id = v_paolo and p.ended_at is null),
+    'DISCIPLE');
+  perform public.set_up_member(
+    (select p.id from public.d_group_placements p
+     where p.church_membership_id = v_rosa and p.ended_at is null),
+    'DISCIPLE');
+  perform public.set_discipler(private.current_disciple_row(v_paolo), v_grace_dgm);
+  perform public.set_discipler(private.current_disciple_row(v_rosa), v_dino_dgm);
+
+  -- Backdate: Paolo with Grace 29 days, Rosa with Dino 58 days.
+  update public.d_group_placements
+  set started_at = now() - interval '29 days'
+  where church_membership_id = v_paolo and ended_at is null;
+  update public.d_group_memberships
+  set started_at = now() - interval '29 days'
+  where id = private.current_disciple_row(v_paolo);
+  update public.discipler_assignments
+  set started_at = now() - interval '29 days'
+  where disciple_d_group_membership_id = private.current_disciple_row(v_paolo)
+    and ended_at is null;
+
+  update public.d_group_placements
+  set started_at = now() - interval '58 days'
+  where church_membership_id = v_rosa and ended_at is null;
+  update public.d_group_memberships
+  set started_at = now() - interval '58 days'
+  where id = private.current_disciple_row(v_rosa);
+  update public.discipler_assignments
+  set started_at = now() - interval '58 days'
+  where disciple_d_group_membership_id = private.current_disciple_row(v_rosa)
+    and ended_at is null;
+
+  -- Lessons 1 to 5: one meeting each, then marked completed by the
+  -- Discipler; each completion backdated to the day after its meeting.
+  for i in 1 .. 5 loop
+    perform set_config('request.jwt.claims', json_build_object('sub', v_grace)::text, true);
+    perform public.record_discipleship_meeting(v_grace_dgm, v_lessons[i],
+      now() - make_interval(days => 29 - (i - 1) * 5),
+      jsonb_build_array(jsonb_build_object('church_membership_id', v_paolo, 'attendance_status', 'PRESENT')));
+    perform public.complete_lesson(v_paolo, v_lessons[i]);
+    update public.disciple_lesson_progress
+    set completed_at = now() - make_interval(days => 28 - (i - 1) * 5),
+        ready_at     = now() - make_interval(days => 28 - (i - 1) * 5)
+    where church_membership_id = v_paolo and lesson_id = v_lessons[i];
+
+    perform set_config('request.jwt.claims', json_build_object('sub', v_dino)::text, true);
+    perform public.record_discipleship_meeting(v_dino_dgm, v_lessons[i],
+      now() - make_interval(days => 57 - (i - 1) * 7),
+      jsonb_build_array(jsonb_build_object('church_membership_id', v_rosa, 'attendance_status', 'PRESENT')));
+    perform public.complete_lesson(v_rosa, v_lessons[i]);
+    update public.disciple_lesson_progress
+    set completed_at = now() - make_interval(days => 56 - (i - 1) * 7),
+        ready_at     = now() - make_interval(days => 56 - (i - 1) * 7)
+    where church_membership_id = v_rosa and lesson_id = v_lessons[i];
+  end loop;
+
+  -- Rosa has started Lesson 6 with Dino.
+  perform public.record_discipleship_meeting(v_dino_dgm, v_lessons[6],
+    now() - interval '20 days',
+    jsonb_build_array(jsonb_build_object('church_membership_id', v_rosa, 'attendance_status', 'PRESENT')));
+
+  -- The Coordinator appoints Rosa. Paolo stays eligible, not appointed.
+  perform set_config('request.jwt.claims', json_build_object('sub', v_admin)::text, true);
+  perform public.appoint_discipler(v_rosa);
+
+  -- A second group, out of Lea's scope.
+  select r.d_group_id into v_men
+  from public.create_d_group('Men of Faith', 'Seeded for local development.', v_ramon_m) r;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', v_ramon)::text, true);
+  perform public.add_members_to_d_group(v_men, array[v_tomas]);
+  perform public.set_up_member(
+    (select p.id from public.d_group_placements p
+     where p.church_membership_id = v_tomas and p.ended_at is null),
+    'DISCIPLE');
 
   perform set_config('request.jwt.claims', '', true);
 end

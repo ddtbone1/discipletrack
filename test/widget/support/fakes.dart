@@ -21,7 +21,8 @@ import 'package:discipletrack/features/ministry/data/ministry_repository.dart';
 import 'package:discipletrack/features/offline/data/offline_snapshot.dart';
 import 'package:discipletrack/features/ministry/domain/d_group.dart';
 import 'package:discipletrack/features/ministry/domain/d_group_detail.dart';
-import 'package:discipletrack/features/ministry/domain/d_group_invitation.dart';
+import 'package:discipletrack/features/ministry/domain/d_group_placement.dart';
+import 'package:discipletrack/features/ministry/domain/discipler_candidate.dart';
 import 'package:discipletrack/features/ministry/domain/d_group_member.dart';
 import 'package:discipletrack/features/ministry/domain/member_option.dart';
 import 'package:discipletrack/features/ministry/domain/ministry_context.dart';
@@ -206,16 +207,19 @@ class FakeMembershipReviewRepository implements MembershipReviewRepository {
 /// Records ministry operations and returns whatever the test configured.
 class FakeMinistryRepository implements MinistryRepository {
   MinistryContext? ministryContext;
-  DGroupInvitation? pendingInvitation;
   List<DGroupSummary> groups = const [];
   Map<String, DGroupDetail> details = {};
   List<MemberOption> placeable = const [];
+  List<AddableMember> addable = const [];
+  InitialSetupStatus setupStatus = const InitialSetupStatus(isOpen: true);
+  List<DisciplerCandidate> candidates = const [];
+  final appointed = <String>[];
   MinistryFailure? actionFailure;
 
-  final responses = <({String id, bool accept})>[];
-  final invites = <({String groupId, String membershipId, String role})>[];
-  final withdrawn = <String>[];
-  final ended = <String>[];
+  final added = <({String groupId, List<String> membershipIds})>[];
+  final setUps = <({String placementId, String role})>[];
+  final windowChanges = <bool>[];
+  final removed = <String>[];
   final pairings = <({String disciple, String? discipler})>[];
   final selfAdded = <String>[];
   final leaders = <({String groupId, String membershipId})>[];
@@ -226,10 +230,6 @@ class FakeMinistryRepository implements MinistryRepository {
 
   @override
   Future<MinistryContext?> fetchMyMinistryContext() async => ministryContext;
-
-  @override
-  Future<DGroupInvitation?> fetchMyPendingInvitation() async =>
-      pendingInvitation;
 
   @override
   Future<List<DGroupSummary>> fetchGroups(String churchId) async => groups;
@@ -245,37 +245,58 @@ class FakeMinistryRepository implements MinistryRepository {
   }) async => placeable;
 
   @override
-  Future<void> respondToInvitation(
-    String invitationId, {
-    required bool accept,
+  Future<List<AddableMember>> fetchAddableMembers(String groupId) async =>
+      addable;
+
+  @override
+  Future<InitialSetupStatus> fetchInitialSetupStatus(String churchId) async =>
+      setupStatus;
+
+  @override
+  Future<void> addMembers({
+    required String groupId,
+    required List<String> membershipIds,
   }) async {
-    responses.add((id: invitationId, accept: accept));
+    added.add((groupId: groupId, membershipIds: membershipIds));
     await _act();
   }
 
   @override
-  Future<void> invite({
-    required String groupId,
-    required String membershipId,
+  Future<void> setUpMember({
+    required String placementId,
     required DGroupResponsibility responsibility,
   }) async {
-    invites.add((
-      groupId: groupId,
-      membershipId: membershipId,
-      role: responsibility.toDb,
-    ));
+    setUps.add((placementId: placementId, role: responsibility.toDb));
     await _act();
   }
 
   @override
-  Future<void> withdrawInvitation(String invitationId) async {
-    withdrawn.add(invitationId);
+  Future<void> setInitialSetupOpen({
+    required String churchId,
+    required bool open,
+  }) async {
+    windowChanges.add(open);
     await _act();
   }
 
   @override
-  Future<void> endMembership(String dGroupMembershipId) async {
-    ended.add(dGroupMembershipId);
+  Future<List<DisciplerCandidate>> fetchDisciplerCandidates({
+    String? groupId,
+    String? churchId,
+  }) async => [
+    for (final c in candidates)
+      if (groupId == null || c.dGroupId == groupId) c,
+  ];
+
+  @override
+  Future<void> appointDiscipler(String membershipId) async {
+    appointed.add(membershipId);
+    await _act();
+  }
+
+  @override
+  Future<void> removeFromGroup(String placementId) async {
+    removed.add(placementId);
     await _act();
   }
 

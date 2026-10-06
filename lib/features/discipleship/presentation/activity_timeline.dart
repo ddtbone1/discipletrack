@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/format/app_format.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_pill.dart';
 import '../../../core/widgets/app_text_link.dart';
 import '../domain/attendance_outcome.dart';
@@ -55,24 +54,21 @@ class JourneyActivitySection extends StatelessWidget {
             ),
           ),
         ),
-        AppCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ActivityTimeline(events: recent),
-              if (events.length > recent.length) ...[
-                const SizedBox(height: AppSpacing.xs),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: AppTextLink(
-                    label: 'View journey history · ${events.length} events',
-                    onTap: () => _showAll(context),
-                  ),
-                ),
-              ],
-            ],
+        // Each event is its own card; no shared container around them.
+        ActivityTimeline(events: recent),
+        if (events.length > recent.length) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Padding(
+            padding: const EdgeInsets.only(left: 20 + AppSpacing.sm),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: AppTextLink(
+                label: 'View journey history · ${events.length} events',
+                onTap: () => _showAll(context),
+              ),
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -80,6 +76,8 @@ class JourneyActivitySection extends StatelessWidget {
   void _showAll(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
+      // Above the floating dock, which lives in the shell route.
+      useRootNavigator: true,
       showDragHandle: true,
       isScrollControlled: true,
       builder: (sheet) => DraggableScrollableSheet(
@@ -109,9 +107,11 @@ class JourneyActivitySection extends StatelessWidget {
   }
 }
 
-/// A compact vertical timeline: one row per event with a small dot, a thin
-/// connector to the next event, the event in bold, and its date and context
-/// beneath. The newest event's dot is slightly stronger.
+/// A compact vertical timeline. Each event is its own thin, view-only card,
+/// tinted by its attendance state (Present and completed lime, Late amber,
+/// a recorded absence red, Excused grey). The rail of dots and connecting
+/// line sits outside the cards, on the left. The newest event's dot is
+/// slightly stronger.
 class ActivityTimeline extends StatelessWidget {
   const ActivityTimeline({required this.events, super.key});
 
@@ -145,26 +145,28 @@ class _EventRow extends StatelessWidget {
   final bool isFirst;
   final bool isLast;
 
-  /// A dot colour only where it carries meaning.
-  Color _dotColor(BuildContext context) {
-    final p = context.palette;
-    final neutral = pillColors(context, PillTone.outline).$2;
-    return switch (event.kind) {
-      ActivityKind.lessonCompleted => p.brand,
-      ActivityKind.meeting => switch (event.outcome) {
-        AttendanceOutcome.present => p.brand,
-        AttendanceOutcome.late => pillColors(context, PillTone.warning).$2,
-        AttendanceOutcome.absent => pillColors(context, PillTone.error).$2,
-        _ => neutral,
-      },
-      _ => neutral,
-    };
-  }
+  /// The attendance (or completion) state the event's card and dot carry;
+  /// null for events with no state, which stay on a plain surface.
+  PillTone? get _tone => switch (event.kind) {
+    ActivityKind.lessonCompleted => PillTone.brand,
+    ActivityKind.meeting => switch (event.outcome) {
+      AttendanceOutcome.present => PillTone.brand,
+      AttendanceOutcome.late => PillTone.warning,
+      AttendanceOutcome.absent => PillTone.error,
+      AttendanceOutcome.excused => PillTone.outline,
+      _ => null,
+    },
+    _ => null,
+  };
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
     final text = Theme.of(context).textTheme;
+    final tone = _tone;
+    final (fill, deep) = tone == null
+        ? (p.surface, pillColors(context, PillTone.outline).$2)
+        : pillColors(context, tone);
     final size = isFirst ? 12.0 : 10.0;
     final secondary = [
       AppFormat.shortDate(event.at),
@@ -179,52 +181,74 @@ class _EventRow extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // The timeline rail, outside the cards: a dot level with the
+            // card's title and a line running on through the gap to the
+            // next card.
             SizedBox(
               width: 20,
               child: Column(
                 children: [
-                  const SizedBox(height: 5),
+                  if (!isFirst)
+                    Container(width: 1.5, height: 12, color: p.border)
+                  else
+                    const SizedBox(height: 12),
                   Container(
                     width: size,
                     height: size,
                     decoration: BoxDecoration(
-                      color: _dotColor(context),
+                      color: deep,
                       shape: BoxShape.circle,
                       border: isFirst
                           ? Border.all(color: p.textPrimary, width: 1.5)
                           : null,
                     ),
                   ),
-                  if (!isLast)
-                    Expanded(
-                      child: Container(
-                        width: 1.5,
-                        margin: const EdgeInsets.symmetric(vertical: 3),
-                        color: p.border,
-                      ),
-                    ),
+                  Expanded(
+                    child: isLast
+                        ? const SizedBox.shrink()
+                        : Container(width: 1.5, color: p.border),
+                  ),
                 ],
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
+            // One thin, view-only card per event, tinted by its state.
             Expanded(
               child: Padding(
-                padding: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.md),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      event.title,
-                      style: text.bodyMedium?.copyWith(
-                        fontWeight: isFirst ? FontWeight.w700 : FontWeight.w600,
-                      ),
+                padding: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.xs),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: fill,
+                    borderRadius: BorderRadius.circular(12),
+                    border: tone == null ? Border.all(color: p.border) : null,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.xs,
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      secondary,
-                      style: text.bodySmall?.copyWith(color: p.muted),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          event.title,
+                          style: text.bodyMedium?.copyWith(
+                            fontWeight: isFirst
+                                ? FontWeight.w700
+                                : FontWeight.w600,
+                            color: p.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          secondary,
+                          style: text.bodySmall?.copyWith(
+                            color: tone == null ? p.muted : deep,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),

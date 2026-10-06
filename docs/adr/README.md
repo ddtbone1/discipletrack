@@ -26,12 +26,13 @@ ADRs explain why a decision exists so future developers and AI coding agents can
 | ADR-009 | Discipleship Meeting Attendance and Role-Specific Monitoring | Accepted; partially superseded by ADR-011 (lesson readiness), ADR-012 (promotion as a recalculation trigger) and ADR-014 (gatherings, gathering monitoring, the missed-meeting condition, two thresholds) |
 | ADR-010 | Lesson Content Delivery and Offline-First Reading | Accepted |
 | ADR-011 | Explicit Lesson Completion, Independent of a Fixed Meeting Count | Accepted; partially superseded by ADR-014 (condition name, role-specific monitoring), ADR-015 (Leader confirmation step, submission withdrawal, reopen result), ADR-016 (decision 14, "reopening must come first") and ADR-017 (the meeting policy and N1, closed: no minimum) |
-| ADR-012 | Discipler Eligibility After Lesson 5 and Concurrent Disciple and Discipler Responsibilities | Accepted; D2 decided (policy function); the Slice 6 questions open; eligibility wording amended by ADR-015 |
+| ADR-012 | Discipler Eligibility After Lesson 5 and Concurrent Disciple and Discipler Responsibilities | Accepted; D2 decided (policy function); eligibility wording amended by ADR-015; the Slice 6 questions decided and decision 9 extended to undo by ADR-018 |
 | ADR-013 | Curriculum Workbook and Guide Modes | Reserved, not written (see Reserved numbers) |
 | ADR-014 | Remove D Group Gathering Attendance from the MVP | Accepted |
 | ADR-015 | The Discipler Marks a Lesson Completed, Without Leader Confirmation | Accepted; partially superseded by ADR-016 (reopen after the undo window) and ADR-017 (count precondition) |
 | ADR-016 | A Completion Is Locked Once Later Progress Exists; Reopen Is Database-Only | Accepted |
 | ADR-017 | No Minimum Meetings; Meeting Count Is Never a Progression Gate | Accepted (closes N1) |
+| ADR-018 | Direct D Group Placement, Needs Setup, and Initial Rollout Recognition of Disciplers | Accepted (supersedes Slice 3 placement by invitation) |
 
 ADR numbers are identifiers, not implementation order.
 

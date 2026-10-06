@@ -90,6 +90,7 @@ class OfflineSnapshot {
                 'is_my_leader': e.isMyLeader,
                 'is_my_discipler': e.isMyDiscipler,
                 'is_my_disciple': e.isMyDisciple,
+                'd_group_member_count': ministry!.memberCount,
               },
           ],
   };

@@ -269,10 +269,9 @@ A Discipler is not automatically a church-wide privileged system user.
 
 A Discipler may also be a Disciple continuing their own journey: the
 DISCIPLE and DISCIPLER responsibilities may be held at the same time, in
-the same D Group (ADR-012; enforced from Slice 6; until then Migration
-006 still refuses DISCIPLE with DISCIPLER). A person is never paired
-with themselves (ADR-012, enforced from Slice 6). DISCIPLE still
-excludes D Group Leader.
+the same D Group (ADR-012). A person is never paired with themselves
+(ADR-012), and two people never disciple each other at the same time
+(ADR-018). DISCIPLE still excludes D Group Leader.
 
 ---
 
@@ -774,16 +773,15 @@ same D Group as the person's Disciple responsibility.
 
 Appointment does not end the person's Disciple responsibility, their own
 Discipler assignment or their lesson progress. They continue through
-Lesson 10 under their own Discipler while discipling others (ADR-012;
-enforced from Slice 6; until then Migration 006 still refuses DISCIPLE
-with DISCIPLER). Slice 6 (Discipler Progression) builds appointment.
+Lesson 10 under their own Discipler while discipling others (ADR-012).
+Slice 6 built appointment.
 
 Historical discipleship progress remains preserved.
 
 D2 is decided: the eligibility lesson comes from one policy function
-(`private.discipler_eligibility_lesson()`), not a church setting. Open decisions, listed
-and not decided here: D5, D6, D7 (reciprocal pairing: may A
-disciple B while B disciples A), D8, D9 and D14. See ADR-012.
+(`private.discipler_eligibility_lesson()`), not a church setting. D5,
+D6, D7 (reciprocal pairing: may A disciple B while B disciples A), D8,
+D9 and D14 are decided by ADR-018. See ADR-012 and ADR-018.
 
 ---
 

@@ -263,7 +263,7 @@ class DiscipleshipRepository {
             "recorded meeting, so Lesson ${detail['lesson_number'] ?? ''} "
             "can't be reopened.",
       'eligibility_lesson_protected' =>
-        "Lesson ${detail['lesson_number'] ?? ''} can't be reopened: this "
+        "Lesson ${detail['lesson_number'] ?? ''} can't be changed now: this "
             "person's appointment as a Discipler rests on Lesson "
             "${detail['eligibility_lesson_number'] ?? ''}.",
       'cannot_void_own_meeting' =>

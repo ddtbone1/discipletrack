@@ -19,6 +19,7 @@ import '../application/ministry_providers.dart';
 import '../domain/d_group_member.dart';
 import '../domain/ministry_context.dart';
 import 'ministry_ui.dart';
+import 'needs_setup_notice.dart';
 
 /// The roster for a Discipler or Disciple: their group at a glance, their
 /// Leader, their own Discipler, a Discipler's own Disciples with where each
@@ -54,9 +55,12 @@ class MyGroupPage extends ConsumerWidget {
             data: (c) => c == null
                 ? const EmptyState(
                     message:
-                        'You are not in a D Group yet. When a Leader invites '
-                        'you, the invitation appears on your Home screen.',
+                        'You are not in a D Group yet. A D Group Leader adds '
+                        'members to their group; once you are added, it shows '
+                        'here.',
                   )
+                : c.needsSetup
+                ? NeedsSetupNotice(ministry: c)
                 : _Roster(ministry: c),
           ),
           const SizedBox(height: AppSpacing.xl),

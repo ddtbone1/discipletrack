@@ -61,6 +61,10 @@ eligibility (27, 34, 64; ADR-012). Discipler progress visibility
 relationship-scoped (62; N7). Pairing copy names the Leader or the
 Coordinator (66).
 
+Revision 2026-10-06 (ADR-018): invitations retired; Add members
+(`/groups/:groupId/add-members`), the setup sheet and D Group detail
+filter chips replace invitation examples (26, 45, 60, 61).
+
 ---
 
 ## 1. Purpose
@@ -912,7 +916,7 @@ Leader Home leads with what needs the Leader: lessons submitted and
 awaiting their confirmation, then attention states, then factual
 progress per Disciple and recent meaningful activity, with drill-down
 to any authorized member. It has no scheduling control and never
-compares Disciplers, Disciples or groups. Inviting a member is
+compares Disciplers, Disciples or groups. Adding members is
 occasional and secondary; it never dominates D Group detail (decision
 A8).
 
@@ -1466,9 +1470,8 @@ meeting"), never "OK".
 Routine actions should not be burdened with unnecessary confirmation
 dialogs.
 
-Keep popups few. An action that is undone simply by doing it again,
-such as withdrawing an invitation that can be re-sent, runs immediately
-without a dialog.
+Keep popups few. An action that is undone simply by doing it again runs
+immediately without a dialog.
 
 ---
 
@@ -1758,21 +1761,21 @@ Two tests apply at every step:
 
 | Pattern | Use when | Do not use when | Examples |
 |---|---|---|---|
-| Inline action (text link) | One tap, re-doable, effect visible in place | The action is protected or irreversibly affects someone else | Withdraw invitation, Invite again, Show all |
+| Inline action (text link) | One tap, re-doable, effect visible in place | The action is protected or irreversibly affects someone else | Show all |
 | Inline expansion | Detail belongs to a row and is short | The detail has its own actions or is long | A lesson's meetings in the journey; a history row's shared notes |
-| Bottom sheet | A single choice or one to three short inputs in context | Long keyboard input, or input that must survive an error and retry | Invite role, Pair, choosing which Disciple to record for |
-| Dedicated task screen | Several inputs, keyboard use, server validation with recoverable errors | A single choice | Record Meeting, New group, Edit profile |
+| Bottom sheet | A single choice or one to three short inputs in context | Long keyboard input, or input that must survive an error and retry | Set up a member (Disciple or Existing Discipler), Pair, choosing which Disciple to record for |
+| Dedicated task screen | Several inputs, keyboard use, server validation with recoverable errors | A single choice | Record Meeting, New group, Edit profile, Add members (`/groups/:groupId/add-members`: search and multi-select) |
 | Full-screen modal | A focused mode that leaves the dock | Ordinary forms (use a pushed page) | Possibly the lesson reader's focus mode |
 | Dialog | Confirming a destructive or hard-to-reverse action, saying what changes | Routine or re-doable actions, choices, errors | Remove, Unpair, Change Leader, Decline request, Void, Reopen, Confirm lesson completion |
 | Stepper | Later steps depend on earlier answers or a server check | Independent fields that can be shown together | Join church; not Record Meeting |
 | Progressive disclosure | Optional or rare inputs; long histories | Required information | Notes in Record Meeting; older meetings; voided rows |
 | Tabs | Local or contextual only: two long views used separately, shown only when both contexts exist (N8) | Content consumed together; primary navigation; a tab that would be empty | Journey: My Journey and My Disciples, only for a person who is both a Disciple and an assigned Discipler |
-| Sections | Content consumed together | | D Group detail, Disciple detail |
+| Sections | Content consumed together | | Disciple detail |
 | Accordion | A long ordered set where one or two items matter now | Short lists | The 12-lesson journey with the current lesson open |
 | Timeline | Chronological or sequential facts | Unordered sets | Lesson timeline, activity, meeting history |
 | Compact rows | Large homogeneous collections | Few rich objects | Members, Disciples, requests, meeting history |
-| Cards | A domain object with its own state (section 10) | Every list row; card in card | Current lesson, invitation, D Group summary |
-| Chips / segmented control | Small mutually exclusive option sets | More than about five options | Present / Late / Absent / Excused; list filters |
+| Cards | A domain object with its own state (section 10) | Every list row; card in card | Current lesson, D Group summary |
+| Chips / segmented control | Small mutually exclusive option sets | More than about five options | Present / Late / Absent / Excused; list filters, such as D Group detail (All, Disciples, Disciplers, Needs setup) |
 | Overflow menu | Secondary or destructive row actions | The row's primary action | Remove from group, Void, Reopen |
 | FAB | Never: the dock holds the bottom centre and the main action comes first (section 40) | | None |
 | Drill-down | From a figure to the records behind it, one level per question | Skipping levels, or landing where the counted records are not shown | Coordinator: D Groups → group → person → journey → record |
@@ -1814,8 +1817,8 @@ Primary action by page:
 | Disciple detail | Discipler | Record Meeting; "Mark Lesson n as finished" is secondary on the lesson card |
 | Disciple detail | Leader | Confirm Lesson n when submitted; otherwise none. Fallback recording is secondary |
 | Disciple detail | Coordinator | None; Confirm as secondary when submitted; Reopen in overflow |
-| D Group detail | Leader | None as a lime button; the Awaiting confirmation section leads. Invite a member is secondary (decision A8) |
-| D Group detail | Coordinator | Invite a member, or none |
+| D Group detail | Leader | None as a lime button; the Awaiting confirmation section leads. Add members is secondary (decision A8) |
+| D Group detail | Coordinator | Add members, or none |
 | D Groups | Coordinator | New group |
 | Record Meeting | Recorder | Record meeting |
 

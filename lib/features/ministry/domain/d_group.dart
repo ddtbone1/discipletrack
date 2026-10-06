@@ -61,6 +61,7 @@ class DGroupSummary {
     required this.leaderName,
     required this.disciplerCount,
     required this.discipleCount,
+    this.memberCount,
   });
 
   /// Shape of `d_groups?select=id,name,description,status,members:
@@ -89,6 +90,7 @@ class DGroupSummary {
       leaderName: leaderName,
       disciplerCount: disciplers,
       discipleCount: disciples,
+      memberCount: (map['placements'] as List<dynamic>?)?.length,
     );
   }
 
@@ -100,6 +102,11 @@ class DGroupSummary {
   final int disciplerCount;
   final int discipleCount;
 
+  /// Everyone placed in the group, including the Leader and people who still
+  /// need setup (ADR-018). Disciple and Discipler counts above are
+  /// responsibility counts. Null when the read did not include placements.
+  final int? memberCount;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -107,9 +114,15 @@ class DGroupSummary {
           other.group == group &&
           other.leaderName == leaderName &&
           other.disciplerCount == disciplerCount &&
-          other.discipleCount == discipleCount;
+          other.discipleCount == discipleCount &&
+          other.memberCount == memberCount;
 
   @override
-  int get hashCode =>
-      Object.hash(group, leaderName, disciplerCount, discipleCount);
+  int get hashCode => Object.hash(
+    group,
+    leaderName,
+    disciplerCount,
+    discipleCount,
+    memberCount,
+  );
 }
