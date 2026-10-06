@@ -28,15 +28,17 @@ List<DockItem> dockItemsFor({
     glyph: _house,
     path: Routes.home,
   ),
-  // Journey (N8): offered from relationships, never from a role. A
-  // Coordinator or Leader gets it too when they also disciple or are a
-  // Disciple.
+  // Journey (N8): offered from relationships, never from a role. Every
+  // Leader disciples (ADR-020), so every Leader has it; a Coordinator gets
+  // it when they also disciple or are a Disciple. Lessons are read from
+  // the journey, so the lesson pages keep it active.
   if (JourneyViews.of(ministry).isOffered)
     const DockItem(
       label: 'Journey',
       icon: CupertinoIcons.book,
       activeIcon: CupertinoIcons.book_fill,
       path: Routes.journey,
+      alsoActiveOn: [Routes.lessons, Routes.myDisciples],
     ),
   if (isCoordinator)
     const DockItem(
@@ -50,9 +52,10 @@ List<DockItem> dockItemsFor({
       label: 'D Group',
       icon: CupertinoIcons.person_2,
       activeIcon: CupertinoIcons.person_2_fill,
-      path: ministry.isLeader
-          ? Routes.dGroupDetailFor(ministry.dGroupId)
-          : Routes.myGroup,
+      // One roster for everyone (ADR-020); the Leader manages the group
+      // from there, on a page that keeps this item active.
+      path: Routes.myGroup,
+      alsoActiveOn: [if (ministry.isLeader) Routes.dGroups],
     ),
   const DockItem(
     label: 'Profile',
@@ -70,11 +73,12 @@ int activeDockIndex(List<DockItem> items, String location) {
   var best = -1;
   var bestLength = -1;
   for (var i = 0; i < items.length; i++) {
-    final path = items[i].path;
-    final matches = location == path || location.startsWith('$path/');
-    if (matches && path.length > bestLength) {
-      best = i;
-      bestLength = path.length;
+    for (final path in [items[i].path, ...items[i].alsoActiveOn]) {
+      final matches = location == path || location.startsWith('$path/');
+      if (matches && path.length > bestLength) {
+        best = i;
+        bestLength = path.length;
+      }
     }
   }
   return best;

@@ -1,0 +1,134 @@
+{
+  "_about": "Identifying metadata for the Journey curriculum (ADR-019 decision 2): cover titles, contents-page themes and topics, section headings, scripture references and Training Module titles. No lesson wording, Key Objectives, banners or answers. Source: docs/curriculum/SOURCE_ANALYSIS.md. Lesson 1 section titles were not legible in the available copy, so its sections carry labels only.",
+  "lessons": [
+    {
+      "number": 1,
+      "title": "Salvation",
+      "blocks": [
+        { "type": "LESSON_THEME", "tier": "DISCIPLE", "body": { "text": "Salvation" } },
+        { "type": "TOPIC_LIST", "tier": "DISCIPLE", "body": { "items": ["Creation and the one true God", "The triune God", "Where evil came from", "The first man and woman", "Sin and the love and grace of God", "The promise of a Saviour", "The Saviour revealed", "The Ten Commandments", "The claims of the Saviour", "Good works and salvation", "How to receive salvation", "Commitment to salvation"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "A", "body": {} },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "A", "body": { "refs": ["Genesis 1:1", "Psalms 33:6, 9", "Revelation 4:11", "Genesis 1:31", "Ephesians 2:4", "Mark 12:32", "Genesis 1:26", "Acts 17:29", "1 John 5:7", "1 Corinthians 8:6", "John 1:1-3, 14", "Matthew 9:1-7", "Acts 5:3-4", "Acts 16:6", "Ephesians 4:30", "2 Corinthians 13:14", "Revelation 5:11-12", "Isaiah 14:12-15", "Revelation 12:9", "1 Corinthians 10:19-20", "Matthew 13:38", "2 Corinthians 4:4", "1 Thessalonians 3:5", "Genesis 3:1-4", "2 Corinthians 11:4", "1 Thessalonians 2:17-18", "Matthew 25:41", "Revelation 20:10", "Psalms 99:5", "Genesis 2:7", "Genesis 1:26-27", "Genesis 1:28", "Genesis 2:16-17", "Genesis 3:1-6", "1 Timothy 2:13-14", "Genesis 3:7", "Genesis 3:23-24", "Romans 5:12", "Genesis 5:1-3", "1 John 1:10", "Isaiah 59:2"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "B", "body": {} },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "B", "body": { "refs": ["Genesis 3:15", "Exodus 20:1-17", "Romans 7:7", "Isaiah 7:14", "Matthew 1:18-23", "John 20:30-31", "Matthew 20:28", "Romans 5:8", "1 John 5:11-12", "1 Timothy 2:5", "John 3:18, 36", "Revelation 20:15", "Ephesians 2:8-9", "John 6:28-29", "Romans 6:23", "John 3:15-16", "Romans 10:9-13"] } }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Assurance",
+      "blocks": [
+        { "type": "LESSON_THEME", "tier": "DISCIPLE", "body": { "text": "Assurance of salvation" } },
+        { "type": "TOPIC_LIST", "tier": "DISCIPLE", "body": { "items": ["The meaning of assurance", "The reliability of the Word of God", "The author of the Bible", "Enemies of the Bible", "The promises in the Word of God", "God's Holy Spirit dwells in us", "Salvation is secure", "Your new relationship with God"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "A", "body": { "title": "The Word of God" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "A", "body": { "refs": ["1 John 5:13", "1 Thessalonians 2:13", "2 Peter 1:20-21", "2 Timothy 3:16-17", "1 Corinthians 2:9-13", "Matthew 5:17-18", "Matthew 4:1-11", "Matthew 24:35", "Psalms 12:6-7", "Psalms 119:160"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "B", "body": { "title": "Eternal Security" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "B", "body": { "refs": ["John 3:16", "John 5:24", "John 6:37", "Acts 26:18", "Romans 5:1", "Romans 6:23", "Romans 10:13", "2 Corinthians 5:21", "Ephesians 1:6", "Ephesians 3:17", "John 14:23", "Colossians 1:14", "Revelation 1:5", "Revelation 21:27"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "C", "body": { "title": "The Holy Spirit" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "C", "body": { "refs": ["Romans 8:11", "Romans 8:9", "Romans 8:16", "1 John 5:10", "John 5:24", "John 10:28", "John 10:29", "Romans 8:38-39"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "D", "body": { "title": "New Relationship" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "D", "body": { "refs": ["Romans 8:15", "Jeremiah 29:11-12", "2 Corinthians 6:18", "Titus 1:2", "John 8:31"] } }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Prayer",
+      "blocks": [
+        { "type": "LESSON_THEME", "tier": "DISCIPLE", "body": { "text": "Prayer" } },
+        { "type": "TOPIC_LIST", "tier": "DISCIPLE", "body": { "items": ["Knowing God through prayer", "Why pray", "How to pray", "When to pray", "Answers to prayer", "The Lord's Prayer", "Hindrances to prayer", "Sin after salvation"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "A", "body": { "title": "Communication" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "A", "body": { "refs": ["Ephesians 2:18", "Romans 10:13", "Jeremiah 32:17, 27", "Psalms 44:21", "Matthew 6:8", "1 Corinthians 6:17", "Philippians 4:6", "Ephesians 3:20", "John 16:24", "Matthew 6:26", "Matthew 10:29-31", "1 John 5:14", "1 Peter 5:7", "Jeremiah 33:3", "Matthew 7:7-11", "John 14:13", "Matthew 6:7", "Leviticus 26:1", "1 Thessalonians 1:9", "1 Timothy 6:10", "Psalms 29:2", "Psalms 32:5", "Psalms 38:18", "Psalms 62:8", "Psalms 100:4", "Proverbs 8:17", "Hebrews 4:16", "Psalms 119:18", "Luke 18:1", "1 Thessalonians 5:17", "John 15:7", "Hebrews 11:6", "1 John 4:16"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "B", "body": { "title": "How to Pray" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "B", "body": { "refs": ["Luke 11:1", "Matthew 6:9-13", "James 4:2", "James 4:3", "Proverbs 28:9", "Psalms 66:18", "Psalms 103:12", "Hebrews 10:17", "Romans 6:1-2", "Romans 6:12", "Galatians 5:19-21", "Colossians 3:5", "Colossians 3:8-9", "Hebrews 12:5-11", "Galatians 6:7-9", "James 1:14-16"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "C", "body": { "title": "Overcoming Sin" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "C", "body": { "refs": ["Ephesians 2:1-3", "2 Corinthians 5:17", "James 1:14", "Psalms 119:9-11", "John 17:15-18", "1 John 2:12-14", "Romans 8:13", "Romans 12:2", "Colossians 3:5, 16", "Psalms 119:59-60", "Luke 6:46", "Proverbs 28:13", "Psalms 51:2", "1 John 1:9", "John 3:16", "John 8:31", "John 13:33-35"] } }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Local Church",
+      "blocks": [
+        { "type": "LESSON_THEME", "tier": "DISCIPLE", "body": { "text": "Local Church" } },
+        { "type": "TOPIC_LIST", "tier": "DISCIPLE", "body": { "items": ["The beginning of the church", "Functions of the local church", "Responsibility to the church", "Purpose of Biblical leadership", "Dynamic role of women in the church", "Importance of baptism", "Baptism and salvation", "The need for baptism"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "A", "body": { "title": "The Local Church" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "A", "body": { "refs": ["1 Corinthians 10:32", "Acts 1:8", "Acts 2:41", "Acts 4:4", "Acts 5:14", "Acts 5:42", "Acts 6:1, 7", "Acts 8:1, 4", "Acts 9:31", "Acts 11:19-26", "Acts 13:1-2", "Acts 14:23", "Acts 16:5", "2 Corinthians 11:3-4, 13-15", "Acts 18:8", "Romans 10:13-15", "1 Corinthians 11:23-27", "Galatians 6:1", "Ephesians 3:21", "Ephesians 4:11-12", "Ephesians 4:15", "Hebrews 10:25", "Hebrews 13:17", "Ephesians 5:25", "Ephesians 2:19-20", "1 Timothy 3:1-7", "Titus 1:5-9", "Romans 16:1-15", "Titus 2:3-5"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "B", "body": { "title": "Be Baptized" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "B", "body": { "refs": ["Luke 23:39-43", "Acts 8:12", "Acts 18:8", "Matthew 3:16", "Acts 8:37-39", "Matthew 28:19-20", "Romans 6:2-5", "Ephesians 2:6"] } }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Discipleship",
+      "blocks": [
+        { "type": "LESSON_THEME", "tier": "DISCIPLE", "body": { "text": "Discipleship" } },
+        { "type": "TOPIC_LIST", "tier": "DISCIPLE", "body": { "items": ["Steps of discipleship", "Cost of discipleship", "Commitment to discipleship", "Destination of spiritual formation", "Stewardship of our lives", "Giving and the disciple"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "A", "body": { "title": "Discipleship" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "A", "body": { "refs": ["2 Peter 3:9", "2 Timothy 2:2", "John 3:16", "John 8:31", "Luke 11:1", "John 13:34-35", "Ephesians 4:11-12", "Luke 14:26-27, 33", "Matthew 10:37", "Matthew 13:22", "John 6:66", "Matthew 6:25-33", "Jeremiah 29:11-12", "Luke 18:28-30"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "B", "body": { "title": "Stewardship" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "B", "body": { "refs": ["Job 41:11", "Acts 17:24-25", "Matthew 25:14-28", "Deuteronomy 8:17-18", "Matthew 6:19-21, 24", "John 3:16", "Romans 10:13-15", "1 Corinthians 6:19-20", "2 Corinthians 8:8-9", "2 Corinthians 9:6", "Colossians 3:1-2", "Luke 14:33", "1 Corinthians 16:2", "Hebrews 7:8", "2 Corinthians 9:7", "2 Corinthians 8:2-3"] } },
+        { "type": "MODULE_HEADING", "tier": "DISCIPLER", "body": { "number": 1, "title": "The definition of one on one discipleship" } }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "The Future",
+      "blocks": [
+        { "type": "LESSON_THEME", "tier": "DISCIPLE", "body": { "text": "The Future" } },
+        { "type": "TOPIC_LIST", "tier": "DISCIPLE", "body": { "items": ["Our spiritual struggle", "Our spiritual armor", "The end of the struggle", "The rapture", "The tribulation", "The second coming", "The millennium", "The new heaven and new earth", "The judgment seat of Christ"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "A", "body": { "title": "What's Next" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "A", "body": { "refs": ["Ephesians 6:12", "Ephesians 6:13-18", "1 John 3:8", "1 John 2:14", "1 John 4:4", "Romans 13:12-14", "Matthew 24:3-8", "2 Timothy 3:1-4", "John 14:2-3", "1 Corinthians 15:51-52", "1 Thessalonians 4:15-18", "2 Thessalonians 1:7-9", "2 Thessalonians 2:8-12", "Revelation 20:10-15", "Revelation 21:4"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "B", "body": { "title": "The Judgement Seat" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "B", "body": { "refs": ["Romans 14:10", "1 Corinthians 3:13-15", "2 Corinthians 5:10", "1 Corinthians 9:25", "1 Thessalonians 2:19", "2 Timothy 4:8", "James 1:12", "Revelation 2:10", "1 Peter 5:4", "1 John 2:28", "1 John 3:2-3"] } },
+        { "type": "MODULE_HEADING", "tier": "DISCIPLER", "body": { "number": 2, "title": "The value of one on one discipleship" } }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "Spiritual Formation",
+      "blocks": [
+        { "type": "LESSON_THEME", "tier": "DISCIPLE", "body": { "text": "Spiritual Growth" } },
+        { "type": "TOPIC_LIST", "tier": "DISCIPLE", "body": { "items": ["Our culture today", "Importance of holiness", "Principles of purity", "Seven stages of spiritual growth"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "A", "body": { "title": "How to be Holy" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "A", "body": { "refs": ["1 Peter 1:15-16", "Matthew 15:18", "1 Corinthians 10:12", "John 17:15-20", "2 Corinthians 5:20", "James 4:7-8", "Romans 12:1-2", "Psalms 119:9", "1 John 1:9", "Psalms 119:11", "Galatians 6:7", "Romans 13:14", "Galatians 5:22-23", "Galatians 6:9", "1 Peter 2:2", "Hebrews 5:13-14", "1 John 2:1", "1 John 3:7", "1 Corinthians 14:20", "Ephesians 5:8", "1 John 2:14", "Titus 2:6-8", "Ephesians 6:4", "Colossians 3:21", "1 Corinthians 4:15", "1 Peter 5:1", "1 Timothy 5:9", "Titus 2:2"] } },
+        { "type": "MODULE_HEADING", "tier": "DISCIPLER", "body": { "number": 3, "title": "Procedures for one on one discipleship" } },
+        { "type": "MODULE_HEADING", "tier": "DISCIPLER", "body": { "number": 4, "title": "The value of discipleship" } }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "Faith",
+      "blocks": [
+        { "type": "LESSON_THEME", "tier": "DISCIPLE", "body": { "text": "Faith" } },
+        { "type": "TOPIC_LIST", "tier": "DISCIPLE", "body": { "items": ["Understanding faith", "Trial and testing", "Heroes of the faith", "The Holy Spirit"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "A", "body": { "title": "Faith" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "A", "body": { "refs": ["Hebrews 11:1", "Hebrews 11:6", "Ephesians 2:8-9", "Galatians 5:22", "2 Corinthians 4:18", "Romans 10:17", "Matthew 6:25-34", "Numbers 23:19", "1 Chronicles 28:20", "Job 42:2", "Malachi 3:6", "Matthew 24:35", "Titus 1:2", "James 1:2-4", "1 Peter 1:7", "John 16:33", "2 Timothy 3:12", "Deuteronomy 31:8", "Matthew 5:11-12", "2 Corinthians 4:8-18", "1 Peter 4:19", "1 Peter 3:13-17", "1 Peter 4:1-2", "1 Peter 4:12-19", "Romans 12:19", "Romans 8:28", "Matthew 7:7-11", "Isaiah 45:5-6", "Isaiah 46:9-10", "Hebrews 11", "Ephesians 5:20", "1 Thessalonians 5:18"] } },
+        { "type": "MODULE_HEADING", "tier": "DISCIPLER", "body": { "number": 5, "title": "Before accepting a disciple" } },
+        { "type": "MODULE_HEADING", "tier": "DISCIPLER", "body": { "number": 6, "title": "Getting started with your new disciple" } }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "Conversation",
+      "blocks": [
+        { "type": "LESSON_THEME", "tier": "DISCIPLE", "body": { "text": "Words" } },
+        { "type": "TOPIC_LIST", "tier": "DISCIPLE", "body": { "items": ["Problem solving with Christians", "Understanding false teachers", "How to answer non-Christian beliefs", "Drawing people to Christ"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "A", "body": { "title": "Problem Solving" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "A", "body": { "refs": ["Colossians 3:8-9", "Matthew 18:15", "Matthew 18:16", "1 Corinthians 6:1-5", "1 Corinthians 6:6", "1 Corinthians 6:7-8", "Colossians 3:13", "Ephesians 4:32", "Romans 8:28", "Psalms 119:165", "Proverbs 13:3", "Proverbs 13:10", "Proverbs 15:28", "Romans 12:10"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "B", "body": { "title": "False Teachers" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "B", "body": { "refs": ["1 Corinthians 2:2", "Galatians 1:8", "Matthew 7:15", "Acts 20:28-32", "2 John 10-11", "Acts 17:10-11"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "C", "body": { "title": "Words of a Disciple" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "C", "body": { "refs": ["Acts 1:8", "John 15:8", "John 15:16", "1 Peter 3:15", "Hebrews 4:12", "2 Timothy 2:23-26", "1 Corinthians 2:4-5"] } },
+        { "type": "MODULE_HEADING", "tier": "DISCIPLER", "body": { "number": 7, "title": "Your strategy in discipleship" } }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "Loving God",
+      "blocks": [
+        { "type": "LESSON_THEME", "tier": "DISCIPLE", "body": { "text": "Loving God" } },
+        { "type": "TOPIC_LIST", "tier": "DISCIPLE", "body": { "items": ["The greatest commandment", "A new commandment", "Go and make disciples"] } },
+        { "type": "SECTION_HEADING", "tier": "DISCIPLE", "section": "A", "body": { "title": "Loving God" } },
+        { "type": "SCRIPTURE_REFERENCES", "tier": "DISCIPLE", "section": "A", "body": { "refs": ["Mark 12:30", "Luke 9:23", "John 13:34-35"] } }
+      ]
+    }
+  ]
+}

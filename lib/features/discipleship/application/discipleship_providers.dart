@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/supabase/postgrest_failure.dart';
+import '../../curriculum/application/curriculum_providers.dart';
 import '../../membership/application/membership_providers.dart';
 import '../data/discipleship_repository.dart';
 import '../domain/disciple_progress_summary.dart';
@@ -200,7 +201,12 @@ class LessonProgressController extends Notifier<LessonProgressState> {
       ..invalidate(discipleJourneyProvider(membershipId))
       ..invalidate(recordingOptionsProvider)
       ..invalidate(myDisciplesProvider)
-      ..invalidate(groupProgressProvider);
+      ..invalidate(groupProgressProvider)
+      // Completing or undoing a lesson changes which lessons are reached,
+      // and so what may be read (ADR-019 decision 6).
+      ..invalidate(lessonAccessProvider)
+      ..invalidate(lessonContentProvider)
+      ..invalidate(myReadableContentProvider);
   }
 }
 

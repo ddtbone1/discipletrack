@@ -185,6 +185,7 @@ class _MemberList extends StatelessWidget {
       return const Padding(
         padding: EdgeInsets.symmetric(horizontal: AppSpacing.page),
         child: EmptyState(
+          illustration: Illustration.complete,
           icon: Icons.groups_2_outlined,
           title: 'Everyone is already in a D Group',
           message:

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/connectivity/connection_status.dart';
 import '../core/theme/app_theme.dart';
+import '../features/curriculum/application/curriculum_providers.dart';
 import '../features/appearance/application/theme_mode_provider.dart';
 import '../features/discipleship/application/discipleship_providers.dart';
 import '../features/membership/application/membership_providers.dart';
@@ -61,7 +62,10 @@ class _DiscipleTrackAppState extends ConsumerState<DiscipleTrackApp> {
           ..invalidate(discipleJourneyProvider)
           ..invalidate(meetingHistoryProvider)
           ..invalidate(meetingSummaryProvider)
-          ..invalidate(progressSummaryProvider);
+          ..invalidate(progressSummaryProvider)
+          ..invalidate(myReadableContentProvider)
+          ..invalidate(lessonAccessProvider)
+          ..invalidate(lessonContentProvider);
       },
     );
   }
@@ -77,6 +81,8 @@ class _DiscipleTrackAppState extends ConsumerState<DiscipleTrackApp> {
   Widget build(BuildContext context) {
     // Saves the offline snapshot whenever fresh data arrives.
     ref.watch(offlineSnapshotSyncProvider);
+    // Downloads the lessons the person may read, for offline reading.
+    ref.watch(curriculumSyncProvider);
     final offline = ref.watch(isOfflineProvider);
 
     return MaterialApp.router(

@@ -32,8 +32,10 @@ ADRs explain why a decision exists so future developers and AI coding agents can
 | ADR-015 | The Discipler Marks a Lesson Completed, Without Leader Confirmation | Accepted; partially superseded by ADR-016 (reopen after the undo window) and ADR-017 (count precondition) |
 | ADR-016 | A Completion Is Locked Once Later Progress Exists; Reopen Is Database-Only | Accepted |
 | ADR-017 | No Minimum Meetings; Meeting Count Is Never a Progression Gate | Accepted (closes N1) |
-| ADR-018 | Direct D Group Placement, Needs Setup, and Initial Rollout Recognition of Disciplers | Accepted (supersedes Slice 3 placement by invitation) |
+| ADR-018 | Direct D Group Placement, Needs Setup, and Initial Rollout Recognition of Disciplers | Accepted (supersedes Slice 3 placement by invitation); Leader self-add replaced by ADR-020 |
 | ADR-019 | Curriculum Licensing Posture, Tiered Content and Progression-Gated Access | Accepted |
+| ADR-020 | Every D Group Leader Holds the Discipler Role | Accepted; amends ADR-018 |
+| ADR-021 | A Disciple's Lesson Answers Stay on Their Device (Before the Workbook) | Accepted; anticipates ADR-013 without writing it |
 
 ADR numbers are identifiers, not implementation order.
 

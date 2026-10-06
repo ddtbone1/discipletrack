@@ -15,9 +15,9 @@ import '../../../core/widgets/app_text_link.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
+import '../../../core/widgets/role_badge.dart';
 import '../../discipleship/application/discipleship_providers.dart';
 import '../../discipleship/domain/disciple_progress_summary.dart';
-import '../../discipleship/presentation/current_lesson_card.dart';
 import '../application/ministry_providers.dart';
 import '../application/ministry_structure_controller.dart';
 import '../domain/d_group_detail.dart';
@@ -307,36 +307,13 @@ class _DetailBodyState extends ConsumerState<_DetailBody> {
                 : InitialsAvatar(name: leader.fullName),
             detail: leader?.phone,
             pills: [
-              if (leader != null)
-                const AppPill(
-                  tone: PillTone.ink,
-                  icon: Icons.star_rounded,
-                  label: 'Leader',
-                  outlined: true,
-                ),
-              if (detail.leaderIsDiscipler)
-                const AppPill(
-                  tone: PillTone.brand,
-                  icon: Icons.school_outlined,
-                  label: 'Also a Discipler',
-                  outlined: true,
-                ),
+              if (leader != null) ...const [
+                RoleBadge(label: 'Leader', tone: PillTone.ink),
+                RoleBadge(label: 'Discipler', tone: PillTone.brand),
+              ],
             ],
           ),
         ),
-        if (isLeaderHere && !detail.leaderIsDiscipler) ...[
-          const SizedBox(height: AppSpacing.xs),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: AppTextLink(
-              label: 'Add myself as Discipler',
-              requiresConnection: true,
-              onTap: structure.isBusy
-                  ? null
-                  : () => _controller.addSelfAsDiscipler(_groupId),
-            ),
-          ),
-        ],
         const SizedBox(height: AppSpacing.lg),
 
         // Members ---------------------------------------------------------
@@ -357,11 +334,14 @@ class _DetailBodyState extends ConsumerState<_DetailBody> {
         ),
         const SizedBox(height: AppSpacing.sm),
         if (shown.isEmpty)
-          AppCard(
-            child: Text(
-              _emptyLine(_filter, canManage: canManage),
-              style: context.supportingStyle,
-            ),
+          EmptyState(
+            illustration: _filter == GroupFilter.needsSetup
+                ? Illustration.complete
+                : Illustration.group,
+            title: _filter == GroupFilter.needsSetup
+                ? 'All set up'
+                : 'Nobody here yet',
+            message: _emptyLine(_filter, canManage: canManage),
           )
         else
           TileGroup(
@@ -434,12 +414,15 @@ class _DetailBodyState extends ConsumerState<_DetailBody> {
               : 'No one else is in this group yet.',
         GroupFilter.disciples => 'No Disciples yet.',
         GroupFilter.disciplers => 'No Disciplers yet.',
-        GroupFilter.needsSetup => 'Everyone here has a role.',
+        GroupFilter.needsSetup =>
+          'Everyone in this group has a role. New members you add appear '
+              'here until you set them up.',
       };
 }
 
-/// Local filters with their counts, as chips that scroll sideways on narrow
-/// screens rather than wrapping into a second row.
+/// Local filters with their counts, as one fixed row of tabs that share
+/// the width, so none wraps or is cut off. The active tab is marked by its
+/// text and a thin lime outline only (user decision 2026-10-07).
 class _FilterChips extends StatelessWidget {
   const _FilterChips({
     required this.selected,
@@ -453,29 +436,61 @@ class _FilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          for (final f in GroupFilter.values) ...[
-            ChoiceChip(
-              label: Text('${f.label} ${counts[f] ?? 0}'),
+    final p = context.palette;
+    final active = pillColors(context, PillTone.brand).$2;
+    return Row(
+      children: [
+        for (final (i, f) in GroupFilter.values.indexed) ...[
+          if (i > 0) const SizedBox(width: AppSpacing.xxs),
+          // Width follows the label, so every tab keeps the same type size.
+          Expanded(
+            flex: f.label.length + 4,
+            child: Semantics(
+              button: true,
               selected: f == selected,
-              showCheckmark: false,
-              // The selected filter reads at a glance: ink fill, white text.
-              selectedColor: context.palette.ink,
-              labelStyle: TextStyle(
-                color: f == selected
-                    ? context.palette.onInk
-                    : context.palette.textPrimary,
-                fontWeight: f == selected ? FontWeight.w700 : FontWeight.w500,
+              child: InkWell(
+                customBorder: const StadiumBorder(),
+                onTap: () => onSelected(f),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  height: 38,
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  decoration: ShapeDecoration(
+                    shape: StadiumBorder(
+                      side: f == selected
+                          ? BorderSide(color: p.brand, width: 1.2)
+                          : BorderSide.none,
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(text: f.label),
+                          TextSpan(
+                            text: ' ${counts[f] ?? 0}',
+                            style: const TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        color: f == selected ? active : p.muted,
+                        fontWeight: f == selected
+                            ? FontWeight.w700
+                            : FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              onSelected: (_) => onSelected(f),
             ),
-            const SizedBox(width: AppSpacing.xs),
-          ],
+          ),
         ],
-      ),
+      ],
     );
   }
 }
@@ -524,65 +539,64 @@ class _MemberRow extends StatelessWidget {
         ? const <DGroupMember>[]
         : detail.disciplesOf(dr);
 
-    final pills = <Widget>[
-      if (person.needsSetup)
-        const AppPill(
-          tone: PillTone.warning,
-          icon: Icons.hourglass_empty_rounded,
-          label: 'Needs setup',
-          outlined: true,
-        ),
-      if (person.isLeader)
-        const AppPill(tone: PillTone.ink, label: 'Leader', outlined: true),
+    // Who the person is, as small badges, and at most one state badge
+    // (UI_DESIGN_SYSTEM section 39). Dates and explanations live on the
+    // pages that act on them, so a row stays to three short lines.
+    final badges = <Widget>[
+      if (person.isLeader) const RoleBadge(label: 'Leader', tone: PillTone.ink),
       if (person.isDiscipler)
-        const AppPill(tone: PillTone.brand, label: 'Discipler', outlined: true),
+        const RoleBadge(label: 'Discipler', tone: PillTone.brand),
       if (person.isDisciple)
-        const AppPill(tone: PillTone.info, label: 'Disciple', outlined: true),
-      if (candidate != null)
-        const AppPill(
-          tone: PillTone.warning,
-          icon: Icons.verified_outlined,
-          label: 'Eligible to disciple',
-          outlined: true,
-        ),
-    ];
-
-    final lines = <Widget>[
+        const RoleBadge(label: 'Disciple', tone: PillTone.info),
       if (person.needsSetup)
-        Text(
-          'Added ${MinistryFormat.shortDate(person.placement.startedAt)}. '
-          'Choose their role.',
-          style: context.captionStyle,
-        ),
+        const RoleBadge(label: 'Needs setup', tone: PillTone.warning),
       if (candidate != null)
-        _IconLine(
-          icon: Icons.verified_outlined,
-          text: isCoordinator
-              ? 'Since ${MinistryFormat.shortDate(candidate!.eligibleSince)} · not appointed'
-              : 'Since ${MinistryFormat.shortDate(candidate!.eligibleSince)} · Coordinator appoints',
-        ),
-      if (progress != null)
-        Text(progress!.lessonLine, style: context.captionStyle),
-      if (dd != null)
-        discipler != null
-            ? _IconLine(
-                icon: Icons.link_rounded,
-                text: 'Paired with ${discipler.fullName}',
-              )
-            : const _IconLine(
-                icon: Icons.link_off_rounded,
-                text: 'Not paired yet',
-                warning: true,
-              ),
-      if (dr != null)
-        _IconLine(
-          icon: Icons.school_outlined,
-          text: theirDisciples.isEmpty
-              ? 'No Disciples yet'
-              : 'Disciples: ${theirDisciples.map((d) => d.fullName).join(', ')}',
-        ),
+        const RoleBadge(label: 'Eligible', tone: PillTone.warning),
     ];
 
+    // One fact line: where a Disciple is and with whom, how many Disciples
+    // a Discipler has, or when a newcomer was added.
+    final Widget? fact = person.needsSetup
+        ? Text(
+            'Added ${MinistryFormat.shortDate(person.placement.startedAt)}',
+            style: context.captionStyle,
+          )
+        : dd != null
+        ? Wrap(
+            spacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              if (progress != null)
+                ProgressFact(
+                  progress!.currentLessonNumber == null
+                      ? 'Every lesson completed'
+                      : 'Lesson ${progress!.currentLessonNumber} of '
+                            '${progress!.lessonsTotal}',
+                ),
+              Text(
+                discipler != null
+                    ? 'with ${discipler.fullName}'
+                    : 'Not paired yet',
+                style: context.captionStyle.copyWith(
+                  color: discipler != null
+                      ? p.muted
+                      : pillColors(context, PillTone.warning).$2,
+                ),
+              ),
+            ],
+          )
+        : dr != null
+        ? Text(
+            theirDisciples.isEmpty
+                ? 'No Disciples yet'
+                : theirDisciples.length == 1
+                ? 'Disciples ${theirDisciples.single.fullName}'
+                : '${theirDisciples.length} Disciples',
+            style: context.captionStyle,
+          )
+        : null;
+
+    // Compact icon actions, never wide pills; the tooltip names each one.
     final Widget? action;
     if (!canManage) {
       action = null;
@@ -596,23 +610,24 @@ class _MemberRow extends StatelessWidget {
         ),
       );
     } else if (person.needsSetup) {
-      action = FilledButton.tonal(
-        style: _actionStyle(context),
+      action = _RowAction(
+        icon: Icons.person_add_alt_1_rounded,
+        tooltip: 'Set up',
+        emphasised: true,
         onPressed: enabled ? onSetUp : null,
-        child: const Text('Set up'),
       );
     } else if (dd != null && discipler == null) {
-      // Unpaired is the state that needs action, so its action stands out.
-      action = FilledButton.tonalIcon(
-        style: _actionStyle(context),
+      action = _RowAction(
+        icon: Icons.link_rounded,
+        tooltip: 'Pair',
+        emphasised: true,
         onPressed: enabled ? onPair : null,
-        icon: const Icon(Icons.link_rounded, size: 18),
-        label: const Text('Pair'),
       );
     } else if (dd != null) {
-      action = TextButton(
+      action = _RowAction(
+        icon: Icons.swap_horiz_rounded,
+        tooltip: 'Change Discipler',
         onPressed: enabled ? onPair : null,
-        child: const Text('Change'),
       );
     } else {
       action = null;
@@ -633,15 +648,7 @@ class _MemberRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            if (progress == null)
-              InitialsAvatar(name: person.fullName)
-            else
-              LessonRing(
-                total: progress!.lessonsTotal,
-                completed: progress!.lessonsCompleted,
-                currentNumber: progress!.currentLessonNumber,
-                size: 44,
-              ),
+            InitialsAvatar(name: person.fullName),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(
@@ -649,18 +656,17 @@ class _MemberRow extends StatelessWidget {
                 children: [
                   Text(
                     person.fullName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: text.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  if (pills.isNotEmpty) ...[
+                  if (badges.isNotEmpty) ...[
                     const SizedBox(height: 4),
-                    Wrap(spacing: 6, runSpacing: 4, children: pills),
+                    Wrap(spacing: 4, runSpacing: 4, children: badges),
                   ],
-                  if (lines.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    ...lines,
-                  ],
+                  if (fact != null) ...[const SizedBox(height: 4), fact],
                 ],
               ),
             ),
@@ -669,7 +675,7 @@ class _MemberRow extends StatelessWidget {
               PopupMenuButton<int>(
                 tooltip: 'More actions',
                 enabled: enabled,
-                icon: Icon(Icons.more_vert_rounded, color: p.muted),
+                icon: Icon(Icons.more_horiz_rounded, color: p.muted),
                 onSelected: (i) => menu[i].$2(),
                 itemBuilder: (_) => [
                   for (var i = 0; i < menu.length; i++)
@@ -683,41 +689,36 @@ class _MemberRow extends StatelessWidget {
   }
 }
 
-class _IconLine extends StatelessWidget {
-  const _IconLine({
+/// A row action as a compact round icon button. The one that moves a person
+/// forward (Set up, Pair) is lime-tinted; Change stays quiet.
+class _RowAction extends StatelessWidget {
+  const _RowAction({
     required this.icon,
-    required this.text,
-    this.warning = false,
+    required this.tooltip,
+    required this.onPressed,
+    this.emphasised = false,
   });
 
   final IconData icon;
-  final String text;
-  final bool warning;
+  final String tooltip;
+  final VoidCallback? onPressed;
+  final bool emphasised;
 
   @override
   Widget build(BuildContext context) {
-    final p = context.palette;
-    final color = warning ? pillColors(context, PillTone.warning).$2 : p.muted;
-    return Row(
-      children: [
-        Icon(icon, size: 15, color: color),
-        const SizedBox(width: 4),
-        Flexible(
-          child: Text(
-            text,
-            style: context.captionStyle.copyWith(color: color),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
+    final (bg, fg) = pillColors(
+      context,
+      emphasised ? PillTone.brand : PillTone.neutral,
+    );
+    return IconButton(
+      tooltip: tooltip,
+      onPressed: onPressed,
+      icon: Icon(icon, size: 20),
+      style: IconButton.styleFrom(
+        backgroundColor: emphasised ? bg : neutralFill(context),
+        foregroundColor: emphasised ? fg : context.palette.textPrimary,
+        minimumSize: const Size(40, 40),
+      ),
     );
   }
-}
-
-/// The row action that moves a person forward (Set up, Pair): a light lime
-/// fill with deep lime text, so it stands out from the plain Change link.
-ButtonStyle _actionStyle(BuildContext context) {
-  final (bg, fg) = pillColors(context, PillTone.brand);
-  return FilledButton.styleFrom(backgroundColor: bg, foregroundColor: fg);
 }

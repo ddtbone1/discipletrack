@@ -1,3 +1,4 @@
+import 'package:discipletrack/features/curriculum/presentation/lessons_nav_card.dart';
 import 'package:discipletrack/features/discipleship/domain/disciple_progress_summary.dart';
 import 'package:discipletrack/features/discipleship/domain/journey.dart';
 import 'package:discipletrack/features/discipleship/presentation/journey_page.dart';
@@ -130,7 +131,7 @@ void main() {
       );
       expect(find.byType(TabBar), findsNothing);
       // The current lesson is the first thing on the page.
-      expect(find.text('Current lesson'), findsOneWidget);
+      expect(find.text('Lesson 4'), findsOneWidget);
     });
 
     testWidgets('a Discipler with no journey of their own sees My Disciples '
@@ -190,8 +191,8 @@ void main() {
   });
 
   group('My Journey', () {
-    testWidgets('shows factual progress, the own wording, the timeline and '
-        'that the page is read-only', (tester) async {
+    testWidgets('shows factual progress once, and one way into the lessons '
+        '(no timeline)', (tester) async {
       await _pump(
         tester,
         const JourneyPage(),
@@ -200,25 +201,17 @@ void main() {
       );
       expect(find.text('Lesson 4'), findsOneWidget);
       expect(find.text('Discipler: Mark Reyes'), findsOneWidget);
-      // Overall facts are pills by the meetings; the last recorded meeting
-      // stands out in the current lesson card.
-      expect(find.text('3 meetings attended'), findsOneWidget);
-      expect(find.text('1 recorded absence'), findsOneWidget);
-      expect(find.text('Last recorded meeting Sep 28'), findsOneWidget);
-      expect(find.text('In progress since Sep 3'), findsOneWidget);
+      // One line: the lesson's state and the last recorded meeting.
       expect(
-        find.text(
-          'This page is read-only. Your Discipler records your meetings.',
-        ),
+        find.text('In progress since Sep 3  ·  Last met Sep 28'),
         findsOneWidget,
       );
-      // Every lesson sits in a collapsed list below.
-      expect(find.text('Opens after Lesson 4 is completed.'), findsNothing);
-      await tester.ensureVisible(find.text('All lessons'));
-      await tester.tap(find.text('All lessons'));
-      await tester.pumpAndSettle();
-      expect(find.text('Opens after Lesson 5 is completed.'), findsOneWidget);
-      expect(find.textContaining('No meetings recorded yet.'), findsOneWidget);
+      // No timeline, no read button, no repeated facts: one card opens the
+      // lessons.
+      expect(find.byType(LessonsNavCard), findsOneWidget);
+      expect(find.textContaining('Read Lesson'), findsNothing);
+      expect(find.text('3 meetings attended'), findsNothing);
+      expect(find.textContaining('No meetings yet.'), findsOneWidget);
       expect(find.text('Record a meeting'), findsNothing);
       expect(find.textContaining('%'), findsNothing);
     });
@@ -243,7 +236,8 @@ void main() {
     testWidgets('a Disciple sees their journey block', (tester) async {
       await _pump(tester, const HomePage(), _context(disciple: true), _repo());
       expect(find.text('Your journey'), findsOneWidget);
-      expect(find.text('Lesson 4 · 2 counted meetings'), findsOneWidget);
+      expect(find.text('Lesson 4 · Now'), findsOneWidget);
+      expect(find.textContaining('3 of 12 completed'), findsOneWidget);
       // Once, on the D Group card; not repeated in the journey block.
       expect(find.text('Mark Reyes'), findsOneWidget);
       expect(find.text('Your Discipler'), findsOneWidget);
@@ -315,13 +309,19 @@ void main() {
       expect(find.text('You · Discipler'), findsOneWidget);
       expect(find.text('Disciples'), findsOneWidget);
       // Each Disciple carries their lesson and last recorded meeting.
-      expect(find.text('Lesson 3 of 12'), findsNWidgets(2));
-      expect(find.text('No meeting recorded yet'), findsNWidgets(2));
+      // One line each: the lesson in colour, then the last meeting.
+      expect(
+        find.text(
+          'Lesson 3 of 12  ·  No meeting recorded yet',
+          findRichText: true,
+        ),
+        findsNWidgets(2),
+      );
     });
   });
 
   group('Disciple rows', () {
-    testWidgets('use a stepper over the curriculum, described in words', (
+    testWidgets('show the ring, described in words, and one status line', (
       tester,
     ) async {
       final handle = tester.ensureSemantics();
@@ -335,7 +335,7 @@ void main() {
         find.bySemanticsLabel(RegExp(r'Lesson 3 of 12. 2 lessons completed.')),
         findsOneWidget,
       );
-      expect(find.text('Lesson 3 in progress'), findsOneWidget);
+      expect(find.textContaining('In progress'), findsOneWidget);
       handle.dispose();
     });
   });

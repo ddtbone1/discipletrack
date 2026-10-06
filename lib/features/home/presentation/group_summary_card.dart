@@ -61,14 +61,16 @@ class GroupSummaryCard extends StatelessWidget {
     final leader = c.leader;
     final discipler = c.myDiscipler;
     final disciples = c.myDisciples;
+    // Every Leader is a Discipler (ADR-020), so "the Leader" says both.
     final roles = [
       for (final r in DGroupResponsibility.values)
-        if (c.myResponsibilities.contains(r)) r.label,
+        if (c.myResponsibilities.contains(r) &&
+            !(c.isLeader && r == DGroupResponsibility.discipler))
+          r.label,
     ];
 
-    void open() => context.push(
-      c.isLeader ? Routes.dGroupDetailFor(c.dGroupId) : Routes.myGroup,
-    );
+    // One roster for everyone; a Leader manages the group from there.
+    void open() => context.push(Routes.myGroup);
 
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -140,9 +142,7 @@ class GroupSummaryCard extends StatelessWidget {
             ),
           ],
         ),
-        if (leader != null ||
-            c.isDisciple ||
-            (c.isDiscipler && !c.isLeader)) ...[
+        if (leader != null || c.isDisciple || c.isDiscipler) ...[
           const SizedBox(height: AppSpacing.md),
           if (leader != null)
             _Person(name: leader.fullName, role: 'Your Leader', ink: ink),

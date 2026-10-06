@@ -537,9 +537,9 @@ it has synced, without a per-lesson download. The curriculum has ten
 lessons. Content has a Disciple tier and a Discipler tier (answers,
 Discipler notes, training modules). Each person reads only the lessons
 their progression or relationship allows (ADR-019 decision 6): a
-Disciple their reached lessons, the assigned Discipler both tiers of
-their Disciple's reached lessons, the Leader only the Disciple tier for
-their group's active Disciples, the Coordinator everything. Until
+Disciple their reached lessons, any Discipler (every Leader included)
+both tiers of all lessons (ADR-019 decision 16), the Coordinator
+everything. Until
 permission to reproduce the source curriculum is confirmed, only
 identifying metadata is published. The source's pairing guidance (men
 with men, women with women, Pastor approval for family members and close

@@ -7,6 +7,7 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/person_row.dart';
+import '../../curriculum/presentation/lessons_nav_card.dart';
 import '../../ministry/application/ministry_providers.dart';
 import '../application/discipleship_providers.dart';
 import '../domain/journey.dart';
@@ -101,6 +102,7 @@ class _Journey extends StatelessWidget {
       children: [
         if (disciplerName == null) ...[
           const EmptyState(
+            illustration: Illustration.waiting,
             title: 'Not paired yet',
             message:
                 "You're not paired with a Discipler yet. Progress starts once "
@@ -116,11 +118,8 @@ class _Journey extends StatelessWidget {
           lastRecordedMeetingAt: summary?.lastRecordedMeetingAt,
           ownJourney: true,
         ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          'This page is read-only. Your Discipler records your meetings.',
-          style: context.captionStyle,
-        ),
+        const SizedBox(height: AppSpacing.md),
+        LessonsNavCard(journey: journey),
         const SizedBox(height: AppSpacing.lg),
         const SectionHeading('Meetings'),
         history.when(
@@ -136,16 +135,11 @@ class _Journey extends StatelessWidget {
           data: (rows) => MeetingCalendar(
             entries: rows,
             emptyMessage:
-                'No meetings recorded yet. When your Discipler records your '
-                'first meeting, your progress starts here.',
+                'No meetings yet. Your Discipler records each one, and they '
+                'show here.',
+            emptyIllustration: Illustration.waiting,
           ),
         ),
-        if (summary != null) ...[
-          const SizedBox(height: AppSpacing.sm),
-          MeetingFactPills(summary: summary!),
-        ],
-        const SizedBox(height: AppSpacing.lg),
-        AllLessonsList(journey: journey, ownJourney: true),
         if (kShowJourneyActivity) ...[
           const SizedBox(height: AppSpacing.lg),
           JourneyActivitySection(

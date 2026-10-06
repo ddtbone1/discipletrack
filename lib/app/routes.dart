@@ -89,6 +89,24 @@ abstract final class Routes {
   /// state, so the profile screens are not restricted to ACTIVE members.
   static const profileRoutes = {profile, editProfile};
 
+  /// The lesson list and the lesson reader (Slice 7). [lessonsFor] and
+  /// [lessonFor] add `?for=<membershipId>` to read in the context of a
+  /// Disciple; the database decides what each reader may open (ADR-019).
+  static const lessons = '/lessons';
+  static const lessonReader = '/lessons/:lessonId';
+
+  static String lessonsFor({String? forMembershipId}) =>
+      forMembershipId == null ? lessons : '/lessons?for=$forMembershipId';
+
+  static String lessonFor(String lessonId, {String? forMembershipId}) =>
+      forMembershipId == null
+      ? '/lessons/$lessonId'
+      : '/lessons/$lessonId?for=$forMembershipId';
+
+  /// Curriculum screens. Reachable by any ACTIVE member; a lesson the reader
+  /// may not open is refused by the database, never shown.
+  static const curriculumRoutes = {lessons, lessonReader};
+
   /// Discipleship screens. Reachable by any ACTIVE member; each read and
   /// write is authorized by the database for the pair (caller, person), so
   /// a deep link without authority opens a refused screen, never data.

@@ -4,13 +4,17 @@ library;
 
 import 'package:discipletrack/core/supabase/supabase_providers.dart';
 import 'package:discipletrack/core/theme/app_theme.dart';
+import 'package:discipletrack/features/curriculum/data/curriculum_repository.dart';
 import 'package:discipletrack/features/discipleship/data/discipleship_repository.dart';
 
+import 'curriculum_fakes.dart';
 import 'discipleship_fakes.dart';
 
 export 'discipleship_fakes.dart';
+export 'curriculum_fakes.dart';
 
 import 'package:discipletrack/features/auth/data/auth_repository.dart';
+import 'package:discipletrack/features/auth/data/remembered_email_store.dart';
 import 'package:discipletrack/features/membership/application/membership_providers.dart';
 import 'package:discipletrack/features/membership/data/membership_repository.dart';
 import 'package:discipletrack/features/membership/domain/church_membership.dart';
@@ -353,6 +357,9 @@ Future<void> pumpPage(
   FakeMembershipReviewRepository? reviewRepo,
   FakeMinistryRepository? ministryRepo,
   FakeDiscipleshipRepository? discipleshipRepo,
+  FakeCurriculumRepository? curriculumRepo,
+  CurriculumCacheStore? curriculumCache,
+  RememberedEmailStore? rememberedEmail,
   String userId = sampleUserId,
   ThemeMode mode = ThemeMode.light,
 }) async {
@@ -373,6 +380,15 @@ Future<void> pumpPage(
         ministryRepositoryProvider.overrideWithValue(ministry),
         discipleshipRepositoryProvider.overrideWithValue(
           discipleshipRepo ?? FakeDiscipleshipRepository(),
+        ),
+        curriculumRepositoryProvider.overrideWithValue(
+          curriculumRepo ?? FakeCurriculumRepository(),
+        ),
+        curriculumCacheStoreProvider.overrideWithValue(
+          curriculumCache ?? CurriculumCacheStore(enabled: false),
+        ),
+        rememberedEmailStoreProvider.overrideWithValue(
+          rememberedEmail ?? RememberedEmailStore(enabled: false),
         ),
         myProfileProvider.overrideWith((ref) async => profile ?? sampleProfile),
         myMembershipProvider.overrideWithBuild(

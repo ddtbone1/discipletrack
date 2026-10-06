@@ -20,6 +20,10 @@ Revision 2026-10-06 (ADR-017, N1 closed): there is no minimum number of meetings
 
 Revision 2026-10-06 (ADR-018, Slice 6, Migrations 012 to 015): placement by invitation retired and replaced by direct placement (d_group_placements). Section 2: Rules, Partial Unique Indexes, Temporal Integrity, D Group Lifecycle note, Responsibility Combinations (DISCIPLE excludes LEADER only, enforced; placement required; discipler_basis), "Placement by Invitation" replaced by "Placement" (setup, initial setup period, removal), Leader Presence, Discipler Assignments (self and reciprocal pairing refused), Controlled Operations. Section 4: undo also refused for an appointed person's eligibility lesson and earlier (ADR-018 decision 9). Section 5: enforced by appoint_discipler(), D5, D8 and D9 decided, effects record discipler_basis APPOINTMENT, open items closed. Section 6: recalculation trigger list. Section 11: Discipler Eligibility implementation, Needs Setup added. Section 12: operation list.
 
+Revision 2026-10-06 (ADR-019, Slice 7, Migration 017): section 4 Lesson Content Publications (one current publication, FULL requires a licence reference, METADATA block types, tiers, answers apart, immutability, the single service-role writer); section 11 Reached Lessons and the member-count note under Needs Setup.
+
+Revision 2026-10-06 (ADR-020, Migration 018): every active Leader holds DISCIPLER in their group, enforced by a deferred constraint trigger; section 2 Rules, Responsibility Combinations and Placement updated. Section 0 and section 1 First-Entry Onboarding: the founding Admin is created onboarded.
+
 Revision 2026-10-05 (user decision, ninth): the curriculum has ten lessons, not twelve. Section 0: ten lesson rows and postconditions, and the Slice 5 migration's replacement of the bootstrap functions; examples in sections 4, 5, 11 and 12.
 
 ---
@@ -134,7 +138,9 @@ These are assertable and serve as the bootstrap test:
 - exactly one ACTIVE church with the supplied id
 - church_settings present, both thresholds 3 (one of them dormant, see
   above), due days 7
-- the initial user holds an ACTIVE membership
+- the initial user holds an ACTIVE membership, with onboarding_completed_at
+  set: the founder set up the church and sees no first-entry welcome
+  (Migration 018)
 - that membership has an active ADMIN and an active COORDINATOR role
 - exactly one ACTIVE curriculum for the church
 - exactly ten lessons, numbered 1 to 10, each with required_meetings = 4
@@ -355,7 +361,8 @@ rejected applicant therefore cannot request again from the app.
 church_memberships.onboarding_completed_at records the one-time
 first-entry welcome. It is NULL until the member, with an ACTIVE
 membership, completes the welcome through complete_onboarding(), which
-is idempotent and keeps the original timestamp. It is server-backed so
+is idempotent and keeps the original timestamp. The founding Admin's
+membership is created with it set by bootstrap (Migration 018). It is server-backed so
 a reinstall or another device never replays the welcome, and it is not
 reset by reactivation. Clients have no direct write path to it.
 
@@ -379,7 +386,7 @@ state (RBAC section 1a). No other church data is visible until ACTIVE.
 - The two sides of a discipler assignment belong to different church memberships: nobody is paired with themselves (ADR-012; enforced since Migration 013).
 - Reciprocal pairing (A disciples B while B disciples A) is refused for overlapping periods (D7, ADR-018; enforced since Migration 013).
 - A person is in at most one D Group at a time (d_group_placements, Migration 012), and an active responsibility requires an active placement in the same group.
-- A person MAY simultaneously hold active LEADER and DISCIPLER responsibilities. A Leader who personally disciples members must hold the DISCIPLER responsibility in order to receive discipler assignments.
+- An active LEADER always holds an active DISCIPLER responsibility in the same group (ADR-020), so a Leader can always receive discipler assignments.
 - A DISCIPLER may care for multiple Disciples.
 - A DISCIPLE may have only one active primary Discipler.
 - Discipler and Disciple assignments must belong to the same D Group.
@@ -491,7 +498,11 @@ d_group_memberships integrity trigger for every writer:
   Migration 013 replaced the integrity trigger body so that
   d_group_membership_disciple_conflict is raised for DISCIPLE with
   LEADER only.
-- LEADER with DISCIPLER in the same group is allowed.
+- LEADER requires DISCIPLER in the same group (ADR-020): an active
+  LEADER row implies an active DISCIPLER row for the same person and
+  group (d_group_memberships_leader_discipler, a deferred constraint
+  trigger, Migration 018). create_d_group() and assign_d_group_leader()
+  create it with discipler_basis LEADER_SELF.
 - A d_group_memberships row and its D Group belong to the same church.
 - One active row per person, group and responsibility (partial unique
   index WHERE ended_at IS NULL).
@@ -565,10 +576,11 @@ separate from their responsibilities there (d_group_memberships).
   is not an appointment.
 - Only the Coordinator closes or reopens the initial setup period
   (set_initial_setup_open()); both are audited.
-- DISCIPLER rows are otherwise created only by add_self_as_discipler()
-  (the group's Leader for themselves, discipler_basis LEADER_SELF, not
-  bounded by the setup period) and appoint_discipler() (section 5,
-  discipler_basis APPOINTMENT).
+- DISCIPLER rows are otherwise created with the leadership
+  (create_d_group() and assign_d_group_leader(), discipler_basis
+  LEADER_SELF, ADR-020) and by appoint_discipler() (section 5,
+  discipler_basis APPOINTMENT). add_self_as_discipler() remains but
+  always answers already_discipler for an active Leader.
 - Removal (remove_from_d_group()) ends every active assignment on
   either side of the person's rows, then every responsibility they hold
   in the group, then the placement, in one transaction. The Leader is
@@ -718,6 +730,53 @@ clause.
 
 The literal number 10 is seed data in section 0, not a rule. No rule
 elsewhere may hard-code a lesson count.
+
+## Lesson Content Publications
+
+Added 2026-10-06 (Migration 017, ADR-010, ADR-019).
+
+Lesson content is published, never edited. Tables:
+curriculum_publications, lesson_content_blocks, lesson_block_answers
+(DBML section 11a).
+
+- At most one current publication per curriculum: partial unique index
+  on curriculum_publications(curriculum_id) WHERE superseded_at IS NULL.
+  Versions are unique per curriculum and positive.
+- content_level FULL requires a non-blank licence_reference (CHECK).
+  Until permission to reproduce the source is recorded, only METADATA
+  is published (ADR-019 decisions 2 and 3).
+- A METADATA publication holds only LESSON_THEME, TOPIC_LIST,
+  SECTION_HEADING, SCRIPTURE_REFERENCES and MODULE_HEADING blocks
+  (constraint trigger). Key Objectives, banners and lesson wording
+  need FULL.
+- Every block belongs to exactly one tier. MODULE_HEADING and
+  DISCIPLER_NOTE are DISCIPLER tier. A block's lesson belongs to its
+  publication's curriculum. body is a JSON object with the keys its
+  type requires (constraint trigger).
+- Answers live only in lesson_block_answers, one row per FILL_IN block
+  of a FULL publication, so a Disciple-tier read cannot include them.
+- Immutability: rows are never updated, except superseded_at, set once;
+  no row is deleted (refuse_content_rewrite trigger).
+- The only writer is public.publish_curriculum(), granted to
+  service_role alone. It supersedes the current publication, writes the
+  new one, sets curriculum_lessons.title from the definition, and
+  audits CURRICULUM_PUBLISHED, in one transaction.
+- Faithful lessons (Migration 019, ADR-019 amended): block types POINT,
+  FIGURE, SELF_CHECK, SIGN_OFF, ASSIGNMENT, LIST and HEADING. A blank is
+  "[_]" in a block's text and the body carries "blanks"; when it does,
+  lesson_block_answers holds exactly one answer per blank (trigger). The
+  converted lesson text stays out of the repository (ADR-019 decision 15).
+- lesson_covers (Migration 019, ADR-019 decision 17): at most one cover
+  per lesson (primary key lesson_id, foreign key to curriculum_lessons).
+  RLS enabled with no client grant; written only by set_lesson_cover()
+  (service_role), read only through get_lesson_covers(). A cover is not
+  content and opens nothing.
+- Content never drives progress. No progress, meeting or completion
+  row references a block or publication, and a new publication changes
+  no one's journey (ADR-010 decisions 5 and 6).
+
+Who may read which tier is defined in RBAC_RLS_MATRIX.md; the gate
+uses reached lessons (section 11).
 
 ## Unique Constraints
 
@@ -1755,6 +1814,26 @@ needs_setup(member)
 Derived at read time, never stored. A member who needs setup sees their
 group's name and their Leader's name only (RBAC_RLS_MATRIX.md section
 1). "Unplaced" (section 2) is the absence of an active placement.
+
+Member counts of a D Group count every active placement, including
+members who need setup (Migration 016): someone counts from the moment
+they are added.
+
+## Reached Lessons
+
+Added 2026-10-06 (Migration 017, ADR-019 decision 6).
+
+reached(member, lesson)
+= true when the member's progress row for the lesson is COMPLETED,
+  or when the member has an active DISCIPLE d_group_memberships row
+  and the lesson is eligible_lesson(member) (section 4)
+
+The default Lesson 1 that eligible_lesson() resolves for anyone grants
+nothing without an active DISCIPLE row ("no journey, no curriculum").
+Undoing or reopening a completion, or the DISCIPLE row ending, withdraws
+the lesson at once. Derived at read time, never stored. Implemented by
+private.has_reached_lesson(membership, lesson). It decides lesson
+content access only, never progress.
 
 ## Active Discipleships
 

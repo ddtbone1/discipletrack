@@ -50,21 +50,21 @@ and uses the password `dev-password-123`:
 
 | Email | Name | Role | What to look at |
 |---|---|---|---|
-| `admin@discipletrack.local` | Dev Admin | Admin and Coordinator, not in a group | Closes the initial setup period and appoints Paolo from D Groups; Home figures, including 6 active discipleships; any Disciple's detail by deep link |
-| `leader@discipletrack.local` | Lea Santos | Leader of Young Adults A | Every Disciple's detail in the group; recording on a Discipler's behalf |
+| `admin@discipletrack.local` | Dev Admin | Admin and Coordinator, not in a group; the founder, so no Welcome | Closes the initial setup period and appoints Paolo from D Groups; Home figures, including 7 active discipleships; any Disciple's detail by deep link |
+| `leader@discipletrack.local` | Lea Santos | Leader of Young Adults A, and its Discipler like every Leader (ADR-020) | Journey with My Disciples (Felix); My D Group roster with Manage members; every Disciple's detail in the group; recording on a Discipler's behalf |
 | `discipler@discipletrack.local` | Dino Reyes | Existing Discipler of Diana, Daniel, Ella and Rosa | My Disciples with four rows; Record a meeting with the choose-Disciple sheet |
 | `disciple1@discipletrack.local` | Diana Cruz | Disciple of Dino | Lesson 1 completed and locked (Lesson 2 already has meetings, so no Undo); Lesson 2 in progress with 3 recorded absences in a row |
 | `disciple2@discipletrack.local` | Daniel Bautista | Disciple of Dino | Lesson 1 in progress with 7 counted meetings, ready for Dino to mark completed; one duplicate meeting voided |
 | `disciple3@discipletrack.local` | Ella Navarro | Disciple of Dino | Paired, no counted meeting; removed from one of Daniel's meetings where she was listed by mistake |
 | `discipler2@discipletrack.local` | Grace Lim | Existing Discipler of Hana and Paolo | My Disciples with two rows; cannot see Dino's Disciples |
 | `disciple5@discipletrack.local` | Hana Torres | Disciple of Grace | Present, Excused, then Late (recorded by Lea), with notes; Lesson 1 just marked completed by Grace, so Undo is available |
-| `disciple4@discipletrack.local` | Felix Ramos | Disciple, never paired | "Not paired yet" on My Journey |
+| `disciple4@discipletrack.local` | Felix Ramos | Disciple of Lea, no meeting yet | A Disciple whose Discipler is the Leader |
 | `member@discipletrack.local` | Mara Villanueva | Approved, in no D Group | Listed by Add Members; no Journey in the dock; out of scope for everyone's progress |
 | `newcomer@discipletrack.local` | Nina Aquino | Added to Young Adults A, Needs setup | Home says her Leader will set up her role; Lea sees "Set up" on her row |
 | `disciple6@discipletrack.local` | Paolo Mendoza | Disciple of Grace, Lessons 1 to 5 completed | Eligible to disciple, not appointed: the Coordinator sees him under Eligible to disciple |
 | `disciple7@discipletrack.local` | Rosa Domingo | Disciple of Dino and appointed Discipler | Both My Journey and My Disciples (none paired yet); Lessons 1 to 5 locked against undo |
-| `leader2@discipletrack.local` | Ramon Garcia | Leader of Men of Faith | Cannot see or act on Young Adults A |
-| `disciple8@discipletrack.local` | Tomas Villa | Disciple in Men of Faith, not paired | Out of scope for Lea and her Disciplers |
+| `leader2@discipletrack.local` | Ramon Garcia | Leader (and Discipler) of Men of Faith | Cannot see or act on Young Adults A |
+| `disciple8@discipletrack.local` | Tomas Villa | Disciple in Men of Faith, not paired | "Not paired yet" on My Journey; out of scope for Lea and her Disciplers |
 
 Meetings are dated over the last 60 days relative to the reset, so dates move
 with each `db reset`. Every meeting is recorded through
@@ -73,6 +73,41 @@ voids through `void_discipleship_meeting()` and `void_meeting_participant()`,
 with each account impersonated, so every seeded state is one the app could
 have produced. The seed is for looking at the app by hand; integration tests
 never read it.
+
+### Lesson content (Slice 7)
+
+`db reset` then runs `supabase/seed_curriculum.sql`, which publishes the
+Journey curriculum at the METADATA level through `publish_curriculum()`:
+titles, themes, topics, section headings, scripture references and the
+Training Module titles. No lesson wording or answers exist in the repository
+(ADR-019). The SQL is generated from `supabase/curriculum/journey-metadata.json`;
+after editing the JSON, regenerate it:
+
+```powershell
+dart run tool/generate_curriculum_seed.dart
+```
+
+A unit test fails if the two drift. To publish to a real project, use
+`tool/publish_curriculum.ps1`; a FULL publication requires `-LicenceReference`.
+
+**Full lessons (local only).** With the source PDFs in
+`docs/curriculum/source/` (git-ignored), the converted lessons and covers are
+built into `supabase/curriculum/full/` (git-ignored) and applied after a
+`db reset`:
+
+```powershell
+dart run tool/curriculum/build_definition.dart "<licence reference>"
+dart run tool/curriculum/build_covers.dart
+Get-Content supabase/curriculum/full/publish_local.sql  | docker exec -i supabase_db_discipletrack psql -U postgres -d postgres -q
+Get-Content supabase/curriculum/full/publish_covers.sql | docker exec -i supabase_db_discipletrack psql -U postgres -d postgres -q
+```
+
+What to look at, by account (ADR-019 decisions 6 and 16): Diana reads
+Lessons 1 and 2, and Lessons 3 to 10 show locked; Paolo reads Lessons 1 to 6;
+Dino, Lea, Ramon, Grace and Rosa are Disciplers, so every lesson opens for
+them in both tiers, with answers, from Journey or any Disciple's detail; the
+Admin (as Coordinator) opens every lesson from D Groups, Curriculum; Mara and
+Nina have no journey, so every lesson is locked.
 
 Use a separate browser profile per account to walk through the roles side by
 side.

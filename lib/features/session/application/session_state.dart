@@ -73,18 +73,25 @@ final sessionStateProvider = Provider<SessionState>((ref) {
   final hasSession = ref.watch(currentSessionProvider) != null;
   if (!hasSession) return SessionState.signedOut;
 
+  final userId = ref.watch(currentUserIdProvider);
   final profile = ref.watch(myProfileProvider);
   final membership = ref.watch(myMembershipProvider);
 
   // A refresh that already has a value (a retry after reconnecting, a saved
   // edit) keeps the session resolved, so the router never flashes the
-  // splash while data reloads in the background.
-  bool pending(AsyncValue<Object?> v) => v.isLoading && !v.hasValue;
+  // splash while data reloads in the background. A reload after signing in
+  // is different: the value it still holds belongs to the signed-out period
+  // (null) or to another user, and reading it would route this person on
+  // someone else's state, for example to Join Church for a moment.
+  bool pending(AsyncValue<Object?> v, {required String? Function() owner}) =>
+      v.isLoading && (!v.hasValue || owner() != userId);
   bool failed(AsyncValue<Object?> v) => v.hasError && !v.hasValue;
 
   return resolveSessionState(
     hasSession: true,
-    isLoading: pending(profile) || pending(membership),
+    isLoading:
+        pending(profile, owner: () => profile.value?.id) ||
+        pending(membership, owner: () => membership.value?.userId),
     hasError: failed(profile) || failed(membership),
     membershipStatus: membership.value?.status,
     onboardingCompleted: membership.value?.onboardingCompletedAt != null,

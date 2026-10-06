@@ -51,6 +51,7 @@ class PendingMembersPage extends ConsumerWidget {
             ),
             data: (items) => items.isEmpty
                 ? const EmptyState(
+                    illustration: Illustration.complete,
                     icon: Icons.inbox_outlined,
                     title: 'No pending requests',
                     message:

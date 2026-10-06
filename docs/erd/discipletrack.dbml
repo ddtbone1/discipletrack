@@ -259,7 +259,7 @@ Enum d_group_responsibility {
 // Why a DISCIPLER row exists (Migration 013, ADR-018 decision 6).
 Enum discipler_basis {
   INITIAL_ROLLOUT [note: 'recognized as an Existing Discipler at setup while the initial setup window was open']
-  LEADER_SELF [note: 'the group Leader added themselves']
+  LEADER_SELF [note: 'the Discipler role of the Leader, granted with the leadership (ADR-020)']
   APPOINTMENT [note: 'appointed by the Coordinator after the eligibility lesson; see ministry_role_transitions']
 }
 
@@ -301,6 +301,40 @@ Enum curriculum_status {
   ACTIVE
   INACTIVE
   ARCHIVED
+}
+
+Enum curriculum_content_level {
+  METADATA
+  FULL
+}
+
+Enum content_tier {
+  DISCIPLE
+  DISCIPLER
+}
+
+Enum lesson_block_type {
+  LESSON_THEME
+  TOPIC_LIST
+  SECTION_HEADING
+  SCRIPTURE_REFERENCES
+  MODULE_HEADING
+  KEY_OBJECTIVE
+  BANNER
+  PARAGRAPH
+  FILL_IN
+  DISCUSSION_PROMPTS
+  SCENARIO
+  VERSE_WRITING
+  ASSIGNMENTS
+  DISCIPLER_NOTE
+  POINT
+  FIGURE
+  SELF_CHECK
+  SIGN_OFF
+  ASSIGNMENT
+  LIST
+  HEADING
 }
 
 
@@ -815,10 +849,9 @@ Table d_group_memberships {
   - no ambiguous overlapping periods for the same person,
     D Group and responsibility
 
-  LEADER and DISCIPLER MAY be active simultaneously for the same
-  person. A D Group Leader who personally disciples members must hold
-  the DISCIPLER responsibility in order to receive discipler
-  assignments.
+  An active LEADER always holds an active DISCIPLER row in the same
+  group (ADR-020, Migration 018, deferred constraint trigger), so every
+  Leader can receive discipler assignments.
 
   DISCIPLE and DISCIPLER MAY be active simultaneously for the same
   person, in the same D Group (ADR-012). DISCIPLE excludes LEADER.
@@ -827,7 +860,7 @@ Table d_group_memberships {
 
   discipler_basis records why a DISCIPLER row exists (ADR-018
   decision 6): INITIAL_ROLLOUT (set_up_member() while the church's
-  initial setup window is open), LEADER_SELF (add_self_as_discipler())
+  initial setup window is open), LEADER_SELF (granted with the leadership, ADR-020)
   or APPOINTMENT (appoint_discipler(), with a ministry_role_transitions
   row). DISCIPLER rows that existed before Migration 013 were
   backfilled: LEADER_SELF where the holder led the group when the row
@@ -1178,11 +1211,10 @@ Table curricula {
   for offline reading, limited to what the person may read. Until
   permission to reproduce the source is confirmed, only identifying
   metadata is published and no lesson text is kept in the repository. Content is kept apart from progress, meetings and
-  completion. Its table is not defined here yet: the Curriculum /
-  Lesson Content slice adds it after inspecting the real material.
-  Expected shape, not normative: a separate table keyed to
-  curriculum_lessons.id with a published version, never columns that
-  progress depends on.
+  completion. Migration 017 defines it: curriculum_publications,
+  lesson_content_blocks and lesson_block_answers (section 11a), keyed
+  to curriculum_lessons.id with a published version, never columns
+  that progress depends on.
 
   The earlier statement that DiscipleTrack "does not store or deliver
   lesson content" is superseded by ADR-010.
@@ -1237,6 +1269,116 @@ Table curriculum_lessons {
   '''
 }
 
+
+// ============================================================
+// 11a. LESSON CONTENT (Migration 017, ADR-010, ADR-019)
+// ============================================================
+
+Table curriculum_publications {
+  id uuid [pk]
+
+  curriculum_id uuid [not null]
+
+  version integer [not null]
+  content_level curriculum_content_level [not null]
+  licence_reference text
+
+  published_by uuid [not null]
+  published_at timestamptz [not null]
+  superseded_at timestamptz
+
+  created_at timestamptz [not null]
+
+  indexes {
+    (curriculum_id, version) [unique]
+    curriculum_id [unique, note: 'partial: WHERE superseded_at IS NULL']
+  }
+
+  Note: '''
+  One publication of a curriculum's lesson content. At most one
+  current publication (superseded_at null) per curriculum.
+
+  content_level: METADATA carries identifying metadata only (ADR-019
+  decision 2: titles, themes, topic and section headings, scripture
+  references, Training Module titles). FULL requires a non-blank
+  licence_reference (CHECK), the recorded permission to reproduce the
+  source (ADR-019 decision 3).
+
+  Written only by public.publish_curriculum(), which is granted to
+  service_role alone. A new publication supersedes the previous one;
+  rows are never edited except to set superseded_at once, and never
+  deleted (refuse_content_rewrite trigger). No client policy and no
+  client grant: clients read content only through the controlled
+  reads in RBAC_RLS_MATRIX.md.
+  '''
+}
+
+Table lesson_content_blocks {
+  id uuid [pk]
+
+  publication_id uuid [not null]
+  lesson_id uuid [not null]
+
+  ordinal integer [not null]
+  section_label text
+  block_type lesson_block_type [not null]
+  tier content_tier [not null]
+  body jsonb [not null]
+
+  created_at timestamptz [not null]
+
+  indexes {
+    (publication_id, lesson_id, ordinal) [unique]
+    (lesson_id, publication_id)
+  }
+
+  Note: '''
+  The ordered blocks of one lesson in one publication, each in exactly
+  one tier (ADR-019 decision 5).
+
+  Enforced by trigger: the lesson belongs to the publication's
+  curriculum; a METADATA publication holds only LESSON_THEME,
+  TOPIC_LIST, SECTION_HEADING, SCRIPTURE_REFERENCES and MODULE_HEADING;
+  MODULE_HEADING and DISCIPLER_NOTE are DISCIPLER tier; body carries
+  the keys its type requires. Immutable once written.
+
+  Content belongs to a lesson, never to a person. Progress, meetings
+  and completion never key to a block (ADR-010 decisions 5 and 6).
+  '''
+}
+
+Table lesson_block_answers {
+  id uuid [pk]
+
+  block_id uuid [not null, unique]
+  answers jsonb [not null]
+
+  created_at timestamptz [not null]
+
+  Note: '''
+  The answers of one FILL_IN block, kept in their own table so that a
+  Disciple-tier read can never include them (ADR-019 decision 5).
+  Allowed only on a FILL_IN block of a FULL publication (trigger), so
+  none exist while only metadata is published. Immutable once written.
+  '''
+}
+
+
+Table lesson_covers {
+  lesson_id uuid [pk]
+  image text [not null]
+  mime_type text [not null, default: 'image/jpeg']
+  updated_at timestamptz [not null]
+
+  Note: '''
+  The book's cover photo of one lesson, a small base64 JPEG, shown behind
+  its card in the lesson list (ADR-019 decision 17). Not content: every
+  ACTIVE member of the church reads it through get_lesson_covers(). Written
+  only by trusted tooling (set_lesson_cover(), service role).
+  '''
+}
+
+Ref: lesson_covers.lesson_id > curriculum_lessons.id
 
 // ============================================================
 // 12. DISCIPLESHIP MEETINGS
@@ -2253,6 +2395,16 @@ Ref: gathering_attendance.recorded_by > profiles.id
 Ref: curricula.church_id > churches.id
 
 Ref: curriculum_lessons.curriculum_id > curricula.id
+
+Ref: curriculum_publications.curriculum_id > curricula.id
+
+Ref: curriculum_publications.published_by > profiles.id
+
+Ref: lesson_content_blocks.publication_id > curriculum_publications.id
+
+Ref: lesson_content_blocks.lesson_id > curriculum_lessons.id
+
+Ref: lesson_block_answers.block_id - lesson_content_blocks.id
 
 
 // ============================================================

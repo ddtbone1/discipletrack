@@ -86,10 +86,9 @@ class JourneyProgressBar extends StatelessWidget {
   }
 }
 
-/// One Disciple in My Disciples and on Home: an avatar, the name and the
-/// lesson they are on, a stepper over the curriculum's lessons, and pills
-/// for the lesson's state and the last recorded meeting. The meeting count
-/// stays on Disciple detail.
+/// One Disciple in My Disciples and on Home: the lesson ring, the name and
+/// one line with the lesson's state and the last recorded meeting. The
+/// meeting count stays on Disciple detail.
 class DiscipleProgressRow extends StatelessWidget {
   const DiscipleProgressRow({required this.disciple, this.onTap, super.key});
 
@@ -128,40 +127,39 @@ class DiscipleProgressRow extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                Text(d.lessonLine, style: context.supportingStyle),
-                const SizedBox(height: AppSpacing.xs),
-                LessonStepper(
-                  total: d.lessonsTotal,
-                  completed: d.lessonsCompleted,
-                  currentNumber: d.currentLessonNumber,
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    if (d.currentLessonNumber == null)
-                      const AppPill(
-                        tone: PillTone.brand,
-                        icon: Icons.check_circle_outline_rounded,
-                        label: 'Every lesson completed',
-                      )
-                    else if (d.currentState == LessonState.inProgress)
-                      AppPill(
-                        tone: PillTone.brand,
-                        icon: Icons.play_circle_outline_rounded,
-                        label: 'Lesson ${d.currentLessonNumber} in progress',
-                      )
-                    else
-                      AppPill(
-                        tone: PillTone.warning,
-                        icon: Icons.hourglass_empty_rounded,
-                        label: 'Lesson ${d.currentLessonNumber} not started',
+                const SizedBox(height: 2),
+                // One line: where they stand and when they last met. The
+                // ring already gives the lesson number.
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: d.currentLessonNumber == null
+                            ? 'Every lesson completed'
+                            : d.currentState == LessonState.inProgress
+                            ? 'In progress'
+                            : 'Not started',
+                        style: TextStyle(
+                          color: pillColors(
+                            context,
+                            d.currentLessonNumber != null &&
+                                    d.currentState != LessonState.inProgress
+                                ? PillTone.warning
+                                : PillTone.brand,
+                          ).$2,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                  ],
+                      if (d.lastRecordedMeetingAt != null)
+                        TextSpan(
+                          text:
+                              '  ·  Last met '
+                              '${AppFormat.shortDate(d.lastRecordedMeetingAt!)}',
+                        ),
+                    ],
+                  ),
+                  style: context.supportingStyle,
                 ),
-                const SizedBox(height: 4),
-                Text(d.lastMeetingLine, style: context.supportingStyle),
               ],
             ),
           ),
@@ -171,58 +169,6 @@ class DiscipleProgressRow extends StatelessWidget {
     );
     return MergeSemantics(
       child: onTap == null ? row : InkWell(onTap: onTap, child: row),
-    );
-  }
-}
-
-/// One segment per lesson of the curriculum: completed lessons filled, the
-/// current one outlined, the rest empty. Used where several people are
-/// listed, so their positions in the curriculum compare at a glance
-/// without any percentage.
-class LessonStepper extends StatelessWidget {
-  const LessonStepper({
-    required this.total,
-    required this.completed,
-    required this.currentNumber,
-    super.key,
-  });
-
-  final int total;
-  final int completed;
-
-  /// Null when every lesson is completed.
-  final int? currentNumber;
-
-  @override
-  Widget build(BuildContext context) {
-    final track = neutralFill(context);
-    final label = currentNumber == null
-        ? '$completed of $total lessons completed'
-        : 'Lesson $currentNumber of $total. '
-              '${completed == 1 ? '1 lesson' : '$completed lessons'} completed.';
-    return Semantics(
-      label: label,
-      excludeSemantics: true,
-      child: Row(
-        children: [
-          for (var n = 1; n <= total; n++) ...[
-            if (n > 1) const SizedBox(width: 3),
-            Expanded(
-              child: Container(
-                height: 6,
-                decoration: BoxDecoration(
-                  color: n <= completed
-                      ? progressColor(context)
-                      : n == currentNumber
-                      ? progressColor(context).withValues(alpha: 0.35)
-                      : track,
-                  borderRadius: AppRadius.pill,
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
     );
   }
 }

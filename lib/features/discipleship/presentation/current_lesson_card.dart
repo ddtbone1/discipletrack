@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/format/app_format.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_pill.dart';
@@ -13,11 +12,11 @@ import '../domain/meeting_history_entry.dart';
 ///
 /// A ring shows lessons completed out of the curriculum (no percentage is
 /// printed); beside it the current lesson, its title and the Discipler.
-/// Below, the current lesson's meetings as steps, one marker per recorded
-/// meeting in date order, coloured by outcome. There is no "remaining"
-/// marker, because a lesson has no fixed number of meetings (ADR-011).
-/// Pills carry the lesson's state, the outcome counts and the last recorded
-/// meeting. [footer] holds the actions the viewer may take.
+/// Below, one coloured line with the lesson's state and the last recorded
+/// meeting, then the current lesson's meetings as steps, one marker per
+/// recorded meeting in date order, coloured by outcome. There is no
+/// "remaining" marker, because a lesson has no fixed number of meetings
+/// (ADR-011). [footer] holds the actions the viewer may take.
 class CurrentLessonCard extends StatelessWidget {
   const CurrentLessonCard({
     required this.journey,
@@ -74,14 +73,6 @@ class CurrentLessonCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      lesson == null ? 'Journey' : 'Current lesson',
-                      style: text.labelSmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
                       lesson == null
                           ? 'All lessons completed'
                           : 'Lesson ${lesson.number}',
@@ -123,26 +114,31 @@ class CurrentLessonCard extends StatelessWidget {
             ],
           ),
           if (lesson != null) ...[
-            const SizedBox(height: AppSpacing.sm),
-            Wrap(spacing: 6, runSpacing: 6, children: [_statePill(lesson)]),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              lastRecordedMeetingAt == null
-                  ? 'No meeting recorded yet'
-                  : 'Last recorded meeting '
-                        '${AppFormat.shortDate(lastRecordedMeetingAt!)}',
+            const SizedBox(height: AppSpacing.md),
+            // One line: where the lesson stands and when they last met.
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: _stateText(lesson),
+                    style: TextStyle(
+                      color: pillColors(context, _stateTone(lesson)).$2,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (lastRecordedMeetingAt != null)
+                    TextSpan(
+                      text:
+                          '  ·  Last met '
+                          '${AppFormat.shortDate(lastRecordedMeetingAt!)}',
+                    ),
+                ],
+              ),
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
             ),
-            const Divider(height: AppSpacing.lg * 1.5),
-            Text(
-              lesson.countLine,
-              style: text.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            MeetingSteps(meetings: meetings),
             if (meetings.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.sm),
-              OutcomePills(meetings: meetings),
+              MeetingSteps(meetings: meetings),
             ],
           ],
           ?footer,
@@ -151,29 +147,21 @@ class CurrentLessonCard extends StatelessWidget {
     );
   }
 
-  Widget _statePill(JourneyLesson lesson) => switch (lesson.state) {
-    LessonState.inProgress => AppPill(
-      tone: PillTone.brand,
-      icon: Icons.play_circle_outline_rounded,
-      label: lesson.startedAt == null
+  static String _stateText(JourneyLesson lesson) => switch (lesson.state) {
+    LessonState.inProgress =>
+      lesson.startedAt == null
           ? 'In progress'
           : 'In progress since ${AppFormat.shortDate(lesson.startedAt!)}',
-    ),
-    LessonState.notStarted => const AppPill(
-      tone: PillTone.warning,
-      icon: Icons.hourglass_empty_rounded,
-      label: 'Not started',
-    ),
-    LessonState.submitted => const AppPill(
-      tone: PillTone.warning,
-      label: 'Marked finished',
-    ),
-    LessonState.completed => const AppPill(
-      tone: PillTone.brand,
-      icon: Icons.check_circle_outline_rounded,
-      label: 'Completed',
-    ),
-    LessonState.locked => const AppPill(label: 'Upcoming'),
+    LessonState.notStarted => 'Not started',
+    LessonState.submitted => 'Marked finished',
+    LessonState.completed => 'Completed',
+    LessonState.locked => 'Upcoming',
+  };
+
+  static PillTone _stateTone(JourneyLesson lesson) => switch (lesson.state) {
+    LessonState.inProgress || LessonState.completed => PillTone.brand,
+    LessonState.notStarted || LessonState.submitted => PillTone.warning,
+    LessonState.locked => PillTone.neutral,
   };
 }
 
@@ -206,54 +194,6 @@ String outcomeBreakdown(List<MeetingHistoryEntry> meetings) => [
     if (meetings.any((m) => m.outcome == o))
       '${meetings.where((m) => m.outcome == o).length} ${o.label}',
 ].join(' · ');
-
-/// The person's overall meeting facts as pills, shown with the meeting
-/// history rather than in the current lesson card. A run of two or more
-/// recorded absences is stated only in oversight views ([includeConsecutive]).
-class MeetingFactPills extends StatelessWidget {
-  const MeetingFactPills({
-    required this.summary,
-    this.includeConsecutive = false,
-    super.key,
-  });
-
-  final MeetingSummary summary;
-  final bool includeConsecutive;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = summary;
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      children: [
-        AppPill(
-          icon: Icons.check_rounded,
-          iconTone: PillTone.brand,
-          label: s.meetingsAttended == 1
-              ? '1 meeting attended'
-              : '${s.meetingsAttended} meetings attended',
-        ),
-        AppPill(
-          icon: Icons.close_rounded,
-          iconTone: PillTone.error,
-          label: s.recordedAbsences == 1
-              ? '1 recorded absence'
-              : '${s.recordedAbsences} recorded absences',
-        ),
-        if (s.excused > 0)
-          AppPill(icon: Icons.remove_rounded, label: '${s.excused} excused'),
-        if (includeConsecutive && s.consecutiveRecordedAbsences >= 2)
-          AppPill(
-            tone: PillTone.warning,
-            icon: Icons.warning_amber_rounded,
-            label:
-                '${s.consecutiveRecordedAbsences} recorded absences in a row',
-          ),
-      ],
-    );
-  }
-}
 
 /// Lessons completed out of the curriculum, as a ring with the current
 /// lesson number in the middle. Read aloud in words; no percentage.
@@ -385,65 +325,6 @@ class _Step extends StatelessWidget {
       height: 30,
       decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
       child: Icon(icon, size: 18, color: fg),
-    );
-  }
-}
-
-/// Every lesson of the curriculum, collapsed by default: completed ones
-/// with their date, the current one, and the rest as upcoming.
-class AllLessonsList extends StatelessWidget {
-  const AllLessonsList({
-    required this.journey,
-    this.ownJourney = false,
-    super.key,
-  });
-
-  final DiscipleJourney journey;
-  final bool ownJourney;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    return Card.filled(
-      color: context.palette.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-      ),
-      margin: EdgeInsets.zero,
-      clipBehavior: Clip.antiAlias,
-      child: ExpansionTile(
-        shape: const Border(),
-        title: const Text('All lessons'),
-        subtitle: Text(journey.summaryLine),
-        childrenPadding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-        children: [
-          for (final l in journey.lessons)
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: ListTile(
-                dense: true,
-                tileColor: neutralFill(context),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                leading: Icon(
-                  switch (l.state) {
-                    LessonState.completed => Icons.check_circle_rounded,
-                    LessonState.locked => Icons.lock_outline_rounded,
-                    _ => Icons.radio_button_checked_rounded,
-                  },
-                  color: switch (l.state) {
-                    LessonState.completed => p.textPrimary,
-                    LessonState.locked => p.disabled,
-                    _ => p.warning,
-                  },
-                ),
-                title: Text('Lesson ${l.number} · ${l.title}'),
-                subtitle: Text(l.statusLine(ownJourney: ownJourney)),
-              ),
-            ),
-        ],
-      ),
     );
   }
 }

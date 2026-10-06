@@ -173,6 +173,7 @@ class _MinistryEntry extends ConsumerWidget {
         return const SizedBox.shrink();
       }
       return const EmptyState(
+        illustration: Illustration.group,
         title: 'Not in a D Group yet',
         message:
             'A D Group Leader adds members to their group. Once you are '

@@ -84,7 +84,11 @@ void main() {
     final groups = await repo.fetchGroups(church.churchId);
     final mine = groups.singleWhere((s) => s.group.id == g.groupId);
     expect(mine.leaderName, 'Leader repo-lead');
-    expect(mine.disciplerCount, 1);
+    expect(
+      mine.disciplerCount,
+      2,
+      reason: 'the Leader is a Discipler (ADR-020)',
+    );
     expect(mine.discipleCount, 1);
     expect(mine.memberCount, 4, reason: 'includes the newcomer not set up');
 
@@ -102,12 +106,16 @@ void main() {
     final detail = (await repo.fetchGroupDetail(g.groupId))!;
 
     expect(detail.leader!.fullName, 'Leader repo-lead');
-    expect(detail.disciplers.single.fullName, 'Repo Discipler');
-    expect(detail.disciplers.single.phone, '+63 900 000 0010');
-    expect(
-      detail.disciplers.single.disciplerBasis,
-      DisciplerBasis.initialRollout,
+    final repoDiscipler = detail.disciplers.singleWhere(
+      (m) => m.fullName == 'Repo Discipler',
     );
+    expect(repoDiscipler.phone, '+63 900 000 0010');
+    expect(repoDiscipler.disciplerBasis, DisciplerBasis.initialRollout);
+    // Every Leader also holds DISCIPLER, with the leadership (ADR-020).
+    final leaderAsDiscipler = detail.disciplers.singleWhere(
+      (m) => m.fullName == 'Leader repo-lead',
+    );
+    expect(leaderAsDiscipler.disciplerBasis, DisciplerBasis.leaderSelf);
     final d = detail.disciples.single;
     expect(detail.disciplerOf(d)!.fullName, 'Repo Discipler');
 
@@ -119,7 +127,11 @@ void main() {
   test('the Coordinator reads the same detail', () async {
     final detail = (await MinistryRepository(church.approver.client)
         .fetchGroupDetail(g.groupId))!;
-    expect(detail.members, hasLength(3));
+    expect(
+      detail.members,
+      hasLength(4),
+      reason: 'Leader (twice: LEADER and DISCIPLER), Discipler, Disciple',
+    );
     expect(detail.placements, hasLength(4));
   });
 

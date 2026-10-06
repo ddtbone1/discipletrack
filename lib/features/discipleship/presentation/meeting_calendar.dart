@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/illustration.dart';
 import '../../../core/format/app_format.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -18,6 +20,8 @@ class MeetingCalendar extends StatefulWidget {
   const MeetingCalendar({
     required this.entries,
     required this.emptyMessage,
+    this.emptyIllustration = Illustration.empty,
+    this.emptyAction,
     this.clock,
     this.actionBuilder,
     this.entryActionBuilder,
@@ -36,6 +40,13 @@ class MeetingCalendar extends StatefulWidget {
   /// Newest first, as `get_meeting_history()` returns them.
   final List<MeetingHistoryEntry> entries;
   final String emptyMessage;
+
+  /// The mood of the empty state, before any meeting is recorded.
+  final Illustration emptyIllustration;
+
+  /// What to do next in the empty state, such as a link to record the
+  /// first meeting.
+  final Widget? emptyAction;
 
   /// For tests; defaults to now.
   final DateTime Function()? clock;
@@ -121,7 +132,8 @@ class _MeetingCalendarState extends State<MeetingCalendar> {
   @override
   Widget build(BuildContext context) {
     if (widget.entries.isEmpty) {
-      final action = widget.actionBuilder?.call(null, false);
+      final action =
+          widget.emptyAction ?? widget.actionBuilder?.call(null, false);
       return Card.filled(
         color: context.palette.surface,
         shape: const RoundedRectangleBorder(
@@ -129,13 +141,23 @@ class _MeetingCalendarState extends State<MeetingCalendar> {
         ),
         margin: EdgeInsets.zero,
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+          ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(widget.emptyMessage),
+              IllustrationView(widget.emptyIllustration, height: 110),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                widget.emptyMessage,
+                textAlign: TextAlign.center,
+                style: context.supportingStyle,
+              ),
               if (action != null) ...[
-                const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.sm),
                 action,
               ],
             ],

@@ -106,6 +106,8 @@ Privileged system roles require an authorized assignment process.
 A Member cannot make themselves a D Group Leader or Discipler.
 
 These responsibilities require an authorized ministry assignment.
+A Leader's own Discipler role is part of their leadership assignment
+(ADR-020), not a self-assignment.
 
 ---
 
@@ -205,9 +207,10 @@ A D Group may contain multiple Disciplers.
 
 Each Discipler operates only within authorized scope.
 
-A person may hold active LEADER and DISCIPLER responsibilities at the
-same time. A D Group Leader who personally disciples members must hold
-the DISCIPLER responsibility in order to receive discipler assignments.
+Every active D Group Leader also holds the DISCIPLER responsibility in
+their group (ADR-020): the role comes with the leadership, so a Leader
+can always be paired with Disciples. A replaced Leader keeps the
+DISCIPLER responsibility and stays in the group.
 
 ---
 
@@ -230,8 +233,8 @@ D Group Leader. Only this pair is mutually exclusive.
 
 DISCIPLE and DISCIPLER may coexist for the same person in one D Group:
 a Disciple appointed as a Discipler continues their own journey as a
-Disciple (BR-037) (ADR-012). LEADER and DISCIPLER may
-also coexist, as described in BR-013. All of a person's active
+Disciple (BR-037) (ADR-012). LEADER always
+comes with DISCIPLER, as described in BR-013 (ADR-020). All of a person's active
 responsibilities are in one D Group at a time.
 
 Nobody is paired with themselves: the Discipler and the Disciple of a
@@ -423,12 +426,13 @@ Flutter UI/business logic.
 
 DiscipleTrack delivers the published lesson material (ADR-010) in two
 tiers, gated by progression (ADR-019). A Disciple reads the Disciple
-tier of the lessons they have reached, never a future lesson. The Leader of the Disciple's group reads the Disciple tier for
-that Disciple's reached lessons. Answers and other Discipler-tier
-material are read only by the current assigned Discipler, for lessons
-that Disciple has reached, and by the Coordinator; recording a meeting
-on a Discipler's behalf grants a Leader no answers. A person with no
-active Disciple journey reads no lesson content. Supabase holds the
+tier of the lessons they have reached, never a future lesson: completed
+lessons and the current one, the next opening only when the current one
+is marked completed. Any Discipler of the church, every Leader included
+(ADR-020), reads all ten lessons in both tiers, with answers, in their
+own and any Disciple's context (ADR-019 decision 16). The Coordinator
+reads everything. A person who is neither a Disciple with a journey,
+nor a Discipler, nor the Coordinator reads no lesson content. Supabase holds the
 authoritative published content. Until permission to reproduce the
 source is confirmed, only identifying metadata is published
 (ADR-019 decisions 1 and 2).

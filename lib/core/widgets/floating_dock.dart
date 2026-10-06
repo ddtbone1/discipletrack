@@ -13,6 +13,7 @@ class DockItem {
     required this.activeIcon,
     required this.path,
     this.glyph,
+    this.alsoActiveOn = const [],
   });
 
   final String label;
@@ -26,6 +27,10 @@ class DockItem {
 
   /// Where tapping goes. Also the prefix that marks the item active.
   final String path;
+
+  /// Further path prefixes that mark the item active: pages reached from
+  /// this destination that live under another path.
+  final List<String> alsoActiveOn;
 }
 
 /// The floating bottom dock (UI_DESIGN_SYSTEM section 21): a small pill

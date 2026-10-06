@@ -224,15 +224,15 @@ void main() {
       expect(find.text('Add myself as Discipler'), findsNothing);
 
       // Pairing state is visible per Disciple.
-      expect(find.text('Paired with Ben Discipler'), findsOneWidget);
+      expect(find.text('with Ben Discipler'), findsOneWidget);
       expect(find.text('Not paired yet'), findsOneWidget);
-      expect(find.text('Pair'), findsOneWidget);
-      expect(find.text('Change'), findsOneWidget);
+      expect(find.byTooltip('Pair'), findsOneWidget);
+      expect(find.byTooltip('Change Discipler'), findsOneWidget);
 
       // Eve was added and waits for setup.
       expect(find.text('Eve Newcomer'), findsOneWidget);
       expect(find.text('Needs setup'), findsOneWidget);
-      expect(find.text('Set up'), findsOneWidget);
+      expect(find.byTooltip('Set up'), findsOneWidget);
     });
 
     testWidgets('the Leader manages their group but cannot change its '
@@ -244,9 +244,10 @@ void main() {
       );
 
       expect(find.text('Change Leader'), findsNothing);
-      expect(find.text('Add myself as Discipler'), findsOneWidget);
+      // Every Leader is already a Discipler (ADR-020): no self-add.
+      expect(find.text('Add myself as Discipler'), findsNothing);
       expect(find.text('Add members'), findsOneWidget);
-      expect(find.text('Set up'), findsOneWidget);
+      expect(find.byTooltip('Set up'), findsOneWidget);
     });
 
     testWidgets('filters show counts and narrow the list', (tester) async {
@@ -295,11 +296,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // The lesson is coloured text on the row (UI_DESIGN_SYSTEM section 39).
       expect(find.text('Lesson 4 of 10'), findsOneWidget);
-      expect(
-        find.bySemanticsLabel(RegExp('Lesson 4 of 10. 3 lessons completed')),
-        findsOneWidget,
-      );
       // Dan has no progress row, so his row stays a plain face.
       expect(find.text('Dan Disciple'), findsOneWidget);
     });
@@ -365,7 +363,7 @@ void main() {
         roles: const {ChurchRole.coordinator},
       );
 
-      await tapVisible(tester, find.text('Pair'));
+      await tapVisible(tester, find.byTooltip('Pair'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Ben Discipler').last);
       await tester.pumpAndSettle();
@@ -384,7 +382,7 @@ void main() {
         detail: _detail(danDisciples: true),
       );
 
-      await tapVisible(tester, find.text('Pair'));
+      await tapVisible(tester, find.byTooltip('Pair'));
       await tester.pumpAndSettle();
       final sheet = find.byType(BottomSheet);
       expect(
@@ -403,7 +401,7 @@ void main() {
         roles: const {ChurchRole.coordinator},
       );
 
-      await tapVisible(tester, find.text('Set up'));
+      await tapVisible(tester, find.byTooltip('Set up'));
       await tester.pumpAndSettle();
       expect(find.text('Set up Eve Newcomer'), findsOneWidget);
       expect(find.text('Existing Discipler'), findsOneWidget);
@@ -421,7 +419,7 @@ void main() {
         setupOpen: false,
       );
 
-      await tapVisible(tester, find.text('Set up'));
+      await tapVisible(tester, find.byTooltip('Set up'));
       await tester.pumpAndSettle();
       expect(find.textContaining('The setup period has ended'), findsOneWidget);
 
@@ -467,8 +465,8 @@ void main() {
         roles: const {ChurchRole.coordinator},
         candidates: [cara],
       );
-      expect(find.text('Eligible to disciple'), findsOneWidget);
-      expect(find.textContaining('not appointed'), findsOneWidget);
+      // A short badge; the date lives on the D Groups page.
+      expect(find.text('Eligible'), findsOneWidget);
       await tester.tap(find.text('Disciplers 1'));
       await tester.pumpAndSettle();
       expect(find.text('Cara Disciple'), findsNothing);
@@ -483,8 +481,7 @@ void main() {
         ministryContext: _leaderContext(),
         candidates: [cara],
       );
-      expect(find.text('Eligible to disciple'), findsOneWidget);
-      expect(find.textContaining('Coordinator appoints'), findsOneWidget);
+      expect(find.text('Eligible'), findsOneWidget);
       await openMenuOf(tester, 'Cara Disciple');
       expect(find.text('Appoint as Discipler'), findsNothing);
     });
@@ -523,6 +520,8 @@ void main() {
         find.textContaining('Young Adults A · eligible since'),
         findsOneWidget,
       );
+      await tester.ensureVisible(find.text('Appoint'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Appoint'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Appoint').last);
@@ -759,6 +758,41 @@ void main() {
       expect(find.text('Cara Disciple'), findsOneWidget);
       expect(find.text('+63 900 333'), findsOneWidget);
       expect(find.text('Your Discipler'), findsNothing);
+    });
+
+    testWidgets('a Leader uses the same roster, as a Discipler, with Manage '
+        'members added (ADR-020)', (tester) async {
+      await pumpPage(
+        tester,
+        const MyGroupPage(),
+        membership: active,
+        ministryRepo: FakeMinistryRepository()
+          ..ministryContext = MinistryContext(
+            dGroupId: _groupId,
+            dGroupName: 'Young Adults A',
+            roster: [
+              _entry(
+                'ana',
+                'Ana Leader',
+                DGroupResponsibility.leader,
+                me: true,
+              ),
+              _entry(
+                'ana',
+                'Ana Leader',
+                DGroupResponsibility.discipler,
+                me: true,
+              ),
+            ],
+          ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Manage members'), findsOneWidget);
+      expect(find.text('Your Disciples'), findsOneWidget);
+      expect(find.text('Your Leader'), findsNothing);
+      // Roles are coloured text, never pills (UI_DESIGN_SYSTEM section 39).
+      expect(find.text('You · Leader'), findsOneWidget);
     });
 
     testWidgets('someone not set up yet sees their group and Leader only', (

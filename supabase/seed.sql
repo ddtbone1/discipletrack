@@ -111,7 +111,7 @@ $$;
 --                                   added from Add Members)
 --   discipler2@discipletrack.local  Discipler
 --   disciple3@discipletrack.local   Disciple
---   disciple4@discipletrack.local   Disciple, never paired
+--   disciple4@discipletrack.local   Disciple (paired with the Leader)
 --   disciple5@discipletrack.local   Disciple
 --
 -- This block places them; the Slice 5 block below pairs them and records
@@ -297,9 +297,10 @@ $$;
 --                                behalf, with notes. Grace then marked
 --                                Lesson 1 completed; Lesson 2 has no
 --                                meeting yet, so Undo is still available.
---   Felix Ramos (disciple4)      placed, never paired.
+--   Felix Ramos (disciple4)      Disciple of Lea, no meeting yet.
 --   Mara Villanueva (member@)    not placed; sees no one's progress.
---   Lea Santos (leader@)         leads the group; sees all of the above.
+--   Lea Santos (leader@)         leads the group and, as every Leader,
+--                                is a Discipler (ADR-020): disciples Felix.
 --   Dev Admin (admin@)           Coordinator; church-wide.
 --
 -- Pairing and every meeting go through the real operations, with each
@@ -362,6 +363,18 @@ begin
   perform public.set_discipler(private.current_disciple_row(v_daniel), v_dino_dgm);
   perform public.set_discipler(private.current_disciple_row(v_ella), v_dino_dgm);
   perform public.set_discipler(private.current_disciple_row(v_hana), v_grace_dgm);
+  -- Every Leader is also a Discipler (ADR-020): Lea disciples Felix.
+  perform public.set_discipler(
+    private.current_disciple_row(
+      (select m.id from public.church_memberships m
+       where m.user_id = 'a0000000-0000-4000-8000-000000000009')),
+    (select dgm.id
+     from public.d_group_memberships dgm
+     join public.church_memberships m on m.id = dgm.church_membership_id
+     where m.user_id = v_leader
+       and dgm.responsibility = 'DISCIPLER'
+       and dgm.ended_at is null)
+  );
 
   -- Backdate: Dino and his Disciples 60 days, Grace and Hana 30. The
   -- whole group's placements go back 60 days so they cover every row.
@@ -495,7 +508,7 @@ $$;
 --   Mara Villanueva (member@)     approved, in no D Group: Add Members
 --                                 lists her
 --   Nina Aquino (newcomer@)       added to Young Adults A, Needs setup
---   Felix Ramos (disciple4)       Disciple, not paired
+--   Felix Ramos (disciple4)       Disciple of Lea (the Leader)
 --   Dino Reyes, Grace Lim         Existing Disciplers (initial rollout)
 --   Diana Cruz (disciple1)        Disciple below Lesson 5
 --   Paolo Mendoza (disciple6)     Disciple of Grace; Lessons 1 to 5

@@ -107,9 +107,10 @@ class JourneyActivitySection extends StatelessWidget {
   }
 }
 
-/// A compact vertical timeline. Each event is its own thin, view-only card,
-/// tinted by its attendance state (Present and completed lime, Late amber,
-/// a recorded absence red, Excused grey). The rail of dots and connecting
+/// A compact vertical timeline. Each event is its own thin, view-only card
+/// on the plain surface, its attendance state shown by a coloured bar on
+/// the inside left edge (Present and completed lime, Late amber, a recorded
+/// absence red, Excused grey). The rail of dots and connecting
 /// line sits outside the cards, on the left. The newest event's dot is
 /// slightly stronger.
 class ActivityTimeline extends StatelessWidget {
@@ -164,9 +165,12 @@ class _EventRow extends StatelessWidget {
     final p = context.palette;
     final text = Theme.of(context).textTheme;
     final tone = _tone;
-    final (fill, deep) = tone == null
-        ? (p.surface, pillColors(context, PillTone.outline).$2)
-        : pillColors(context, tone);
+    final deep = tone == null
+        ? pillColors(context, PillTone.outline).$2
+        : pillColors(context, tone).$2;
+    // The state's own colour for the bar: lime itself for Present and
+    // completed, the pill's strong tone for the rest.
+    final accent = tone == PillTone.brand ? p.brand : deep;
     final size = isFirst ? 12.0 : 10.0;
     final secondary = [
       AppFormat.shortDate(event.at),
@@ -212,42 +216,51 @@ class _EventRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
-            // One thin, view-only card per event, tinted by its state.
+            // One thin, view-only card per event on the plain surface. Its
+            // state is a coloured bar on the inside left edge, not a fill
+            // (user decision 2026-10-06).
             Expanded(
               child: Padding(
                 padding: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.xs),
-                child: DecoratedBox(
+                child: Container(
+                  clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
-                    color: fill,
+                    color: p.surface,
                     borderRadius: BorderRadius.circular(12),
-                    border: tone == null ? Border.all(color: p.border) : null,
+                    border: Border.all(color: p.border),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: AppSpacing.xs,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          event.title,
-                          style: text.bodyMedium?.copyWith(
-                            fontWeight: isFirst
-                                ? FontWeight.w700
-                                : FontWeight.w600,
-                            color: p.textPrimary,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (tone != null) Container(width: 4, color: accent),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                            vertical: AppSpacing.xs,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                event.title,
+                                style: text.bodyMedium?.copyWith(
+                                  fontWeight: isFirst
+                                      ? FontWeight.w700
+                                      : FontWeight.w600,
+                                  color: p.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                secondary,
+                                style: text.bodySmall?.copyWith(color: p.muted),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          secondary,
-                          style: text.bodySmall?.copyWith(
-                            color: tone == null ? p.muted : deep,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),

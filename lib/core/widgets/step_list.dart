@@ -13,6 +13,8 @@ class StepItem {
     required this.state,
     this.subtitle,
     this.detail,
+    this.onTap,
+    this.locked = false,
   });
 
   final String title;
@@ -21,6 +23,13 @@ class StepItem {
 
   /// Optional content shown under the subtitle, typically on the current step.
   final Widget? detail;
+
+  /// Opens the step, for a list whose steps lead somewhere (the lesson
+  /// timeline). A tappable step shows a chevron.
+  final VoidCallback? onTap;
+
+  /// The step cannot be opened yet; it shows a lock instead of a chevron.
+  final bool locked;
 }
 
 /// A vertical, sequential progress timeline (UI_DESIGN_SYSTEM section 32).
@@ -104,41 +113,67 @@ class _StepRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(
-                top: 3,
-                bottom: isLast ? 0 : AppSpacing.lg,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Semantics(
-                    label:
-                        'Step ${index + 1} of $count, ${step.title}, '
-                        '$_stateLabel',
-                    excludeSemantics: true,
-                    child: Text(
-                      step.title,
-                      style: AppTypography.sectionTitle.copyWith(
-                        fontSize: 15,
-                        color: upcoming ? p.muted : p.textPrimary,
-                      ),
-                    ),
-                  ),
-                  if (step.subtitle != null) ...[
-                    const SizedBox(height: 2),
-                    Text(step.subtitle!, style: context.supportingStyle),
-                  ],
-                  if (step.detail != null) ...[
-                    const SizedBox(height: AppSpacing.sm),
-                    step.detail!,
-                  ],
-                ],
+          Expanded(child: _content(context, upcoming)),
+        ],
+      ),
+    );
+  }
+
+  Widget _content(BuildContext context, bool upcoming) {
+    final p = context.palette;
+    final body = Padding(
+      padding: EdgeInsets.only(top: 3, bottom: isLast ? 0 : AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Semantics(
+            label:
+                'Step ${index + 1} of $count, ${step.title}, '
+                '$_stateLabel',
+            excludeSemantics: true,
+            child: Text(
+              step.title,
+              style: AppTypography.sectionTitle.copyWith(
+                fontSize: 15,
+                color: upcoming ? p.muted : p.textPrimary,
               ),
             ),
           ),
+          if (step.subtitle != null) ...[
+            const SizedBox(height: 2),
+            Text(step.subtitle!, style: context.supportingStyle),
+          ],
+          if (step.detail != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            step.detail!,
+          ],
         ],
+      ),
+    );
+    if (step.onTap == null && !step.locked) return body;
+    final row = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: body),
+        Padding(
+          padding: const EdgeInsets.only(top: 2, left: AppSpacing.xs),
+          child: Icon(
+            step.locked
+                ? Icons.lock_outline_rounded
+                : Icons.chevron_right_rounded,
+            size: step.locked ? 18 : 22,
+            color: p.muted,
+          ),
+        ),
+      ],
+    );
+    if (step.onTap == null) return row;
+    return Semantics(
+      button: true,
+      child: InkWell(
+        onTap: step.onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: row,
       ),
     );
   }

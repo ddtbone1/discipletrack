@@ -4,6 +4,7 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show PostgrestException;
 
 import 'support/ministry_fixture.dart';
 import 'support/test_env.dart';
@@ -139,15 +140,21 @@ void main() {
           .single();
       expect(active['church_membership_id'], next.membershipId);
 
-      // The replaced Leader is out of the group and can be added again.
-      final placeable = await church.approver.client.rpc<List<dynamic>>(
-        'list_placeable_members',
-        params: {'p_d_group_id': g.groupId},
+      // Every Leader holds DISCIPLER (ADR-020): the new one gains it, and
+      // the replaced one keeps theirs and stays in the group.
+      Future<List<dynamic>> disciplerRows(String membershipId) => service
+          .from('d_group_memberships')
+          .select('discipler_basis')
+          .eq('d_group_id', g.groupId)
+          .eq('church_membership_id', membershipId)
+          .eq('responsibility', 'DISCIPLER')
+          .isFilter('ended_at', null);
+      expect(
+        (await disciplerRows(next.membershipId)).single['discipler_basis'],
+        'LEADER_SELF',
       );
-      final oldRow = placeable.cast<Map<String, dynamic>>().singleWhere(
-        (r) => r['church_membership_id'] == g.leader.membershipId,
-      );
-      expect(oldRow['current_d_group_id'], isNull);
+      expect(await disciplerRows(g.leader.membershipId), hasLength(1));
+      expect(await activePlacementOf(g.leader.membershipId), isNotNull);
 
       expect(await auditActionsFor(g.groupId), [
         'D_GROUP_CREATED',
@@ -518,7 +525,8 @@ void main() {
     });
 
     test(
-      'a Leader can add themselves as Discipler once and be paired',
+      'every Leader is a Discipler from the start (ADR-020): paired at once, '
+      'self-add refused, and the role cannot end while they lead',
       () async {
         final g = await newGroup('self');
         final dd = await member('self-dd');
@@ -529,13 +537,16 @@ void main() {
           'DISCIPLE',
         );
 
-        final row = await rpcRow(
-          g.leader.user.client,
-          'add_self_as_discipler',
-          {'p_d_group_id': g.groupId},
-        );
-        final selfDgm = row['d_group_membership_id'] as String;
-        expect((await dgm(selfDgm))['responsibility'], 'DISCIPLER');
+        final selfRow = await service
+            .from('d_group_memberships')
+            .select('id, discipler_basis')
+            .eq('d_group_id', g.groupId)
+            .eq('church_membership_id', g.leader.membershipId)
+            .eq('responsibility', 'DISCIPLER')
+            .isFilter('ended_at', null)
+            .single();
+        expect(selfRow['discipler_basis'], 'LEADER_SELF');
+        final selfDgm = selfRow['id'] as String;
 
         await expectLater(
           g.leader.user.client.rpc<List<dynamic>>(
@@ -547,7 +558,21 @@ void main() {
 
         final paired = await setDiscipler(g.leader.user.client, ddDgm, selfDgm);
         expect(paired['outcome'], 'ASSIGNED');
-        expect(await auditActionsFor(selfDgm), ['D_GROUP_MEMBER_ADDED']);
+
+        // Even a trusted direct write cannot leave a Leader without it.
+        await expectLater(
+          service
+              .from('d_group_memberships')
+              .update({'ended_at': DateTime.now().toUtc().toIso8601String()})
+              .eq('id', selfDgm),
+          throwsA(
+            isA<PostgrestException>().having(
+              (e) => e.message,
+              'message',
+              contains('leader_must_be_discipler'),
+            ),
+          ),
+        );
       },
     );
   });

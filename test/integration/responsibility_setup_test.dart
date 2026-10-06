@@ -115,14 +115,24 @@ void main() {
       );
     });
 
-    test('a Leader adding themselves is recorded as LEADER_SELF', () async {
+    test('a new Leader holds DISCIPLER as LEADER_SELF, so adding themselves '
+        'is refused (ADR-020)', () async {
       final g = await newGroup('su-self');
-      final row = await rpcRow(g.leader.user.client, 'add_self_as_discipler', {
-        'p_d_group_id': g.groupId,
-      });
-      expect(
-        (await dgm(row['d_group_membership_id'] as String))['discipler_basis'],
-        'LEADER_SELF',
+      final row = await service
+          .from('d_group_memberships')
+          .select('discipler_basis')
+          .eq('d_group_id', g.groupId)
+          .eq('church_membership_id', g.leader.membershipId)
+          .eq('responsibility', 'DISCIPLER')
+          .isFilter('ended_at', null)
+          .single();
+      expect(row['discipler_basis'], 'LEADER_SELF');
+      await expectLater(
+        g.leader.user.client.rpc<List<dynamic>>(
+          'add_self_as_discipler',
+          params: {'p_d_group_id': g.groupId},
+        ),
+        throwsPostgrestCode('PT409'),
       );
     });
 
@@ -203,8 +213,18 @@ void main() {
       final dd = await setUpMember(g.leader.user.client, pl, 'DISCIPLE');
       expect((await dgm(dd))['responsibility'], 'DISCIPLE');
 
-      await rpcRow(g.leader.user.client, 'add_self_as_discipler', {
-        'p_d_group_id': g.groupId,
+      // A Leader's own Discipler role does not depend on the window: a
+      // group created after it closed still gives its Leader one.
+      final late = await newGroup('win-late');
+      final leaderRows = await service
+          .from('d_group_memberships')
+          .select('responsibility')
+          .eq('d_group_id', late.groupId)
+          .eq('church_membership_id', late.leader.membershipId)
+          .isFilter('ended_at', null);
+      expect(leaderRows.map((r) => r['responsibility']).toSet(), {
+        'LEADER',
+        'DISCIPLER',
       });
     });
 

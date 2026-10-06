@@ -6,6 +6,7 @@ import '../../../app/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_pill.dart';
 import '../../../core/widgets/app_scaffold.dart';
@@ -13,17 +14,21 @@ import '../../../core/widgets/app_text_link.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
+import '../../../core/widgets/role_badge.dart';
 import '../../discipleship/application/discipleship_providers.dart';
 import '../../discipleship/domain/disciple_progress_summary.dart';
 import '../application/ministry_providers.dart';
+import '../domain/d_group_detail.dart';
 import '../domain/d_group_member.dart';
 import '../domain/ministry_context.dart';
 import 'ministry_ui.dart';
 import 'needs_setup_notice.dart';
 
-/// The roster for a Discipler or Disciple: their group at a glance, their
+/// The roster for everyone in a group: their group at a glance, their
 /// Leader, their own Discipler, a Discipler's own Disciples with where each
-/// one is, and everyone else in the group by role.
+/// one is, and everyone else in the group by role. Every Leader is also a
+/// Discipler (ADR-020) and uses this same page, with one added control to
+/// manage the group's members.
 ///
 /// Phone numbers appear only where `get_my_d_group_roster()` returned them
 /// (Plan decision 8): the person's own Leader and own Discipler, and a
@@ -54,6 +59,7 @@ class MyGroupPage extends ConsumerWidget {
             ),
             data: (c) => c == null
                 ? const EmptyState(
+                    illustration: Illustration.group,
                     message:
                         'You are not in a D Group yet. A D Group Leader adds '
                         'members to their group; once you are added, it shows '
@@ -70,19 +76,12 @@ class MyGroupPage extends ConsumerWidget {
   }
 }
 
-/// Role colours, used the same way on every D Group page: the Leader in
-/// violet, Disciplers in teal, Disciples in blue. Avatars use a pastel
-/// chosen from the name; the role is carried by the pill.
+/// Role colours, used the same way on every D Group page. Avatars use a
+/// pastel chosen from the name; the role is coloured text (section 39).
 PillTone _toneOf(DGroupResponsibility r) => switch (r) {
   DGroupResponsibility.leader => PillTone.ink,
   DGroupResponsibility.discipler => PillTone.brand,
   DGroupResponsibility.disciple => PillTone.info,
-};
-
-IconData _iconOf(DGroupResponsibility r) => switch (r) {
-  DGroupResponsibility.leader => Icons.star_rounded,
-  DGroupResponsibility.discipler => Icons.school_outlined,
-  DGroupResponsibility.disciple => Icons.person_outline_rounded,
 };
 
 class _Roster extends ConsumerWidget {
@@ -114,6 +113,10 @@ class _Roster extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _GroupHeader(ministry: c),
+        if (c.isLeader) ...[
+          const SizedBox(height: AppSpacing.sm),
+          _LeaderControls(ministry: c),
+        ],
         const SizedBox(height: AppSpacing.lg),
         if (leader != null) ...[
           const SectionHeading('Your Leader'),
@@ -207,16 +210,24 @@ class _Roster extends ConsumerWidget {
     DiscipleProgressSummary? d,
   ) {
     if (d == null) return const [];
+    // One line, one size: the lesson in colour, then the last meeting.
+    final base = context.captionStyle;
     return [
-      AppPill(
-        icon: Icons.menu_book_outlined,
-        label: d.currentLessonNumber == null
-            ? 'Every lesson completed'
-            : 'Lesson ${d.currentLessonNumber} of ${d.lessonsTotal}',
-      ),
-      Padding(
-        padding: const EdgeInsets.only(top: 3),
-        child: Text(d.lastMeetingLine, style: context.supportingStyle),
+      Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: d.currentLessonNumber == null
+                  ? 'Every lesson completed'
+                  : 'Lesson ${d.currentLessonNumber} of ${d.lessonsTotal}',
+              style: base.copyWith(
+                color: pillColors(context, PillTone.brand).$2,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            TextSpan(text: '  ·  ${d.lastMeetingLine}', style: base),
+          ],
+        ),
       ),
     ];
   }
@@ -270,14 +281,13 @@ class _GroupHeader extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.xxs),
                     Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
+                      spacing: 10,
+                      runSpacing: 4,
                       children: [
                         for (final r in mine)
-                          AppPill(
-                            tone: PillTone.brand,
-                            icon: _iconOf(r),
+                          RoleBadge(
                             label: 'You · ${r.label}',
+                            tone: _toneOf(r),
                           ),
                       ],
                     ),
@@ -402,14 +412,8 @@ class _PersonTile extends StatelessWidget {
                       ),
                     ),
                     if (role != null) ...[
-                      const SizedBox(width: 6),
-                      AppPill(
-                        tone: role == DGroupResponsibility.leader
-                            ? PillTone.brand
-                            : PillTone.outline,
-                        icon: _iconOf(role!),
-                        label: role!.label,
-                      ),
+                      const SizedBox(width: 8),
+                      RoleBadge(label: role!.label, tone: _toneOf(role!)),
                     ],
                   ],
                 ),
@@ -435,7 +439,12 @@ class _PersonTile extends StatelessWidget {
                 ],
                 if (pills.isNotEmpty) ...[
                   const SizedBox(height: AppSpacing.xs),
-                  Wrap(spacing: 6, runSpacing: 6, children: pills),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: pills,
+                  ),
                 ],
               ],
             ),
@@ -449,5 +458,45 @@ class _PersonTile extends StatelessWidget {
       ),
     );
     return onTap == null ? tile : InkWell(onTap: onTap, child: tile);
+  }
+}
+
+/// The Leader's way into managing the group: adding members, setting up
+/// roles and pairing. Says how many people wait for setup, so pending work
+/// shows without leaving the roster.
+class _LeaderControls extends ConsumerWidget {
+  const _LeaderControls({required this.ministry});
+
+  final MinistryContext ministry;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final waiting = ref
+        .watch(dGroupDetailProvider(ministry.dGroupId))
+        .value
+        ?.filterCounts[GroupFilter.needsSetup];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // The roster's one primary for a Leader: lime, like the app's other
+        // main actions.
+        AppButton(
+          label: 'Manage members',
+          icon: Icons.manage_accounts_outlined,
+          onPressed: () =>
+              context.push(Routes.dGroupDetailFor(ministry.dGroupId)),
+        ),
+        if (waiting != null && waiting > 0) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            waiting == 1
+                ? '1 person needs their role set up.'
+                : '$waiting people need their role set up.',
+            textAlign: TextAlign.center,
+            style: context.supportingStyle,
+          ),
+        ],
+      ],
+    );
   }
 }

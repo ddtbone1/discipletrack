@@ -33,12 +33,7 @@ class MyDisciplesBody extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'The people you disciple. Tap someone to record a meeting or see '
-          'their journey.',
-          style: context.supportingStyle,
-        ),
-        const SizedBox(height: AppSpacing.lg),
+        const SizedBox(height: AppSpacing.sm),
         disciples.when(
           loading: () => const SizedBox(height: 320, child: LoadingState()),
           error: (e, _) => SizedBox(
@@ -51,6 +46,7 @@ class MyDisciplesBody extends ConsumerWidget {
           ),
           data: (rows) => rows.isEmpty
               ? const EmptyState(
+                  illustration: Illustration.join,
                   title: 'No Disciples yet',
                   message:
                       'No Disciples are paired with you yet. Your Leader or '
@@ -91,7 +87,7 @@ class _DiscipleList extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
         ],
-        const SectionHeading('Longest since last meeting first'),
+        const SectionHeading('Your Disciples'),
         TileGroup(
           children: [
             for (final d in disciples)

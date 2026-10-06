@@ -64,6 +64,13 @@ class DGroupsPage extends ConsumerWidget {
               icon: Icons.add_rounded,
               onPressed: () => context.push(Routes.newDGroup),
             ),
+            const SizedBox(height: AppSpacing.xs),
+            AppButton(
+              label: 'Curriculum',
+              variant: AppButtonVariant.secondary,
+              icon: Icons.menu_book_outlined,
+              onPressed: () => context.push(Routes.lessons),
+            ),
             const SizedBox(height: AppSpacing.lg),
             groups.when(
               loading: () => const SizedBox(height: 240, child: LoadingState()),
@@ -77,6 +84,7 @@ class DGroupsPage extends ConsumerWidget {
               ),
               data: (items) => items.isEmpty
                   ? const EmptyState(
+                      illustration: Illustration.group,
                       title: 'No D Groups yet',
                       message:
                           'Create the first group and appoint its Leader. '

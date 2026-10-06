@@ -37,14 +37,15 @@ void main() {
       expect(items[1].path, Routes.dGroups);
     });
 
-    test('a Leader\'s group goes to its detail page; a Disciple\'s to the '
-        'roster', () {
+    test('everyone\'s group goes to the roster; for a Leader the management '
+        'page keeps D Group active (ADR-020)', () {
       final leader = dockItemsFor(
         isCoordinator: false,
         ministry: _context(DGroupResponsibility.leader),
       );
       expect(_labels(leader), ['Home', 'D Group', 'Profile']);
-      expect(leader[1].path, Routes.dGroupDetailFor('g1'));
+      expect(leader[1].path, Routes.myGroup);
+      expect(activeDockIndex(leader, Routes.dGroupDetailFor('g1')), 1);
 
       final disciple = dockItemsFor(
         isCoordinator: false,

@@ -55,6 +55,15 @@ Needs-setup member, section 2 rows and notes, section 3
 `d_group_memberships`, `discipler_assignments`, `d_group_invitations`
 (historical), section 5 `ministry_role_transitions`, section 10.
 
+Revision 2026-10-06 (ADR-020, Migration 018): every D Group Leader
+holds DISCIPLER in their group, granted with the leadership. Section 10
+`add_self_as_discipler()`.
+
+Revision 2026-10-06 (ADR-019, Slice 7, Migration 017): lesson content
+implemented. Section 5 `curricula` note names the content tables (no
+client policy or grant) and the controlled reads; section 10 adds
+publish_curriculum() and the three content reads.
+
 ---
 
 # 1. Role Model
@@ -820,6 +829,11 @@ content is tiered and gated by progression:
   resolved for someone with no journey grants nothing
 - nobody else, including ADMIN without COORDINATOR
 There is no client write path. Publishing is trusted tooling in the service-role context.
+Implemented in Migration 017: curriculum_publications,
+lesson_content_blocks and lesson_block_answers have RLS enabled, no
+client policy and no grant to anon or authenticated. Clients read only
+through get_lesson_content(), list_lesson_access() and
+get_my_readable_content() (section 10).
 A device copy of the content is display data only and authorizes
 nothing.
 
@@ -1432,10 +1446,10 @@ get_initial_setup_status(p_church_id) (Migration 013)
 
 add_self_as_discipler()
 → the group's LEADER only, for themselves
-→ records discipler_basis LEADER_SELF; not bounded by the initial setup
-  period (a Leader can never be a Disciple, so the Lesson 5 path does
-  not exist for them)
-→ audited as D_GROUP_MEMBER_ADDED
+→ since ADR-020 every active Leader already holds DISCIPLER (granted by
+  create_d_group() and assign_d_group_leader(), discipler_basis
+  LEADER_SELF), so it answers already_discipler; kept for compatibility
+  and called by no client
 
 set_discipler()
 → COORDINATOR or the group's LEADER, who keeps pairing authority for
@@ -1515,6 +1529,41 @@ Monitoring and follow-up creation
 → never assigns a follow-up to its own subject
 → a person who is both a Disciple and a Discipler (ADR-012) is
   monitored as a Disciple only
+
+publish_curriculum() (Migration 017, ADR-019)
+→ service_role only; no client grant. Trusted tooling
+  (tool/publish_curriculum.ps1, and the local seed) calls it
+→ supersedes the current publication and writes the new one with its
+  blocks and answers in one transaction; sets curriculum_lessons.title;
+  audited as CURRICULUM_PUBLISHED
+→ FULL is refused without a licence reference; a METADATA publication
+  refuses any block type outside the metadata set
+
+get_lesson_content(), list_lesson_access(), get_my_readable_content()
+(Migration 017, ADR-019)
+→ ACTIVE member of the lesson's church; the only client reads of
+  lesson content (the content tables have no client policy or grant)
+→ every block is checked with private.can_read_lesson_tier(): the
+  Coordinator both tiers of any lesson; any active Discipler of the
+  church (every Leader, ADR-020) both tiers of any lesson, in any
+  context (Migration 019, ADR-019 decision 16); the person themselves
+  the Disciple tier of reached lessons; nobody else
+→ get_lesson_content() refuses with PT403 not_authorized when the caller
+  may read neither tier; answers are returned only with the Discipler
+  tier
+→ list_lesson_access() refuses PT403 for a person outside the caller's
+  scope, and otherwise returns every lesson with the tiers open to the
+  caller, so a locked lesson is shown, never its content
+→ get_my_readable_content() returns everything the caller may read now,
+  for the device copy; the app replaces the copy on each refresh and
+  clears it on sign-out
+
+get_lesson_covers(), set_lesson_cover() (Migration 019, ADR-019
+decision 17)
+→ get_lesson_covers(): any ACTIVE member, the covers of their church's
+  lessons, open and locked alike (no lesson content)
+→ set_lesson_cover(): service_role only (tool/curriculum/build_covers.dart)
+→ lesson_covers has RLS enabled and no client grant
 
 Each operation must:
 

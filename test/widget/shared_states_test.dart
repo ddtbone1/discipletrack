@@ -5,6 +5,7 @@ import 'package:discipletrack/core/widgets/app_text_link.dart';
 import 'package:discipletrack/core/widgets/confirm_dialog.dart';
 import 'package:discipletrack/core/widgets/empty_state.dart';
 import 'package:discipletrack/core/widgets/error_state.dart';
+import 'package:discipletrack/core/widgets/illustration.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -83,16 +84,17 @@ void main() {
       expect(find.text('Refresh'), findsOneWidget);
     });
 
-    testWidgets('restricted explains, with a lock and a default title', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        _host(const EmptyState.restricted(message: 'For the Coordinator.')),
-      );
-      expect(find.text("This isn't available to you"), findsOneWidget);
-      expect(find.text('For the Coordinator.'), findsOneWidget);
-      expect(find.byIcon(Icons.lock_outline_rounded), findsOneWidget);
-    });
+    testWidgets(
+      'restricted explains, with its illustration and a default title',
+      (tester) async {
+        await tester.pumpWidget(
+          _host(const EmptyState.restricted(message: 'For the Coordinator.')),
+        );
+        expect(find.text("This isn't available to you"), findsOneWidget);
+        expect(find.text('For the Coordinator.'), findsOneWidget);
+        expect(find.byType(IllustrationView), findsOneWidget);
+      },
+    );
   });
 
   group('showConfirmDialog', () {

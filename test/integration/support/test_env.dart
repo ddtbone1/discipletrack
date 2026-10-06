@@ -530,6 +530,47 @@ Future<void> deleteChurchRows(String churchId) async {
     await service.from('curricula').select('id').eq('church_id', churchId),
   );
   if (curricula.isNotEmpty) {
+    // Published content (Migration 017) before the lessons it belongs to.
+    final publications = _ids(
+      await service
+          .from('curriculum_publications')
+          .select('id')
+          .inFilter('curriculum_id', curricula),
+    );
+    if (publications.isNotEmpty) {
+      final blocks = _ids(
+        await service
+            .from('lesson_content_blocks')
+            .select('id')
+            .inFilter('publication_id', publications),
+      );
+      if (blocks.isNotEmpty) {
+        await service
+            .from('lesson_block_answers')
+            .delete()
+            .inFilter('block_id', blocks);
+      }
+      await service
+          .from('lesson_content_blocks')
+          .delete()
+          .inFilter('publication_id', publications);
+      await service
+          .from('curriculum_publications')
+          .delete()
+          .inFilter('id', publications);
+    }
+    final lessons = _ids(
+      await service
+          .from('curriculum_lessons')
+          .select('id')
+          .inFilter('curriculum_id', curricula),
+    );
+    if (lessons.isNotEmpty) {
+      await service
+          .from('lesson_covers')
+          .delete()
+          .inFilter('lesson_id', lessons);
+    }
     await service
         .from('curriculum_lessons')
         .delete()

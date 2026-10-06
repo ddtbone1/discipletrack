@@ -6,6 +6,7 @@ import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 import 'app_button.dart';
+import 'illustration.dart';
 
 /// Full-page error with an optional retry.
 ///
@@ -21,6 +22,7 @@ class ErrorState extends StatelessWidget {
     required this.message,
     this.title = 'Something went wrong',
     this.onRetry,
+    this.illustration = Illustration.error,
     super.key,
   });
 
@@ -43,6 +45,7 @@ class ErrorState extends StatelessWidget {
             '${_capitalise(subject)} needs a connection. Connect and try '
             'again.',
         onRetry: onRetry,
+        illustration: Illustration.offline,
       );
     }
     return ErrorState(
@@ -60,24 +63,17 @@ class ErrorState extends StatelessWidget {
   final String title;
   final String message;
   final VoidCallback? onRetry;
+  final Illustration illustration;
 
   @override
   Widget build(BuildContext context) {
-    final p = context.palette;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.sm),
-              decoration: BoxDecoration(
-                color: p.errorSurface,
-                borderRadius: AppRadius.card,
-              ),
-              child: Icon(Icons.error_outline, color: p.error, size: 28),
-            ),
+            IllustrationView(illustration, height: 110),
             const SizedBox(height: AppSpacing.md),
             Text(
               title,

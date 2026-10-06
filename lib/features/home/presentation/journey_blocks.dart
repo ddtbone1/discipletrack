@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/routes.dart';
+import '../../../core/format/app_format.dart';
 import '../../../core/connectivity/connection_status.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
@@ -12,8 +12,8 @@ import '../../../core/widgets/app_pill.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_text_link.dart';
 import '../../../core/widgets/person_row.dart';
+import '../../curriculum/presentation/lesson_carousel.dart';
 import '../../discipleship/application/discipleship_providers.dart';
-import '../../discipleship/domain/journey.dart';
 import '../../discipleship/domain/journey_views.dart';
 import '../../discipleship/presentation/discipleship_ui.dart';
 import '../../discipleship/presentation/my_disciples_page.dart';
@@ -34,7 +34,13 @@ class JourneyBlocks extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (views.hasOwnJourney) ...[
-          const SectionHeading('Your journey'),
+          SectionHeading(
+            'Your journey',
+            trailing: AppTextLink(
+              label: 'See all',
+              onTap: () => context.go(Routes.journey),
+            ),
+          ),
           // The Discipler's name is on the D Group card above.
           const _OwnJourney(),
           const SizedBox(height: AppSpacing.lg),
@@ -60,7 +66,6 @@ class _OwnJourney extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final p = context.palette;
     final journey = ref.watch(myJourneyProvider);
     final Widget content;
     if (journey.hasError && !journey.hasValue) {
@@ -74,49 +79,37 @@ class _OwnJourney extends ConsumerWidget {
       content = const SizedBox(height: 48);
     } else {
       final j = journey.value!;
-      final current = j.currentLesson;
-      content = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      final id = ref.watch(myMembershipIdProvider);
+      final last = id == null
+          ? null
+          : ref.watch(meetingSummaryProvider(id)).value?.lastRecordedMeetingAt;
+      // One line of facts, then the lessons to swipe through; the current
+      // one opens straight into the reader.
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            current == null
-                ? 'Every lesson completed'
-                : 'Lesson ${current.number} · ${current.countLine}',
-            style: AppTypography.body.copyWith(
-              color: p.textPrimary,
-              fontWeight: FontWeight.w600,
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: '${j.lessonsCompleted} of ${j.lessonsTotal} completed',
+                  style: TextStyle(
+                    color: pillColors(context, PillTone.brand).$2,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (last != null)
+                  TextSpan(text: '  ·  Last met ${AppFormat.shortDate(last)}'),
+              ],
             ),
+            style: context.supportingStyle,
           ),
-          const SizedBox(height: AppSpacing.xs),
-          JourneyProgressBar(
-            total: j.lessonsTotal,
-            completed: j.lessonsCompleted,
-            currentNumber: current?.number,
-            submitted: current?.state == LessonState.submitted,
-            compact: true,
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(j.summaryLine, style: context.supportingStyle),
+          const SizedBox(height: AppSpacing.sm),
+          LessonCarousel(journey: j),
         ],
       );
     }
-    return AppCard(
-      onTap: () => context.go(Routes.journey),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          content,
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'See my journey',
-            style: AppTypography.supporting.copyWith(
-              color: p.textPrimary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
+    return AppCard(onTap: () => context.go(Routes.journey), child: content);
   }
 }
 

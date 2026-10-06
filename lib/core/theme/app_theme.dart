@@ -117,6 +117,14 @@ abstract final class AppTheme {
       ),
 
       dividerTheme: DividerThemeData(color: p.border, thickness: 1, space: 1),
+      // Overflow menus (the horizontal "more" button) open as a rounded
+      // card, matching the app's rounded components.
+      popupMenuTheme: PopupMenuThemeData(
+        color: p.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
 
       progressIndicatorTheme: ProgressIndicatorThemeData(color: p.textPrimary),
     );

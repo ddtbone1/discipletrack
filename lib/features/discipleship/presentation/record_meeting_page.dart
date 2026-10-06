@@ -80,6 +80,7 @@ class RecordMeetingPage extends ConsumerWidget {
               final target = rows.where((r) => r.isTarget).firstOrNull;
               if (target == null) {
                 return const EmptyState(
+                  illustration: Illustration.empty,
                   message:
                       'No Disciples can be recorded together for this lesson.',
                 );

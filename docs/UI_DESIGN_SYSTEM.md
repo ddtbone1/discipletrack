@@ -516,7 +516,7 @@ MemberCard
 DiscipleProgressCard
 OutcomeSelector (a Disciple's meeting outcome, section 67)
 FollowUpCard
-LessonTimeline
+LessonCoverCard
 
 Avoid excessively generic abstractions such as:
 
@@ -1342,6 +1342,21 @@ Do not create a new badge style for every feature.
 
 Semantic status styling should be centralized.
 
+**Badge, pill or coloured text (user decisions 2026-10-06).** Each has one
+job and they are never swapped:
+
+- A **role badge** (`RoleBadge`) labels a person: Leader, Discipler,
+  Disciple, and a short state beside a name (Needs setup, Eligible). Small,
+  tinted fill, no border.
+- **Coloured text** (`ProgressFact`) states a progress fact: "Lesson 6 of
+  10". Bold caption in the tone's colour, no fill.
+- A **pill** carries a state on a card or page: In progress, Completed, Not
+  paired, a meeting outcome. Pills are used sparingly.
+
+List rows stay to three short lines: name, badges, one fact. Row actions
+are compact round icon buttons with a tooltip (Set up, Pair, Change
+Discipler), never wide text pills. The overflow menu is the horizontal
+"more" icon, opening a rounded menu.
 ---
 
 ## 40. Buttons
@@ -1808,16 +1823,17 @@ Primary action by page:
 
 | Page | Viewer | Primary |
 |---|---|---|
-| Home | Disciple | None (later: read the current lesson) |
+| Home | Disciple | Read Lesson n, inside the Your journey card (2026-10-06) |
 | Home | Discipler | Record Meeting |
-| Home | Leader | None; the confirmation tile leads |
+| Home | Leader | As a Discipler (ADR-020): Record Meeting when a Disciple is paired with them; otherwise none |
 | Home | Coordinator, Admin | None; attention tiles lead |
-| Journey, My Journey | Disciple | None, stated |
+| Journey, My Journey | Disciple | None, stated; "Read Lesson n" is secondary inside the lesson card, and the Lessons timeline opens every reached lesson |
 | Journey, My Disciples | Discipler | Record Meeting |
-| Disciple detail | Discipler | Record Meeting; "Mark Lesson n as finished" is secondary on the lesson card |
+| Disciple detail | Discipler | Record Meeting; "Mark Lesson n as finished" and, below it, "Read Lesson n" are secondary on the lesson card |
 | Disciple detail | Leader | Confirm Lesson n when submitted; otherwise none. Fallback recording is secondary |
 | Disciple detail | Coordinator | None; Confirm as secondary when submitted; Reopen in overflow |
-| D Group detail | Leader | None as a lime button; the Awaiting confirmation section leads. Add members is secondary (decision A8) |
+| My D Group | Leader | Manage members (lime), opening D Group detail (ADR-020) |
+| D Group detail | Leader | None as a lime button. Add members is secondary (decision A8) |
 | D Group detail | Coordinator | Add members, or none |
 | D Groups | Coordinator | New group |
 | Record Meeting | Recorder | Record meeting |
@@ -1962,9 +1978,12 @@ concept used in several places:
 |---|---|---|
 | MeetingCount | "Lesson 4 · 5 meetings recorded", with an optional typical number from the database | text, no fixed-total markers |
 | LessonStatusLine | One wording for lesson state across roles | StatusPill |
-| LessonTimeline | The journey, with completed, current, submitted and locked lessons | StepList, extended |
+| LessonCoverCard | One lesson over its cover photo: number, title, and a lock when it is not open. The lesson list is ten of these; a journey page has one, LessonsNavCard, its only way into the lessons (no timeline, no read button) | image card with a bottom shade |
 | JourneyProgress | "Lesson 6 of 12", 12 segments, "5 of 12 completed" (section 31); total from the active curriculum | text and segment marks, no percentage |
-| DiscipleProgressRow | Name, lesson, count, last recorded meeting | PersonRow |
+| DiscipleProgressRow | Lesson ring, name, and one coloured line: the lesson's state and the last recorded meeting | PersonRow |
+| LessonCarousel | Home, for a Disciple: "n of 10 completed · Last met" over the ten LessonCoverCards to swipe, starting on the current one ("Lesson n · Now"); reached lessons open, the rest are locked | PageView of LessonCoverCard |
+| FilterTabs | List filters with counts in one fixed row that shares the width (each tab sized by its label, one type size); the active tab is its text in the brand colour and a thin lime outline, no fill | Row of stadium tabs |
+| BlankField | A blank or writing field the Disciple types into, inline, growing with the answer; saved on the device (ADR-021) | TextField, underline only |
 | MeetingHistoryRow | Outcome, counted or not, recorder, voided state, Void where allowed | PersonRow layout |
 | OutcomeSelector | Present, Late, Absent, Excused, with the counting hint | a segmented control |
 | MonthMeetingView | Recorded meetings by month (section 20) | added only with that view |

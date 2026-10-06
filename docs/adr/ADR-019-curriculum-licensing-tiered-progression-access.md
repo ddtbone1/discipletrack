@@ -4,6 +4,8 @@
 
 Accepted (2026-10-06, user decisions after the curriculum source analysis, `docs/curriculum/SOURCE_ANALYSIS.md`). Amended the same day (user): Leaders read the Disciple tier only; the no-journey rule is explicit; the metadata boundary and canonical titles are fixed (decisions 2 and 6).
 
+Amended again on 2026-10-06 (user, "Slice 7 curriculum requirement correction"): permission to reproduce the curriculum digitally is confirmed, and DiscipleTrack must reproduce the lessons faithfully. Decisions 1 to 4 are superseded by decisions 11 to 15 below; decisions 5 to 10 stand.
+
 Partially supersedes [ADR-010](ADR-010-lesson-content-delivery.md):
 - decision 1, the repository Markdown as the source for publishing;
 - decision 12, every ACTIVE member reads all lesson content.
@@ -62,7 +64,7 @@ The book also prescribes workflow that the ministry has deliberately decided dif
 
    Answers are stored apart from the content they answer, so the database can withhold them by policy, not by client filtering.
 
-### Who may read what (replaces ADR-010 decision 12)
+### Who may read what (replaces ADR-010 decision 12; the Discipler and Leader parts are superseded by decision 16)
 
 6. **Read scope:**
    - **Lesson list** (number and title, `curriculum_lessons`): unchanged, every ACTIVE member of the church, including those not in a D Group.
@@ -116,7 +118,7 @@ The book also prescribes workflow that the ministry has deliberately decided dif
 
 ## Alternatives Considered
 
-**Publish the source text now and seek permission later.** Rejected. It distributes a third-party work without a confirmed right to do so.
+**Publish the source text now and seek permission later.** Rejected at the time. Resolved on 2026-10-06: permission is confirmed (decision 11).
 
 **One read scope for all content, with answers hidden by the client.** Rejected. The client is untrusted (AGENTS.md). Answers must be withheld by the database.
 
@@ -131,8 +133,8 @@ The book also prescribes workflow that the ministry has deliberately decided dif
 - **Slice 7 builds:**
   - the content structures, with tiers and separately stored answers;
   - the progression-gated read operations and their RLS;
-  - a metadata-only publication of the ten lessons;
-  - a reader that shows what each person may read.
+  - a metadata-only publication of the ten lessons, superseded by the faithful full publication (decisions 11 to 15);
+  - a reader that shows what each person may read, in a Disciple view and a Discipler view.
 - **Documents updated in the same pass:**
   - RBAC_RLS_MATRIX: the "Read lesson content" row and its note, plus new rows for the two tiers;
   - BUSINESS_RULES BR-029a;
@@ -143,3 +145,47 @@ The book also prescribes workflow that the ministry has deliberately decided dif
   - the ADR-013 reserved entry.
 - **The DBML content tables** are added by the Slice 7 migration, as ADR-010 anticipated.
 - **ADR-013**, when written, covers the workbook experience and responses only. The tier boundary and the read scope above are already decided.
+
+## Amendment: faithful digital reproduction (2026-10-06)
+
+The user confirmed that permission to reproduce *Journey* digitally has been obtained, and corrected the Slice 7 requirement: the app must reproduce the provided lessons faithfully, not reduce them to metadata. This supersedes decisions 1 to 4. The tier boundary, read scope, device copy, book-workflow and deferral decisions (5 to 10) stand.
+
+11. **Permission and its record.** Full content is published only as a `FULL` publication with a `licence_reference` (the database refuses one without it). The reference records who granted permission, when and its scope. The ministry supplies the grantor and scope wording for that reference; the user's confirmation of 2026-10-06 is the decision that allows publishing.
+12. **Faithful reproduction.** The provided lesson files are the authoritative content source, and the app is a digital re-layout, not a rewrite. Preserved exactly, where applicable:
+    - lesson titles and ordering; section ordering and headings;
+    - instructional and explanatory text;
+    - statements and fill-in-the-blank material;
+    - scripture references in their original context;
+    - Reflect & Transfer questions; Water Cooler scenarios; write-the-verse sections; assignments;
+    - Discipler-training modules;
+    - any other lesson-specific content, in its order.
+
+    Nothing substantive is summarized, paraphrased, modernized, combined, omitted, invented or reordered to make the interface cleaner. Layout may change; curriculum content may not. No lesson content is generated.
+13. **One canonical structure, two authorized presentations.** The source is the Discipler's Copy. Each lesson is stored once, as ordered blocks:
+    - **Disciple view:** the faithful lesson with every supplied answer withheld, shown as an unanswered blank.
+    - **Discipler view:** the same lesson with the answers and the Discipler-only material (Training Modules, Discipler notes), under the relationship-scoped read rules of decision 6.
+
+    Answers stay in their own table and reach a client only with the Discipler tier (decision 5). Blanks, verse writing and homework are displayed, not yet answered or saved: workbook persistence stays in Slice 8 (decision 10).
+14. **Deterministic conversion, verified.** Lessons are converted by a repeatable tool from the source files, never retyped or summarized. Each conversion is checked automatically and by comparison with the source:
+    1. every substantive source item is represented;
+    2. wording is preserved (the word sequence of the converted lesson, read back, equals the source's);
+    3. ordering is preserved;
+    4. answers do not appear in the Disciple view;
+    5. Discipler-only content stays behind the read rules;
+    6. the screen is a mobile re-layout, not a rewrite.
+
+    One representative lesson establishes the schema and the mobile components and is verified first. The same conversion is then applied to all ten.
+15. **Where the text lives.** The converted lesson files stay out of the repository (git-ignored), like the source PDFs, until the licence is confirmed to cover storing the text in source control. The text lives in the database and in each reader's device copy (decision 7). The repository holds the schema, the converter, the renderers, and the metadata definition used for local development.
+
+## Amendment: Disciplers read every lesson (2026-10-06)
+
+User decision of 2026-10-06, made after the full lessons were in the app. It replaces the Discipler and Leader parts of decision 6. The Disciple's own gating is unchanged.
+
+16. **Any Discipler reads all ten lessons, both tiers, with answers.** A person who holds an active DISCIPLER responsibility in any D Group of the church reads every lesson of that church's curriculum, in their own context and in any Disciple's context. Every Leader holds DISCIPLER (ADR-020), so every Leader reads them too. The Coordinator reads everything, as before.
+    - **Why:** a Discipler prepares lessons ahead of the Disciple and teaches from the Discipler's Copy, which in print they already hold whole. Gating them by a Disciple's progress only got in the way.
+    - **What stays gated:** a Disciple who is not a Discipler reads only the Disciple tier of the lessons they have reached (completed, plus the current one). The next lesson opens only when the current one is marked completed. Answers and Discipler-only material stay with the Discipler tier.
+    - **Person data is unaffected.** Lesson content carries nothing about a person. `list_lesson_access()` still refuses a context person outside the caller's scope, so who someone is and how far they have come stays as private as before.
+    - **Known effect:** a person who is both a Disciple and a Discipler (ADR-012) reads their own lessons ahead and with answers, because the Discipler role reads all. This is accepted; the book gives every Discipler the full Discipler's Copy.
+    - Enforced in `private.can_read_lesson_tier()` through `private.is_discipler_in_church()` (Migration 019).
+
+17. **Lesson covers.** Each lesson's cover photo from the book is shown behind its card in the lesson list. Covers carry no lesson content, so every ACTIVE member of the church reads them, open and locked lessons alike (`get_lesson_covers()`). Only trusted tooling writes them (`set_lesson_cover()`, service role). Like the text, the images come from the licensed source and stay out of the repository.

@@ -13,6 +13,8 @@ import '../features/auth/presentation/start_page.dart';
 import '../features/auth/presentation/verify_email_page.dart';
 import '../features/home/presentation/home_page.dart';
 import '../features/membership_review/presentation/pending_members_page.dart';
+import '../features/curriculum/presentation/lesson_index_page.dart';
+import '../features/curriculum/presentation/lesson_reader_page.dart';
 import '../features/ministry/presentation/add_members_page.dart';
 import '../features/ministry/presentation/d_group_detail_page.dart';
 import '../features/ministry/presentation/d_group_form_page.dart';
@@ -65,6 +67,7 @@ Set<String> allowedFor(SessionState state) => switch (state) {
     Routes.pendingMembers,
     ...Routes.ministryRoutes,
     ...Routes.discipleshipRoutes,
+    ...Routes.curriculumRoutes,
   },
 };
 
@@ -207,6 +210,27 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: Routes.myGroup,
             pageBuilder: (c, s) =>
                 buildPage(state: s, child: const MyGroupPage()),
+          ),
+          GoRoute(
+            path: Routes.lessons,
+            pageBuilder: (c, s) => buildPage(
+              state: s,
+              child: LessonIndexPage(
+                forMembershipId: s.uri.queryParameters['for'],
+              ),
+            ),
+            routes: [
+              GoRoute(
+                path: ':lessonId',
+                pageBuilder: (c, s) => buildPage(
+                  state: s,
+                  child: LessonReaderPage(
+                    lessonId: s.pathParameters['lessonId']!,
+                    forMembershipId: s.uri.queryParameters['for'],
+                  ),
+                ),
+              ),
+            ],
           ),
           GoRoute(
             path: Routes.journey,

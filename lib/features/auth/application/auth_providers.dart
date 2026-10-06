@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../curriculum/data/curriculum_repository.dart';
 import '../../offline/data/offline_snapshot.dart';
 import '../data/auth_repository.dart';
 
@@ -46,10 +47,12 @@ class AuthController extends Notifier<AsyncValue<void>> {
     () => ref.read(authRepositoryProvider).resendVerificationCode(email),
   );
 
-  /// Also deletes the offline snapshots, so the next person to use the
-  /// device sees nothing of the last one's data (Slice 4 plan).
+  /// Also deletes the offline snapshots and lesson copies, so the next person
+  /// to use the device sees nothing of the last one's data (Slice 4 plan,
+  /// ADR-019 decision 7).
   Future<bool> signOut() => _succeeds(() async {
     await ref.read(offlineSnapshotStoreProvider).clearAll();
+    await ref.read(curriculumCacheStoreProvider).clearAll();
     await ref.read(authRepositoryProvider).signOut();
   });
 

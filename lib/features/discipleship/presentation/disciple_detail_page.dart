@@ -8,6 +8,7 @@ import '../../../core/supabase/postgrest_failure.dart';
 import '../../../core/connectivity/connection_status.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_pill.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_text_link.dart';
@@ -15,6 +16,8 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/person_row.dart';
+import '../../../core/widgets/role_badge.dart';
+import '../../curriculum/presentation/lessons_nav_card.dart';
 import '../../ministry/application/ministry_providers.dart';
 import '../application/discipleship_providers.dart';
 import '../data/discipleship_repository.dart';
@@ -144,6 +147,8 @@ class _Detail extends ConsumerWidget {
             onBehalf: !isMyDisciple,
           ),
         ),
+        const SizedBox(height: AppSpacing.md),
+        LessonsNavCard(journey: journey, forMembershipId: person.membershipId),
         const SizedBox(height: AppSpacing.lg),
         const SectionHeading('Meetings'),
         history.when(
@@ -158,7 +163,23 @@ class _Detail extends ConsumerWidget {
           ),
           data: (rows) => MeetingCalendar(
             entries: rows,
-            emptyMessage: 'No meetings recorded for ${person.firstName} yet.',
+            emptyMessage: 'No meetings with ${person.firstName} yet.',
+            emptyIllustration: Illustration.group,
+            emptyAction: journey.canRecord
+                // A compact pill, so the next step reads as tappable.
+                ? AppButton(
+                    label: 'Record first meeting',
+                    icon: Icons.add_rounded,
+                    variant: AppButtonVariant.secondary,
+                    dense: true,
+                    expand: false,
+                    requiresConnection: true,
+                    offlineAction: 'record a meeting',
+                    onPressed: () => context.push(
+                      Routes.recordMeetingFor(person.membershipId),
+                    ),
+                  )
+                : null,
             // Void actions only where the server says the viewer may.
             entryActionBuilder: (e) => e.canVoid
                 ? _VoidMenu(entry: e, firstName: person.firstName)
@@ -176,10 +197,13 @@ class _Detail extends ConsumerWidget {
                 : null,
           ),
         ),
-        if (summary != null) ...[
+        // Oversight view: a run of recorded absences is stated as a fact.
+        if ((summary?.consecutiveRecordedAbsences ?? 0) >= 2) ...[
           const SizedBox(height: AppSpacing.sm),
-          // Oversight view: a run of recorded absences is stated as a fact.
-          MeetingFactPills(summary: summary, includeConsecutive: true),
+          ProgressFact(
+            '${summary!.consecutiveRecordedAbsences} recorded absences in a row',
+            tone: PillTone.warning,
+          ),
         ],
         // Recent activity sits at the bottom of the page.
         if (kShowJourneyActivity) ...[
@@ -417,7 +441,7 @@ class _VoidMenu extends ConsumerWidget {
     final busy = ref.watch(meetingVoidControllerProvider).isBusy;
     return PopupMenuButton<_VoidChoice>(
       tooltip: 'Meeting actions',
-      icon: const Icon(Icons.more_vert_rounded),
+      icon: const Icon(Icons.more_horiz_rounded),
       enabled: !busy,
       onSelected: (choice) => _onSelected(context, ref, choice),
       itemBuilder: (_) => [

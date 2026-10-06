@@ -315,7 +315,11 @@ void main() {
           .select('id')
           .eq('d_group_id', g.groupId)
           .isFilter('ended_at', null);
-      expect(rows, hasLength(4));
+      expect(
+        rows,
+        hasLength(5),
+        reason: 'the Leader holds LEADER and DISCIPLER (ADR-020)',
+      );
       final placements = await c
           .from('d_group_placements')
           .select('church_membership_id')
@@ -379,11 +383,11 @@ void main() {
         final rows = (await discipler.user.client.rpc<List<dynamic>>(
           'get_my_d_group_roster',
         )).cast<Map<String, dynamic>>();
-        Map<String, dynamic> of(TestMember m) => rows.singleWhere(
-          (r) => r['church_membership_id'] == m.membershipId,
-        );
+        // The Leader appears twice: LEADER and DISCIPLER (ADR-020).
+        Map<String, dynamic> of(TestMember m) =>
+            rows.firstWhere((r) => r['church_membership_id'] == m.membershipId);
 
-        expect(rows, hasLength(4), reason: 'Needs setup is not on the roster');
+        expect(rows, hasLength(5), reason: 'Needs setup is not on the roster');
         expect(rows.map((r) => r['d_group_member_count']).toSet(), {
           5,
         }, reason: 'yet the newcomer counts as a member');
@@ -409,8 +413,9 @@ void main() {
       final c = disciple1.user.client;
       final rows = (await c.rpc<List<dynamic>>('get_my_d_group_roster'))
           .cast<Map<String, dynamic>>();
+      // The Leader appears twice: LEADER and DISCIPLER (ADR-020).
       Map<String, dynamic> of(TestMember m) =>
-          rows.singleWhere((r) => r['church_membership_id'] == m.membershipId);
+          rows.firstWhere((r) => r['church_membership_id'] == m.membershipId);
 
       expect(of(disciple2)['full_name'], 'Sec Disciple Two');
       expect(of(disciple2)['phone'], isNull);

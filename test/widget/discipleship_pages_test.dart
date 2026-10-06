@@ -185,10 +185,10 @@ void main() {
 
       expect(find.text('Ana Lim'), findsOneWidget);
       expect(find.text('Ben Cruz'), findsOneWidget);
-      expect(find.text('Lesson 8 of 12'), findsNWidgets(2));
-      expect(find.text('Last recorded meeting Oct 1'), findsOneWidget);
-      expect(find.text('No meeting recorded yet'), findsOneWidget);
-      expect(find.text('Longest since last meeting first'), findsOneWidget);
+      expect(find.text('Lesson 8 of 12'), findsNothing);
+      expect(find.textContaining('Last met Oct 1'), findsOneWidget);
+      expect(find.textContaining('Last met'), findsOneWidget);
+      expect(find.text('Your Disciples'), findsOneWidget);
       expect(find.text('Record a meeting'), findsOneWidget);
       // Never recorded is listed first.
       expect(
@@ -269,12 +269,10 @@ void main() {
         ),
       );
       expect(find.text('Diana Cruz'), findsOneWidget);
-      // The current lesson comes first: number, title, Discipler, count.
-      expect(find.text('Current lesson'), findsOneWidget);
+      // The current lesson comes first: number, title, Discipler.
       expect(find.text('Lesson 4'), findsOneWidget);
       expect(find.text('Lesson title 4'), findsOneWidget);
       expect(find.text('Discipler: Mark Reyes'), findsOneWidget);
-      expect(find.text('2 counted meetings'), findsOneWidget);
       expect(
         find.bySemanticsLabel('Lesson 4 of 12. 3 lessons completed.'),
         findsOneWidget,
@@ -323,7 +321,8 @@ void main() {
         'history explains itself', (tester) async {
       await pump(tester, repo(canRecord: false));
       expect(find.textContaining('Record'), findsNothing);
-      expect(find.text('No meetings recorded for Diana yet.'), findsOneWidget);
+      expect(find.text('No meetings with Diana yet.'), findsOneWidget);
+      expect(find.text('Record first meeting'), findsNothing);
     });
 
     testWidgets('a refused deep link shows the restricted state without '
