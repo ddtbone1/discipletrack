@@ -322,8 +322,10 @@ Two kinds of device data exist:
 - the session snapshot (Slice 4): own profile, membership, church name,
   roles, group names and the phone numbers visible to the person;
 - the published lesson content (ADR-010), from the Curriculum / Lesson
-  Content slice: synced once, then readable offline, refreshed when the
-  published version changes.
+  Content slice: only the tiers and lessons the server allows that
+  person (ADR-019), synced once, readable offline, refreshed when the
+  published version changes, and pruned to the current scope on every
+  refresh.
 
 Supabase stays authoritative for both. Device data is display data,
 never authorizes anything, is cleared on sign-out, and never masks a

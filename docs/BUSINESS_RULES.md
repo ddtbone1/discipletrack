@@ -421,9 +421,17 @@ Flutter UI/business logic.
 
 ## BR-029a — Lesson Content Is Delivered, Separately from Progress
 
-DiscipleTrack delivers the published lesson material to every ACTIVE
-member of the church (ADR-010). Supabase holds the authoritative
-published content; the repository Markdown is its publishing source.
+DiscipleTrack delivers the published lesson material (ADR-010) in two
+tiers, gated by progression (ADR-019). A Disciple reads the Disciple
+tier of the lessons they have reached, never a future lesson. The Leader of the Disciple's group reads the Disciple tier for
+that Disciple's reached lessons. Answers and other Discipler-tier
+material are read only by the current assigned Discipler, for lessons
+that Disciple has reached, and by the Coordinator; recording a meeting
+on a Discipler's behalf grants a Leader no answers. A person with no
+active Disciple journey reads no lesson content. Supabase holds the
+authoritative published content. Until permission to reproduce the
+source is confirmed, only identifying metadata is published
+(ADR-019 decisions 1 and 2).
 
 Reading is offline-first: once the curriculum has synced, lessons are
 readable without a connection, with no per-lesson download.

@@ -189,7 +189,8 @@ D Group responsibility. This is a valid state, not a stored role.
 | View own church membership | Yes | Yes | Yes | Yes | Yes | Yes |
 | View own church | Yes | Yes | Yes | Yes | Yes | Yes |
 | Read curriculum | Yes | Yes | Yes | Yes | Yes | Yes |
-| Read lesson content | Yes | Yes | Yes | Yes | Yes | Yes |
+| Read lesson content, Disciple tier (ADR-019) | No | Any lesson | Active Disciples of own D Group, reached lessons | Assigned Disciples, reached lessons | Own reached lessons | No |
+| Read lesson content, Discipler tier: answers, notes, modules (ADR-019) | No | Any lesson | No (only as an assigned Discipler) | Assigned Disciples, reached lessons | No | No |
 | Manage church configuration | Yes | No | No | No | No | No |
 | Manage ministry settings | No | Yes | No | No | No | No |
 | Approve church membership | Yes | Yes | No | No | No | No |
@@ -801,10 +802,24 @@ Curriculum mutation is not part of the normal MVP user workflow.
 
 The MVP uses one fixed church curriculum.
 
-Lesson content (ADR-010): the published lesson content table, added by
-the Curriculum / Lesson Content slice, has the same SELECT scope as
-curriculum_lessons (ACTIVE church members, never PENDING) and no client
-write path. Publishing is trusted tooling in the service-role context.
+Lesson content (ADR-010, scope replaced by ADR-019 decision 6): the
+lesson list (curriculum_lessons) stays readable by ACTIVE members. Lesson
+content is tiered and gated by progression:
+- Disciple tier of lesson N: the person for lessons they have reached
+  (completed and current eligible), their current assigned Discipler and
+  the Leader of their current group for the same lessons while the
+  Disciple is active in that group, and the COORDINATOR for any lesson
+- Discipler tier (answers, Discipler notes, modules): the current
+  assigned Discipler for lessons the Disciple has reached, and the
+  COORDINATOR; never the Disciple, and never the LEADER as such
+  (recording on a Discipler's behalf grants no answers; a Leader who is
+  also a Discipler reads this tier only through their own assigned
+  Disciples)
+- "reached": lessons COMPLETED, plus the current lesson only while the
+  person holds an active DISCIPLE responsibility; a default Lesson 1
+  resolved for someone with no journey grants nothing
+- nobody else, including ADMIN without COORDINATOR
+There is no client write path. Publishing is trusted tooling in the service-role context.
 A device copy of the content is display data only and authorizes
 nothing.
 

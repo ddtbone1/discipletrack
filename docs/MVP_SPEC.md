@@ -531,9 +531,20 @@ completed (ADR-017; section 20). The legacy required_meetings value,
 seeded as four, drives nothing.
 
 Lesson names and content are church-owned curriculum data. DiscipleTrack
-delivers the lesson material in the app (ADR-010): it originates as
-Markdown, is published into Supabase, and is readable offline once it
-has synced, without a per-lesson download. Reading never records
+delivers the lesson material in the app (ADR-010, ADR-019): it is
+published into Supabase by trusted tooling and is readable offline once
+it has synced, without a per-lesson download. The curriculum has ten
+lessons. Content has a Disciple tier and a Discipler tier (answers,
+Discipler notes, training modules). Each person reads only the lessons
+their progression or relationship allows (ADR-019 decision 6): a
+Disciple their reached lessons, the assigned Discipler both tiers of
+their Disciple's reached lessons, the Leader only the Disciple tier for
+their group's active Disciples, the Coordinator everything. Until
+permission to reproduce the source curriculum is confirmed, only
+identifying metadata is published. The source's pairing guidance (men
+with men, women with women, Pastor approval for family members and close
+friends) is recorded as future ministry-policy guidance and is not
+enforced (ADR-019 decision 9). Reading never records
 progress, and offline reading never allows an offline change.
 
 ---

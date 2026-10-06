@@ -11,6 +11,14 @@ the real lesson material has been inspected (see Consequences).
 Curriculum size revised to ten lessons (user decision 2026-10-05);
 references to twelve lessons below are historical.
 
+Partially superseded by
+[ADR-019](ADR-019-curriculum-licensing-tiered-progression-access.md)
+(2026-10-06): decision 1 (repository Markdown as the publishing
+source) and decision 12 (one read scope for all content). Decisions 8
+and 9 are amended: the device caches only what the server returned for
+the person and is pruned on refresh. Until permission to reproduce the
+source curriculum is confirmed, only identifying metadata is published.
+
 ## Context
 
 Until this decision the specification stated that DiscipleTrack tracks

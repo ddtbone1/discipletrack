@@ -76,7 +76,9 @@ All within one transaction:
 Lesson rows are identification and ordering only. Lesson content is not
 part of bootstrap: it is published separately by trusted tooling under
 ADR-010, which supersedes the earlier statement that DiscipleTrack does
-not store or deliver lesson content.
+not store or deliver lesson content. Content is tiered and its read
+scope is gated by progression (ADR-019); until permission to reproduce
+the source is confirmed, only identifying metadata is published.
 
 The two thresholds in step 2 (ADR-014 decisions 12 and 13):
 

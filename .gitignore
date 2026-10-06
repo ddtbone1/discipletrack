@@ -50,3 +50,7 @@ app.*.map.json
 # Environment configuration containing real project keys.
 # Local dev/test defaults in config/ are published constants and ARE committed.
 config/prod.json
+
+# Curriculum source materials (lesson PDFs). Kept local, never committed:
+# read for source analysis only; lesson content reaches the app as data.
+/docs/curriculum/source/

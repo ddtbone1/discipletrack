@@ -1899,7 +1899,7 @@ domain effect.
 Progress and meeting history are shown as concrete facts:
 
 - "Lesson 4 · 5 meetings recorded"
-- "5 of 12 lessons completed"
+- "5 of 10 lessons completed"
 - "Lesson 6 current"
 - "Lesson 6 awaiting confirmation"
 - "Last recorded meeting Sep 25"

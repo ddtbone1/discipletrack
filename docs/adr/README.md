@@ -24,7 +24,7 @@ ADRs explain why a decision exists so future developers and AI coding agents can
 | ADR-007 | Server-Side Monitoring | Superseded by ADR-009 |
 | ADR-008 | Documentation Precedence and Schema Source of Truth | Accepted |
 | ADR-009 | Discipleship Meeting Attendance and Role-Specific Monitoring | Accepted; partially superseded by ADR-011 (lesson readiness), ADR-012 (promotion as a recalculation trigger) and ADR-014 (gatherings, gathering monitoring, the missed-meeting condition, two thresholds) |
-| ADR-010 | Lesson Content Delivery and Offline-First Reading | Accepted |
+| ADR-010 | Lesson Content Delivery and Offline-First Reading | Accepted; partially superseded by ADR-019 (publishing source, read scope; device copy amended) |
 | ADR-011 | Explicit Lesson Completion, Independent of a Fixed Meeting Count | Accepted; partially superseded by ADR-014 (condition name, role-specific monitoring), ADR-015 (Leader confirmation step, submission withdrawal, reopen result), ADR-016 (decision 14, "reopening must come first") and ADR-017 (the meeting policy and N1, closed: no minimum) |
 | ADR-012 | Discipler Eligibility After Lesson 5 and Concurrent Disciple and Discipler Responsibilities | Accepted; D2 decided (policy function); eligibility wording amended by ADR-015; the Slice 6 questions decided and decision 9 extended to undo by ADR-018 |
 | ADR-013 | Curriculum Workbook and Guide Modes | Reserved, not written (see Reserved numbers) |
@@ -33,6 +33,7 @@ ADRs explain why a decision exists so future developers and AI coding agents can
 | ADR-016 | A Completion Is Locked Once Later Progress Exists; Reopen Is Database-Only | Accepted |
 | ADR-017 | No Minimum Meetings; Meeting Count Is Never a Progression Gate | Accepted (closes N1) |
 | ADR-018 | Direct D Group Placement, Needs Setup, and Initial Rollout Recognition of Disciplers | Accepted (supersedes Slice 3 placement by invitation) |
+| ADR-019 | Curriculum Licensing Posture, Tiered Content and Progression-Gated Access | Accepted |
 
 ADR numbers are identifiers, not implementation order.
 
@@ -57,9 +58,11 @@ part of Slice 5. Expected scope:
 - the assigned Discipler does not see private workbook responses by default
 - the security implications of an offline curriculum copy
 
-It is expected to partially supersede ADR-010 decision 12 (one read
-scope for all lesson content) for the Guide tier. Open questions it
-owns: D13 (exact Guide read scope) and D17 (offline workbook responses).
+ADR-019 (2026-10-06) has already decided the tier boundary, that answers
+are protected server-side, and the relationship-scoped Discipler read
+scope; ADR-013 covers the workbook experience and personal responses only. The
+open question it owns is D17 (offline workbook responses). D13 (exact Guide read scope) was
+decided by ADR-019 decision 6.
 
 ## Rule
 

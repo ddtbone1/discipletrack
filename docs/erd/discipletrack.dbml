@@ -1171,10 +1171,13 @@ Table curricula {
   Curriculum data is stored in PostgreSQL rather than being permanently
   hard-coded into Flutter.
 
-  Lesson content (ADR-010): DiscipleTrack delivers the published lesson
-  material. It originates as Markdown in the repository, is published
-  into Supabase by trusted tooling, and is cached on the device for
-  offline reading. Content is kept apart from progress, meetings and
+  Lesson content (ADR-010, ADR-019): DiscipleTrack delivers the
+  published lesson material in two tiers (Disciple; Discipler: answers,
+  notes, modules), each gated by progression and relationship. It is
+  published into Supabase by trusted tooling and cached on the device
+  for offline reading, limited to what the person may read. Until
+  permission to reproduce the source is confirmed, only identifying
+  metadata is published and no lesson text is kept in the repository. Content is kept apart from progress, meetings and
   completion. Its table is not defined here yet: the Curriculum /
   Lesson Content slice adds it after inspecting the real material.
   Expected shape, not normative: a separate table keyed to
