@@ -1,0 +1,934 @@
+{
+  "number": 7,
+  "title": "Spiritual Formation",
+  "blocks": [
+    {
+      "type": "LESSON_THEME",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Spiritual Growth"
+      }
+    },
+    {
+      "type": "TOPIC_LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Our culture today",
+          "Importance of holiness",
+          "Principles of purity",
+          "Seven stages of spiritual growth"
+        ]
+      }
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "How to be Holy"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Key Objective: To understand the importance of purity."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "This lesson is about purity and holiness in our day to day lives. There are many aspects of this subject but a few need to be addressed up-front: sexuality, drug and alcohol abuse. Our culture is displaying an ever bolder public promotion of sin with increasingly depraved practices. The media regularly promotes all of these areas and uses sexuality to advertise products visually. The world wants you to believe there are no penalties for violating God’s law."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Our culture and Bible-believing churches are attacked with humanistic and secularist thinking daily. Even many Christians are influenced more in their concepts of love and morality by the media than by the Word of God. And with the rise of homosexuality, which is predicted in Scripture, we need God’s guidance and power more than ever."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "In God’s Word, being enslaved to sin and sexual themes are discussed candidly. In fact, God created sexuality for important and good purposes. But God has limited it to marriage and has placed consequences upon disobedience of this standard. And God does not want us to be a slave to any sin in spite of the influences we see all around us."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "In this lesson we want to look at why purity is important and a path to follow for victory."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Peter 1:15-16",
+        "text": "First of all, God has called us to be holy. Our salvation is instant but our holiness is a [_] of growth. What is holiness or purity of life? It is living as Christ would live in motives, thoughts, words, actions, relationships, and making the right decisions morally.\n\nWhy should we be holy? Certainly we want to avoid the [_] we see for sin but that shouldn’t be the only reason. The whole concept of purity for the disciple is to be completely at God’s disposal, ready for His use anytime, anywhere, and under any circumstance. Instead of a corrupt culture driving our life which leads to emptiness, we submit to God’s way, committing to Him for a purposeful life that matters; a life that draws people to Christ and gives them real meaning for living.",
+        "blanks": 2
+      },
+      "answers": [
+        "process",
+        "consequences"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Spiritual growth is a natural process."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "A high “plane” of living for the disciple is to desire and to keep a nearness to God - to love God and to love an unbroken [_] with Him. We must view our relationship with God as something we foster. We must think that what we do and what we are is an opportunity to glorify Him. Being holy honors God and allows us to love Him with all our heart, mind and soul.",
+        "blanks": 1
+      },
+      "answers": [
+        "fellowship"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "It also means having a desire to have purity within our human [_]. If you are married that especially means purity to your wife or your husband. If you are single, it’s your relationship to the guys or girls that you are involved with.",
+        "blanks": 1
+      },
+      "answers": [
+        "relationships"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Also, being holy in our lives means we make decisions about what is right and wrong as a disciple of Jesus Christ."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Here is a simple set of “filters” to apply to decisions:"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "1. Is there a Bible principle that applies to this decision or action?"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "2. Is there a specific set of Bible verses about this?"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "3. Will this cause another Christian to be discouraged or weaker in their faith?"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "4. Is there Godly counsel available on this?"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Take a minute and discuss with your Discipler how those questions would work on a particular decision. Here are some important principles for holiness and purity in our lives:"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 15:18",
+        "text": "The first principle to consider is that the problem starts inside us. Before we can have consistent purity in our lives, we must first admit and deal with the reality that impurity starts within. Pressures in our culture are huge but if we want to sin then it’s really our [_] to temptation that is a root problem. Cleaning up our culture will not entirely solve the problem. The problem arises within our hearts.",
+        "blanks": 1
+      },
+      "answers": [
+        "response"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Corinthians 10:12",
+        "text": "Here we see the most subtle of all errors; to think that we are somehow [_] and cannot be tempted. How many perceived public Christian leaders have we seen “fall” into sin? We must understand that a slow process within their hearts led to that end result.",
+        "blanks": 1
+      },
+      "answers": [
+        "invincible"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "John 17:15",
+        "text": "The second principle to consider is that our Lord prayed a specific prayer for our purity of life. Christ wants us in the world to be His “eyes,” “mouth,” and “hands” to an unreached world. He never wanted us in an isolated monastery or living in an Amish-type separation. He wants us in the world but He wants us [_] by the world’s evil.",
+        "blanks": 1
+      },
+      "answers": [
+        "untouched"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "John 17:16-17",
+        "text": "Sanctify is a Bible word that means to be [_] for God’s use alone. How do we achieve being in the world but not being worldly? It’s by building God’s Word daily in our lives.",
+        "blanks": 1
+      },
+      "answers": [
+        "separated"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "John 17:18-20",
+        "text": ""
+      }
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "God wants me to live a principled life."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Just as Jesus came into a sinful world to do the Father’s will, we are also sent into the world. We have a purpose for being here; not just to be holy and pure in and of itself, but to do what Jesus did while He was here. This prayer of Jesus was also for you and me. We are there in verse 20. Let us be encouraged to live a life separated from sin and separated to God’s will for us."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "2nd Corinthians 5:20",
+        "text": "Another principle is that we are in this world to [_] Christ. How we live reflects upon Christ. When we go into the workplace or into our community, our life and lifestyle should represent Him properly. Discuss for a minute how ambassadors of our government relate to the foreign governments they are assigned to and how this applies to us.",
+        "blanks": 1
+      },
+      "answers": [
+        "represent"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "James 4:7-8",
+        "text": "We overcome Satan’s attacks, not through direct conflict, but through [_] to God first, and second, through resistance to Satan’s devices.",
+        "blanks": 1
+      },
+      "answers": [
+        "submission"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Romans 12:1",
+        "text": "Another principle in having daily purity is to present ourselves to God; to [_] our lives to Him. This is a deliberate presentation of ourselves to God to be ready for His use anytime.",
+        "blanks": 1
+      },
+      "answers": [
+        "dedicate"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "We are Ambassadors for Christ."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Romans 12:2",
+        "text": "The world is trying to get us to think and live in its way, but we are not to conform to the moral system in the world. The opposite of holiness in our lives is living by the system that is in the world.\n\n“Being transformed” means a change that takes place on the inside. Living a pure life for God’s use is dependent upon a [_] of our mental processes. This is one of the great benefits of discipleship; we are transforming our thoughts to God’s way of thinking.\n\nHow can I purify my life every day?",
+        "blanks": 1
+      },
+      "answers": [
+        "renovation"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Psalms 119:9 and 1st John 1:9",
+        "text": "Cleansing takes care of evil and affects how we live, act, and make decisions. How can we stay clean?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Psalms 119:11",
+        "text": "Our holiness or purity of life will come from God changing us through His Word, not by us changing ourselves. Your attitude toward the Bible will greatly influence your daily [_] and ultimately your life. What is your attitude towards God’s Word and your Daily in the Word?",
+        "blanks": 1
+      },
+      "answers": [
+        "decisions"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Galatians 6:7",
+        "text": "What are the consequences of immorality? We can see the consequences all around us: disease, suffering, premature death, loss of peace and joy in life, missing God’s [_], and blessings, etc.",
+        "blanks": 1
+      },
+      "answers": [
+        "opportunities"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Romans 13:14",
+        "text": "Don’t make it easy to be unholy; make it hard. Remove the sources of temptation or remove yourself from the temptation. And being holy is not just a list of “don’ts.” There are qualities God desires in our lives found in Galatians 5:22-23 like love, joy, peace, longsuffering, kindness, goodness, faithfulness, gentleness, self-control as we become Christ-like."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Galatians 6:9",
+        "text": "If you are single, are you willing to be single and biblically moral? If you are married, are you willing to be faithful in your marriage? A disciple of Christ is not a programmed person. Being a reproducible disciple of Christ is not what you do but who you are. It’s your [_]; your motivation. It’s who you become. It’s not only on Sunday, but a daily life from a holy perspective.\n\nGod does not demand that we live a life of sinless perfection in order to have fellowship with Him, but He does require, as disciples, that we be serious about holiness; that we confess and turn from the sin we commit, and that we desire to stay close to Him daily. Let’s stop for just a moment and discuss the areas we are strong in and the areas of weakness we have.\n\nIf you desire, let’s have a prayer of commitment, that from this day forward you are going to adopt God’s definition for holy living and live that way.\n\nBelow is a table that describes stages of spiritual growth commonly experienced. Sometimes we expect Christians to act spiritually mature when they are not. Sometimes we expect disciples to have a level of decision-making and purity of life when they still need to grow in Christ. As disciples grow spiritually, they gain a greater capacity to glorify God with their lives and to draw people to Christ. Now look at the stages of spiritual growth:\n\nStages Characteristic Problem Need Babe in Christ Desires the Word Unaware of spiritual truths To be loved - assurance Little child Disobeys in word and actions Easily deceived - weak Protection and correction Child Little understanding Complaining, gossiping To be discipled Young man Strong in the Lord and has overcome the enemy Many temptations and pride To become a Disciple Maker Father Reproduces Disciplers Priorities Wisdom Elder Training Leaders Victories and trials Faithfulness Aged Leading Leaders Transitions Finish right This chart is assembled from the following references: 1 Peter 2:2, Heb. 5:13-14, 1 John 2:1, 1 John 3:7, 1 Cor. 14:20, Eph. 5:8 1 John 2:14, Titus 2:6-8, Eph. 6:4, Col 3:21, 1 Cor. 4:15, 1 Peter 5:1, 1 Tim 5:9, Titus 2:2 Discuss these two questions: Where do you think you were on this chart when you started discipleship?\n\nWhere do you think you are now on this chart?",
+        "blanks": 1
+      },
+      "answers": [
+        "personality"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain Romans 12:1-2?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: A friend says to you, ”I hope when I get married, it’s for life. That’s why I’m going to live together with someone first, just to make sure they’re the right one before making that kind of commitment.” Or a Christian says to you in passing, “Hey, they’re not married, but it’s working for them.” How would you respond to these statements? After you make your comments to them, they say to you, “Judge not, lest ye be judged.” What do you say then? Need ideas, visit www.TheJourneyForum.com"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Psalms 119:11",
+        "instruction": "Write Psalms 119:11 in the space below - going down a line at each punctuation mark.",
+        "lines": 3,
+        "followUp": "How would you explain that verse?",
+        "blanks": 2
+      },
+      "answers": [
+        "Thy word have I hid in mine heart,",
+        "that I might not sin against thee."
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Daily in the Word",
+        "subtitle": "Reading, Writing, Saying and Studying the Bible."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Your Discipler will now take a thorough look at all the sections in your Daily in the Word notebook and give instructions if needed. If you are Daily in the Word you will mature spiritually."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "When you finish Mark, start on Romans to 2nd Thessalonians. At The Journey Forum website, there are other ideas for doing your Daily in the Word. You’ll see other plans like these:"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Survey the Old Testament"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Survey the New Testament"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Survey the Life of Christ"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Read through the Bible in 30 days or 90 days.\n\nSurveys are a combination of reading sections of the Bible, comparing Scripture and writing out key verses that you find.\n\nMore plans are being developed all the time that will help you with a life time of being in God’s Word, so check the web site. The most important thing is that we put God first in our lives and we will if we are Daily in the Word."
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Online Resources",
+        "subtitle": "TheJourneyForum.com"
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "If you have a smart phone or mobile device, you can download the lessons and other helpful materials directly to your device. Also, consider sharing with other disciples and disciplers how you are doing in your Daily in the Word. Go to TheJourneyForum.com and click on “Users.” Remember to share the Spiritual Map every chance you can with someone who needs Christ."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "<<< See a special message from the author, Church Planter John Honeycutt, at this QR Code."
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Assignments for Lesson Seven"
+      },
+      "source": "image"
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": "With your Discipler, complete the Discipleship Training Module(s) on the following pages."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": "Download or read online the study on “How to Know God’s Will” before your next meeting. If you have"
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "any questions, please write them down and discuss them with your Discipler. Look up each Bible verse",
+          "in the study. (Go to www.TheJourneyForum.com and click on Users)"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 3,
+        "text": "Pick 6 or more of the verses below and explain what they mean on a separate sheet of paper:"
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Romans 8:29",
+          "Romans 12:1-2",
+          "2nd Corinthians 10:3-5",
+          "1st John 2:15-16",
+          "1st Corinthians 7:1",
+          "1st Thessalonians 4:3-7",
+          "1st Peter 2:11",
+          "1st Corinthians 6:13-20",
+          "Hebrews 13:4",
+          "1st Peter 3:1",
+          "2nd Peter 3:18"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 4,
+        "text": "Write your answers to all the Water Cooler Scenarios in the lesson."
+      }
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Reflect & Review",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "SELF_CHECK",
+      "tier": "DISCIPLE",
+      "body": {
+        "header": "Question",
+        "columns": [
+          "Struggling",
+          "Needs Improvement",
+          "Growing",
+          "Doing Well"
+        ],
+        "items": [
+          "How are you doing in your Daily in the Word?",
+          "How are you doing in memorizing the Word of God?",
+          "How are you doing in your daily prayer time?",
+          "Are you faithfully meeting with your Discipler?",
+          "Have you been biblically baptized by immersion after salvation?",
+          "Are you faithful to attend and give to your Local Church?",
+          "How are you at sharing the Gospel with others?",
+          "What is your commitment level to one on one discipleship?"
+        ]
+      }
+    },
+    {
+      "type": "MODULE_HEADING",
+      "tier": "DISCIPLER",
+      "body": {
+        "number": 3,
+        "title": "Module 3",
+        "subtitle": "Procedures for one on one discipleship."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "* Work on this with your Discipler."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Take time to talk and [_] to your disciple at each meeting.",
+        "blanks": 1
+      },
+      "answers": [
+        "listen"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "There are times you will not even [_] the lessons. But always encourage your disciple with the Word of God.",
+        "blanks": 1
+      },
+      "answers": [
+        "open"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "The disciple is not to complete the lessons [_] on their own.",
+        "blanks": 1
+      },
+      "answers": [
+        "ahead"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "In some cases, the Discipler is to only give one [_] of the Journey lessons at a time as the Discipler and disciple are meeting and studying together.",
+        "blanks": 1
+      },
+      "answers": [
+        "page"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "The lessons are to be [_] by the Discipler. Do not assign pages of a Journey lesson [_] of the meeting.",
+        "blanks": 2
+      },
+      "answers": [
+        "taught",
+        "ahead"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Never [_] a Bible verse in the lessons. Have your disciple [_] each verse.",
+        "blanks": 2
+      },
+      "answers": [
+        "skip",
+        "read"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "[_] your Daily in the Word notebooks.",
+        "blanks": 1
+      },
+      "answers": [
+        "Exchange"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "When you start each lesson read any introduction to them and [_] what you have already learned.",
+        "blanks": 1
+      },
+      "answers": [
+        "review"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Look up every [_] verse on each page in the lessons with your disciple.",
+        "blanks": 1
+      },
+      "answers": [
+        "Bible"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "[_] the verses and the lesson.",
+        "blanks": 1
+      },
+      "answers": [
+        "Explain"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Teach the [_] of each key word in the Bible verses that are studied in the lesson.",
+        "blanks": 1
+      },
+      "answers": [
+        "meaning"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Do not assign the [_] at the end of the lessons until you have completed teaching the lesson.",
+        "blanks": 1
+      },
+      "answers": [
+        "questions"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Do not go on to the [_] lesson until you have completed an evaluation of your disciple (the evaluations are in the lessons) and been given permission by the church leadership.",
+        "blanks": 1
+      },
+      "answers": [
+        "next"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "[_] what you have learned when it is time to stop.",
+        "blanks": 1
+      },
+      "answers": [
+        "Review"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "At the [_] of each meeting ask, “What are you going to do about what you have learned today?”",
+        "blanks": 1
+      },
+      "answers": [
+        "end"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Close with [_]. Schedule your next appointment. Record your meeting in your records.",
+        "blanks": 1
+      },
+      "answers": [
+        "prayer"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Remember: To [_] for your disciple.\n\nHow you disciple them will determine how they [_].\n\nThen remember to get your disciple [_].\n\nJourney is only one to one and begins with [_].\n\nHave your Discipler sign and date here when they review this assignment:\n\nThis assignment was completed successfully.",
+        "blanks": 4
+      },
+      "answers": [
+        "pray",
+        "disciple",
+        "evangelizing",
+        "evangelism"
+      ]
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "See a video message. >>>"
+      }
+    },
+    {
+      "type": "MODULE_HEADING",
+      "tier": "DISCIPLER",
+      "body": {
+        "number": 4,
+        "title": "Module 4",
+        "subtitle": "The Value of one on one discipleship."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "* Work on this with your Discipler."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Jesus spent three and a half years teaching His disciples so that when He was [_], they would disciple others. This was His only [_] to reach the whole world in every generation to follow.",
+        "blanks": 2
+      },
+      "answers": [
+        "gone",
+        "plan"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "The value of one on one discipleship to a disciple:\n\nDiscipleship protects the disciple from [_].\n\nDiscipleship gives the disciple loving, gentle [_].\n\nDiscipleship [_] the disciple.\n\nDiscipleship provides the disciple with a personal [_] to replace the ungodly friends. Discipleship teaches the disciple godly [_].\n\nDiscipleship provides the disciple with counsel to help make right [_].\n\nDiscipleship stops [_] behavior.\n\nDiscipleship increases the disciples’ [_] rate.",
+        "blanks": 8
+      },
+      "answers": [
+        "Satan",
+        "correction",
+        "Encourages",
+        "friend",
+        "habits",
+        "decisions",
+        "wrong",
+        "growth"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "The value of one on one discipleship to the Discipler:\n\nDiscipleship prevents [_] in the disciple.\n\nDiscipleship purifies the Disciplers’ [_].\n\nDiscipleship teaches the disciple how to [_] his or her disciple from the Word of God. Discipleship develops ministry [_] in the Discipler.\n\nDiscipleship teaches the Discipler how to [_] another believer into a ministry.\n\nDiscipleship brings [_] to the Discipler when the disciple grows in Christ: 3rd John 4 Discipleship teaches the Discipler how to inspire and [_] others to serve Christ. Discipleship [_] the Discipler as he or she ministers the Word of God.\n\nDiscipleship teaches the Discipler how to preach or [_] the Word of God.\n\nDiscipleship teaches the Discipler how to [_] the Word of God.\n\nDiscipleship helps the Discipler to pass on what he or she has [_].\n\nDiscipleship keeps the Discipler [_] about their Christian service.",
+        "blanks": 12
+      },
+      "answers": [
+        "problems",
+        "life",
+        "counsel",
+        "skills",
+        "guide",
+        "joy",
+        "motivate",
+        "Matures",
+        "teach",
+        "apply",
+        "learned",
+        "excited"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "The value of one on one discipleship to the local church:\n\nDiscipleship increases the number [_].\n\nDiscipleship gets everyone working towards a common [_].\n\nDiscipleship stops the church from [_].\n\nDiscipleship finds [_] people and puts them in the spotlight.\n\nDiscipleship brings more [_] to Christ.\n\nDiscipleship strengthens your local church by developing godly [_].\n\nDiscipleship strengthens the church [_].\n\nDiscipleship increases the number of people being personally [_] for.\n\nDiscipleship causes new churches to [_] naturally.\n\nDiscipleship most importantly allows the church to be [_] to Christ.",
+        "blanks": 10
+      },
+      "answers": [
+        "attending",
+        "goal",
+        "dying",
+        "problem",
+        "people",
+        "leaders",
+        "financially",
+        "cared",
+        "start",
+        "obedient"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "The value of one on one discipleship to the world:\n\n Discipleship is the [_] plan Christ gave out of love for the whole world. Discipleship is the only way the whole world can hear the Gospel and not [_]. Discipleship will make it possible for Disciplers to go to other [_] to make disciples.\n\nVisit www.TheJourneyForum.com to see more on this subject.\n\nHave your Discipler sign and date here when they review this assignment:\n\nThis assignment was completed successfully.",
+        "blanks": 3
+      },
+      "answers": [
+        "essential",
+        "perish",
+        "countries"
+      ]
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    }
+  ]
+}

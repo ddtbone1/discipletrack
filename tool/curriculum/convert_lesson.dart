@@ -5,7 +5,7 @@
 //
 // Reads docs/curriculum/source/ (git-ignored) with pdftotext and the
 // lesson's hints from supabase/curriculum/full/lesson-NN.hints.json, and
-// writes supabase/curriculum/full/lesson-NN.json (also git-ignored). Prints
+// writes supabase/curriculum/full/lesson-NN.json. Prints
 // every warning and exits non-zero if there is one: a lesson is accepted
 // only when it converts cleanly and tool/curriculum/verify_lesson.dart
 // passes.

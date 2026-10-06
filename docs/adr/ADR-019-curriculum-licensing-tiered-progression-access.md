@@ -150,7 +150,7 @@ The book also prescribes workflow that the ministry has deliberately decided dif
 
 The user confirmed that permission to reproduce *Journey* digitally has been obtained, and corrected the Slice 7 requirement: the app must reproduce the provided lessons faithfully, not reduce them to metadata. This supersedes decisions 1 to 4. The tier boundary, read scope, device copy, book-workflow and deferral decisions (5 to 10) stand.
 
-11. **Permission and its record.** Full content is published only as a `FULL` publication with a `licence_reference` (the database refuses one without it). The reference records who granted permission, when and its scope. The ministry supplies the grantor and scope wording for that reference; the user's confirmation of 2026-10-06 is the decision that allows publishing.
+11. **Permission and its record.** Full content is published only as a `FULL` publication with a `licence_reference` (the database refuses one without it). The reference records who granted permission, when and its scope. The church that uses DiscipleTrack, Liberty Bible Baptist Church - Gensan, is itself the publisher of Journey (user, 2026-10-07), so no outside grant is needed. The reference reads: "Journey is published by Liberty Bible Baptist Church - Gensan, which reproduces it in DiscipleTrack as its publisher (confirmed 2026-10-07)." If another church is ever onboarded, its own permission from the publisher is recorded the same way.
 12. **Faithful reproduction.** The provided lesson files are the authoritative content source, and the app is a digital re-layout, not a rewrite. Preserved exactly, where applicable:
     - lesson titles and ordering; section ordering and headings;
     - instructional and explanatory text;
@@ -175,7 +175,7 @@ The user confirmed that permission to reproduce *Journey* digitally has been obt
     6. the screen is a mobile re-layout, not a rewrite.
 
     One representative lesson establishes the schema and the mobile components and is verified first. The same conversion is then applied to all ten.
-15. **Where the text lives.** The converted lesson files stay out of the repository (git-ignored), like the source PDFs, until the licence is confirmed to cover storing the text in source control. The text lives in the database and in each reader's device copy (decision 7). The repository holds the schema, the converter, the renderers, and the metadata definition used for local development.
+15. **Where the text lives.** Since the church publishes Journey (decision 11, 2026-10-07), the converted lesson files and the resized covers are versioned in the repository (`supabase/curriculum/full/`) and published by `db reset`. The source PDFs and original cover images stay local and git-ignored (`docs/curriculum/source/`). The text lives in the database and in each reader's device copy (decision 7). The repository holds the schema, the converter, the renderers, and the metadata definition used for local development.
 
 ## Amendment: Disciplers read every lesson (2026-10-06)
 
@@ -188,4 +188,4 @@ User decision of 2026-10-06, made after the full lessons were in the app. It rep
     - **Known effect:** a person who is both a Disciple and a Discipler (ADR-012) reads their own lessons ahead and with answers, because the Discipler role reads all. This is accepted; the book gives every Discipler the full Discipler's Copy.
     - Enforced in `private.can_read_lesson_tier()` through `private.is_discipler_in_church()` (Migration 019).
 
-17. **Lesson covers.** Each lesson's cover photo from the book is shown behind its card in the lesson list. Covers carry no lesson content, so every ACTIVE member of the church reads them, open and locked lessons alike (`get_lesson_covers()`). Only trusted tooling writes them (`set_lesson_cover()`, service role). Like the text, the images come from the licensed source and stay out of the repository.
+17. **Lesson covers.** Each lesson's cover photo from the book is shown behind its card in the lesson list. Covers carry no lesson content, so every ACTIVE member of the church reads them, open and locked lessons alike (`get_lesson_covers()`). Only trusted tooling writes them (`set_lesson_cover()`, service role). Like the text, the resized images are in the repository; the originals stay local.

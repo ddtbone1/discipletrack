@@ -4,7 +4,7 @@
 //
 //   dart run tool/curriculum/build_definition.dart "<licence reference>"
 //
-// Writes, in the git-ignored supabase/curriculum/full/:
+// Writes, in supabase/curriculum/full/:
 //   definition.json      for tool/publish_curriculum.ps1 -ContentLevel FULL
 //   publish_local.sql    the same publication for the local church
 // Apply the local one with:

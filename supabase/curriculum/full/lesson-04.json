@@ -1,0 +1,1008 @@
+{
+  "number": 4,
+  "title": "Local Church",
+  "blocks": [
+    {
+      "type": "LESSON_THEME",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Local Church"
+      }
+    },
+    {
+      "type": "TOPIC_LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "The beginning of the church",
+          "Functions of the local church",
+          "Responsibility to the church",
+          "Purpose of Biblical leadership",
+          "Dynamic role of women in the church",
+          "Importance of baptism",
+          "Baptism and salvation",
+          "The need for baptism"
+        ]
+      }
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "The Local Church"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Key Objective: To understand God’s plan for the church."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "In this section we see that God has a very specific plan for reaching out to a world of unreached people:"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Corinthians 10:32",
+        "text": "In the Old Testament, God primarily worked through the [_] to get His Word to an unreached world. In the New Testament and in our time, God works through local [_] until His return to get His Word to lost Jews and Gentiles (a Gentile is anyone that is not a Jew). This verse lists those three groups.\n\nNotice in the table of contents of your Bible that seven letters in the New Testament are addressed to seven local churches (Romans-Thessalonians) and these letters contain the main body of [_] for New Testament Christians. Also, the books 1st and 2nd Timothy and Titus are to pastors of local churches. And the book of Revelation addresses seven local churches. These simple observations clearly show that God is working through Bible-preaching churches and nothing can take the place of the church.",
+        "blanks": 3
+      },
+      "answers": [
+        "Jews",
+        "churches",
+        "truth"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "God’s plan is the multiplication of disciples through disciple-making local churches that teach and preach the [_] of [_].\n\nLet’s see how local churches developed after Jesus had finished training His disciples:",
+        "blanks": 2
+      },
+      "answers": [
+        "Word",
+        "God"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Acts 1:8",
+        "text": "Before Jesus ascended into Heaven, promising He would return, He told His disciples to be [_] to the farthest places in the world.",
+        "blanks": 1
+      },
+      "answers": [
+        "witnesses"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Acts 2:41, 4:4, 5:14",
+        "text": "After hearing powerful Bible messages in Jerusalem, [_] believe.",
+        "blanks": 1
+      },
+      "answers": [
+        "thousands"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Through our church we reach our community and the rest of the world."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Acts 5:42, 6:1,7",
+        "text": "Notice that the disciples obeyed His command to care for and teach the new believers daily. The disciples multiply because they followed Christ’s example and command. This illustrates the next step of discipleship for us to know: If you faithfully meet with your Discipler you will experience biblical truths for your life and your future disciples. When we are faithful to meet, the result will be [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "multiplication"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Acts 8:1, 4",
+        "text": "Persecution scattered the disciples from [_]. The disciples who were scattered proclaimed the [_] everywhere they went because they had been discipled.",
+        "blanks": 2
+      },
+      "answers": [
+        "Jerusalem",
+        "Word"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Acts 9:31",
+        "text": "Three years after the resurrection of Christ, [_] started in Judea, Galilee and Samaria and multiplied. This means that people became believers and they began to be discipled under the leadership of mature disciples forming a church in their location: a local church.",
+        "blanks": 1
+      },
+      "answers": [
+        "churches"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Acts 11:19-26",
+        "text": "Eight years after the resurrection of Christ, a local church started in Antioch. This church is our [_] to follow. The Word of God will now focus on this church. A [_] number believed upon Christ in Antioch. So God brings leadership to the church and more [_] received the Lord in Antioch. Then the disciples were called [_] first in Antioch. Notice that there is a difference between being a Believer and being a Disciple.",
+        "blanks": 4
+      },
+      "answers": [
+        "pattern",
+        "great",
+        "people",
+        "Christians"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "God’s plan today is the Local Church."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Acts 13:2, 14:23, 16:5",
+        "text": "Three years later, in 44 A.D., the church at Antioch sent [_] who went and started churches. And those churches started other churches and so on. Biblical churches today are still following this strategic plan. True New Testament Bible-teaching churches started from our Lord’s Disciples. These churches have made disciples and started other Bible-teaching churches since Christ’s [_] disciples.\n\nWhy are there so many churches and religions? We see in God’s Word that Satan’s strategy is to imitate and corrupt what God does. And the Bible records Satan’s first attempt to organize false religion for his purposes at the Tower of Babel in 2200 B.C. Satan tried to work against God’s plan of sending the Saviour through the Jewish people because he wants to be worshipped.\n\nToday God’s plan is for the world to hear about the Saviour through Bible-believing churches. And it’s not surprising that we see Satan establishing false churches to confuse people and work against God’s church. That’s why there are so many denominations. Satan is the author of false, man-made religions and false churches. Read 2nd Corinthians 11:3-4, 13-15. Satan’s main agenda is in religion.",
+        "blanks": 2
+      },
+      "answers": [
+        "missionaries",
+        "first"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "What is a true New Testament Bible-Believing Local Church? It is a group of saved and discipled men and women who assemble together for worship and ministry with the leaders God has given them under the Word of God.\n\nWhat are the functions of a local church?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Acts 13:1-2",
+        "text": "We are to [_] the good news of salvation at home and around the world.",
+        "blanks": 1
+      },
+      "answers": [
+        "spread"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Acts 18:8",
+        "text": "We are to observe the teaching of [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "baptism"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Romans 10:13-15",
+        "text": "We are to [_] to send the Gospel globally.",
+        "blanks": 1
+      },
+      "answers": [
+        "give"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Corinthians 11:23-27",
+        "text": "We are to observe the [_] [_]. (Explained at the end of this lesson)",
+        "blanks": 2
+      },
+      "answers": [
+        "Lord's",
+        "Supper"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Galatians 6:1",
+        "text": "We are to restore sinful [_] to right living and service for Christ.",
+        "blanks": 1
+      },
+      "answers": [
+        "members"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 3:21",
+        "text": "We are to bring [_] to God.",
+        "blanks": 1
+      },
+      "answers": [
+        "glory"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 4:11-12 and Ephesians 4:15",
+        "text": "We are to mature disciples for [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "leadership"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Hebrews 10:25",
+        "text": "We are to [_] together for worship and fellowship.\n\nWhat is my responsibility to my local church?",
+        "blanks": 1
+      },
+      "answers": [
+        "assemble"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Hebrews 13:17",
+        "text": "[_]",
+        "blanks": 1
+      },
+      "answers": [
+        "Biblically follow our pastor"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 5:25",
+        "text": "reads, Christ also [_] the [_], and [_] Himself for it; [_] your church. Pray for and love your Pastor. [_] your church. Financially send the Gospel to those in spiritual darkness through our local church. And we must be faithful to worship together and to serve in our church as directed by our Pastor. [_] discipleship. We see the importance and the great opportunity we have to make an impact for Christ through our local church. Now, let’s understand the purpose of Biblical leadership in the church:",
+        "blanks": 6
+      },
+      "answers": [
+        "loved",
+        "church",
+        "gave",
+        "Love",
+        "Support",
+        "Complete"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 2:19-20, 4:11",
+        "text": "Writing about the foundation of local churches, the Apostles (Christ’s first disciples) and Prophets (men who spoke as God gave them the words to say) were in local churches until the Bible was completed around 90 A.D. Then they were not needed.\n\nToday, there are [_] positions in local churches to be filled: “Evangelist” is the Bible word for what we call a [_]. “Pastors” are the [_] of the local church. “Teachers” include [_].",
+        "blanks": 4
+      },
+      "answers": [
+        "three",
+        "missionary",
+        "shepherds",
+        "disciplers"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 4:12",
+        "text": "The Leaders are to equip, train or prepare [_]. The work of the ministry is making [_]. To edify is to [_] or build up. The purpose of the leadership of your church is to mature you for the work of the ministry. Ministry in the Bible always has these components: a person has the Word of God and they are transferring it to someone else. When someone is authorized by the leadership to disciple one on one, the entire purpose is to see people commit to Christ and build the Word of God in their life so they can do the same.\n\nWe have now learned Step #5 of Discipleship: A disciple is faithful in a biblical local church.\n\nWhat are the qualifications for leadership in the church? For local churches to navigate through the challenges in our culture, we must be obedient to and strive for the qualifications that God gives us in His Word for leaders. The following two passages help us understand what a biblical pastor and leaders look like: Read 1st Timothy 3:1-7 and Titus 1:5-9.",
+        "blanks": 3
+      },
+      "answers": [
+        "the believers or God's people",
+        "disciples",
+        "mature"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Let’s now take a look at the dynamic contribution of women in the church by seeing the ladies mentioned in Romans 16:1-15.\n\nPhoebe - She is called “our sister” meaning she is a [_]. She was a [_] of the church which is at Cenchrea: She had been a [_] of many.\n\nPriscilla - She served the Lord with Aquila, her [_]. They[_] their lives for the Lord. [_] the churches gave thanks for her. And they had a church in their [_].\n\nMary - She helped them [_] for the Lord.\n\nJunia - She spent time in [_] with Paul for being a Christian.\n\nTryphena, Tryphosa - These two ladies [_] for the Lord.\n\nPersis - Mother of Rufus - She labored [_] for the Lord and her [_] is serving the Lord. Julia and the Sister of Nereus - These two ladies [_] for others.\n\nNote: To know more about the amazing contribution women have made to Christianity, go to TheJourneyForum.com (click on Users).",
+        "blanks": 13
+      },
+      "answers": [
+        "believer",
+        "servant",
+        "help",
+        "husband",
+        "risked",
+        "All",
+        "home",
+        "work",
+        "prison",
+        "labored or worked hard",
+        "much or very hard",
+        "son",
+        "cared"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Titus 2:3-5",
+        "text": "Ladies, be encouraged to be a [_] of women.\n\nWhy should we care about our local church? Because it’s one of the institutions that God created for His work in our lives and the world. It is God’s plan; it is God’s design. God instructs us to assemble together, especially in the last days. (Hebrews 10:25) The most exciting life we can lead is in living for Christ and strengthening our church by multiplying Disciplers. Our involvement counts.",
+        "blanks": 1
+      },
+      "answers": [
+        "discipler"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain Acts 5:42 and 6:1,7?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: What would you say to invite a friend to your church and why they should visit?\n\nHere’s another one: A neighbor says “I don’t think we should put the 10 Commandments on display because it breaks the wall of separation between church and state.” How would you respond?"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 5:25",
+        "instruction": "Write Ephesians 5:25 in the space below - going down a line at each punctuation mark.",
+        "lines": 4,
+        "followUp": "How would you explain that verse?",
+        "blanks": 4
+      },
+      "answers": [
+        "Husbands ,",
+        "love your wives,",
+        "even as Christ also loved the church,",
+        "and gave himself for it;"
+      ]
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "title": "Be Baptized"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Key Objective: To understand the importance of baptism."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "The command of Christ was to go, make disciples and baptize them. So now let’s look at some questions about Biblical baptism."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Can baptism save us or wash away our sins?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Luke 23:39-43",
+        "text": "The thief on the cross believed upon Jesus and Jesus said the man would be [_] [_] in paradise. The thief never was baptized, never joined a church, etc. He just [_]. Salvation is by grace through [_] in Christ [_] [_] works.\n\nWhen do we need to be baptized?",
+        "blanks": 6
+      },
+      "answers": [
+        "with",
+        "me",
+        "believed",
+        "faith",
+        "ALONE",
+        "without"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Acts 8:12 and Acts 18:8",
+        "text": "Baptism always comes [_] salvation. This is why [_] cannot be Scripturally baptized.",
+        "blanks": 2
+      },
+      "answers": [
+        "after",
+        "babies"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Baptism is a testimony of my commitment to Christ."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "What is the Biblical way to be baptized?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Matthew 3:16",
+        "text": "reads, And Jesus, when he was baptized, went [_] [_] of the water:",
+        "blanks": 2
+      },
+      "answers": [
+        "up",
+        "out"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Acts 8:37-39",
+        "text": "Because baptism is a picture of the death, burial, and resurrection of Jesus Christ, the Bible teaches baptism is by [_]. To immerse is to be covered completely with water. No one in the Bible was ever baptized by someone sprinkling water on them. And the word “baptism” means to submerge underwater.\n\nWhy do we need to be baptized?",
+        "blanks": 1
+      },
+      "answers": [
+        "immersion"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Matthew 28:19-20",
+        "text": "We are [_] to be baptized. And also, the act of going under the water and rising up is a [_] of what happened to the Christian believer:",
+        "blanks": 2
+      },
+      "answers": [
+        "commanded",
+        "picture"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 6:2-3",
+        "text": "He died - I died"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 6:3-4",
+        "text": "He was buried - I was buried"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 6:4-5",
+        "text": "He was raised - I have new life"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Ephesians 2:6",
+        "text": "He ascended - I ascended"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Water baptism is a picture of the [_] work God did when you received Christ. Also, baptism is a step of [_] for a disciple of Jesus Christ because baptism publicly testifies that Jesus Christ is your Lord.\n\nWhere should I be baptized?",
+        "blanks": 2
+      },
+      "answers": [
+        "spiritual",
+        "obedience"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Baptism is a public testimony of your decision to trust Jesus as your Saviour and Lord. Because of this, believers need to be baptized by their local church.\n\nHave you been Biblically baptized?\n\nTake a moment with your Discipler and discuss if you have taken this step of obedience. If you have been Biblically baptized, share what that meant to you.\n\nWrite the date or approximate date of your Salvation: [_] Write the date or approximate date of your Baptism: [_] Write the name of the Church which baptized you: [_]",
+        "blanks": 3
+      },
+      "answers": [
+        "Go ye therefore,",
+        "and teach all nations,",
+        "baptizing them in the name of the Father,"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Lord’s Supper The topic of the Lord’s Supper has more resources in the web site and at this point your church may have some information for you regarding this church service. As a general summary, the Lord’s Supper, or the Last Supper, or Communion was the last meal Jesus shared with His Twelve Apostles before His death on the cross for all our sins. Since then, it has been an important act of our worship, led by your pastor for believers only. The bread, in the Lord’s Supper, symbolizes the body of Christ that was “broken” for us. The ‘cup’ symbolizes His blood that washed away our sins forever. However, it is important to understand that the observance of the Lord’s Supper does not help in any one’s salvation.\n\nThe purpose of the Lord’s Supper is for self-examination and rededication of our lives to Christ. We do well to ask, “Are we living in a manner that shows appreciation for His sacrifice?” “Are we refusing to repent of any sin that was covered by His blood?” It is also a means for building fellowship with one another in the church, and serves to remind us of our future blessing in Him. Jesus told His disciples that He would eat with them again when His Father’s kingdom is established. For more information, see your Pastor about this wonderful church service for Believers."
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain Luke 23:42-43?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: You have a young disciple and they ask you if baptism will wash away their sin. How would you respond?"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Matthew 28:19",
+        "instruction": "Write Matthew 28:19 in the space below - going down a line at each punctuation mark.",
+        "lines": 4,
+        "followUp": "How would you explain that verse?",
+        "blanks": 2
+      },
+      "answers": [
+        "and of the Son,",
+        "and of the Holy Ghost:"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Assignments for Lesson Four"
+      },
+      "source": "image"
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Daily in the Word",
+        "subtitle": "Reading, Writing, Saying and Studying the Bible."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Your Discipler will now take a thorough look at all the sections in your Daily in the Word notebook and give instructions if needed. Remember Christ told His followers that they would be His disciples if they were faithfully in His Word. John 8:31. If you are Daily in the Word you will mature spiritually."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Here are some additional ways to learn God’s Word and to grow as a disciple:"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Bible Reading Projects There are times when you and your Discipler cannot meet together like during summer vacations or other reasons that keep you from meeting for a few weeks. The assignments below can be done together to encourage growth in God’s Word. You also may feel the need for large amounts of the Word of God to be built into your life at times and these suggested projects can help you focus on specific goals."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Also, consider downloading and listening to God’s Word on your smartphone or similar device. Here are some choices:"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Old Testament New Testament Romans to 2nd Thessalonians Psalms 119 Proverbs John 1st Timothy through Titus Genesis 1st and 2nd Peter Luke Exodus Joshua Judges Let’s review the Steps of Discipleship we have learned so far:"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": "Become a Believer by trusting Jesus Christ as Savior from John 3:16."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": "A disciple is in the Word of God every day from John 8:31."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 3,
+        "text": "A disciple is in prayer to God every day from Luke 11:1."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 4,
+        "text": "A disciple and discipler meet together every week from John 13:33-35."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 5,
+        "text": "A disciple is faithful in a biblical local church from Ephesians 4:11-12."
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "<<< See a video message from John or Cathy Honeycutt."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": "Review any memory verses you have learned with your Discipler now."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Answer the questions for Lesson 4 below on a separate piece of paper and bring them to your next",
+          "meeting:"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": "Explain 1st Corinthians 10:32."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": "Read Acts 19:10 and explain how it was possible that all of Asia heard the Word of the Lord."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 3,
+        "text": "Who started the first Bible-Believing Churches?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 4,
+        "text": "What is a true New Testament Bible-Believing Church?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 5,
+        "text": "What is the purpose of the Church Leadership?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 6,
+        "text": "How should you regard the church leaders who follow the Word of God?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 7,
+        "text": "What should you look for in a church?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 8,
+        "text": "Explain what the Bible teaches about the role of ladies in the church."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 9,
+        "text": "What is your responsibility to the Local Church?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 10,
+        "text": "Explain why we need to be baptized."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 11,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Give two examples of someone who was baptized after salvation. Support your answers with",
+          "Scripture."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 12,
+        "text": "What is the Biblical way to be baptized?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 13,
+        "text": "(True or False) Baptism is necessary for salvation."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 14,
+        "text": "Have you been baptized?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 15,
+        "text": "Where and by whom?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 16,
+        "text": "Write the new Bible verses you are memorizing now."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 17,
+        "text": "Write your answers to all the Water Cooler Scenarios in the lesson."
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Note to the disciple: It rarely happens, but if you feel something is being taught that you are still not clear",
+          "about, or if your Discipler will not meet with you regularly, please see your Pastor about this. Most of the",
+          "time it is a misunderstanding and your Pastor can clear things up."
+        ]
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Online Resources",
+        "subtitle": "TheJourneyForum.com"
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "If you have a smart phone or mobile device, you can download the lessons and other helpful materials directly to your device. Also, consider sharing with other disciples and disciplers how you are doing in your Daily in the Word. Go to TheJourneyForum.com and click on “Users.” Remember to share the Spiritual Map every chance you can with someone who needs Christ."
+      }
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    }
+  ]
+}

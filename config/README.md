@@ -90,16 +90,16 @@ dart run tool/generate_curriculum_seed.dart
 A unit test fails if the two drift. To publish to a real project, use
 `tool/publish_curriculum.ps1`; a FULL publication requires `-LicenceReference`.
 
-**Full lessons (local only).** With the source PDFs in
-`docs/curriculum/source/` (git-ignored), the converted lessons and covers are
-built into `supabase/curriculum/full/` (git-ignored) and applied after a
-`db reset`:
+**Full lessons.** The church publishes Journey (ADR-019 decisions 11 and 15),
+so the converted lessons and covers are in the repository under
+`supabase/curriculum/full/`, and `db reset` publishes them after the metadata
+seed (`publish_local.sql`, then `publish_covers.sql`). To rebuild them, the
+source PDFs (and any supplied covers, `covers/lesson-01.png` and so on) go in
+`docs/curriculum/source/`, which stays git-ignored:
 
 ```powershell
 dart run tool/curriculum/build_definition.dart "<licence reference>"
 dart run tool/curriculum/build_covers.dart
-Get-Content supabase/curriculum/full/publish_local.sql  | docker exec -i supabase_db_discipletrack psql -U postgres -d postgres -q
-Get-Content supabase/curriculum/full/publish_covers.sql | docker exec -i supabase_db_discipletrack psql -U postgres -d postgres -q
 ```
 
 What to look at, by account (ADR-019 decisions 6 and 16): Diana reads

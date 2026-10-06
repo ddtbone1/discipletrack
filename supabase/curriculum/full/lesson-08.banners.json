@@ -1,0 +1,24 @@
+{
+  "firstPage": 2,
+  "sections": [
+    {
+      "label": "A",
+      "title": "Faith",
+      "objective": "Key Objective: To understand how to have faith."
+    }
+  ],
+  "assignments": "Assignments for Lesson Eight",
+  "modules": [
+    {
+      "page": 9,
+      "number": 5,
+      "subtitle": "Accepting a disciple and becoming a good communicator."
+    },
+    {
+      "page": 10,
+      "number": 6,
+      "subtitle": "Getting started with your new disciple."
+    }
+  ],
+  "cover": 15
+}

@@ -219,14 +219,13 @@ class _RichBlanks extends StatelessWidget {
 
   InlineSpan _blank(BuildContext context, List<String> answers, int i) {
     if (i < answers.length) {
-      final (bg, fg) = pillColors(context, PillTone.brand);
+      final fg = pillColors(context, PillTone.brand).$2;
       return TextSpan(
-        text: ' ${answers[i]} ',
+        text: answers[i].isEmpty ? '      ' : answers[i],
         semanticsLabel: 'answer: ${answers[i]}',
         style: style?.copyWith(
           fontWeight: FontWeight.w700,
           color: fg,
-          backgroundColor: bg,
           decoration: TextDecoration.underline,
           decorationColor: fg,
         ),
@@ -379,7 +378,7 @@ class _ModuleTitle extends StatelessWidget {
 }
 
 /// A bulleted item: its scripture reference (when it leads the bullet) in
-/// the brand colour, then its text.
+/// bold text, then its text.
 class _Point extends StatelessWidget {
   const _Point({required this.block, required this.style, this.workbook});
 
@@ -390,16 +389,18 @@ class _Point extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = pillColors(context, PillTone.brand).$2;
+    // Green is kept for answers; references read as bold text and the
+    // bullets stay quiet (user, 2026-10-07).
+    final p = context.palette;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 9, right: AppSpacing.sm),
           child: Container(
-            width: 7,
-            height: 7,
-            decoration: BoxDecoration(color: fg, shape: BoxShape.circle),
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(color: p.muted, shape: BoxShape.circle),
           ),
         ),
         Expanded(
@@ -412,8 +413,8 @@ class _Point extends StatelessWidget {
                   child: Text(
                     block.reference!,
                     style: style?.copyWith(
-                      color: fg,
-                      fontWeight: FontWeight.w700,
+                      color: p.textPrimary,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),

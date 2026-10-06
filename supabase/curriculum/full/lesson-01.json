@@ -1,0 +1,1436 @@
+{
+  "number": 1,
+  "title": "Salvation",
+  "blocks": [
+    {
+      "type": "LESSON_THEME",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Salvation"
+      }
+    },
+    {
+      "type": "TOPIC_LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Creation and the one true God",
+          "The triune God",
+          "Where evil came from",
+          "The first man and woman",
+          "Sin and the love and grace of God",
+          "The promise of a Saviour",
+          "The Saviour revealed",
+          "The Ten Commandments",
+          "The claims of the Saviour",
+          "Good works and salvation",
+          "How to receive salvation",
+          "Commitment to salvation"
+        ]
+      }
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "The Beginning"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Key Objective: To understand the one true God of the Bible."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Did you know that the Bible addresses the foundational questions of life - whether asked in an intellectual setting or discussed by people at the water cooler?"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Let’s see what the Bible says about who God is, who we are, our purpose, the source of all problems, and the solution to those problems. The Bible’s truth is for everyone."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "If you have major questions still unanswered, I suggest that you approach this study honestly with an attitude that says, “God, I want to know if You exist and why I am here. If You are there, help me to be willing to humble myself before You.”"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Genesis 1:1",
+        "text": "The One True [_] made everything. He not only [_] the world, but the heavens and the earth-everything there is.",
+        "blanks": 2
+      },
+      "answers": [
+        "God",
+        "created"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Psalms 33:6, 9",
+        "text": "God created all things out of nothing. He spoke and it was. And His creation has its own separate [_] from God; He does not exist in the trees, rocks, or earth.",
+        "blanks": 1
+      },
+      "answers": [
+        "existence"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Revelation 4:11",
+        "text": "God is [_] in Himself. God did not have to create but He wanted to receive [_] from all He created.",
+        "blanks": 2
+      },
+      "answers": [
+        "complete",
+        "pleasure"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Genesis 1:31",
+        "text": "After God had created all things, He pronounced it “[_] [_] .” All things were completely good as they were originally made. This is because God is perfectly [_] and completely [_].\n\nWe can see that God [_] with a thought out plan.",
+        "blanks": 5
+      },
+      "answers": [
+        "very",
+        "good",
+        "good",
+        "holy",
+        "thinks"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "God was and is and will always be."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 2:4",
+        "text": "God not only thinks and acts, He [_]. Therefore the God who exists is [_]. He thinks, acts, and feels… three marks of personality. God is not simply a force nor is He in everything that exists. He is a person. And God created us to have a [_] relationship with him.",
+        "blanks": 3
+      },
+      "answers": [
+        "feels",
+        "personal",
+        "close"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Mark 12:32",
+        "text": "Though people may believe there are other [_], the Bible teaches there is only one God. Maybe you have wondered why some people use the words Father, Jesus, and Spirit for God? To understand why, let’s learn about the nature of God:",
+        "blanks": 1
+      },
+      "answers": [
+        "gods"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Genesis 1:26",
+        "text": "“Let us make man in our image.” Here it is shown that there is more than one [_] in what the Bible refers to as the “Godhead.” (See Acts 17:29)",
+        "blanks": 1
+      },
+      "answers": [
+        "personality"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st John 5:7",
+        "text": "In this verse, each of the [_] persons is clearly seen.\n\nNotice God the Father:",
+        "blanks": 1
+      },
+      "answers": [
+        "three"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Corinthians 8:6",
+        "text": "God the [_] is God and is shown as separate and distinct from the other persons of the Godhead.\n\nNotice God the Son:",
+        "blanks": 1
+      },
+      "answers": [
+        "Father"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "John 1:1-3, 14",
+        "text": "These verses state that the person called “the [_]” is God and made all things. Verse 14 shows that “the Word” is Jesus Christ. Jesus Christ is [_]God. He is God in a human body.",
+        "blanks": 2
+      },
+      "answers": [
+        "Word",
+        "equally"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 9:1-7",
+        "text": "Jesus Christ claims the power of [_] sins as His natural right, thus showing that He claims to be [_]. Only the Holy God can forgive sins.\n\nThe one true God is a Triune God.\n\nNotice God the Holy Spirit:",
+        "blanks": 2
+      },
+      "answers": [
+        "forgiving",
+        "God"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Acts 5:3-4",
+        "text": "These verses show that lying to the Holy Spirit is lying to God."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Acts 16:6",
+        "text": "The Holy Spirit [_] and He [_].",
+        "blanks": 2
+      },
+      "answers": [
+        "acts",
+        "thinks"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 4:30",
+        "text": "This verse shows that the Holy Spirit also [_]. The Holy Spirit is not a force but is a person; He thinks, acts, feels, and is active in comforting our lives.",
+        "blanks": 1
+      },
+      "answers": [
+        "feels"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "2nd Corinthians 13:14",
+        "text": "All persons of the Godhead are seen in this verse. To summarize, there is one true God and He is triune, as the three in one.\n\nNow let’s learn about the beginning of evil in the world:"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Revelation 5:11-12",
+        "text": "God created many wonderful and beautiful [_] before He created the first man and woman. Angels were created to do God’s will, worship Him and serve Him. A very special angel, named [_] , was the most beautiful angel because God’s Glory would shine through him.",
+        "blanks": 2
+      },
+      "answers": [
+        "angels",
+        "Lucifer"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Isaiah 14:12-15",
+        "text": "Lucifer [_] against God. Lucifer wanted to share God’s power and glory. Because of his rebellion, God cast him out of Heaven.",
+        "blanks": 1
+      },
+      "answers": [
+        "rebelled"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Revelation 12:9",
+        "text": "Lucifer is now known as “the Serpent “, “the Devil “or “Satan”. He lost the beauty and light he once had and became [_] and full of [_]. Many of the angels joined in his rebellion and were cast out with Lucifer.",
+        "blanks": 2
+      },
+      "answers": [
+        "evil",
+        "darkness"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Corinthians 10:19-20",
+        "text": "Demons are the false [_] that are worshipped by people around the world. They are represented by [_]. The Scriptures teach that the only spirit beings other than the one true God are the angels of God, the Devil and his evil spirits.\n\nSome of the names of Lucifer are “Satan” which means adversary and the “Devil” which means slanderer. Other titles and names are:",
+        "blanks": 2
+      },
+      "answers": [
+        "gods",
+        "idols"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 13:38",
+        "text": "The [_] one",
+        "blanks": 1
+      },
+      "answers": [
+        "wicked or evil"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "2nd Corinthians 4:4",
+        "text": "Lucifer is the [_] of this world.",
+        "blanks": 1
+      },
+      "answers": [
+        "god"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Thessalonians 3:5",
+        "text": "Another name for Lucifer is the [_].\n\nNotice how Satan continues to work today:",
+        "blanks": 1
+      },
+      "answers": [
+        "Tempter"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Genesis 3:1-4",
+        "text": "Perverting the [_] of God",
+        "blanks": 1
+      },
+      "answers": [
+        "Word"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "2nd Corinthians 11:4",
+        "text": "In [_]",
+        "blanks": 1
+      },
+      "answers": [
+        "religion"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Thessalonians 2:17-18",
+        "text": "Hindering God’s [_]",
+        "blanks": 1
+      },
+      "answers": [
+        "ministers"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Revelation 12:9",
+        "text": "[_] people",
+        "blanks": 1
+      },
+      "answers": [
+        "deceiving"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 25:41 and Revelation 20:10",
+        "text": "Hell will be the Devil’s place forever when God [_] all sin.",
+        "blanks": 1
+      },
+      "answers": [
+        "judges"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Psalms 99:5",
+        "text": "God will judge sin one day because He is supremely holy, pure, and without any evil and cannot excuse any [_].\n\nIn summary, the Bible teaches us that evil began when Lucifer rebelled against God.",
+        "blanks": 1
+      },
+      "answers": [
+        "sin"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Genesis 2:7",
+        "text": "In this verse we learn that God [_] the body of the first man out of the dust of the ground. However; man is more than a [_].",
+        "blanks": 2
+      },
+      "answers": [
+        "formed",
+        "body"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Genesis 1:26-27",
+        "text": "Man was made in God’s [_] and likeness. God made us with a body, soul and spirit (three in one) and this sets us apart from other creatures. What does it mean that man is made in God’s image? Among other things, it means people have a sense of right and wrong, which means we can make [_] and think for ourselves. It also means that people are creative. Men and women in all parts of the world make works of [_]. It is also the reason why we [_]. And since God created us, we have a responsibility to Him.",
+        "blanks": 4
+      },
+      "answers": [
+        "image",
+        "choices",
+        "art",
+        "love"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Genesis 1:28",
+        "text": "God commands Adam, to be fruitful and [_]. Since Adam and Eve were made in God’s image, their children were intended to be in God’s [_] as well.",
+        "blanks": 2
+      },
+      "answers": [
+        "reproduce or increase",
+        "likeness"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "God does not tempt anyone with evil."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Genesis 1:31",
+        "text": "Everything that God created was very good including the first man and woman; there was no sin, wrong, or evil in them. The God of the Bible has never created anything that was not good."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Genesis 2:16,17",
+        "text": "The first man and woman had the ability to love and obey God. But they were also [_] to choose to disobey God. God wanted them to freely choose to [_] Him. The condition was simple. God is a Holy God and must judge all sin. If they disobeyed God, [_] would be the result; [_] separation from God.\n\nAs the man and the woman were faced with the choice of obedience or disobedience, notice that they had the following special gifts from God: They were made in the [_] and likeness of God. They were surrounded by a [_] environment. They had a constant, close relationship with [_]. They had a true free choice, with power to obey or [_] to disobey. The requirement was very simple, with both the command and the [_] clearly given.",
+        "blanks": 9
+      },
+      "answers": [
+        "free",
+        "love",
+        "death",
+        "eternal",
+        "image",
+        "perfect",
+        "God",
+        "power",
+        "penalty"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Genesis 3:1-6",
+        "text": "[_], in the form of a serpent, questions the Word of God and lies to Eve. Eve believes the lie of Satan and [_] God.",
+        "blanks": 2
+      },
+      "answers": [
+        "Satan",
+        "disobeys"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Timothy 2:13-14",
+        "text": "Adam, though knowing it was a lie, also [_] God. Their spirits died immediately and their body and soul were corrupted by sin. They were separated from God, the only source of life. They became [_] because of their disobedience.",
+        "blanks": 2
+      },
+      "answers": [
+        "disobeys",
+        "sinners"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Genesis 3:7",
+        "text": "By trying to cover themselves with the work of their own hands, they demonstrated that [_] had come upon them.",
+        "blanks": 1
+      },
+      "answers": [
+        "guilt"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Genesis 3:23-24",
+        "text": "Because of their sin they lost [_] with God and were put out of the Garden of Eden.",
+        "blanks": 1
+      },
+      "answers": [
+        "fellowship"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Romans 5:12",
+        "text": "Since Adam’s fall, everyone who comes from Adam is born a [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "sinner"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Genesis 5:1-3",
+        "text": "All who come from Adam and Eve are made in the image of Adam and not the image of God. Each time we look upon the body of one who has died, we should be reminded of the results of sin and that [_] are sinners.",
+        "blanks": 1
+      },
+      "answers": [
+        "we"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st John 1:10",
+        "text": "Each of us has [_] sinned in the sight of God. We sin because we are born [_].",
+        "blanks": 2
+      },
+      "answers": [
+        "personally",
+        "sinners"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Isaiah 59:2",
+        "text": "You are [_] from God now because you are a sinner.\n\nIn summary, God made man. Man’s body, soul and spirit were good. Man had a choice by which he could show his love for God through obedience. Man had a close relationship with God. He was in a perfect environment. Adam and Eve sinned. Since then, all people, includ­ ing you and I, are born sinners and personally sin.\n\nIf appropriate, do the Reflect and Transfer on the next page.\n\nDisciplers, when you see this icon, check the web site for guidance.",
+        "blanks": 1
+      },
+      "answers": [
+        "separated"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain 1st John 5:7?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: If your friend, over coffee, asks you “How could a loving God allow thousands of innocent people to be killed by terrorists or by disasters like tsunamis?” How would you respond to that question? *Need ideas? Visit www.TheJourneyForum.com."
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Romans 5:12",
+        "instruction": "Write Romans 5:12 in the space below - going down a line at each punctuation mark.",
+        "lines": 5,
+        "followUp": "How would you explain that verse?",
+        "blanks": 5
+      },
+      "answers": [
+        "Wherefore,",
+        "as by one man sin entered into the world,",
+        "and death by sin;",
+        "and so death passed upon all men,",
+        "for that all have sinned:"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "<<< See a video message from John or Cathy Honeycutt."
+      }
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "title": "The Saviour"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Key Objective: To understand how God made a way back to Him."
+      },
+      "source": "image"
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Genesis 3:15",
+        "text": "As soon as the first man and woman sinned, God promised he would send a [_] through her “seed” meaning one who would be born. Even though Adam and Eve were guilty and deserved judgment, God, out of love, reached out to them (and to all of us) and gave the promise of a Saviour for mankind. But we are blind to our sin and even blind to our need of a Saviour. To make sure we know we are sinners and that we [_] a Saviour, God gave us the Ten Commandments.",
+        "blanks": 2
+      },
+      "answers": [
+        "Savior",
+        "need"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "The Ten Commandments are located in Exodus 20:1-17 and here is a summary of them.\n\n...Have no other gods before me... (God is to be first)\n\n...Do not make graven images or idols . . . (including to make your own idea of God.)\n\n...Do not take the name of the LORD ... God in vain...\n\n...Remember the sabbath day, to keep it holy... (to worship God.)\n\n...Honour your father and mother...\n\n...Do not kill...\n\n...Do not commit adultery... (even lust is adultery.)\n\n...Do not steal...\n\n...Do not bear false witness... (to lie)\n\n...Do not covet...\n\nIs there anyone who has not broken God’s Law? God knows that men and women cannot keep His 10 Commandments. No one has ever kept the Ten Commandments or even had the right [_]. If someone asks you, “Don’t you think all people are basically good?” How would you respond?",
+        "blanks": 1
+      },
+      "answers": [
+        "motives"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 7:7",
+        "text": "The Ten Commandments were not given to bring us to God or to remove our sin but to show us our need of a Saviour. God not only gave His Ten Commandments to help us, He also gave over 300 prophecies about the Saviour so that we would know who He is. To learn more about this, go to www. TheJourneyForum.com."
+      }
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "God knows we cannot save ourselves."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "But who is the Saviour? Read Isaiah 7:14 Immanuel means “God with us.” The promised Saviour is [_] Himself!",
+        "blanks": 1
+      },
+      "answers": [
+        "God"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Matthew 1:18-23",
+        "text": "(This fulfills Genesis 3:15 and Isaiah 7:14).\n\nLet’s now read a short summary of the teachings and life of the Saviour. What did the Saviour do and teach? We need to know who Jesus is from the Bible and who He said He is:\n\nThe passages below are from Matthew chapters 8, 16, 21; Mark 2, Luke 22; John 3, 19, Acts 1.\n\nWhile Jesus, the Son of God, lived on earth in the form of a man, He was tempted in all the same ways we are; yet He never sinned. He came to give His life for everyone.\n\nAnd, Jesus proved Himself as the promised Saviour in many ways. Jesus foretold that He must suffer many things, be rejected by the religious leaders, be killed, and then be raised from the dead on the third day.\n\nThose suffering from different kinds of diseases were brought to Him, and He healed them all. He healed a man who had been lame for thirty-eight years. A man full of leprosy saw Jesus and fell on his face, saying, “Lord, if you will, you can make me clean.” Jesus then touched him, saying, “I will: be...clean.” Immediately the leprosy left the man.\n\nJesus Christ said He could forgive sins...only God can do that. And Jesus had power over all spirits. Most of the religious and political leaders rejected Jesus’ teaching. However, one called Nicodemus came to Jesus, and said “We know that you...come from God: for no man can do these miracles...\n\nexcept God be with him.” Jesus explained to him that God so loves everyone in the world that He gave his only begotten Son to die for us in our place, so that anyone who believes in Him will not perish and pay for their own sins, but have everlasting life. Nicodemus would soon understand and believe.\n\nJesus taught with great authority. He went into the temple and threw out those who were making profit in religion.\n\nJesus said to them, “It is written, My house shall be called the house of prayer; but you have made it a den of thieves.” And Jesus taught, “...what shall it profit a man, if he shall gain the whole world, and lose his own soul?”\n\nJesus said, “...I am the door: by me if any man enter in, he shall be saved,... I am the good shepherd: the good shepherd gives his life for the sheep...I give unto them eternal life; and they shall never perish...”"
+      }
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Jesus said He is God."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Jesus offered hope over pain. He condemned sin but called the sinner to believe. He knew everyone’s true thoughts and needs. He knows us the same way today. He offered then and now offers love, acceptance, belonging and a meaningful life now and eternal life with Him."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Jesus spoke with a woman at a well revealing that He knew everything about her, even the sinful acts in her life. He gave her hope for freedom from her empty life and she believed in Him and told everyone in her community about Him. Many believed because of her changed life."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Jesus spoke personally with an influential man who asked how he could inherit eternal life. Jesus invited the man to make an uncompromising commitment and follow Him, but the man went away sad."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "After three years of teaching, Jesus knew His time had come to die for the sins of everyone. Jesus said to His disciples, “Let not your heart be troubled:...In my Father’s house are many mansions...I go to prepare a place for you...and I will come again, and receive you unto myself; that where I am, there you may be also...”"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "After the last supper, Judas came to Jesus with armed men from the religious leaders, greeting Him with a kiss of betrayal. Jesus knowing all things...said unto them, “Whom do you seek?” They answered him, “Jesus of Nazareth.” Jesus said, “I am he.” As soon as He said that, they went backward, and fell to the ground. Then Jesus allowed Himself to be tied up and brought to the religious leaders. He came for this purpose."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "As soon as it was day, the religious leaders began to accuse Him before Pilate, the Roman ruler, saying, “We found this fellow perverting the nation, and forbidding to give tribute to Caesar, saying that he himself is Christ a King.” But Pilate said, “I find no fault in this man...release him...” And they cried out all at once, saying, “Crucify him, crucify him...” And Pilate said unto them the third time, “Why, what evil has he done? I have found no cause of death in him...let him go.” And they instantly yelled with loud voices, that he might be crucified. Then Pilate sentenced Him that it should be as they required."
+      }
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Jesus paid the ultimate price for my sins on the cross. The Resurrection proves Jesus Christ is God."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Jesus was beaten and taken to a place called Calvary. There they nailed Jesus to the cross. He did this for you and me. Jesus prayed saying, “Father, forgive them; for they know not what they do.” After hours of suffering, Jesus, knowing that everything was now accomplished for His death, called out, “It is finished.” Then He bowed His head, and let His life go willingly."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Afterwards, two men took Jesus’ body, wound it in linen grave clothes that were dipped in spices, and laid His body in a tomb. Then, as requested by the religious leaders, the tomb was sealed and guarded by Roman soldiers."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "After three days, an angel of the Lord rolled back the stone from the tomb’s door. In fright, the Roman soldiers fainted. When followers of Jesus came to the tomb and saw the stone moved, they were stunned. Suddenly, one of the angels said, “Fear not...Jesus, which was crucified...He is not here: for he is risen, as he said.” Then they remembered His words."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "That evening, Jesus appeared to His disciples and said, “Peace be unto you.” He showed them the scars from the nails and the spear in His hands and His side. The disciples were filled with joy to see the Lord."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "And Jesus instructed His disciples to go into the entire world and tell the Good News of Salvation because God loves us! His disciples gave their lives for Him because they saw Him alive."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Jesus said to doubting Thomas, ”...because you have seen me, you have believed: blessed are they that have not seen, and yet have believed.” Could that be you? Christ died for your sins...He was buried...and He rose again!"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Jesus was seen by hundreds of people, showing them that He was alive. And He instructed His disciples, “Go...into all the world, and preach the gospel (the good news of salvation).” As they watched, Jesus was taken up, and a cloud took Him out of their sight. Two angels said, “this same Jesus, which is taken up from you into heaven, shall so come in like manner as you have seen him go into heaven.”"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "John 20:30-31",
+        "text": "Jesus Christ is God. Jesus was God before He was born to [_]. He was God while He was on the earth. He proved He is God by His victory over sin and death and by His resurrection from the dead. And He is God [_] and He is alive now. He is the promised Saviour.",
+        "blanks": 2
+      },
+      "answers": [
+        "Mary",
+        "today"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Matthew 20:28",
+        "text": "Jesus Christ came to give His life as a [_] to pay for our sins.",
+        "blanks": 1
+      },
+      "answers": [
+        "ransom"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 5:8",
+        "text": "He came to show us God’s [_] even though we are sinners.",
+        "blanks": 1
+      },
+      "answers": [
+        "love"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "1st John 5:11,12",
+        "text": "He came to give us eternal life to [_] eternal death in Hell.",
+        "blanks": 1
+      },
+      "answers": [
+        "escape"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Salvation is trusting Christ alone. Rejecting truth results in eternal separation from God."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "1st Timothy 2:5",
+        "text": "Notice that this verse says there is only one [_] between God and men. A mediator is one who restores peace between two parties. There are not several possible mediators; Jesus Christ is the only one because He is [_] . He is the only possible intercessor between God the Father and man. He came to save you from your sins. Jesus Christ was either who He said He was or He was a liar. Jesus Christ could not just be a good teacher. He claimed to be God and He claimed to have the power to forgive sins. What do you believe?",
+        "blanks": 2
+      },
+      "answers": [
+        "mediator",
+        "God"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "John 3:18,36",
+        "text": "God’s [_] is clear. Because we are born sinners and we sin, we are already condemned and under the judgment of God. If we refuse the Son of God we [_] under the condemnation and judgment of God. God will not excuse any sin.",
+        "blanks": 2
+      },
+      "answers": [
+        "penalty",
+        "remain"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Revelation 20:15",
+        "text": "The Lake of Fire is God’s punishment for [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "sinners"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Ephesians 2:8-9",
+        "text": "Your religious works, your offerings, your church attendance, your baptism or any of your good deeds cannot change your sinful condition before God. No church and no religion can remove your sin. Only Jesus Christ can save you. Salvation is the gift of God. Salvation is never on the basis of any kind of [_] [_]. The word “justified” means to be made right with God. Salvation is by faith plus nothing. You can do nothing to cleanse yourself from sin.\n\nJesus Christ died and rose again to give you new life. Note: If you have already accepted Christ, then let’s review the joy of coming to Christ. If you are unsure about your salvation then go through this section carefully.",
+        "blanks": 2
+      },
+      "answers": [
+        "good",
+        "works"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "John 6:28-29",
+        "text": "Because of Jesus Christ, you now can come to God simply by [_], without works. Are you willing to [_] and trust by faith in the One True God for forgiveness of your sins?",
+        "blanks": 2
+      },
+      "answers": [
+        "faith",
+        "believe"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 6:23",
+        "text": "We deserve only one thing from God, and that is [_]. God is completely holy and just and we deserve nothing but judgment. We have sinned. We have rebelled against God. But the last part of this verse says God has provided us with a way back to Him. It is not because God owes it to us; it is a [_] based on His love. The first man and woman were given a choice. However, they sinned and we also have sinned. We must all make a [_].",
+        "blanks": 3
+      },
+      "answers": [
+        "judgment",
+        "gift",
+        "choice"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "John 3:15-16",
+        "text": "God is standing with His arms open, telling us that even though we are all sinners, He has provided a way through which we may come to Him. God’s promise is clear. If we [_] God’s Son, the Jesus of the Bible, as our Lord and Saviour, then on the basis of Christ’s finished work; His death, burial and resurrection as the only payment for our sin (which we trust by faith alone), God promises He will transfer us from the Kingdom of Satan to the Kingdom of God, from the family of Adam to the family of God, from a life of serving sin to a life of serving God, and from eternal death in Hell to eternal life in Heaven.",
+        "blanks": 1
+      },
+      "answers": [
+        "accept"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "God promises you real life now and perfect peace, love, and joy with Him forever."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 10:9, 10-13",
+        "text": "From our [_] we must believe that Jesus Christ is alive now and ask Jesus Christ to forgive us and save us. We trust Him only as our Lord and Saviour, by faith believing in Him alone as payment for our sins. You can pray now to put your complete trust in Jesus Christ as your Lord. For Jesus Christ to be your Lord means you surrender yourself, your will, your life, everything to Him. It means you will follow, worship and obey [_] Him.\n\nNow God in His love has given you an [_] to be saved from your sins.\n\nWould you like to surrender your life to Jesus Christ now?\n\nI invite you to make this decision by asking God sincerely from your heart to save you. Here is a suggested prayer:\n\nLord Jesus, I confess that I am a sinner and that I need Your forgiveness. I am truly sorry for my sins and humbly ask You to forgive me and cleanse me. I believe that You died on the cross in my place and that You rose for my salvation. I surrender my will, my life, and my everything to You-- the Lord Jesus Christ. From this day forward I will follow and worship only You. You alone are my Lord and Saviour forever. By faith I accept from You the free gift of eternal life. I ask this in the Name of Jesus Christ. Amen.",
+        "blanks": 3
+      },
+      "answers": [
+        "heart",
+        "only",
+        "opportunity"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain Romans 10:13?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: If your neighbor asks you, “Why do you think Jesus is anything more than a good teacher?” Or “Why are Christians so intolerant to think that Jesus is the only way?” How would you respond?"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 5:8",
+        "instruction": "Write Romans 5:8 in the space below - going down a line at each punctuation mark.",
+        "lines": 4,
+        "followUp": "How would you explain that verse?",
+        "blanks": 4
+      },
+      "answers": [
+        "But God commendeth his love toward us,",
+        "in that ,",
+        "while we were yet sinners,",
+        "Christ died for us."
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Assignments for Lesson One"
+      },
+      "source": "image"
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "The Word of God, the Bible, brought you into salvation. Your attitude about God and His Word are so",
+          "important, it will determine the direction of your life. It is important that you know the Bible is the very",
+          "words of God and every word is pure. The Bible tells us the very thoughts of God. You can know your",
+          "Heavenly Father by knowing His Word."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Read 1st Thessalonians 2:13. If you received Christ, the Bible will work in you. And each word is",
+          "important. The way to know God is through His Word."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 3,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Read Hebrews 4:12. You and I do not judge the Bible; it judges and knows us. We are to respect the",
+          "Word of God and allow it to change us. You must obey the Word of God."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 4,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "It is very important that you decide now to give time to God and His Word everyday. Our Lord Jesus",
+          "said, in John 8:31, to those which believed on him, that if they would continue in His word, then they",
+          "would be His disciples. And God’s plan for your life is that you become His disciple. A disciple is a",
+          "trained follower who places Christ first.",
+          "There are specific steps to discipleship in the Word of God and your discipler is with you to help you",
+          "through each one successfully. You will learn how to meet with your Heavenly Father every day. If He is",
+          "not leading you, your life will be too complicated.",
+          "All the problems and trials in life can be solved by our Heavenly Father. God is always at work and always",
+          "moving. God wants to bring comfort and peace to your life even when you are in the middle of those",
+          "troubles.",
+          "There is a spiritual struggle going on and you are on the winning side. Sometimes life is difficult because",
+          "evil is fighting against God, but God will help you."
+        ]
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "There are many resources for Journey online. A few to check are:"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": "The Spiritual Map is a summary of lesson one to use as a witnessing tool."
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "<<<",
+          "witnessing tool."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Today, you might see a Hindu family across the street or Muslims in the stores or Buddhists in the",
+          "airport. People from non-Christian beliefs are all around us and many are receptive to the Gospel. Are",
+          "you prepared to share the truth of God’s Word with genuine concern, drawing them to Christ?",
+          "There are tools to help you respond with the unique truths of biblical Christianity to point them to Jesus",
+          "Christ, to answer questions, and win souls for eternity.",
+          "Check the resources at www.TheJourneyForum.com regularly which include information on: Major",
+          "Religions in our world, such as: Catholicism, Islam, Buddhism, Hinduism, Judaism. Major Cults in our",
+          "world, such as: Jehovah Witnesses, Mormonism, Scientology, and others. Witnessing Tools like the",
+          "Spiritual Map, Gospel Tracts, and more.",
+          "Go to www.TheJourneyForum.com and click on “Users.”",
+          "Go to the website today and download this free"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Get a note book with rings that you can put paper into. Then divide the paper with these sections:",
+          "Daily in the Word, Prayer, Special Verses, Message Notes, and Bible Study. You need blank paper in",
+          "each section."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Answer the questions for Lesson 1 below on a separate piece of paper and bring them to your next",
+          "meeting:"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": "Which statement is true?"
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "a. God started evolution",
+          "b. God created everything out of nothing",
+          "c. God is in the trees, plants and wind"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": "Write out a Bible verse that teaches God is three in one."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 3,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Does the Bible teach that Jesus Christ is God? [_]. Write your reasons with",
+          "Bible verses."
+        ],
+        "blanks": 1
+      },
+      "answers": [
+        ""
+      ]
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 4,
+        "text": "Where did evil start?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 5,
+        "text": "What does it mean that man was made in the image of God?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 6,
+        "text": "What does it mean to be born in the image of Adam?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 7,
+        "text": "Why is salvation not by our morality or religious good deeds or works?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 8,
+        "text": "What do you believe about Jesus Christ?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 9,
+        "text": "How do we receive salvation?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 10,
+        "text": "Write your answers to all Water Cooler Questions in this lesson."
+      }
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "<<< See a video message from John or Cathy Honeycutt."
+      }
+    }
+  ]
+}

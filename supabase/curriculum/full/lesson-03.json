@@ -1,0 +1,1409 @@
+{
+  "number": 3,
+  "title": "Prayer",
+  "blocks": [
+    {
+      "type": "LESSON_THEME",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Prayer"
+      }
+    },
+    {
+      "type": "TOPIC_LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Knowing God through prayer",
+          "Why pray",
+          "How to pray",
+          "When to pray",
+          "Answers to prayer",
+          "The Lord's Prayer",
+          "Hindrances to prayer",
+          "Sin after salvation"
+        ]
+      }
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "Communication"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Key Objective: To know my Heavenly Father through prayer."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Biblical Christianity is not just a set of beliefs, but a personal relationship to be enjoyed with God the Father, God the Son, and God the Holy Spirit. Simply put, we get to know someone by communicating with them. As a disciple and Discipler meet together around God’s Word, they are to grow and experience biblical truths together. Each makes an impact on the other. In the same way, as we communicate with God and we grow closer to Him, we will come to know Him personally. The time we spend with the Lord in prayer is to be exciting and powerful. Now let’s see what the Bible says about prayer."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 2:18",
+        "text": "Because of your salvation you can now communicate with your Heavenly Father."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Romans 10:13",
+        "text": "Remember, He [_] you in answer to your prayer of salvation.",
+        "blanks": 1
+      },
+      "answers": [
+        "saved"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Jeremiah 32:17, 27",
+        "text": "He is [_] [_]. He can answer prayer.",
+        "blanks": 2
+      },
+      "answers": [
+        "all",
+        "powerful"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Psalms 44:21, Matthew. 6:8 He knows [_]. He knows your needs.",
+        "blanks": 1
+      },
+      "answers": [
+        "everything"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "True Christianity is a personal walk with God."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Corinthians 6:17",
+        "text": "He is [_] [_] you.",
+        "blanks": 2
+      },
+      "answers": [
+        "always",
+        "with"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Philippians 4:6",
+        "text": "He wants to hear your [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "requests"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 3:20",
+        "text": "He can do [_] than you can imagine.\n\nWhy should we pray?",
+        "blanks": 1
+      },
+      "answers": [
+        "more"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "John 16:24",
+        "text": "Prayer brings [_]. God will help you with your problems.",
+        "blanks": 1
+      },
+      "answers": [
+        "joy"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 6:26, 10:29-31",
+        "text": "Pray because God is interested in the [_] details of your life.",
+        "blanks": 1
+      },
+      "answers": [
+        "smallest"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st John 5:14",
+        "text": "Pray because God will [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "listen"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Peter 5:7",
+        "text": "Pray because God [_] about your troubles.",
+        "blanks": 1
+      },
+      "answers": [
+        "cares"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Jeremiah 33:3",
+        "text": "Pray because God [_] prayer.",
+        "blanks": 1
+      },
+      "answers": [
+        "answers"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 7:7-11",
+        "text": "To summarize, God really cares about your communication with Him and He is concerned about the smallest details of your life. Now let’s understand how we can communicate with God daily:"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "John 14:13",
+        "text": "Jesus said to “ask in my name”. This means you pray what Jesus would pray."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 6:7",
+        "text": "Do not use vain [_] (repeating words over and over). Vain means empty or worthless.",
+        "blanks": 1
+      },
+      "answers": [
+        "repititions"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "God hears my prayer and has the power to answer me."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Leviticus 26:1",
+        "text": "The Bible commands us to not make [_]. Many people around the world pray to idols. What are the idols in our culture?",
+        "blanks": 1
+      },
+      "answers": [
+        "idols"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Thessalonians 1:9",
+        "text": "They turned to [_] from [_] to serve the living and true God.",
+        "blanks": 2
+      },
+      "answers": [
+        "God",
+        "idols"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Timothy 6:10",
+        "text": "Today, some trust in [_] and worship it or the things it can buy.\n\nHow Do I Pray?",
+        "blanks": 1
+      },
+      "answers": [
+        "money"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Psalms 29:2",
+        "text": "Pray giving the Lord the [_] He deserves.",
+        "blanks": 1
+      },
+      "answers": [
+        "glory"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Psalms 32:5, 38:18",
+        "text": "Pray [_] and agreeing with God about our sin.",
+        "blanks": 1
+      },
+      "answers": [
+        "confessing"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Psalms 62:8",
+        "text": "[_] in Him and [_] out your heart to Him.",
+        "blanks": 2
+      },
+      "answers": [
+        "trust",
+        "pour"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Psalms 100:4",
+        "text": "Pray giving [_] to God.",
+        "blanks": 1
+      },
+      "answers": [
+        "thanks"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Proverbs 8:17",
+        "text": "Love and [_] God.",
+        "blanks": 1
+      },
+      "answers": [
+        "seek"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Philippians 4:6",
+        "text": "Pray making specific [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "requests"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Hebrews 4:16",
+        "text": "Come in prayer with confidence and you will find grace to help in time of need."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Psalms 119:18",
+        "text": "Here is a simple plan for prayer: divide your time with God into these parts: begin with prayer asking the Lord to teach you, then Bible reading, then thinking about what God has said, then prayer again. When should you pray?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Luke 18:1",
+        "text": "[_], prayer is communication with God your Father.",
+        "blanks": 1
+      },
+      "answers": [
+        "continually"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "John 6:23",
+        "text": "Pray before each [_] giving thanks to God.\n\nWill my prayers be answered?",
+        "blanks": 1
+      },
+      "answers": [
+        "meal"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Thessalonians 5:17",
+        "text": "We are to pray [_]. This means that there is no time when we cannot communicate with our Heavenly Father. It also means we should never give up on the power of prayer.",
+        "blanks": 1
+      },
+      "answers": [
+        "without ceasing or continually"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st John 5:14",
+        "text": "Pray according to [_] [_], not our will. How do you know God’s Will? His will is always in agreement with His Word. You will learn more about this in a coming lesson.",
+        "blanks": 2
+      },
+      "answers": [
+        "His",
+        "will"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "John 15:7",
+        "text": "This is why Daily in the Word is important.\n\nWhy is it required for us to have faith when we pray?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Read Hebrews 11:6 and 1st John 4:16 God is [_]. God will always do to us and for us that which will ultimately be best for us. God’s answers often seem delayed because He knows the best time for everything. God answers all our prayers, but not always the way we want or when we want. Our faith and trust in our loving Heavenly Father will help us to understand His answers. Our Heavenly Father is all-wise, all-powerful, and all-loving. This is the 3rd Step of Discipleship for us to know: A disciple is in prayer to God every day.",
+        "blanks": 1
+      },
+      "answers": [
+        "love"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain 1st Corinthians 6:17?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: If your neighbor asks you, “What about those who never hear about Jesus? What will happen to them?” How would you respond?"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 3:20",
+        "instruction": "Write Ephesians 3:20 in the space below - going down a line at each punctuation mark.",
+        "lines": 3,
+        "followUp": "How would you explain that verse?",
+        "blanks": 2
+      },
+      "answers": [
+        "Now unto him that is able to do exceeding abudantly above all that we ask or think,",
+        "according to the power that worketh in us."
+      ]
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "title": "How to Pray"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Key Objective: To understand how we can communicate with God daily."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "In this section we will look at what is called the “Lord’s Prayer” and obstacles to prayer."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Luke 11:1",
+        "text": "To understand the context of the “Lord’s Prayer” we must see that the disciples asked Jesus to teach them to pray. The Lord was not teaching them a prayer but rather how to pray. Jesus did not intend for this prayer to be prayed over and over because He said in Matthew 6:7, ...do not use vain repetitions. The “Lord’s Prayer” is found in several places in the Bible. We will look at it from Matthew 6:9-13."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "The “Lord’s Prayer” is a [_] for prayer and teaches us many principles about prayer:\n\nThe words “Our Father” teach us the principle of our [_] with God.\n\nThe words “in heaven” teach us the principle of [_].\n\nFor His name to be “hallowed” teaches us the principle of [_].\n\nFor His “kingdom” to “come” teaches us the principle of focusing on [_] Kingdom.\n\nFor God’s “will” to be done “on earth, as it is in heaven” teaches us the principle of [_] to [_] will.",
+        "blanks": 7
+      },
+      "answers": [
+        "pattern",
+        "relationship",
+        "faith",
+        "worship",
+        "His",
+        "submission",
+        ""
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "The Lord’s Prayer is a guide."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "To ask God to give us “our daily bread” teaches us the principle of our [_] [_]. To ask God to “forgive us our debts” teaches us the principle of confession of [_].",
+        "blanks": 3
+      },
+      "answers": [
+        "daily",
+        "needs",
+        "sin"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "The words “as we forgive our debtors” teaches the principle of removing [_] to prayer.",
+        "blanks": 1
+      },
+      "answers": [
+        "hindrances"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "The phrase “and lead us not into temptation, but deliver us from evil” teaches us the principle of [_] and [_].",
+        "blanks": 2
+      },
+      "answers": [
+        "guidance",
+        "protection"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "The words that it’s God’s “kingdom, and the power, and the glory, for ever” teaches us the principle of God’s right to [_] in our lives.",
+        "blanks": 1
+      },
+      "answers": [
+        "rule"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "We see that the “Lord’s Prayer” teaches us how to pray. Now let’s look at obstacles to prayer:"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "James 4:2",
+        "text": "An obstacle to daily prayer is just not [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "asking"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "James 4:3",
+        "text": "You ask with the wrong [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "motives"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Proverbs 28:9",
+        "text": "An obstacle to prayer is failing to [_] to God’s Word.",
+        "blanks": 1
+      },
+      "answers": [
+        "listen"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Psalms 66:18",
+        "text": "Unconfessed [_] is an obstacle to prayer. Because communication with God is so important and vital to every part of your Christian life and because all of us deal with sin in our lives every day, we must understand how to deal with sin. As God’s child, how does He view my sins?",
+        "blanks": 1
+      },
+      "answers": [
+        "sin"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Psalms 103:12",
+        "text": "reads, As far as the east is from the west, Our sins, God will [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "remove"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Hebrews 10:17",
+        "text": "“And their sins and iniquities will I [_] no more.” If all of my sins are forgiven, am I free to sin?",
+        "blanks": 1
+      },
+      "answers": [
+        "remember"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Sin hinders my relationship with Him."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 6:1-2",
+        "text": "Shall we continue in sin? [_] [_]. God says “NO!”",
+        "blanks": 2
+      },
+      "answers": [
+        "God",
+        "forbid"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 6:12",
+        "text": "Let not sin [_] in your body.\n\nLet’s read the two main passages of Scripture, (Galatians 5:19-21 and Colossians 3:5, 8-9) that deal with sins we commit in our world everyday . If you need to know the definition of some of the terms go to www.TheJourneyForum.com.",
+        "blanks": 1
+      },
+      "answers": [
+        "reign"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Hebrews 12:5-11",
+        "text": "As a child of God, if you continue to sin God will discipline you as a [_] disciplines his children. But you will never lose your [_]. A son or daughter can never stop being a son or daughter.\n\nGalatians 6:7-9 God will allow you to [_] according to what you sow.\n\nJames 1:14-16 What is the final result of not dealing with sin? [_]. As a Christian, your salvation is secure. But you can lose your peace, your joy, your closeness to God. Be in the Word of God everyday and be in prayer to God everyday.\n\nSee Prayer Journals and other resources at TheJourneyForum.com.",
+        "blanks": 4
+      },
+      "answers": [
+        "father",
+        "salvation",
+        "reap",
+        "death"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain Matthew 6:7?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: Your co-worker says to you, “I prayed for a promotion and I didn’t get it. I thought prayer worked.” How would you respond to them?"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "James 4:2",
+        "instruction": "Write James 4:2 in the space below - going down a line at each punctuation mark.",
+        "lines": 3,
+        "followUp": "How would you explain that verse?",
+        "blanks": 4
+      },
+      "answers": [
+        "Ye lust, and have not:",
+        "ye kill, and desire to have, and cannot obtain:",
+        "ye fight and war, yet ye have not,",
+        "because ye ask not."
+      ]
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "title": "Overcoming Sin"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Key Objective: Understanding the obstacles to knowing God."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "As a Christian, why do I still sin?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "Ephesians 2:1-3",
+        "text": "Understand that before you were saved, you walked according to the ways of this [_] ; you walked according to the [_] of the kingdom of the air; you fulfilled the [_] of your sinful nature and its desires and thoughts. (Lust means a desire for what is [_].)",
+        "blanks": 4
+      },
+      "answers": [
+        "world",
+        "ruler",
+        "lusts or cravings",
+        "forbidden"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "2nd Corinthians 5:17",
+        "text": "But the day you received Christ you were [_] . You received a new nature at your salvation but you still live in the world. You still have a very real enemy and you still have the same body and mind you had before you were saved.",
+        "blanks": 1
+      },
+      "answers": [
+        "changed"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "James 1:14",
+        "text": "The main source of temptation is our own [_] [_].\n\nHow do I overcome sin today? Let’s apply the following steps to a sin we are struggling with.",
+        "blanks": 2
+      },
+      "answers": [
+        "evil",
+        "desires"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "Psalms 119:9-11",
+        "text": "[_] God’s Word in your [_]. This means that God’s Word is internalized and affects your thinking, which in turn affects your behavior.",
+        "blanks": 2
+      },
+      "answers": [
+        "Hide",
+        "heart"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "John 17:15-18",
+        "text": "Everyday I must allow the [_] of God to [_] me from the world. Sanctify means to be set apart from sin to be used only for God’s purposes.",
+        "blanks": 2
+      },
+      "answers": [
+        "Word",
+        "sanctify"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "My relationship with God grows with daily application of His Word."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "1st John 2:12-14",
+        "text": "I must allow the Word of God to [_] the enemy.\n\nRemember the 2nd Step of Discipleship: A disciple is in the Word of God everyday.",
+        "blanks": 1
+      },
+      "answers": [
+        "overcome"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Read Romans 8:13, Romans 12:2, Colossians 3:5,16 I must allow the [_] of God to take the [_] of God to [_] (to drain of life) the deeds of my body and [_] my [_].",
+        "blanks": 5
+      },
+      "answers": [
+        "Spirit",
+        "Word",
+        "mortify or put to death",
+        "renew",
+        "mind"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "Psalms 119:59-60",
+        "text": "How should you correct your life with the Word of God? [_]",
+        "blanks": 1
+      },
+      "answers": [
+        "quickly"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "Luke 6:46",
+        "text": "You must not only be Daily in the Word but you must also obey the Word so that your life style will reflect the teachings of God’s Word.\n\nWhen disciples and Disciplers meet together it greatly helps with accountability. It encourages us not only to learn God’s Word but to experience it; to put it into practice. As disciples mature spiritually, they are preparing to have their own disciple in the future.\n\nThis is the 4th Step of Discipleship to know: A disciple and discipler meet together every week."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Read Proverbs 28:13 Now as God’s child, you must accept [_] and acknowledge that you still sin. Your sin hinders your prayers and closeness to God. Through the prayer of salvation your sins are all forgiven. But now, as God’s child, you admit your guilt for cleansing and to repent of the sin.\n\nPray “I confess to the sin of [_]and [_] and etc”. True repentance means you do not want to ever do that again. Go back and look at the list of sins from Galatians 5 and Colossians 3. It is important that you look at the list. Go through them carefully asking God to reveal any areas of unconfessed sin in your life.",
+        "blanks": 3
+      },
+      "answers": [
+        "responsibility",
+        "",
+        ""
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Communicating with Him helps me overcome the sin in my life."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "Psalms 51:2",
+        "text": "Lord, [_] me thoroughly from mine iniquity, and cleanse me from my sin.",
+        "blanks": 1
+      },
+      "answers": [
+        "wash"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "1st John 1:9",
+        "text": "If we confess our sins God will [_] us and cleanse us.\n\nAsk God in prayer to forgive and cleanse you. This is not for salvation but to break the power of sin you have allowed in your life, and to have a close relationship with your Heavenly Father. Stop now and pray for God to forgive you and cleanse you from each sin He has revealed to you. And each day ask God to help you.\n\nBeing a disciple of Jesus Christ means that you are taking out of your life those things that are not pleasing to God and adding to your life the things that are pleasing to Him. To help you continue to mature in your Christian life you need to establish these practices right away:\n\nDo not allow sinful thoughts to control your mind.\n\nDo not go to places or be with people that make it [_] to sin.\n\nBe aware of the tactics of Satan that point you in the wrong direction (unforgiveness, bitterness etc.).",
+        "blanks": 2
+      },
+      "answers": [
+        "forgive",
+        "easy"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "title": "Assignments for Lesson Three"
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Be in the Word every day and actively communicate with God throughout each day."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Find those verses in God’s Word that help you with your particular weaknesses or ask your Discipler to help find those verses."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Surround yourself with people who will encourage your walk with God."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "View your Discipler as one with whom you can be totally honest to strengthen each other."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "In conclusion, we have the incredible opportunity to know God through His Word and through communicating with Him. And He wants our lives to have peace and joy which comes from a life that is consistent with biblical truth."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Remember that throughout Journey, we are not only learning biblical truths for every day life, we are also learning what it means to be a disciple of Jesus Christ. We do this by knowing and practicing the Steps of Discipleship."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Let’s review the Steps of Discipleship we have learned so far:"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "number": 1,
+        "text": "Become a Believer by trusting in Jesus Christ as Savior from John 3:16."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "number": 2,
+        "text": "A disciple is in the Word of God every day from John 8:31."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "number": 3,
+        "text": "A disciple is in Prayer to God every day from Luke 11:1."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "number": 4,
+        "text": "A disciple and discipler meet together every week from John 13:33-35."
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "items": [
+          "There are a total of eight Steps of Discipleship to help us reach the Destinations of Spiritual Formation."
+        ]
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain Romans 12:1-2?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: A person you work with asks you, “Why did my mother die from cancer?” How would you respond?"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "John 8:31",
+        "instruction": "Write John 8:31 in the space below - going down a line at each punctuation mark.",
+        "lines": 4,
+        "followUp": "How would you explain that verse?",
+        "blanks": 3
+      },
+      "answers": [
+        "Then said Jesus to those Jews which believed on him,",
+        "If ye continue in my word,",
+        "then are ye my disciples indeed;"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Daily in the Word",
+        "subtitle": "Reading, Writing, Saying and Studying the Bible."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Your Discipler will now take a thorough look at all the sections in your Daily in the Word notebook and give instructions if needed. Remember Christ told His followers that they would be His disciples if they were faithfully in His Word, John 8:31. If you are Daily in the Word you will mature spiritually."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Here are some additional ways to learn God’s Word and to grow as a disciple:"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Marking words. It’s important that you continue to hand write God’s Word and study His Word. As you are reading, saying and writing the words of God, some verses or words will just seem to jump off the page and capture your attention. These will be words that convict of sin, comfort, reveal sin, guide, give you peace and many other things. This is God’s Spirit teaching you His Word. Underline those words, phrases and verses that get your attention. And write any questions, thoughts or notes in your Daily in the Word near those underlined words."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Notes from Messages. It’s a great idea to take notes on the Bible messages you hear at your church and place them in the Message Notes section of your notebook. You are building God’s Word in your life and placing it deeper in your heart."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Memory verses. Some verses and words will really touch your heart and life. Write those verses in the “Special Verses” section of your Daily in the Word notebook. Memorize and think about those verses from God’s Word."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Prayer. It is very important to have regular times of prayer. Always begin and end the day with prayer. The truth is, every single one of us has a deep, inner need to know our Saviour. And prayer is not just going to your Father when you need something. Prayer is relating every area of your life to Him and His Kingdom for His Glory."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "In prayer, God changes our will so that we conform to His Will. Prayer is the loving communication between you and your loving Heavenly Father. He longs to hear and answer the desires and needs of your life. Sometimes you need to pray until the “ache” in your soul stops hurting. Tell God exactly how you feel and what you fear. He saved you to have a close relationship with Him. God the Father is interested in every part of your life. God cares and loves you. Bring everything to Him - and then follow His leading. There are many resources for Journey online. Check the “Water Cooler Scenario” sections for help in preparing answers to real questions."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Now your assignment is to read, write and say the Gospel according to Mark. You should have",
+          "finished writing 1st John in your Daily in the Word by now. Building God’s Word in your life makes a",
+          "permanent difference. This book was written by a disciple of Jesus Christ. Read, write and say at least",
+          "3 to 5 verses everyday. If you want to do more, that’s awesome. You can see a writing plan on the",
+          "following pages."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "What should my prayer requests be? In order to grow in prayer, keep a list of prayer requests in the",
+          "Prayer section of your notebook to see how God is working. Write the requests you have for others and",
+          "yourself and write down the answers when they come. Here is your assignment: look up the verses",
+          "below this week. Find the prayer request(s) in the verses. Bring your answers to your Discipler at the",
+          "next meeting and use them as prayer requests in your prayer time:",
+          "2nd Chronicles 16:12",
+          "Psalms 19:14",
+          "Psalms 34:4",
+          "Psalms 37:5",
+          "Psalms 51:2,10",
+          "Psalms 119:18, 34, 133",
+          "Matthew 5:44",
+          "Matthew 6:11",
+          "Matthew 9:37-38",
+          "Matthew 26:41",
+          "Acts 4:29",
+          "Romans 15:30",
+          "Ephesians 6:19-20",
+          "2nd Thessalonians 3:1",
+          "1st Timothy 2:1-4",
+          "James 1:5",
+          "James 5:14",
+          "1st Peter 5:7"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 3,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Begin to memorize all the Bible verses below. They are all verses that will help you witness and",
+          "share the Gospel with others. Your goal is to know them by Lesson Nine. Quote or write new verses",
+          "each time you meet with your Discipler and review what you have already learned.",
+          "Genesis 1:1",
+          "Ephesians 2:4",
+          "See a video",
+          "message",
+          "1st John 5:7",
+          "Isaiah 14:12-15",
+          "Matthew 25:41",
+          "Genesis 1:26-27",
+          "Genesis 2:16-17",
+          "Romans 5:12",
+          "10 Commandments",
+          "John 11:43-44",
+          "John 11:25-26",
+          "John 14:6",
+          "John 10:28",
+          "Mark 8:36",
+          "Luke 5:20",
+          "Luke 7:48",
+          "John 3:16",
+          "1st Cor. 15:3-6",
+          "John 3:36",
+          "Revelation 20:15",
+          "John 20:31",
+          "Romans 10:13"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 4,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Answer the questions for Lesson 3 below on a separate piece of paper and bring them to your",
+          "next meeting:",
+          "",
+          "A.",
+          "What are some things we know about God",
+          "from praying?",
+          "B. Why should you pray?",
+          "C. How should you pray?",
+          "D. What does the Bible teach about idols?",
+          "E. When should you pray?",
+          "F. How will your prayers be answered?",
+          "G. What is your plan for prayer?",
+          "H. What does the Lord’s Prayer teach you?",
+          "I.",
+          "What keeps your prayers from being",
+          "answered?",
+          "J. How does God see your sin after salvation?",
+          "K.",
+          "Why should you be in the Word of God",
+          "everyday?",
+          "L.",
+          "Write your answers to every Water Cooler",
+          "Scenario in this lesson."
+        ]
+      }
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Assignment: The Gospel of Mark."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "The verses below are arranged by topics and/or stories. It’s fine to write more than one group of verses per day. Some even write a chapter a day from the Bible. Take time every day to do your Daily in the Word."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Date Date Date Mark 1:1-4 Mark 4:1-4 Mark 6:30-31 Mark 1: 5-8 Mark 4:5-9 Mark 6:32-34 Mark 1:9-11 Mark 4:10-12 Mark 6:35-38 Mark 1:12-15 Mark 4:13-15 Mark 6:39-40 Mark 1:16-20 Mark 4:16-20 Mark 6:41-44 Mark 1:21-25 Mark 4:21-25 Mark 6:45-46 Mark 1:26-28 Mark 4:26-29 Mark 6:47-50 Mark 1:29-31 Mark 4:30-35 Mark 6:51-52 Mark 1:32-34 Mark 4:36-41 Mark 6:53-56 Mark 1:35-39 Mark 5:1-4 Mark 7:1-4 Mark 1:40-42 Mark 5:5-9 Mark 7:5-8 Mark 1:43-45 Mark 5:10-13 Mark 7:9-13 Mark 2:1-3 Mark 5:14-17 Mark 7:14-16 Mark 2:4-8 Mark 5:18-20 Mark 7:17-20 Mark 2:9-13 Mark 5:21-24 Mark 7:21-23 Mark 2:14-17 Mark 5:25-29 Mark 7:24-26 Mark 2:18-20 Mark 5:30-34 Mark 7:27-30 Mark 2:21-22 Mark 5:35-37 Mark 7:31-34 Mark 2:23-28 Mark 5:38-40 Mark 7:35-37 Mark 3:1-4 Mark 5:41-43 Mark 8:1-3 Mark 3:5-8 Mark 6:1-4 Mark 8:4-9 Mark 3:9-12 Mark 6:5-6 Mark 8:10-13 Mark 3:13-15 Mark 6:7-9 Mark 8:14-18 Mark 3:16-19 Mark 6:10-13 Mark 8:19-21 Mark 3:20-22 Mark 6:14-16 Mark 8:22-26 Mark 3:23-25 Mark 6:17-20 Mark 8:27-29 Mark 3:26-30 Mark 6:21-24 Mark 8:30-33 Mark 3:31-35 Mark 6:25-29 Mark 8:34-38 See a video message Date Date Date Mark 9:1-3 Mark 12:1-3 Mark 14:41-42 Mark 9:4-7 Mark 12:4-8 Mark 14:43-45 Mark 9:8-10 Mark 12:9-12 Mark 14:46-47 Mark 9:11-13 Mark 12:13-17 Mark 14:48-52 Mark 9:14-18 Mark 12:18-22 Mark 14:53-55 Mark 9:19-23 Mark 12:23-27 Mark 14:56-59 Mark 9:24-27 Mark 12:28-31 Mark 14:60-62 Mark 9:28-29 Mark 12:32-34 Mark 14:63-65 Mark 9:30-32 Mark 12:35-37 Mark 14:66-68 Mark 9:33-37 Mark 12:38-40 Mark 14:69-72 Mark 9:38-41 Mark 12:41-44 Mark 15:1-3 Mark 9:42-46 Mark 13:1-2 Mark 15:4-6 Mark 9:47-50 Mark 13:3-6 Mark 15:7-10 Mark 10:1-5 Mark 13:7-9 Mark 15:11-14 Mark 10:6-9 Mark 13:10-13 Mark 15:15-18 Mark 10:10-12 Mark 13:14-17 Mark 15:19-22 Mark 10:13-16 Mark 13:18-20 Mark 15:23-25 Mark 10:17-18 Mark 13:21-23 Mark 15:26-28 Mark 10:19-22 Mark 13:24-27 Mark 15:29-31 Mark 10:23-27 Mark 13:28-31 Mark 15:32-35 Mark 10:28-31 Mark 13:32-34 Mark 15:36-38 Mark 10:32-34 Mark 13:34-37 Mark 15:39-41 Mark 10:35-40 Mark 14:1-2 Mark 15:42-44 Mark 10:41-45 Mark 14:3-5 Mark 15:45-47 Mark 10:46-48 Mark 14:6-9 Mark 16:1-4 Mark 10:49-52 Mark 14:10-11 Mark 16:5-6 Mark 11:1-4 Mark 14:12-16 Mark:16:7-8 Mark 11:5-10 Mark 14:17-21 Mark 16:9-11 Mark 11:11-14 Mark 14:22-25 Mark 16:12-13 Mark 11:15-18 Mark 14:26-28 Mark 16:14-16 Mark 11:19-21 Mark 14:29-31 Mark 16:17-18 Mark 11:22-26 Mark 14:32-34 Mark 16:19-20 Mark 11:27-31 Mark 14:35-38 Mark 11:32-33 Mark 14:39-40"
+      }
+    }
+  ]
+}

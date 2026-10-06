@@ -1,0 +1,18 @@
+{
+  "firstPage": 8,
+  "sections": [
+    {
+      "label": "A",
+      "title": "The Beginning",
+      "objective": "Key Objective: To understand the one true God of the Bible."
+    },
+    {
+      "label": "B",
+      "title": "The Saviour",
+      "objective": "Key Objective: To understand how God made a way back to Him."
+    }
+  ],
+  "assignments": "Assignments for Lesson One",
+  "modules": [],
+  "cover": 6
+}

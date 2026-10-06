@@ -1,0 +1,41 @@
+{
+  "firstPage": 2,
+  "sections": [
+    {
+      "label": "A",
+      "title": "What’s Next",
+      "objective": "Key Objective: To view the world from God’s perspective."
+    },
+    {
+      "label": "B",
+      "title": "The Judgement Seat",
+      "objective": "Key Objective: To know that we will give an account of our life."
+    }
+  ],
+  "assignments": "Assignments for Lesson Six",
+  "modules": [
+    {
+      "page": 10,
+      "number": 2,
+      "subtitle": "Discover why discipleship is more effective one on one."
+    }
+  ],
+  "inserts": [
+    {
+      "page": 4,
+      "after": "Here is a time chart picturing the events we just studied:",
+      "block": {
+        "type": "FIGURE",
+        "body": {
+          "caption": ""
+        }
+      }
+    }
+  ],
+  "breakBefore": [
+    "John was close to",
+    "Visit www.TheJourneyForum.com to see more",
+    "This assignment was completed"
+  ],
+  "cover": 14
+}

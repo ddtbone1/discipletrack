@@ -1,0 +1,29 @@
+{
+  "firstPage": 2,
+  "sections": [
+    {
+      "label": "A",
+      "title": "Problem Solving",
+      "objective": "Key Objective: Learning to solve conflicts between each other."
+    },
+    {
+      "label": "B",
+      "title": "False Teachers",
+      "objective": "Key Objective: To understand how false teachers work."
+    },
+    {
+      "label": "C",
+      "title": "Words of a Disciple",
+      "objective": "Key Objective: Learning to draw people to God at the water cooler."
+    }
+  ],
+  "assignments": "Assignments for Lesson Nine",
+  "modules": [
+    {
+      "page": 12,
+      "number": 7,
+      "subtitle": "Your Strategy in Discipleship."
+    }
+  ],
+  "cover": 15
+}

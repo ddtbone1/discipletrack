@@ -1,0 +1,36 @@
+{
+  "firstPage": 2,
+  "sections": [
+    {
+      "label": "A",
+      "title": "Loving God",
+      "objective": "Key Objective: To understand where we go from here."
+    }
+  ],
+  "assignments": null,
+  "modules": [],
+  "inserts": [
+    {
+      "page": 5,
+      "block": {
+        "type": "HEADING",
+        "source": "image",
+        "body": {
+          "title": "Final Approval",
+          "subtitle": "Your Discipler and your Pastor will now check these items with you."
+        }
+      }
+    },
+    {
+      "page": 6,
+      "block": {
+        "type": "HEADING",
+        "source": "image",
+        "body": {
+          "title": "Journey in One on One Discipleship"
+        }
+      }
+    }
+  ],
+  "cover": 1
+}

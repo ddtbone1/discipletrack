@@ -1,0 +1,62 @@
+{
+  "firstPage": 2,
+  "sections": [
+    {
+      "label": "A",
+      "title": "Discipleship",
+      "objective": "Key Objective: To establish a biblical perspective of discipleship."
+    },
+    {
+      "label": "B",
+      "title": "Stewardship",
+      "objective": "Key Objective: To learn how to be a good steward."
+    }
+  ],
+  "assignments": "Assignments for Lesson Five",
+  "modules": [
+    {
+      "page": 12,
+      "number": 1,
+      "subtitle": "The Definition of one on one discipleship.",
+      "before": "• A disciple is a Believer who desires"
+    }
+  ],
+  "inserts": [
+    {
+      "page": 3,
+      "after": "be first in every area. Discuss with your Discipler",
+      "block": {
+        "type": "FIGURE",
+        "source": "image",
+        "body": {
+          "caption": "",
+          "labels": [
+            "Time",
+            "Money",
+            "Job",
+            "Family",
+            "Goals",
+            "Husband Wife",
+            "Everything",
+            "Desires",
+            "Talents",
+            "Plans"
+          ]
+        }
+      }
+    },
+    {
+      "page": 12,
+      "block": {
+        "type": "HEADING",
+        "tier": "DISCIPLER",
+        "source": "image",
+        "body": {
+          "title": "Discipleship Training",
+          "subtitle": "Introduction and explanation."
+        }
+      }
+    }
+  ],
+  "cover": 15
+}

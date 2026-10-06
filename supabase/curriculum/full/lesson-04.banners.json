@@ -1,0 +1,18 @@
+{
+  "firstPage": 2,
+  "sections": [
+    {
+      "label": "A",
+      "title": "The Local Church",
+      "objective": "Key Objective: To understand God’s plan for the church."
+    },
+    {
+      "label": "B",
+      "title": "Be Baptized",
+      "objective": "Key Objective: To understand the importance of baptism."
+    }
+  ],
+  "assignments": "Assignments for Lesson Four",
+  "modules": [],
+  "cover": 13
+}

@@ -1,0 +1,1402 @@
+{
+  "number": 2,
+  "title": "Assurance",
+  "blocks": [
+    {
+      "type": "LESSON_THEME",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Assurance of salvation"
+      }
+    },
+    {
+      "type": "TOPIC_LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "The meaning of assurance",
+          "The reliability of the Word of God",
+          "The author of the Bible",
+          "Enemies of the Bible",
+          "The promises in the Word of God",
+          "God's Holy Spirit dwells in us",
+          "Salvation is secure",
+          "Your new relationship with God"
+        ]
+      }
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "The Word of God"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Key Objective: To understand that I am safe and assured in God forever."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Because you accepted the Lord Jesus Christ as your Saviour, you are saved now and forever, and you can know it for certain."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st John 5:13",
+        "text": "From this verse, we can know for [_] that we have assurance of eternal life.",
+        "blanks": 1
+      },
+      "answers": [
+        "certain"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Assurance of salvation means to know for [_] you belong to God, that you possess eternal salvation.",
+        "blanks": 1
+      },
+      "answers": [
+        "sure"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "We can have a personal relationship with God."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Your assurance of salvation is promised in the Bible. But before we look at those promises, we must understand more about the reliability of God’s Word."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "The Bible is one of the oldest books in the world. The oldest parts are [_] years old. Even though the Bible is made up of [_] smaller books, it has one consistent message. The list of the books of the Bible is in the front of your Bible. Go to the table of contents in the front of your Bible any time you need to find a specific book until you can find them on your own. The Bible is divided into two sections: The [_] Testament and the [_] Testament.",
+        "blanks": 4
+      },
+      "answers": [
+        "4,000",
+        "66",
+        "Old",
+        "New"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "The Bible is often called the Word of God, the Holy Bible, or the Scriptures and is not like any other book. It’s interesting to note that the Bible has always been the world’s number one best seller since printing began."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "The Old Testament was originally written in the Hebrew language and the New Testament was originally written in the Greek language. The Bible has been translated into more languages than any other book in the world.\n\nWho is the author of the Bible?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Thessalonians 2:13",
+        "text": "The Bible says it is the [_] of [_].",
+        "blanks": 2
+      },
+      "answers": [
+        "Word",
+        "God"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "2nd Peter 1:20-21",
+        "text": "These verses teach three important facts: The Bible was not made by [_] ; godly men were used by God to pen the words; God is the [_]: notice it says “…as they were moved by the Holy Ghost.”",
+        "blanks": 2
+      },
+      "answers": [
+        "men",
+        "author"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "God used over 40 different men, over 1,500 years, from all different backgrounds to write down each word He wanted written. Most of the human writers God used to pen His words [_] knew each other. And yet the Bible completely agrees from beginning to end.",
+        "blanks": 1
+      },
+      "answers": [
+        "never"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "It’s amazing also that the Bible has never missed its predictions of thousands of events. Only God could be the author."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "2nd Timothy 3:16-17",
+        "text": "The way in which God gave us the Bible is called “inspiration”. According to this verse, how much of the Bible is inspired? [_] [_].",
+        "blanks": 2
+      },
+      "answers": [
+        "every",
+        "word"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "God is the author of the Bible. God’s Word has enemies."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "How can we learn and understand the Bible?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Corinthians 2:9-13",
+        "text": "The Holy Spirit teaches us the Bible when we [_] the words in the Bible to its own words. You must let the Bible define and speak for itself.\n\nWhat did Jesus say about the Bible?",
+        "blanks": 1
+      },
+      "answers": [
+        "compare or study"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 5:17-18",
+        "text": "The Bible would be fulfilled down to each [_] of a word and the smallest stroke of the pen.",
+        "blanks": 1
+      },
+      "answers": [
+        "letter"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 4:1-11",
+        "text": "Jesus has all power, as God, and could have sent the Devil away at any time. But Jesus showed the importance and power of the Word of God by answering every temptation with the Word of God.\n\nThe Bible has enemies."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Satan continually works against God and the Bible is one of his objectives. He has tried to ban, burn and remove the Bible throughout history. Countless Christian men and women have given their lives for the Word of God. You are holding a Bible in your hands right now because of their sacrifice."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Even today, false teachers use translations to pervert the Word of God and, sadly, some have produced new Bibles for profit. We have to be careful that we know we have the Word of God. It’s important for you to understand the position of our church on this issue (which we will provide for you)."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 24:35",
+        "text": "His Words will not pass [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "away"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Psalms 12:6-7",
+        "text": "God promised to [_] His words forever.",
+        "blanks": 1
+      },
+      "answers": [
+        "preserve"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Psalms 119:160",
+        "text": "Because the Bible is inspired of God, it is [_] from beginning to end.",
+        "blanks": 1
+      },
+      "answers": [
+        "true"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Your assurance of salvation is based upon the true Word of God. And you must always check every [_], teaching or [_] with the Word of God. This is why you must be Daily in the Word.",
+        "blanks": 2
+      },
+      "answers": [
+        "idea",
+        "belief"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "In summary, based on what we have studied, the most important reason for you to believe in the final authority of the Word of God is that God wrote it."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Assignment: Your Discipler will now explain and assign the “Daily in the Word” for Lesson Two, which is found toward the end of this lesson.\n\n<<< See a video message from John or Cathy Honeycutt."
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain 2nd Peter 1:20-21?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: If a friend at work says, “We can’t really believe the Bible - it has too many contradictions” or “You Christians just believe everything you read in the Bible with blind faith” how would you respond? Need ideas? Visit www.TheJourneyForum.com."
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "2nd Timothy 3:16-17",
+        "instruction": "Write 2nd Timothy 3:16-17 in the space below - going down a line at each punctuation mark.",
+        "lines": 7,
+        "followUp": "How would you explain that verse?"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Note: Skipping any assignments in Journey severely affects the multiplication of your disciples. Consider each assignment important and please do not skip any. Thank you."
+      }
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "title": "Eternal Security"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Key Objective: To know the promises of assurance in God’s Word."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "In this section we look at many of the specific promises in the Bible for assurance of salvation. Let’s notice the “heart of God” in these verses and be comforted in his love for us."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "John 3:16",
+        "text": "Your salvation is assured because God [_] you and me.",
+        "blanks": 1
+      },
+      "answers": [
+        "loves"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "John 5:24",
+        "text": "I [_] everlasting life, I [_] [_] come into judgment.",
+        "blanks": 3
+      },
+      "answers": [
+        "have",
+        "will",
+        "not"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "John 6:37",
+        "text": "He will [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "in no way cast me out or never push me away"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Acts 26:18",
+        "text": "I have [_] of sins.",
+        "blanks": 1
+      },
+      "answers": [
+        "forgiveness"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 5:1",
+        "text": "I have [_] with God.",
+        "blanks": 1
+      },
+      "answers": [
+        "peace"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "The Bible holds promises for me."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 6:23",
+        "text": "I have the gift of [_] [_].",
+        "blanks": 2
+      },
+      "answers": [
+        "eternal",
+        "life"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 10:13",
+        "text": "Those who call upon the name of the Lord shall be [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "saved"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "2nd Corinthians 5:21",
+        "text": "He has made me [_], meaning right with God.",
+        "blanks": 1
+      },
+      "answers": [
+        "righteous"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Ephesians 1:6",
+        "text": "God [_] me in the beloved (meaning in Christ).",
+        "blanks": 1
+      },
+      "answers": [
+        "accepted"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Ephesians 3:17",
+        "text": "Christ will [_] in my heart. Read John 14:23.",
+        "blanks": 1
+      },
+      "answers": [
+        "dwell"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Colossians 1:14",
+        "text": "We have [_] through his blood.",
+        "blanks": 1
+      },
+      "answers": [
+        "redemption"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Revelation 1:5",
+        "text": "He [_] me from my sins.",
+        "blanks": 1
+      },
+      "answers": [
+        "washed"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Revelation 21:27",
+        "text": "He recorded my name in the Lamb’s [_] of [_].\n\nIn summary, we have learned that you can be assured of your salvation because of the reliability of God’s Word and because of the specific promises of assurance.\n\nThroughout Journey, we are not only learning biblical truths for every day life, we are also learning what it means to be a disciple of Jesus Christ. We do this by knowing and practicing the Steps of Discipleship. Here is the first one to know:\n\nThe 1st Step of Discipleship: Become a Believer in Jesus Christ. John 3:16 There are a total of eight Steps of Discipleship found in God’s Word.",
+        "blanks": 2
+      },
+      "answers": [
+        "book",
+        "life"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain Romans 5:1?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: A family member says to you, “How can anyone know for sure they are going to heaven?” What would you say? Need ideas? Visit www.TheJourneyForum.com."
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 6:23",
+        "instruction": "Write Romans 6:23 in the space below - going down a line at each punctuation mark.",
+        "lines": 3,
+        "followUp": "How would you explain that verse?",
+        "blanks": 2
+      },
+      "answers": [
+        "For the wages of sin is death;",
+        "but the gift of God is eternal life through Jesus Christ our Lord."
+      ]
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "title": "The Holy Spirit"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Key Objective: To understand the Holy Spirit dwells in us."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "We have seen that your assurance is based upon the reliability of the Word of God; we have seen the specific promises in God’s Word about your salvation, and now we look at another way you know your salvation is sure:"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "One of the most important days of the year for Bible-believers is the day Jesus Christ rose from the dead. It is important because those who have trusted in Him will also be resurrected."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "Romans 8:11",
+        "text": "The Resurrection is also important for another reason. After Jesus ascended up to heaven, He sent [_] [_] to live in all who receive Him as Saviour.\n\nHis Spirit lives in you now. That same Spirit of God that resurrected our Lord is alive in you to help you. God is in Heaven but He is also in union with you now and forever. God wants this truth to bring you an assurance of your salvation. Here are Scripture verses teaching that the Holy Spirit dwells in you:",
+        "blanks": 2
+      },
+      "answers": [
+        "His",
+        "Spirit"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "Romans 8:9",
+        "text": "The Holy Spirit comes to [_] in the believer.",
+        "blanks": 1
+      },
+      "answers": [
+        "live"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "Romans 8:16",
+        "text": "God’s Spirit [_]with our spirit that we are God’s child.",
+        "blanks": 1
+      },
+      "answers": [
+        "witnesses or testifies"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "1st John 5:10",
+        "text": "I know I am saved because I have the [_] of the Spirit within.\n\nCan you ever lose your salvation?",
+        "blanks": 1
+      },
+      "answers": [
+        "witness or testimony"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "John 5:24",
+        "text": "says the kind of life you now have is [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "eternal"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "John 10:28",
+        "text": "says you shall [_] perish.",
+        "blanks": 1
+      },
+      "answers": [
+        "never"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "I have assurance because Christ dwells in me."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "John 10:29",
+        "text": "says no one [_] remove you from God’s hand.",
+        "blanks": 1
+      },
+      "answers": [
+        "can"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "Romans 8:38-39",
+        "text": "Nothing can [_] you from the love of God.\n\nIn summary, your assurance of salvation is based upon God’s promises and His union with you. Visit www.TheJourneyForum.com to see more on this subject.",
+        "blanks": 1
+      },
+      "answers": [
+        "separate"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain Romans 8:9?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: How would you answer this question, “Why are there so many religions if there is only one God?” And how would you respond if a friend says, “I don’t feel saved, I think I lost it or never had it.”"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "Romans 8:16",
+        "instruction": "Write Romans 8:16 in the space below - going down a line at each punctuation mark.",
+        "lines": 2,
+        "followUp": "How would you explain that verse?",
+        "blanks": 2
+      },
+      "answers": [
+        "The Spirit itself beareth witness with our spirit,",
+        "that we are the children of God:"
+      ]
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "D",
+      "body": {
+        "title": "New Relationship"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "D",
+      "body": {
+        "text": "Key Objective: To understand our addition to the family of God."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "D",
+      "body": {
+        "text": "We now see that our assurance of salvation is also based on the fact that we are God’s children."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "D",
+      "body": {
+        "reference": "Romans 8:15",
+        "text": "God is your Heavenly [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "Father"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "D",
+      "body": {
+        "reference": "Jeremiah 29:11-12",
+        "text": "God thinks about you and is deeply interested in your life."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "D",
+      "body": {
+        "reference": "2nd Corinthians 6:18",
+        "text": "says those who trust Christ are the [_] and [_] of God.",
+        "blanks": 2
+      },
+      "answers": [
+        "sons",
+        "daughters"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "D",
+      "body": {
+        "reference": "Titus 1:2",
+        "text": "Your assurance of salvation is based upon faith in God who promised you forgiveness of sins and a relationship with Him. And God cannot [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "lie"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "D",
+      "body": {
+        "text": "My relationship with God is secure because He is now my Heavenly Father."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "D",
+      "body": {
+        "text": "It’s important to know that you are in a spiritual struggle. Satan is doing all he can to work against God. Sometimes life will be hard because there is a battle going on for the souls of men and women. Sometimes the sin that is in the world will make life seem [_]. But the power of Christ helps you each day. Jesus Christ died for you, but He also lives in you and you are in His family now.\n\nTo meet the challenges you will face every day, it’s very important for you to be Daily in the Word. Every day, reading, writing, and saying the Word of God also allows you to be obedient to John 8:31, where Christ told His followers that they would be His disciples if they were faithfully in His Word. This is a foundational step to becoming a disciple of Jesus Christ; to be in the Word of God every day.\n\nIn conclusion, you have the Promises of God, through the perfect Word of God, the Spirit of God in you, and your new relationship with God to give you the assurance of your salvation. By accepting the Lord Jesus Christ as your Saviour, you are saved now and forever; and you can know it for certain.",
+        "blanks": 1
+      },
+      "answers": [
+        "unfair"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "D",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "D",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain Romans 8:15?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "D",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: A new Christian expresses doubts about his salvation to you. How would you explain assurance of salvation?\n\nHere’s another “water cooler” scenario: After witnessing to a family member and telling her about your salvation she says, “It’s great that you’ve found something that works for you.” How would you respond?"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "D",
+      "body": {
+        "reference": "2nd Corinthians 6:18",
+        "instruction": "Write 2nd Corinthians 6:18 in the space below - going down a line at each punctuation mark.",
+        "lines": 3,
+        "followUp": "How would you explain that verse?",
+        "blanks": 3
+      },
+      "answers": [
+        "And will be a Father unto you,",
+        "and ye shall be my sons and daughters,",
+        "saith the Lord Almighty."
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Assignments for Lesson Two"
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Why write God’s Word? Read Deuteronomy 17:18-20 Look at the promises God made to the king over His people from writing the Word of God and following it: he would learn to fear the LORD his God, he would keep all the words of this law and these statutes, his heart would not be lifted up in pride, he would turn not aside from the commandments! As a result, he would enjoy success in life!"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "I believe God has these promises for you also, if you will be Daily in the Word. Kings are busy: plans to make, people to conquer, people to rule, assassinations to avoid, rebellions to put down, and a queen to keep happy. Busier certainly than most of us will ever be. But God commanded the King to hand write his own copy of God’s Word. Why? God knew everyone would be watching the King. He was the leader."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "He was to be a role model. The King’s subjects would follow his example. And God wants everyone to do this."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Another answer to the question of “Why write God’s Word” is that something happens when you write out God’s Holy Scripture that you can experience no other way; as you read the words you are about to write, and then say the words as you write them, sometimes you must glance back and forth to make sure you have the words letter-perfect. This slows you down to absorb and meditate on God’s Word."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Keeping the words in your mind long enough to say them and write them places the Word of God deeper in your heart."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Plus, there is the physical motion of writing. You are writing the Word of God, stroke-by-stroke, letter- by- letter, word-by-word, phrase-by-phrase, verse-by-verse. The very act of recording God’s own words helps you see a truth you might otherwise miss."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Also, being Daily in the Word is a requirement for you to become a disciple. The first step you took was to trust in Christ for eternal life. The next step of discipleship is described in John 8:31 where Christ told His followers that they would be His disciples if they were faithfully in His Word."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "This step is foundational and vital for your Christian life. If you are Daily in the Word you will be obedient to Christ and mature spiritually to become, not just a believer, but a disciple of Jesus Christ. As you continue in Journey, each lesson will help you to become His disciple. So, here at the beginning, be faithful to do your Daily in the Word and you will be amazed at what God will do in your life."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": "Get alone and pray asking God to speak to you through His Word."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": "Find the section in the Bible assigned to you by your Discipler. Write the date and time at the top of"
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "the page of your Daily in the Word notebook."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 3,
+        "text": "Write the book, chapter and verse that you are starting to write on the next line in your notebook."
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Notice the words in the verses many times are divided by punctuation marks."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 4,
+        "text": "Now, read the words out loud up to the punctuation mark then write them on one line in your Daily"
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "in the Word notebook (and it’s good to say the words again as you write them)."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 5,
+        "text": "Read the next part but write the words one line down in your notebook."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 6,
+        "text": "If you have a long verse that has no punctuation marks, divide it where you want to."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 7,
+        "text": "Write a minimum of 3 to 5 verses each day. Of course if you write more that’s great. You are to do"
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "your Daily in the Word every day."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 8,
+        "text": "Do this every day and be ready to show your discipler your Daily in the Word Notebook the next time"
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "you meet, and your discipler will show you their Daily in the Word."
+        ]
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "body": {
+        "reference": "1st John 1:1-2",
+        "instruction": "Let’s practice on 1st John 1:1-2",
+        "lines": 12,
+        "blanks": 12
+      },
+      "answers": [
+        "1 John 1:1 That which was from the beginning,",
+        "which we have heard,",
+        "which we have seen with our eyes,",
+        "which we have looked upon,",
+        "and our hands have handled,",
+        "of the Word of life.",
+        "1 John 1:2 For the life was manifested,",
+        "and we have seen it,",
+        "and bear witness,",
+        "and shew unto you the eternal life,",
+        "which was with the Father,",
+        "and was manifested unto us."
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "See a video message from John or Cathy Honeycutt. >>> There are many resources for Journey online. Go to the website today and download the Assurance Guide. It is a summary of this lesson and you can use it with someone who has received Christ recently."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Your first assignment in being Daily in the Word, is to handwrite the book of 1st John. You",
+          "can see a writing plan on the next page. Be sure to show your discipler what you have accomplished",
+          "each time you meet. After you complete writing the book of 1st John, you may choose from several",
+          "options which will be explained later. The important thing is for you to be obedient to Christ to continue",
+          "in His Word.",
+          "This is the 2nd Step of Discipleship to know: a disciple is in the Word of God every day.",
+          "Join a tradition that God has used: think about this, until the printing press was invented, the only",
+          "copies of the Bible were hand written. This went on for centuries. We have the Bible today because",
+          "Christians wrote God’s Word. Many, many Disciplers involved in Daily in the Word have finished their",
+          "own copy of God’s Word. Some, in other countries, have witnessed Bibles burned and banned and it",
+          "means so much to them to write their own copy. Perhaps you would like to carry on this tradition that God",
+          "has used to preserve His Word and write your own copy of the Word of God.",
+          "Remember, you are not just writing words. You are writing The Word. You will see the Truth...say",
+          "the Truth... hear the Truth... remember the Truth and form the Truth in your heart as it flows from your pen",
+          "onto paper."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Answer the questions for Lesson 2 below on a separate piece of paper and bring them to your",
+          "next meeting:"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": "Answers to every problem in your life are provided by your [_].",
+        "blanks": 1
+      },
+      "answers": [
+        ""
+      ]
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": "What is meant by “assurance of salvation”?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 3,
+        "text": "What did you do to receive salvation?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 4,
+        "text": "What three things is your assurance based upon?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 5,
+        "text": "The Bible is made up of [_] smaller books.",
+        "blanks": 1
+      },
+      "answers": [
+        "66"
+      ]
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 6,
+        "text": "The Bible is divided into two sections: the [_] Testament and the [_]Testament.",
+        "blanks": 2
+      },
+      "answers": [
+        "Old",
+        "New"
+      ]
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 7,
+        "text": "Explain what 2nd Peter 1:20-21 and 2nd Timothy 3:16 teach?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 8,
+        "text": "How does Satan attack the Bible?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 9,
+        "text": "Write a verse about the Bible being preserved."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 10,
+        "text": "What is the most important reason to believe the Bible is our final authority?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 11,
+        "text": "We must always check every [_], teaching or [_] with the Word of God.",
+        "blanks": 2
+      },
+      "answers": [
+        "idea",
+        "belief"
+      ]
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 12,
+        "text": "Write some of God’s promises about your salvation."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 13,
+        "text": "How can you learn the Bible?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 14,
+        "text": "Write two things about the Holy Spirit and His work in your assurance of salvation."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 15,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Can you ever lose your salvation? Why? and write your answers to all the Water Cooler Scenarios",
+          "in the lesson."
+        ]
+      }
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "<<< See a video message from John or Cathy Honeycutt."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "1st John 1:1-2 Date: [~] 1st John 1:3-4 Date: [~] 1st John 1:5-7 Date: [~] 1st John 1:8-10 Date: [~] 1st John 2:1-2 Date: [~] 1st John 2:3-6 Date: [~] 1st John 2:7-11 Date: [~] 1st John 2:12-14 Date: [~] 1st John 2:15-17 Date: [~] 1st John 2:18-19 Date: [~] 1st John 2:20-25 Date: [~] 1st John 2:26-29 Date: [~] 1st John 3:1-3 Date: [~] 1st John 3:4-7 Date: [~] 1st John 3:8-10 Date: [~] 1st John 3:11-13 Date: [~] 1st John 3:14-17 Date: [~] 1st John 3:18-22 Date: [~] 1st John 3:23-24 Date: [~] 1st John 4:1-3 Date: [~] 1st John 4:4-6 Date: [~] 1st John 4:7-9 Date: [~] 1st John 4:10-13 Date: [~] 1st John 4:14-16 Date: [~] 1st John 4:17-21 Date: [~] 1st John 5:1-5 Date: [~] 1st John 5:6-9 Date: [~] 1st John 5:10-13 Date: [~] 1st John 5:14-15 Date: [~] 1st John 5:16-17 Date: [~] 1st John 5:18-21 Date: [~] Assignment: 1st John The verses below are arranged by topics and/or stories. It’s fine to write more than one group of verses per day. Some even write a chapter a day from the Bible. Take time every day to do your Daily in the Word. Note: Taking shortcuts and skipping assignments, especially the Daily in the Word, severely hinders the spiritual growth and multiplication of your disciples."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Note to the Disciple: It rarely happens, but if you feel something is being taught that you are still not clear about, or if your Discipler will not meet with you regularly, please see your Pastor about this. Most of the time it is a misunderstanding and your Pastor can clear things up."
+      }
+    }
+  ]
+}

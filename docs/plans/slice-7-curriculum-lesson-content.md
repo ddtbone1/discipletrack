@@ -258,6 +258,10 @@ Follow-up, 2026-10-07 (user):
 - **Covers:** `build_covers.dart` prefers the ministry's images in
   `docs/curriculum/source/covers/lesson-01.jpg` to `lesson-10.jpg`
   (git-ignored), falling back to the PDF photo.
+- **Content in the repository (2026-10-07):** the church publishes Journey,
+  so `supabase/curriculum/full/` is versioned and seeded by `db reset`. The
+  licence reference names the church as publisher. Lesson text is shown with
+  references in bold text and green kept for answers only.
 
 ### Known limits
 
@@ -438,7 +442,8 @@ awaiting the user's review before 7.6 (all ten lessons). Not committed.
   (answers for the Discipler) until chart images are supplied. The cover
   page holds only the title and decorative topic words. Page footers and
   "Lesson n page m" are omitted as print furniture.
-- **Licence reference used locally:** "Permission to reproduce Journey
-  digitally confirmed by the ministry (user decision 2026-10-06); grantor and
-  scope to be recorded". The ministry's wording is needed before publishing
-  to a hosted project.
+- **Licence reference:** the church publishes Journey itself (user,
+  2026-10-07). The reference, used locally (publication version 3) and for a
+  hosted project: "Journey is published by Liberty Bible Baptist Church -
+  Gensan, which reproduces it in DiscipleTrack as its publisher (confirmed
+  2026-10-07)."

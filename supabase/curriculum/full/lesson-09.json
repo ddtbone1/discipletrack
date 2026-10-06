@@ -1,0 +1,1149 @@
+{
+  "number": 9,
+  "title": "Conversation",
+  "blocks": [
+    {
+      "type": "LESSON_THEME",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Words"
+      }
+    },
+    {
+      "type": "TOPIC_LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Problem solving with Christians",
+          "Understanding false teachers",
+          "How to answer non-Christian beliefs",
+          "Drawing people to Christ"
+        ]
+      }
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "Problem Solving"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Key Objective: Learning to solve conflicts between each other."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Unfortunately, there will be times of offense, hurt and disagreement between Christians. We try not to offend anyone with our words, actions or attitudes, but it will happen and sometimes other Christians will offend us. If and when this happens, if it is [_] enough, the Bible gives these principles to follow:",
+        "blanks": 1
+      },
+      "answers": [
+        "serious"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Colossians 3:8-9",
+        "text": "First, we must realize that these sins are no less serious in the eyes of God than any other sins."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 18:15",
+        "text": "If we are offended, go directly to the other [_] first privately, and try to settle it between yourselves.",
+        "blanks": 1
+      },
+      "answers": [
+        "person(s)"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 18:16, 1st Corinthians 6:1-5",
+        "text": "If the matter is not resolved privately, take it to a [_] in your church to help solve the problems.",
+        "blanks": 1
+      },
+      "answers": [
+        "pastor"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Corinthians 6:6",
+        "text": "Do not go to [_] people to settle a problem with believers.",
+        "blanks": 1
+      },
+      "answers": [
+        "unsaved"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Corinthians 6:7,8",
+        "text": "If the matter still cannot be resolved: see if it’s possible to personally [_] the wrong.",
+        "blanks": 1
+      },
+      "answers": [
+        "accept"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "God provides answers to all of life’s problems."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Colossians 3:13",
+        "text": "How can I forgive others when I do not want to?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 4:32",
+        "text": "Forgive because Jesus asked you to. Forgive because [_] forgave all of your sins.",
+        "blanks": 1
+      },
+      "answers": [
+        "Christ"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Romans 8:28",
+        "text": "Forgive because you know that God uses all things for our [_]. Forgive quickly. Seek forgiveness by humbly going to the other person.\n\nHow to avoid problems with people:",
+        "blanks": 1
+      },
+      "answers": [
+        "good"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Psalms 119:165",
+        "text": "Do your [_] in the Word everyday.",
+        "blanks": 1
+      },
+      "answers": [
+        "daily"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Proverbs 13:3",
+        "text": "Learn to keep your mouth [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "shut"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Proverbs 13:10",
+        "text": "Remove [_] from your life.",
+        "blanks": 1
+      },
+      "answers": [
+        "pride"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Proverbs 15:28",
+        "text": "Do not [_] about people.",
+        "blanks": 1
+      },
+      "answers": [
+        "talk"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Romans 12:10",
+        "text": "Do not insist on your [_] [_] all the time.\n\nIn summary, there will be times when we offend others and they offend us. But the Bible gives us clear steps to follow to clear things up so we can focus on what matters most.\n\nVisit www.TheJourneyForum.com to see more on this subject.\n\nMy words affect my disciples.",
+        "blanks": 2
+      },
+      "answers": [
+        "own",
+        "way"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain Matthew 18:15-16?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: A friend at work asks you, “If Jesus is so great, why are some of his followers such jerks?” How would you respond?\n\nHere’s another one: Your neighbor says, “I don’t go to church anymore because there are so many hypocrites there.” How would you reply?"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 4:32",
+        "instruction": "Write Ephesians 4:32 in the space below - going down a line at each punctuation mark.",
+        "lines": 4,
+        "followUp": "How would you explain that verse?",
+        "blanks": 4
+      },
+      "answers": [
+        "And be ye kind one to another,",
+        "tender-hearted,",
+        "forgiving one another,",
+        "even as God for Christ's sake hath forgiven you."
+      ]
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "title": "False Teachers"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Key Objective: To understand how false teachers work."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "You can uncover false teachers and cults with a few simple questions: Do they deny the biblical doctrine of the Trinity? Do they teach that Jesus Christ is not God? Do they teach any book other than the Bible? Do they add or subtract teachings from the Bible? Do they teach good works for salvation? Or do they teach any plan of salvation other than faith in Christ?"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "If the answer is “yes” to even one of these questions, it’s very likely that person is from a false religion or cult."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Read 1st Corinthians 2:2, Galatians 1:8."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Matthew 7:15",
+        "text": "Regarding false teachers, we are to [_] of them. Do not be deceived by them.",
+        "blanks": 1
+      },
+      "answers": [
+        "beware"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Acts 20:28-32",
+        "text": "Pray for your Pastor as he [_] out for false teachers.",
+        "blanks": 1
+      },
+      "answers": [
+        "watches"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "2nd John 10-11 Do not receive them into your [_]. Beware of those teaching religion on [_] and radio; many are false teachers and this is a way they come into your home.",
+        "blanks": 2
+      },
+      "answers": [
+        "home",
+        "television"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "I must be aware of deceptive teachers."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Acts 17:10-11",
+        "text": "In this verse we see that the Bereans searched the Word of God daily. As we also continue in the Scriptures we can be aware of the deception of false teachers and false leaders, which is another reason to be Daily in the Word.\n\nIn Lesson One, we were encouraged to know what we believe and how to draw people to Christ who are in non-Christian religions. Let’s think about that again because today, you might see a Hindu family across the street or Muslims in the stores or Buddhists in the airport.\n\nThe Mission Field has come to us! Are we prepared to share the truth of God’s Word with genuine concern, drawing them to Christ?\n\nThere are more resources at www.TheJourneyForum.com to equip you for your inevitable divine encounters with people of other religions - at school, at work, in your neighborhood, or even in your own family.\n\nWe have tools to help you respond with the unique truths of biblical Christianity to point them to Jesus Christ, to answer questions, and win souls for eternity.\n\nCheck the resources at www.TheJourneyForum.com regularly which include information on:\n\nKnowing the Major Doctrines of the Word of God.\n\nMajor Religions in our world, such as: Catholicism, Islam, Buddhism, Hinduism, Judaism.\n\nMajor Cults in our world, such as: Jehovah Witnesses, Mormonism, Scientology and others. Witnessing Tools like the Spiritual Map, Gospel Tracts, and more."
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain Acts 17:10-11?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: After you explain the Gospel to a friend, he says to you, “It’s great that you found something that works for you.” How would you continue to draw him to Christ?\n\nHere’s another one: An acquaintance asks you, “Why are Christians so homophobic?” How do you respond?"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Matthew 7:15",
+        "instruction": "Write Matthew 7:15 in the space below - going down a line at each punctuation mark.",
+        "lines": 3,
+        "followUp": "How would you explain that verse?",
+        "blanks": 3
+      },
+      "answers": [
+        "Beware of false prophets,",
+        "which come to you in sheep's clothing,",
+        "but inwardly they are ravening wolves."
+      ]
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "title": "Words of a Disciple"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Key Objective: Learning to draw people to God at the water cooler."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "We were able to know the God of the Bible because someone took time and cared enough to bring the Gospel to us. Now, in turn, we have a responsibility to take it to others. This section teaches what the Bible says about witnessing."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "Acts 1:8",
+        "text": "We are called [_].\n\nYou have learned all but the last two Steps of one on one Discipleship. They are:",
+        "blanks": 1
+      },
+      "answers": [
+        "witnesses"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "John 15:8",
+        "text": "Step #7 A discipler leads people to Christ and disciples them. If we actively [_] people to Christ we will bring glory to God.",
+        "blanks": 1
+      },
+      "answers": [
+        "draw"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "John 15:16",
+        "text": "Step #8 A discipler multiplies disciplers who multiply disciplers. If we multiply disciple makers, we will fulfill God’s [_] for our lives.\n\nThis is God’s purpose for our lives and the purpose of your discipleship training. We are to lead people to Christ and disciple them to the point that they are prepared to lead people to Christ and disciple them. This process is to continue as long as we are alive.",
+        "blanks": 1
+      },
+      "answers": [
+        "purpose"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "I am to consistently draw non-believers to Christ."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "1st Peter 3:15",
+        "text": "Is any one asking you about Jesus? Your own personal salvation story is the greatest true miracle that ever occurred in your life. Your eternity was changed. It’s your story, so no one can debate what happened to you.\n\nHere is the concept in using your conversion story to witness for Christ: you answer simple, everyday questions with phrases that tell your story of becoming a Christian. How? You use simple “prompting”\n\nphrases in your conversations that include curiosity-creating words to encourage the hearer to ask more questions to move the conversation in a spiritual direction.\n\nThese “prompting” phrases show you are opening up your life in a personal way, especially when you say you were wrong about what you used to believe or you were wrong in how you lived, etc. The “prompting” phrases tell the person that you are being “real” and open the door to building a personal connection with them.\n\nThe “prompting” phrases help you to determine the progress of the Holy Spirit in that person’s life. As they ask you for more information, you are gaining permission to tell them more and more of the Gospel, even if you only have a few minutes. Remember your goal is that they clearly know about the most important decision they will ever face...salvation, the rest is up to them.\n\nYour goal in the conversation is to:\n\n1. Help bring a person to the point of acknowledging his one true need in life: God.\n\n2. Increase his understanding of God’s desire for his salvation and a relationship with him.\n\n3. Present how he can experience salvation and that relationship.\n\nHere are some “prompting” phrases to use to get questions to tell your conversion story:\n\n... I had an experience [_] years ago that gave me a vision for my life and .... ... spiritual things didn’t interest me much for most of my life, and then about [_] years ago, my perspective completely changed. ... it might sound kind of weird, but I once was considered [_] by most people’s definition until something happened to change my mind. I was challenged to really pursue spiritual truth, and I discovered that my perspective on God was completely wrong.\n\nPhrases to consider if they ask for more information: ...it’s kind of personal, but I’m happy to share it with you if you really want to know.\n\nIf you are asked about your church or something related to church include phrases like: ... helps people understand spiritual perspectives on life. It’s a lot of fun, and very thought provoking.\n\nIf someone talks about the sinful activity they did last night/weekend: ...I understand what you mean because I used to do that too, but about [_] years ago I had an experience that changed my perspective. Now everything is different. I don’t miss that though.\n\nHere are Phrases and questions to use as the conversation develops: ... what do you mean by Christian? ... what do you believe about God?\n\n“Prompting” phrases include words like:\n\nSpiritual experience...\n\nI used to think that way too, but I had an experience [_] years ago that changed my perspective...\n\nI discovered I was wrong...\n\nLife-changing experience...\n\nChange in belief...\n\nI had a spiritual experience that changed the direction of my life. Nothing has been the same since... My perspective about God changed when I...\n\nNow I think differently...\n\nDiscuss what other “prompting” phrases you can think of or that you have used.",
+        "blanks": 5
+      },
+      "answers": [
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "In sharing the story of your salvation:\n\nMake it personal. Tell what Christ has done for you. Keep Christ central. Always emphasize the Word of God. Your story should have these parts: Before I trusted Christ/ How I trusted Christ/ Since I’ve trusted Christ. Carry a small New Testament with you. When presenting Christ, let the other person read the verses for himself if possible."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "Hebrews 4:12",
+        "text": "What does God’s Word say as it relates to witnessing? When anyone hears the Word of God it speaks to their heart. Remember God’s Spirit is also speaking to the person’s heart while you are speaking the Word of God to them."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "2nd Timothy 2:23-26",
+        "text": "According to these verses, how should you handle a situation with a difficult or indifferent person?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "If you want to see more people come to Christ, put these simple activities into action:\n\n1. [_] people to hear the Word of God at your church every Sunday.\n\n2. Every week build relationships to the [_]. They must see a genuine love and concern on your part for them.\n\n3. Use [_] to lead into spiritual conversations. Questions provoke thoughts.\n\n4. Give your [_] to someone every week.\n\n5. [_] the Spiritual Map and Lesson One. Practice with your Discipler. Show someone the Spiritual Map every day.",
+        "blanks": 5
+      },
+      "answers": [
+        "Bring",
+        "unreached",
+        "questions",
+        "testimony",
+        "Present"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Discuss the important facts about witnessing for Christ found in 1st Corinthians 2:4-5. Remember, in witnessing, you have three powerful resources:\n\nThe [_] of God - As you give out the Word of God it will supernaturally work.\n\nThe [_] of God - He will help you witness and will work in every heart.\n\nThe local [_] - The Word of God is preached and taught and disciples are made.",
+        "blanks": 3
+      },
+      "answers": [
+        "Word",
+        "Spirit",
+        "church"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you give your testimony of salvation that would use the method in this section?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: You are witnessing to a neighbor and he says, “But there’s so much evidence for evolution.” How would you continue to draw him to Christ?\n\nHere’s another one: A co-worker says to you, “I’ve got several gay friends. I would say they’re just like you and me. Being gay is just the way they were born.” How would you respond?\n\nHere’s another one: You are witnessing to a family member and she says, “I would never tell anyone their religion is wrong.” How would you continue to draw her to Christ?"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "C",
+      "body": {
+        "reference": "John 15:16",
+        "instruction": "Write John 15:16 in the space below - going down a line at each punctuation mark.",
+        "lines": 4,
+        "followUp": "How would you explain that verse?",
+        "blanks": 7
+      },
+      "answers": [
+        "Ye have not chosen me,",
+        "but I have chosen you,",
+        "and ordained you,",
+        "that ye should go and bring forth fruit,",
+        "and that your fruit should remain:",
+        "that whatsoever ye shall ask of the father in my name,",
+        "he may give it you."
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Daily in the Word",
+        "subtitle": "Reading, Writing, Saying and Studying the Bible."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Your Discipler will now take a thorough look at all the sections in your Daily in the Word notebook and give instructions if needed. If you are Daily in the Word you will mature spiritually."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Don’t forget that, when you finish Mark, start on Romans to 2nd Thessalonians. When you finish those books, write Acts, and beyond that, continue until you write your own copy of the Word of God."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "At The Journey Forum, there are other ideas for doing your Daily in the Word. You’ll see other plans like these:"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Survey the Old Testament"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Survey the New Testament"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Survey the Life of Christ"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Read through the Bible in 30 days or 90 days.\n\nSurveys are a combination of reading sections of the Bible, comparing Scripture and writing out key verses that you find.\n\nMore plans are being developed all the time that will help you with a life time of being in God’s Word, so check the web site. The most important thing is that we put God first in our lives and we will if we are Daily in the Word.\n\nIf you have a smartphone, you can download the lessons and other helpful material directly to your device. Also, consider sharing with other disciples and disciplers how you are doing in your Daily in the Word. See The Journey Forum for more details.\n\nVisit the website, theJourneyForum.com, to get these witnessing tools:\n\nA Spiritual Map for Mormons A Spiritual Map for Jehovah Witnesses A Spiritual Map for Muslims A Spiritual Map for Buddhists A Spiritual Map for Hindus A Spiritual Map for Atheists A Spiritual Map for Catholics A Spiritual Map for Taoists A Spiritual Map for Scientologists … and see new resources added regularly."
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Reflect & Review",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "SELF_CHECK",
+      "tier": "DISCIPLE",
+      "body": {
+        "header": "Question",
+        "columns": [
+          "Struggling",
+          "Needs Improvement",
+          "Growing",
+          "Doing Well"
+        ],
+        "items": [
+          "How are you doing in your Daily in the Word?",
+          "How are you doing in memorizing the Word of God?",
+          "How are you doing in your daily prayer time?",
+          "Are you faithfully meeting with your Discipler?",
+          "Have you been biblically baptized by immersion after salvation?",
+          "Are you faithful to attend and give to your Local Church?",
+          "How are you at sharing the Gospel with others?",
+          "What is your commitment level to one on one discipleship?",
+          "Are you preparing to have your own disciple?",
+          "Can you teach the Spiritual Map?",
+          "Can you give your testimony?",
+          "Can you teach Lesson One?"
+        ]
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Have any assignments been skipped? Yes No"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "If yes, please explain:"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Mark the memory verses you have learned so far:"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Genesis 1:1"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Ephesians 2:4"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "1st John 5:7"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Isaiah 14:12-15"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Matthew 25:41"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Genesis 1:26-27"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Genesis 2:16-17"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Romans 5:12"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "10 Commandments"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "John 11:43-44"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "John 11:25-26"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "John 14:6"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "John 10:28"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Mark 8:36"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Luke 5:20"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Luke 7:48"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "John 3:16"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "1st Cor. 15:3-6"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "John 3:36"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Revelation 20:15"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "John 20:31"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Romans 10:13"
+      }
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Assignments for Lesson Nine"
+      },
+      "source": "image"
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": "With your Discipler, complete the Discipleship Training Module(s) on the following pages."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "The disciple will present, teach and explain the Spiritual Map to one or more persons with the Discipler",
+          "present. An appointment should be made with the person or persons to whom the disciple will teach the",
+          "lesson, and the disciple will present the Assurance Chart to someone with the Discipler present.",
+          "Important Note: You are close to finishing these lessons. At the end of these lessons you should be ready to",
+          "lead someone to Christ and disciple them to do the same. Share the Spiritual Map with the lost so that you",
+          "can begin discipling when you receive final approval from the church leadership and your Discipler. Have you",
+          "led anyone to Christ?"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 3,
+        "text": "Write your answers to all the Water Cooler Scenarios in the lesson."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 4,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Memorize and quote or write, at your next meeting, the 8 Steps of Discipleship as they are listed below.",
+          "Step #1 Become a Believer by trusting Jesus Christ as Savior from John 3:16.",
+          "Step #2 A disciple is in the Word of God every day from John 8:31.",
+          "Step #3 A disciple is in prayer to God every day from Luke 11:1.",
+          "Step #4 A disciple and discipler meet together every week from John 13:33-35.",
+          "Step #5 A disciple is faithful in a biblical local church from Ephesians 4:11-12",
+          "Step #6 A disciple is obedient to the Word of God and becomes a disciple maker from Luke 14:33.",
+          "Step #7 A discipler leads people to Christ and disciples them from John 15:8",
+          "Step #8 A discipler multiplies disciplers who multiply disciplers from John 15:16."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 5,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Write your “prompting” phrases and your testimony on paper (following the plan given in this lesson) this",
+          "week and bring it to your Discipler at your next meeting. To get more resources for evangelism, go to",
+          "www.TheJourneyForum.com including the Spiritual Map and Gospel Tracts."
+        ]
+      }
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    },
+    {
+      "type": "MODULE_HEADING",
+      "tier": "DISCIPLER",
+      "body": {
+        "number": 7,
+        "title": "Module 7",
+        "subtitle": "Your Strategy in Discipleship."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "* Work on this with your Discipler."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "[_] together and [_] together.",
+        "blanks": 2
+      },
+      "answers": [
+        "Pray",
+        "talk"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "View the commands in the Bible concerning a believers conduct toward [_] [_] as instructions for one on one discipleship.",
+        "blanks": 2
+      },
+      "answers": [
+        "one",
+        "another"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Sometimes you will not even [_] the lessons but talk about problems, difficulties, questions or something they [_] in their Daily in the Word.",
+        "blanks": 2
+      },
+      "answers": [
+        "open",
+        "wrote"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Get to know your disciple. Do not meet together and just go over the [_]. Also, do not just [_]. Keep a [_].",
+        "blanks": 3
+      },
+      "answers": [
+        "lessons",
+        "fellowship",
+        "balance"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "These activities are part of one on one discipleship: appointments, fellowship, friendship, counseling, encouragement, loving correction, teaching, application, assignments plus others. But not all of these may be in [_] at every [_].",
+        "blanks": 2
+      },
+      "answers": [
+        "action",
+        "meeting"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "The first three or four meetings with your disciple, you want to take your disciple’s spiritual [_]. Don’t overwhelm a new believer at first with too much work or [_]. Your disciple should be able to open his [_] to you.",
+        "blanks": 3
+      },
+      "answers": [
+        "pulse",
+        "assignments",
+        "heart"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Your disciple must be a main [_] in your life. Lead your disciple. Make every [_] needed for your disciple. You are a pattern for your disciple. Have a life worth [_]. Give time for your disciple.",
+        "blanks": 3
+      },
+      "answers": [
+        "priority",
+        "sacrifice",
+        "following"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Take your disciple with you to some [_] activities. If you get through the lessons and do not have a [_] with your disciple, that is not one on one discipleship. It is not just the lessons that will produce a great disciple; you also need a close [_] with your disciple.",
+        "blanks": 3
+      },
+      "answers": [
+        "recreational",
+        "bond",
+        "relationship"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "You are to become very close to your disciple but the issue is [_] to Christ. The issue is not how many [_] or how many disciples you have, but how you are [_].",
+        "blanks": 3
+      },
+      "answers": [
+        "obedience",
+        "lessons",
+        "building"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Be patient. You are building a foundation that, if laid [_], will produce fruit that will remain. It takes [_] to reproduce correctly. And remember, you cannot be [_] to your disciple. Allow the Holy Spirit to lead and [_] you both.\n\nVisit www.TheJourneyForum.com to see more on this subject.\n\nHave your Discipler sign and date here when they review this assignment:\n\nThis assignment was completed successfully.\n\nSee a video message >>>",
+        "blanks": 4
+      },
+      "answers": [
+        "correctly",
+        "time",
+        "everything",
+        "change"
+      ]
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    }
+  ]
+}

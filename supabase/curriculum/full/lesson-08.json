@@ -1,0 +1,1409 @@
+{
+  "number": 8,
+  "title": "Faith",
+  "blocks": [
+    {
+      "type": "LESSON_THEME",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Faith"
+      }
+    },
+    {
+      "type": "TOPIC_LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Understanding faith",
+          "Trial and testing",
+          "Heroes of the faith",
+          "The Holy Spirit"
+        ]
+      }
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "Faith"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Key Objective: To understand how to have faith."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "This lesson teaches what the Bible says about faith. Biblical faith means having [_], [_] or [_] in God and His Word. It means you stop trusting [_] and trust Him. It means [_] dependence on God. Faith releases you from your limited [_] to His unlimited, all-powerful abilities.",
+        "blanks": 6
+      },
+      "answers": [
+        "trust",
+        "assurance",
+        "confidence",
+        "yourself",
+        "total",
+        "abilities"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "What is Faith?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Hebrews 11:1",
+        "text": "Faith has [_]. Faith has [_]. We can see the results of living by faith and we can see tangible evidence that living by faith is real.",
+        "blanks": 2
+      },
+      "answers": [
+        "substance",
+        "evidence"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Hebrews 11:6",
+        "text": "Without [_] it is impossible to [_] God. God can be trusted and He will [_] those who trust Him and live by faith.",
+        "blanks": 3
+      },
+      "answers": [
+        "faith",
+        "please",
+        "reward"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 2:8,9",
+        "text": "We are saved by grace through [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "faith"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Galatians 5:22",
+        "text": "Faith is evidence we are being [_] by the Holy Spirit.",
+        "blanks": 1
+      },
+      "answers": [
+        "controlled"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "2nd Corinthians 4:18",
+        "text": "The things we see are short-lived; the things we do not see are [_].\n\nI must trust God every day.",
+        "blanks": 1
+      },
+      "answers": [
+        "eternal"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Romans 10:17",
+        "text": "Biblical faith comes by hearing the [_] of [_].",
+        "blanks": 2
+      },
+      "answers": [
+        "Word",
+        "God"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 6:25-34",
+        "text": "Faith [_] worry, false emotions and doubt.\n\nHave faith in God. If we have our faith in the one true God of the Bible, then we should know these facts:",
+        "blanks": 1
+      },
+      "answers": [
+        "destroys"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Numbers 23:19",
+        "text": "God keeps His [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "promises"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Chronicles 28:20",
+        "text": "God [_] fail.",
+        "blanks": 1
+      },
+      "answers": [
+        "cannot"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Job 42:2",
+        "text": "God knows [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "everything or can do all things"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Malachi 3:6",
+        "text": "God cannot [_] from what He is. He will always be full of love for you.",
+        "blanks": 1
+      },
+      "answers": [
+        "change"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 24:35",
+        "text": "You can [_] God’s Word.",
+        "blanks": 1
+      },
+      "answers": [
+        "trust"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Titus 1:2",
+        "text": "God cannot [_].\n\nFaith during Trials and Suffering:",
+        "blanks": 1
+      },
+      "answers": [
+        "lie"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "James 1:2-4 and 1st Peter 1:7",
+        "text": "The Bible also teaches our faith will be [_]. These trials can [_] our faith.",
+        "blanks": 2
+      },
+      "answers": [
+        "tested",
+        "strengthen"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "John 16:33, 2nd Timothy 3:12",
+        "text": "Disciples will [_] trials of different kinds. Remember that you joined in a [_] for the hearts, minds and souls of all people the day you received the Lord. We will all have times of [_] and trials and hardships. In fact, there may be times when we will suffer just because we are [_] of Jesus Christ. But we can still experience the love and peace and joy that Jesus Christ came to bring.",
+        "blanks": 4
+      },
+      "answers": [
+        "experience",
+        "battle",
+        "need",
+        "disciples"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Deuteronomy 31:8",
+        "text": "God will never [_] you during suffering and trials.",
+        "blanks": 1
+      },
+      "answers": [
+        "leave"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 5:11-12",
+        "text": "Those who suffer for Christ’s sake will receive a great [_] in Heaven.",
+        "blanks": 1
+      },
+      "answers": [
+        "reward"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "2nd Corinthians 4:8-18, 1st Peter 4:19",
+        "text": "When we suffer we should [_] Christ and continue to live a [_] life. God never promised my life would be free of trials.",
+        "blanks": 2
+      },
+      "answers": [
+        "trust",
+        "godly"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Peter 3:13-17",
+        "text": "When you suffer, ask yourself, “Am I suffering for doing right or doing [_]?”",
+        "blanks": 1
+      },
+      "answers": [
+        "wrong"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Peter 4:1-2",
+        "text": "Trials cause us to stop the [_] in our life and to do God’s Will.",
+        "blanks": 1
+      },
+      "answers": [
+        "sin"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Peter 4:12-19",
+        "text": "Discuss what you think this means."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Romans 12:19",
+        "text": "God cares for us when we are suffering, but He does not want us to take [_] on those who cause us suffering. He will do what is just and right with those who persecute His [_].",
+        "blanks": 2
+      },
+      "answers": [
+        "revenge",
+        "children"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Romans 8:28",
+        "text": "We can be comforted in knowing God works everything for [_] to those who love Him.",
+        "blanks": 1
+      },
+      "answers": [
+        "good"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 7:7-11",
+        "text": "Pray for specific help in time of need and trial. [_] God’s help and answer by faith.",
+        "blanks": 1
+      },
+      "answers": [
+        "Expect"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Isaiah 45:5-6 and Isaiah 46:9-10",
+        "text": "Remember your faith is to be in [_]. Biblical faith is always a decision to [_]. God and this decision leads to Biblical [_].\n\nExamples of those who have lived by Faith:",
+        "blanks": 3
+      },
+      "answers": [
+        "God",
+        "obey",
+        "action"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Your Discipler will now assign you to read this week in the Old Testament about the Heroes of Faith listed in Hebrews 11. Look at the act of faith that is listed in Hebrews 11 for each person, then find it in their story, and underline it in your Bible: Abel in Genesis 4, Enoch in Genesis 5, Noah in Genesis 6, Abraham in Genesis 12, Sarah in Genesis 17, Isaac in Genesis 27, Jacob in Genesis 48, Joseph in Genesis 50, Moses in Exodus 2, Israel and the Red Sea in Exodus 14, Joshua and the battle of Jericho in Joshua 6, Rahab in Joshua 6, Gideon in Judges 6-8, Barak in Judges 4-5, Samson in Judges 13- 16, Jepthah in Judges 11-12, David in 1st Samuel 16-30, Samuel in 1st Samuel 1-3."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 5:20 and 1st Thessalonians 5:18",
+        "text": "In summary, a disciple of Jesus Christ lives by faith and trusts in God, not only for salvation, but in all areas of [_]. How does God want us to respond to every situation? We must be [_] dependent on God, which is faith in action. In problems, trials and suffering, make the [_] to rely on His power and faithfulness. Also in great challenges and accomplishments, only trust God to lead you. God will then give you His grace and His power and you will know your Heavenly Father in a deeper, [_] way.\n\nVisit www.TheJourneyForum.com to see more on this subject.\n\nGod provides me strength and faith through difficult times.",
+        "blanks": 4
+      },
+      "answers": [
+        "life",
+        "totally",
+        "decision",
+        "personal"
+      ]
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain Hebrews 11:1,6?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: Your disciple says to you, “I feel God is calling me to be a missionary. What should I do now?” How would you counsel them?"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "1st Thessalonians 5:18",
+        "instruction": "Write 1st Thessalonians 5:18 in the space below - going down a line at each punctuation mark.",
+        "lines": 3,
+        "followUp": "How would you explain that verse?",
+        "blanks": 2
+      },
+      "answers": [
+        "In every thing give thanks :",
+        "for this is the will of God in Christ Jesus concerning you."
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "<<< See a special message from the author, Church Planter John Honeycutt, at this QR Code."
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Daily in the Word",
+        "subtitle": "Reading, Writing, Saying and Studying the Bible."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Your Discipler will now take a thorough look at all the sections in your Daily in the Word notebook and give instructions if needed. If you are Daily in the Word you will mature spiritually. When you finish Mark, start on Romans to 2nd Thessalonians. At The Journey Forum, there are other ideas for doing your Daily in the Word."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "If you have a smartphone, you can download the lessons and other helpful material directly to your device. Also, consider sharing with other disciples and disciplers how you are doing in your Daily in the Word. See The Journey Forum for more details."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Mark the memory verses you have learned so far:"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Genesis 1:1"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Ephesians 2:4"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "1st John 5:7"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Isaiah 14:12-15"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Matthew 25:41"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Genesis 1:26-27"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Genesis 2:16-17"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Romans 5:12"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "10 Commandments"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "John 11:43-44"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "John 11:25-26"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "John 14:6"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "John 10:28"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Mark 8:36"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Luke 5:20"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Luke 7:48"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "John 3:16"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "1st Cor. 15:3-6"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "John 3:36"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Revelation 20:15"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "John 20:31"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Romans 10:13"
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Reflect & Review",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "SELF_CHECK",
+      "tier": "DISCIPLE",
+      "body": {
+        "header": "Question",
+        "columns": [
+          "Struggling",
+          "Needs Improvement",
+          "Growing",
+          "Doing Well"
+        ],
+        "items": [
+          "How are you doing in your Daily in the Word?",
+          "How are you doing in memorizing the Word of God?",
+          "How are you doing in your daily prayer time?",
+          "Are you faithfully meeting with your Discipler?",
+          "Have you been biblically baptized by immersion after salvation?",
+          "Are you faithful to attend and give to your Local Church?",
+          "How are you at sharing the Gospel with others?",
+          "What is your commitment level to one on one discipleship?",
+          "Are you preparing to have your own disciple?"
+        ]
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Assignments for Lesson Eight"
+      },
+      "source": "image"
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": "With your Discipler, complete the Discipleship Training Module(s) on the following pages."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": "Write the Steps of Discipleship you have learned and pick 7 or more of the verses below and explain what"
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "they mean:",
+          "Hebrews 11:1",
+          "Hebrews 11:6",
+          "Romans 10:17",
+          "Write your answers to all the Water Cooler Scenarios in the lesson and this one: How would you counsel a",
+          "Christian who says to you, “My father died painfully from cancer and I feel angry that God would allow that.”"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 3,
+        "text": "Complete the study on the Holy Spirit before your next meeting with your discipler. Write your answers on"
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "a separate sheet of paper.",
+          "As you work through this lesson, carefully study the ministry of the Holy Spirit, so you can understand His",
+          "part in your life. The Holy Spirit’s ministry in your life is rich and full, bringing joy into your life as you walk in",
+          "His power.",
+          "God has given us three resources to produce growth in our Christian life and walk. First, He gave the Word",
+          "of God, which lays out the guidelines by which we should live. Second, He gave the people of God so we",
+          "could be discipled. Third, He gave the Spirit of God to empower us in our walk as a disciple.",
+          "The Holy Spirit’s ministry in our life as believers is of utmost importance.",
+          "Explore truth about the Holy Spirit and how He affects our life."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Read John 16:5-14. Jesus is teaching His disciples about the Holy Spirit and His ministry. Having read this",
+          "passage, consider the following questions:",
+          "a. When would the Holy Spirit’s ministry begin in the life of these men?",
+          "b. According to verses 8-11, what is His ministry to the people of the world?"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": "From verse 13, what were some of His ministries to these disciples?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 3,
+        "text": "Would the Holy Spirit glorify Himself or Christ?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 4,
+        "text": "According to John 14:16-17, when the Holy Spirit would come where would He dwell?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 5,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Acts 1:4-8 are Christ’s final words to His disciples prior to His ascension. Answer these questions from these",
+          "verses:",
+          "a. What would the Holy Spirit give these men?",
+          "b. What would the Holy Spirit’s power enable them to do?"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 6,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "As Christ concluded His earthly ministry, He paved the way for the Holy Spirit’s coming. Pentecost, found in",
+          "Acts 2, is the event when the Holy Spirit made His appearance. Since that day, the ministry of the Holy Spirit",
+          "is unique and exciting.",
+          "Romans 12:19",
+          "Romans 8:28",
+          "Ephesians 2:8-9",
+          "2nd Cor. 5:7",
+          "James 1:2-4",
+          "1st Peter 1:7",
+          "John 16:33",
+          "2nd Tim. 3:12",
+          "Deut. 31:8",
+          "Isaiah 45:5-6",
+          "Isaiah 46:9-10",
+          "1st Peter 4:1-2"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 7,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "The Holy Spirit is, first of all, a person. From the following passages we will see He possesses and performs",
+          "those activities which only people who possess personality can do."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 8,
+        "text": "Look up the following verses and jot down the activities which the Holy Spirit performs:"
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "a. John:14:26, b. Acts 13:2, c. 1st Corinthians 2:10."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 9,
+        "text": "From these verses write down some of the ways the Holy Spirit is affected as a person:"
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "a. Acts 7:51, b. Ephesians 4:30, c. 1st Thessalonians 5:19."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 10,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "In the following verses consider some names of the Holy Spirit and describe how His name is used in",
+          "connection with other persons. a. Genesis 1:2 b. John 14:16 c. John 14:17 d. Romans 8:9. From these",
+          "passages we can conclude that the Holy Spirit is a person. Personality means He possesses will (the ability",
+          "to choose), intellect (the ability to reason and think), and emotion (the ability to feel). The Holy Spirit does",
+          "not have a physical body as we have, but He does have personality."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 11,
+        "text": "Read the Scriptures that reveal some of the activities that He performs as God."
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "a. Genesis 1:2 b. John 16:8-11 c. Titus 3:5 d. 2nd Peter 1:21"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 12,
+        "text": "Who is the Holy Spirit? He is God, and as God He is one of the persons that make up the triune God. He"
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "is also a person with whom we can have a personal relationship."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 13,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Now, let’s turn our attention to the work that the Holy Spirit performs in the life of every Christian. Some of",
+          "these works happen immediately at salvation, and some are ongoing continually in our life. Consider the",
+          "ministries the Holy Spirit performed when you trusted Christ for salvation.",
+          "a.",
+          "The indwelling of the Spirit: Read John 14:17 – the promise of it. Read 1st Corinthians 6:19,20 - the",
+          "reality of it. Read 1st Corinthians 3:16-17 and explain what responsibilities you have since the Holy",
+          "Spirit indwells your physical body.",
+          "b.",
+          "The sealing of the Spirit: Read Ephesians 1:13-14. According to verse 13, what is God’s seal upon your",
+          "life, indicating you belong to Him? Verse 14 teaches that you are sealed until when?",
+          "c. According to Romans 8:16, what does the Spirit do?",
+          "d. What do Romans 8:26-27 teach about the Holy Spirit?",
+          "e. Look up Ephesians 5:18. What command is given in relation to the Holy Spirit?",
+          "According to this verse, what controls a person when he is drunk? Obviously, God does not want you controlled",
+          "by alcohol. What is supposed to control your life?",
+          "Conclusion"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Look up Galatians 5:16-25. According to verses 16 and 17, what are the two conflicting natures in your life?"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Verses 22-23 give the qualities the Holy Spirit wants to produce in you. List them:",
+          "When the Holy Spirit is in control, these are the qualities present. To be filled with the Holy Spirit is to yield",
+          "our life to His control. This should be our desire and request each day... to live out today under the influence",
+          "and control of the Holy Spirit. It is the Holy Spirit who empowers us to be able to live victoriously in our walk",
+          "as a Christian.",
+          "Attempting to live victoriously apart from the power of the Holy Spirit is impossible. The only way to live your",
+          "Christian life is by the power of the Holy Spirit. You ask, “How am I to be filled?” Look up Luke 11:13. The Book",
+          "of James says we have not because we ask not. We need to surrender to God and ask God to fill us each day",
+          "with His Holy Spirit to enable us to live victoriously."
+        ]
+      }
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    },
+    {
+      "type": "MODULE_HEADING",
+      "tier": "DISCIPLER",
+      "body": {
+        "number": 5,
+        "title": "Module 5",
+        "subtitle": "Accepting a disciple and becoming a good communicator."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "* Work on this with your Discipler."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "One on one discipleship involves spiritual [_] and demands a [_] commitment.",
+        "blanks": 2
+      },
+      "answers": [
+        "warfare",
+        "tough"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "One on one discipleship is not designed to just be a “nice” Christian activity but rather to change [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "nations"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Remember, the lessons are only [_] to reach the [_] of Discipleship. Be available for God to take you [_] He has disciples to be made. Be faithful when you are [_] because one on one discipleship will bring testing. One on one discipleship demands [_] to God in our daily lives.",
+        "blanks": 5
+      },
+      "answers": [
+        "tools",
+        "steps",
+        "anywhere",
+        "tested",
+        "obedience"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Before accepting a Disciple:\n\nPlan before you meet, but [_] on the Holy Spirit to lead you. Before accepting a disciple ask yourself: what can I remove from my life and [_] that takes away from one on one discipleship?\n\nAsk yourself: “Does [_] want me to accept this relationship?” “Am I willing to accept this responsibility?” “Is my [_] at a place where I can do this?” “Has the [_] led that person to be my disciple?”\n\nCount the [_] before you commit yourself to a life of one on one discipleship. When you accept the [_] of a disciple, follow through on your [_].",
+        "blanks": 8
+      },
+      "answers": [
+        "depend",
+        "schedule",
+        "God",
+        "life",
+        "Lord",
+        "cost",
+        "responsibility",
+        "commitment"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "How to be a good communicator with your disciple:\n\nHave other [_] Bible verses ready. Explain the lesson with [_] and personal [_].\n\nDo not go too [_] through the lessons and do not go too [_].\n\nRemember it is not the [_] but the Word of God.\n\nNever [_] them what you can show them or what you can [_] them.\n\nRemember this may be [_] to your disciple, and the concepts will be new.\n\nUse words that are [_] to your disciple and explain unfamiliar words. [_] the lesson ahead of the meeting and know the lesson.\n\n[_] the Word of God in the lessons thoroughly.\n\nKnow the [_] and the [_] of each lesson.\n\nHave the lessons and their subjects listed in order in the [_] of your [_] so you know where you have come from and where you are going.\n\nHave the [_] of Discipleship in the front of your notebook and [_] refer to them.\n\nVisit www.TheJourneyForum.com to see more on this subject.\n\nmessage >>> Have your Discipler sign and date here when they review this assignment:\n\nThis assignment was completed successfully.",
+        "blanks": 18
+      },
+      "answers": [
+        "supporting",
+        "illustrations",
+        "experiences",
+        "fast",
+        "slow",
+        "lessons",
+        "tell",
+        "ask",
+        "new",
+        "familiar",
+        "Study",
+        "Know",
+        "themes",
+        "topics",
+        "front",
+        "notebook",
+        "steps",
+        "constantly"
+      ]
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "See a video"
+      }
+    },
+    {
+      "type": "MODULE_HEADING",
+      "tier": "DISCIPLER",
+      "body": {
+        "number": 6,
+        "title": "Module 6",
+        "subtitle": "Getting started with your new disciple."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Understand that pure one on one discipleship is leading an [_] person to Christ and teaching them to observe all things Jesus commanded.",
+        "blanks": 1
+      },
+      "answers": [
+        "unsaved"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Remember, one on one discipleship is [_] one to one. Meet with your disciple every week. Men should only meet with men and women with women. Close [_] members should not disciple each other whenever possible (there can be exceptions in extreme circumstances).",
+        "blanks": 2
+      },
+      "answers": [
+        "only",
+        "family"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Do not use the lessons that you disciple with as Sunday school lessons, sermons or for any other [_] than one on one discipleship.",
+        "blanks": 1
+      },
+      "answers": [
+        "purpose"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "One on one discipleship is the only way to reach the world and is the one reason we are left on earth after our salvation. Some or all of your disciples should be people you have [_] to Christ.",
+        "blanks": 1
+      },
+      "answers": [
+        "won"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "If a new or young disciple leads someone to Christ [_] the disciple has completed one on one discipleship, they may disciple the new believer with Lesson One and Two of Journey. But the disciple must complete Journey and receive [_] to disciple from the church leadership. Do not go on to the next [_] if the disciple is not obedient or does not completely understand.",
+        "blanks": 3
+      },
+      "answers": [
+        "before",
+        "approval",
+        "lesson"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "All assignments are [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "required"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Try to get your disciple through the entire [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "Bible"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Inform your church [_] of any unusual situations.",
+        "blanks": 1
+      },
+      "answers": [
+        "leadership"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "The way you [_] a one on one discipleship relationship may determine its [_]. Be excited, encouraging and loving in all your [_].",
+        "blanks": 3
+      },
+      "answers": [
+        "begin",
+        "success",
+        "words"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Try to disciple in such a way that you would want your disciple to disciple your [_] when they are old enough.",
+        "blanks": 1
+      },
+      "answers": [
+        "children"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "You will find that in one on one discipleship there are two [_] and two [_] at the same time. When we teach we [_], when we disciple we are [_].",
+        "blanks": 4
+      },
+      "answers": [
+        "teachers",
+        "learners",
+        "learn",
+        "discipled"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Never assume the disciple is a [_]. Be ready to go over the Spiritual Map with them and confirm their [_]. You must get their story of how they came to know the Lord as Savior.",
+        "blanks": 2
+      },
+      "answers": [
+        "believer",
+        "salvation"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "You must immediately establish that God’s Word is the [_] for this relationship.",
+        "blanks": 1
+      },
+      "answers": [
+        "authority"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "The disciple is to be discipling before they [_] from the final lesson.",
+        "blanks": 1
+      },
+      "answers": [
+        "graduate"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Here are some of the main points of your first meeting with your disciple:\n\nLet us begin with [_]. Our purpose in meeting together is:\n\nTo [_] spiritually together.\n\nTo develop you into a [_]; not just to complete lessons.\n\nAnd not to finish but to reproduce other [_].\n\nWe must keep our conversations [_] unless something is life threatening or very, very serious.\n\nIf I do not know the answer to a question you have, I will study and [_] an answer or ask you to wait because the question is answered in coming [_].\n\nWe can continue meeting together if both of us are [_] to the Word of God. The Word of God is our final authority and guide. The Word of God is so important for our lives. We cannot grow spiritually without it. If you disagree with any of the teaching, please let me know.\n\nI want you to know that there will be [_]. We will help each other to be faithful.",
+        "blanks": 9
+      },
+      "answers": [
+        "prayer",
+        "grow",
+        "discipler",
+        "disciples",
+        "confidential",
+        "prepare",
+        "lessons",
+        "obedient",
+        "accountability"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Ask your disciple to answer the following questions. This may not be needed for new believers. When did you receive the Lord? How did you come to know the Lord? What were you like before you were saved? What were the circumstances of you getting saved? What changed in your life after you were saved? Where did you attend church before? Are you new to the Bible? Would you say you believe the Bible is God’s Word? Why? How did you come to this church?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Ask your potential new disciple:\n\nPlease tell me, do you [_] to be discipled?\n\nPlease tell me [_] do you want to be discipled?\n\nWill you commit to meet together until you are discipled and [_] to win someone to Christ and disciple them?",
+        "blanks": 3
+      },
+      "answers": [
+        "want",
+        "why",
+        "ready"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "I will now tell you when I received the Lord and how I became a discipler.\n\nWe will now [_] complete the discipleship questionnaire and then exchange it with each other to get to know each other better (if it is the right time to do this with the new disciple).",
+        "blanks": 1
+      },
+      "answers": [
+        "both"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "We agree to meet together.\n\nWe will now set a day and time to meet every [_].\n\nDay:[~] Time: [~] Place: [~] Visit www.TheJourneyForum.com to see more on this subject.\n\nHave your Discipler sign and date here when they review this assignment: This assignment was completed successfully.",
+        "blanks": 1
+      },
+      "answers": [
+        "week"
+      ]
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    }
+  ]
+}

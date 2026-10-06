@@ -1,0 +1,23 @@
+{
+  "firstPage": 2,
+  "sections": [
+    {
+      "label": "A",
+      "title": "Communication",
+      "objective": "Key Objective: To know my Heavenly Father through prayer."
+    },
+    {
+      "label": "B",
+      "title": "How to Pray",
+      "objective": "Key Objective: To understand how we can communicate with God daily."
+    },
+    {
+      "label": "C",
+      "title": "Overcoming Sin",
+      "objective": "Key Objective: Understanding the obstacles to knowing God."
+    }
+  ],
+  "assignments": "Assignments for Lesson Three",
+  "modules": [],
+  "cover": 15
+}

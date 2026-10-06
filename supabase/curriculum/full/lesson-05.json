@@ -1,0 +1,1088 @@
+{
+  "number": 5,
+  "title": "Discipleship",
+  "blocks": [
+    {
+      "type": "LESSON_THEME",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Discipleship"
+      }
+    },
+    {
+      "type": "TOPIC_LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Steps of discipleship",
+          "Cost of discipleship",
+          "Commitment to discipleship",
+          "Destination of spiritual formation",
+          "Stewardship of our lives",
+          "Giving and the disciple"
+        ]
+      }
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "Discipleship"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Key Objective: To establish a biblical perspective of discipleship."
+      },
+      "source": "image"
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Read 2nd Peter 3:9. What is God’s concern for all mankind? [_]. [_] of people are in the world today. How is it possible for so many to hear the Good News of Salvation? God’s plan is the same as His plan for the world to be [_]: Reproduction. In other words, God’s plan is [_].\n\nA disciple, by definition, is a trained follower of Jesus Christ, who draws others to Him and disciples them to do the same. In this lesson, we take a deeper look at the purpose of Biblical discipleship.",
+        "blanks": 4
+      },
+      "answers": [
+        "all to be saved",
+        "Billions",
+        "populated",
+        "multiplication"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "2nd Timothy 2:2",
+        "text": "How did Timothy learn to serve God? [_] [_].\n\nWhat did Paul tell Timothy to do? [_] [_].",
+        "blanks": 4
+      },
+      "answers": [
+        "From",
+        "Paul",
+        "Teach",
+        "others"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Multiplying disciple makers is God’s strategy."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Let’s review the steps of discipleship that you have learned so far:"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "John 3:16",
+        "text": "Step #1 [_] in Jesus Christ as your Savior.",
+        "blanks": 1
+      },
+      "answers": [
+        "Trust"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "John 8:31",
+        "text": "Step #2 A disciple is in the Word of God every day. If we are [_] in the Word, we will mature spiritually.",
+        "blanks": 1
+      },
+      "answers": [
+        "Daily"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Luke 11:1",
+        "text": "Step #3 A disciple is in prayer to God every day. If we communicate with God, we will know Him [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "personally"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "John 13:34-35",
+        "text": "Step #4 A disciple and discipler [_] together every week.",
+        "blanks": 1
+      },
+      "answers": [
+        "meet"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Ephesians 4:11-12",
+        "text": "Step #5 A disciple is faithful in a biblical local [_].\n\nThere are three more steps to reach and in this lesson you will learn the next step of one on one discipleship:",
+        "blanks": 1
+      },
+      "answers": [
+        "church"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Luke 14:33",
+        "text": "Step # 6 is - A disciple is obedient to the Word of God and becomes a disciple maker.\n\nJesus gave some specific requirements to be His disciple in Luke chapter fourteen. As we study this section consider the great call Christ is making to you personally to be His disciple."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Luke 14:26",
+        "text": "Read Matthew 10:37.\n\nJesus said He must come first in all your [_] for you to be His disciple. Consider the following question: Are you willing to be a disciple of Jesus Christ even if it appears it will cost you everything?",
+        "blanks": 1
+      },
+      "answers": [
+        "relationships"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Luke 14:27",
+        "text": "Jesus said He must come first in all your [_] for you to be His disciple. Consider the following question: Is there anything more important than my obedience to Christ?",
+        "blanks": 1
+      },
+      "answers": [
+        "responsibilities"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Luke 14:33",
+        "text": "Jesus said He must come first in [_]; time, talents, finances, goals, desires, plans, affections-- in everything for you to be His disciple.\n\nThe chart below pictures some of the major areas of our life. To be a biblical disciple of Christ, He must be first in every area. Discuss with your Discipler how well you are doing in each area.",
+        "blanks": 1
+      },
+      "answers": [
+        "everything"
+      ]
+    },
+    {
+      "type": "FIGURE",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "caption": "",
+        "labels": [
+          "Time",
+          "Money",
+          "Job",
+          "Family",
+          "Goals",
+          "Husband Wife",
+          "Everything",
+          "Desires",
+          "Talents",
+          "Plans"
+        ]
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Some believers choose not to become a disciple because they think God may ask them to do something that they do not [_] to do, or because they think they know what is [_] for them instead of God knowing what is best, or because they are not sure that God has their best interests in mind, or for other reasons.",
+        "blanks": 2
+      },
+      "answers": [
+        "want",
+        "best"
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Read Matthew 13:22 Jesus said that this person let the [_] of this world, and the deceitfulness of [_], choke the word of God in his life which produced [_].",
+        "blanks": 3
+      },
+      "answers": [
+        "cares",
+        "riches or weatlth",
+        "unfruitfulness"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "John 6:66",
+        "text": "Jesus had a large number of people following Him and some were not ready to take the next step. We have people in the church today like this as well. Jesus tested His disciples so He could focus on training those who would be faithful. He did this because He wanted the Gospel to reach around the world in every generation. Jesus requires faithfulness and He will test us today."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Matthew 6:25-33",
+        "text": "yes yes Do you believe that God has a purpose for you? [_].\n\nDo you believe God knows what is best for you? [_].\n\nThe Bible says you were saved for eternity by placing your faith in Christ. You can trust Him for each day also. Read Jeremiah 29:11-12.",
+        "blanks": 2
+      },
+      "answers": [
+        "",
+        ""
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "A disciple is someone totally committed to Jesus Christ."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Luke 18:28-30",
+        "text": "A man would not follow Christ but the disciples had [_] all and [_] Jesus.\n\nJesus is teaching that the blessings of leaving all our own plans, dreams-- everything behind and following Him are far greater than any sacrifice we might experience.\n\nRemember that God has saved us from a life of hopelessness and eternal death to a life with purpose for eternity. Remember that He paid for our sins to bring us into His family. Remember that He loves us and has blessed us even though we are not worthy of it.\n\nTo be a disciple of Christ, it is natural to respond to God our Father with “I will do whatever you want, whenever you want, wherever you want, to whoever you want by any means you want.”\n\nThere are two decisions we want to consider now. The first decision deals with the direction and purpose of your life. The second decision deals with applying that first decision. The teachings of Christ in this lesson are all about being His disciple. He is calling for you to be His disciple today; not just a believer but a disciple by His definition.\n\nThe first decision to consider is, will you place Christ at the center, first place in your life in order to be a dedicated follower of Him? Second, will you complete your discipleship training to become a disciple maker?\n\nThis is a spiritual crossroad; we are talking about committing to becoming someone in Christ who has the characteristics of a mature disciple.\n\nNow would be a good time to reflect on your journey so far, and ask yourself a question:\n\nDo I want to be a committed disciple of Christ, and have I counted the cost? Stop now and quietly express to God in prayer what is in your heart.\n\nAlso, will you complete your discipleship training to become a disciple maker?\n\nIf you have accepted Christ’s call for discipleship then inform your Pastor and make this a public decision as soon as possible in your church.",
+        "blanks": 2
+      },
+      "answers": [
+        "left",
+        "followed"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain Matthew 10:37?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: Your neighbor wants to know what makes the Christian life so good; what would your answer be?"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "reference": "Luke 14:33",
+        "instruction": "Write Luke 14:33 in the space below - going down a line at each punctuation mark.",
+        "lines": 4,
+        "followUp": "How would you explain that verse?",
+        "blanks": 3
+      },
+      "answers": [
+        "So likewise,",
+        "whosoever he be of you that forsaketh not all that he hath,",
+        "he cannot be my disciple."
+      ]
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "A",
+      "body": {
+        "text": "<<< See a special message from the author, Church Planter John Honeycutt, at this QR Code."
+      }
+    },
+    {
+      "type": "SECTION_HEADING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "title": "Stewardship"
+      },
+      "source": "image"
+    },
+    {
+      "type": "KEY_OBJECTIVE",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Key Objective: To learn how to be a good steward."
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "This part of the lesson is about stewardship in our lives and our great opportunity to partner with God using our time, talent and treasure. We will use the study of our treasure to teach us the Biblical principles. First, it is important to remember that God made and owns everything."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Job 41:11",
+        "text": "Everything under heaven is [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "God's"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Acts 17:24-25",
+        "text": "We are not [_], all ownership is with God. Everything belongs to Him; including everything we have.\n\nBut God wants us to manage His possessions for Him. A manager or a [_] takes care of that which belongs to another. The Lord holds us accountable for taking care of the things He has given us like time, talents, skills, and resources.",
+        "blanks": 2
+      },
+      "answers": [
+        "owners",
+        "steward"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "To see how God thinks, read Matthew 25:14-28.\n\nLet’s now look at one area of stewardship, which is giving. What are our reasons for giving?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Deuteronomy 8:17,18",
+        "text": "We give because it is the Lord that gives us the ability to gain [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "wealth"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Matthew 6:19-21",
+        "text": "We give because it is an investment in [_] riches and giving gets our eyes off riches that will fade away.",
+        "blanks": 1
+      },
+      "answers": [
+        "eternal"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Matthew 6:24",
+        "text": "We give because it makes us choose who we will serve."
+      }
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "I recognize that everything good is because of God."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "John 3:16",
+        "text": "We give because God gave Himself to save [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "us"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Romans 10:13-15",
+        "text": "We give to save people from eternal [_] by spreading the Gospel.",
+        "blanks": 1
+      },
+      "answers": [
+        "death"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "1st Corinthians 6:19-20",
+        "text": "We give because we are not our [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "own"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "2nd Corinthians 8:8-9",
+        "text": "We give to prove we are sincere in our [_] for Jesus Christ.",
+        "blanks": 1
+      },
+      "answers": [
+        "love"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "2nd Corinthians 9:6",
+        "text": "We give because we reap what we [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "sow"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Colossians 3:1-2",
+        "text": "We give because we are to seek those things which are [_].",
+        "blanks": 1
+      },
+      "answers": [
+        "above"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Luke 14:33",
+        "text": "We give because Christ is [_] in our lives.\n\nWhere am I to give financially?",
+        "blanks": 1
+      },
+      "answers": [
+        "first"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "1st Corinthians 16:2",
+        "text": "You learned in the last lesson the importance and purpose of the local church. All giving in the [_] [_] is done in and through local churches that make disciples.",
+        "blanks": 2
+      },
+      "answers": [
+        "New",
+        "Testament"
+      ]
+    },
+    {
+      "type": "BANNER",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Being obedient in my giving promotes God’s truth around the world."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "What am I supposed to give?"
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "You gave everything about you to Christ the moment you accepted Him as Saviour. [_] is His. That’s what this lesson is all about. Your giving is to be out of a willing heart and because you love the Lord Jesus Christ.\n\nNotice that the Bible way to give is in 4 levels:",
+        "blanks": 1
+      },
+      "answers": [
+        "Everything"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "Hebrews 7:8",
+        "text": "– Level 1 A [_] is ten percent. The Bible teaches that giving ten percent of your earnings is a good beginning place of Christian obedience to God.",
+        "blanks": 1
+      },
+      "answers": [
+        "Tithes"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "2nd Corinthians 9:7",
+        "text": "– Level 2 This is [_] giving. As you grow in the Lord, you will go beyond the ten percent. You can be cheerful because God blesses giving.",
+        "blanks": 1
+      },
+      "answers": [
+        "Cheerful"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "1st Corinthians 16:2",
+        "text": "– Level 3 This is [_] giving. This is giving according to the amount God has blessed you.",
+        "blanks": 1
+      },
+      "answers": [
+        "Prosperous"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "2nd Corinthians 8:2-3",
+        "text": "– Level 4 This is [_] giving. When you give beyond your ability, by faith, God will work in ways you can not imagine.",
+        "blanks": 1
+      },
+      "answers": [
+        "Sacrificial"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "For a disciple, true Biblical giving goes much further than giving money. It is turning over complete control of your life and resources to Jesus Christ; our time, talent, skills, resources, etc. When we give financially we are getting the Gospel to the unreached. If God has control of our lives, He will have control of all we have as well. The question now is, will you be obedient to expand the Word of God by giving through your church? Yes No\n\nAt what level or levels will you begin? Level 1 Level 2 Level 3 Level 4\n\nWhen will you begin giving? [_] Note: make it a practice to use the giving envelopes provided at the church; put your name on it and your offering inside.\n\nNotice: We have a certificate for you for making such great progress in Journey. Please email us at lesson5@thejourneyforum.com to inform us that you completed lesson 5. Thank you.\n\nLesson Five Approval:\n\nYour Pastor’s signature [~] Date [~] Your Discipler’s signature [~] Date [~] A growing disciple gives willingly out of obedience to His Word.",
+        "blanks": 1
+      },
+      "answers": [
+        "now"
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "title": "Reflect & Transfer",
+        "subtitle": "Take a moment to understand and learn so that you can share it."
+      },
+      "source": "image"
+    },
+    {
+      "type": "DISCUSSION_PROMPTS",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "items": [
+          "What are the main points of this section?",
+          "What part of this section stands out to you most?",
+          "What questions do you have about this section?",
+          "Are there parts of this section that you disagree with?",
+          "How would you explain Colossians 3:1-2?",
+          "Are there any verses we want to memorize?"
+        ]
+      }
+    },
+    {
+      "type": "SCENARIO",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "text": "Here’s a “water cooler” scenario: You have a young disciple who asks you if he is to tithe on his net income or his gross income. How would you respond?"
+      }
+    },
+    {
+      "type": "VERSE_WRITING",
+      "tier": "DISCIPLE",
+      "section": "B",
+      "body": {
+        "reference": "2nd Corinthians 9:7",
+        "instruction": "Write 2nd Corinthians 9:7 in the space below - going down a line at each punctuation mark.",
+        "lines": 4,
+        "followUp": "How would you explain that verse?",
+        "blanks": 5
+      },
+      "answers": [
+        "Every man according as he purposeth in his heart,",
+        "so let him give ;",
+        "not grudgingly,",
+        "or of necessity:",
+        "for God loveth a cheerfful giver."
+      ]
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLE",
+      "body": {
+        "title": "Assignments for Lesson Five"
+      },
+      "source": "image"
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Your discipler will now take a look at all the sections in your Daily in the Word notebook and give instructions if needed. Here are some more thoughts about studying the Bible:"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Paragraph Study. Try doing your Daily in the Word by writing the verses between one paragraph marker to the next paragraph marker. Many times this is a complete thought."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Meditation. The words of the Bible are living words and the meanings, applications and blessings of each word are inexhaustible. To understand some things that God wants to teach, you will have to meditate on the Word of God. What is meditating on the Word of God? It is to quietly reflect on each word, it is to pray the words, it is applying the words in your daily actions."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "How to meditate. There are many ways God may lead you to think upon His Word. Here are a few ideas, but develop your own. Memorize the words, such, “Man shall not live by bread alone...” and then quote the verse to the Lord as a personal prayer. For example, “O Lord, I am not to live by bread alone, but by every word that comes from You.”"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Repeat the verse several times, and each time emphasize a different word. For example, “MAN shall not live by bread alone...“, “man SHALL NOT live by bread alone…”, “man shall not LIVE by bread alone…”"
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Picture each word and its importance, and let the words grow in your heart, mind and soul by reviewing the Words that God has focused your attention on. Talk to God about His Words. Ask Him about His Words. Expect those Words to produce fruit in your life. Expect God to use His Words to help you make decisions and think correctly. “...be transformed by the renewing of your mind…” Romans 12:2."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Ask God for truth. The Lord said “If any of you lack wisdom, let him ask...” Make sure you obey what God leads you to do."
+      }
+    },
+    {
+      "type": "PARAGRAPH",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Let’s review the Steps of Discipleship we have learned so far:"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": "Become a Believer by trusting Jesus Christ as Savior from John 3:16."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": "A disciple is in the Word of God every day from John 8:31."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 3,
+        "text": "A disciple is in prayer to God every day from Luke 11:1."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 4,
+        "text": "A disciple and discipler meet together every week from John 13:33-35."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 5,
+        "text": "A disciple is faithful in a biblical local church from Ephesians 4:11-12."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 6,
+        "text": "A disciple is obedient to the Word of God and becomes a disciple maker from Luke 14:33."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": "With your Discipler, complete the Discipleship Training Module(s) on the following pages."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Answer the questions for Lesson 5 below on a separate piece of paper and bring them to your next",
+          "meeting:"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 1,
+        "text": "Explain how we obey 2nd Timothy 2:2."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 2,
+        "text": "What is God’s plan to get the Gospel all over the world?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 3,
+        "text": "What is the cost of discipleship?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 4,
+        "text": "Why did Jesus require believers to become disciples?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 5,
+        "text": "What are the most important reasons for you to give offerings to the Lord?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 6,
+        "text": "What are the 4 levels of giving?"
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 7,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "The Christian should give of his time, ministry and resources through the local church. Explain why",
+          "this is true."
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 8,
+        "text": "Write the new Bible verses you are memorizing now."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 9,
+        "text": "Write the six Steps of Discipleship you have learned so far with their Bible verses."
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 10,
+        "text": ""
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "Answer this “water cooler” scenario: A Christian says to you “Don’t I have the right to do what I want",
+          "with my own money?” What would you say?"
+        ]
+      }
+    },
+    {
+      "type": "ASSIGNMENT",
+      "tier": "DISCIPLE",
+      "body": {
+        "number": 11,
+        "text": "Write your answers to all the Water Cooler Scenarios in the lesson."
+      }
+    },
+    {
+      "type": "LIST",
+      "tier": "DISCIPLE",
+      "body": {
+        "items": [
+          "There are many resources for Journey online. Also, we have a certificate for you for making such great",
+          "progress in Journey. Please e-mail us at lesson5@thejourneyforum.com to inform us that you",
+          "completed Lesson 5. We have a free download for you. Thank you."
+        ]
+      }
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLE",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    },
+    {
+      "type": "HEADING",
+      "tier": "DISCIPLER",
+      "body": {
+        "title": "Discipleship Training",
+        "subtitle": "Introduction and explanation."
+      },
+      "source": "image"
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "This is the first training module for Journey. Work on this with your Discipler."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Seriously examine the content of these training modules. You need to know how to disciple but you also need a biblical philosophy of discipleship to last a lifetime."
+      }
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Anytime you need more resources or information, visit www.TheJourneyForum.com.\n\nSee a video message >>>"
+      }
+    },
+    {
+      "type": "MODULE_HEADING",
+      "tier": "DISCIPLER",
+      "body": {
+        "number": 1,
+        "title": "Module 1",
+        "subtitle": "The Definition of one on one discipleship."
+      },
+      "source": "image"
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "A disciple is a Believer who desires to [_] in the Word of God and Christ-like character by learning and [_] the Word of God.",
+        "blanks": 2
+      },
+      "answers": [
+        "grow",
+        "applying"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "A discipler is a Believer who is regularly leading people to Christ and [_] them to do the same.",
+        "blanks": 1
+      },
+      "answers": [
+        "discipling"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Discipleship is leading a new, young or orphaned believer in the [_] of the Word of God and [_] to Christ so that he or she can win and [_] them.",
+        "blanks": 3
+      },
+      "answers": [
+        "basics",
+        "service",
+        "disciple"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Discipleship involves developing a close friendship [_] with your disciple, teaching the Word of God, and [_] skills.",
+        "blanks": 2
+      },
+      "answers": [
+        "relationship",
+        "ministry"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Discipleship is the process by which a believer in the local church, with a [_] worth duplicating, commits himself or herself for an extended period of [_] to a teachable believer in order to guide their growth to spiritual [_].",
+        "blanks": 3
+      },
+      "answers": [
+        "life",
+        "time",
+        "reproduction"
+      ]
+    },
+    {
+      "type": "POINT",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "What is a concise definition of discipleship? Discipleship is Bible study; but it’s not just that. It’s a good relationship between the disciple and the discipler; but it’s not just that. It’s growing spiritually; but it’s not just that. It’s teaching the Bible; but it’s not just that. It’s accountability, training and evangelism; but it’s not just those actions and certainly the list could go on and on. So what is a concise definition of Biblical one on one discipleship? It’s multiplying soul winning disciplers for a lifetime.\n\nHave your Discipler sign and date here when they review this assignment:\n\nThis assignment was completed successfully."
+      }
+    },
+    {
+      "type": "SIGN_OFF",
+      "tier": "DISCIPLER",
+      "body": {
+        "text": "Date completed : [~] Discipler signature: [~]"
+      }
+    }
+  ]
+}

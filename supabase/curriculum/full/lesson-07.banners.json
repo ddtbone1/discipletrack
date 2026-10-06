@@ -1,0 +1,24 @@
+{
+  "firstPage": 2,
+  "sections": [
+    {
+      "label": "A",
+      "title": "How to be Holy",
+      "objective": "Key Objective: To understand the importance of purity."
+    }
+  ],
+  "assignments": "Assignments for Lesson Seven",
+  "modules": [
+    {
+      "page": 10,
+      "number": 3,
+      "subtitle": "Procedures for one on one discipleship."
+    },
+    {
+      "page": 11,
+      "number": 4,
+      "subtitle": "The Value of one on one discipleship."
+    }
+  ],
+  "cover": 16
+}

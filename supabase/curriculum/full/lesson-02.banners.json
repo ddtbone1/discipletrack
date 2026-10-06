@@ -1,0 +1,28 @@
+{
+  "firstPage": 2,
+  "sections": [
+    {
+      "label": "A",
+      "title": "The Word of God",
+      "objective": "Key Objective: To understand that I am safe and assured in God forever."
+    },
+    {
+      "label": "B",
+      "title": "Eternal Security",
+      "objective": "Key Objective: To know the promises of assurance in God’s Word."
+    },
+    {
+      "label": "C",
+      "title": "The Holy Spirit",
+      "objective": "Key Objective: To understand the Holy Spirit dwells in us."
+    },
+    {
+      "label": "D",
+      "title": "New Relationship",
+      "objective": "Key Objective: To understand our addition to the family of God."
+    }
+  ],
+  "assignments": "Assignments for Lesson Two",
+  "modules": [],
+  "cover": 15
+}
