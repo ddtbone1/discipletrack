@@ -4,73 +4,66 @@ import 'package:go_router/go_router.dart';
 import '../../../app/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_pill.dart';
 import '../../ministry/domain/d_group_member.dart';
 import '../../ministry/domain/ministry_context.dart';
+import '../../ministry/presentation/ministry_ui.dart';
 
-/// The pastel green fill on the Home group card (user request of
-/// 2026-10-05). Set to false for the plain white card.
-const _useGreen = true;
-
-/// Colours for the card: a plain pastel green with black content, in both
-/// modes (user request of 2026-10-06).
-typedef _Ink = ({Color card, Color text, Color muted, Color button});
-
-/// The person's D Group on Home, kept minimal: the group's name, the
-/// person's own responsibility, the people in it at a glance, and who
-/// matters to them there. Opens the group: the detail page for its Leader,
-/// the roster for everyone else.
+/// The person's D Group on Home, as one white card with a soft shadow
+/// (user, 2026-10-07): the group's name and the person's place in it, a
+/// row of small labelled facts, and the group's make-up as one bar.
+/// Opens the roster.
 class GroupSummaryCard extends StatelessWidget {
   const GroupSummaryCard({required this.ministry, super.key});
 
   final MinistryContext ministry;
 
-  // In dark mode the light green card is drawn under the light theme, so its
-  // pills and faces keep their light colours on the light card.
   @override
-  Widget build(BuildContext context) =>
-      _useGreen && Theme.of(context).brightness == Brightness.dark
-      ? Theme(
-          data: AppTheme.light(),
-          child: Builder(builder: _card),
-        )
-      : _card(context);
-
-  Widget _card(BuildContext context) {
+  Widget build(BuildContext context) {
     final p = context.palette;
     final text = Theme.of(context).textTheme;
-    final _Ink ink = !_useGreen
-        ? (
-            card: p.surface,
-            text: p.textPrimary,
-            muted: p.muted,
-            button: p.textPrimary,
-          )
-        : (
-            card: const Color(0xFFE6FBC8),
-            text: Colors.black,
-            muted: Colors.black.withValues(alpha: 0.6),
-            button: Colors.black,
-          );
+    final dark = Theme.of(context).brightness == Brightness.dark;
     final c = ministry;
-    final mates = c.groupMates;
-    // Everyone placed in the group, set up or not (ADR-018).
     final members = c.groupSize;
     final leader = c.leader;
     final discipler = c.myDiscipler;
     final disciples = c.myDisciples;
+
     // Every Leader is a Discipler (ADR-020), so "the Leader" says both.
     final roles = [
       for (final r in DGroupResponsibility.values)
         if (c.myResponsibilities.contains(r) &&
             !(c.isLeader && r == DGroupResponsibility.discipler))
-          r.label,
+          r,
     ];
 
-    // One roster for everyone; a Leader manages the group from there.
-    void open() => context.push(Routes.myGroup);
+    // The group's make-up: people per responsibility, and those placed
+    // without one yet (ADR-018).
+    Set<String> holding(DGroupResponsibility r) => {
+      for (final e in c.roster)
+        if (e.responsibility == r) e.churchMembershipId,
+    };
+    final disciplerCount = holding(DGroupResponsibility.discipler).length;
+    final discipleCount = holding(DGroupResponsibility.disciple).length;
+    final placed = {for (final e in c.roster) e.churchMembershipId}.length;
+    final setup = (members - placed).clamp(0, members);
+
+    // Up to three facts, the ones that matter to this person.
+    final facts = <({String label, String value, bool warn})>[
+      (label: 'Members', value: '$members', warn: false),
+      if (leader != null && !c.isLeader)
+        (label: 'Leader', value: _first(leader.fullName), warn: false),
+      if (c.isDisciple)
+        discipler == null
+            ? (label: 'Discipler', value: 'Not paired', warn: true)
+            : (
+                label: 'Discipler',
+                value: _first(discipler.fullName),
+                warn: false,
+              ),
+      if (c.isDiscipler)
+        (label: 'Disciples', value: '${disciples.length}', warn: false),
+    ].take(3).toList();
 
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -83,26 +76,41 @@ class GroupSummaryCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'My D Group',
-                    style: text.bodySmall?.copyWith(
-                      color: ink.muted,
+                    c.dGroupName,
+                    style: text.titleLarge?.copyWith(
+                      color: p.textPrimary,
                       fontWeight: FontWeight.w600,
+                      letterSpacing: -0.3,
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    c.dGroupName,
-                    style: text.headlineSmall?.copyWith(
-                      color: ink.text,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.4,
-                      height: 1.1,
+                  // Each role in its badge colour from My D Group.
+                  Text.rich(
+                    TextSpan(
+                      style: text.bodySmall?.copyWith(color: p.muted),
+                      children: roles.isEmpty
+                          ? const [
+                              TextSpan(text: "You're waiting for your role"),
+                            ]
+                          : [
+                              const TextSpan(text: "You're "),
+                              for (final (i, r) in roles.indexed) ...[
+                                if (i > 0) const TextSpan(text: ' and '),
+                                TextSpan(
+                                  text: r == DGroupResponsibility.leader
+                                      ? 'the '
+                                      : 'a ',
+                                ),
+                                TextSpan(
+                                  text: r.label,
+                                  style: TextStyle(
+                                    color: pillColors(context, roleTone(r)).$2,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ],
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "You're ${_withArticle(roles)}",
-                    style: text.bodyMedium?.copyWith(color: ink.muted),
                   ),
                 ],
               ),
@@ -112,13 +120,15 @@ class GroupSummaryCard extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: ink.button,
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: dark ? Colors.white.withValues(alpha: 0.18) : p.border,
+                ),
               ),
               child: Icon(
                 Icons.arrow_outward_rounded,
-                size: 20,
-                color: ink.card,
+                size: 18,
+                color: p.textPrimary,
               ),
             ),
           ],
@@ -126,130 +136,155 @@ class GroupSummaryCard extends StatelessWidget {
         const SizedBox(height: AppSpacing.lg),
         Row(
           children: [
-            _AvatarStack(
-              names: [for (final m in mates) m.fullName],
-              ring: ink.card,
-              counter: ink.button,
-              counterText: ink.card,
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Text(
-              members == 1 ? '1 member' : '$members members',
-              style: text.bodyMedium?.copyWith(
-                color: ink.text,
-                fontWeight: FontWeight.w600,
+            for (final f in facts)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      f.label,
+                      style: text.labelSmall?.copyWith(color: p.muted),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      f.value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: f.warn
+                            ? pillColors(context, PillTone.warning).$2
+                            : p.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
           ],
         ),
-        if (leader != null || c.isDisciple || c.isDiscipler) ...[
+        if (members > 0) ...[
           const SizedBox(height: AppSpacing.md),
-          if (leader != null)
-            _Person(name: leader.fullName, role: 'Your Leader', ink: ink),
-          if (c.isDisciple)
-            discipler == null
-                ? _Person(
-                    name: 'Not paired with a Discipler yet',
-                    ink: ink,
-                    icon: Icons.link_off_rounded,
-                    trailing: const AppPill(
-                      tone: PillTone.warning,
-                      label: 'Not paired',
-                    ),
-                  )
-                : _Person(
-                    name: discipler.fullName,
-                    role: 'Your Discipler',
-                    ink: ink,
+          _MakeUpBar(
+            disciplers: disciplerCount,
+            disciples: discipleCount,
+            setup: setup,
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '$disciplerCount Disciplers  ·  $discipleCount Disciples',
+                  style: text.labelSmall?.copyWith(color: p.muted),
+                ),
+              ),
+              if (setup > 0)
+                Text(
+                  setup == 1 ? '1 needs setup' : '$setup need setup',
+                  style: text.labelSmall?.copyWith(
+                    color: p.muted,
+                    fontWeight: FontWeight.w600,
                   ),
-          if (c.isDiscipler)
-            _Person(
-              name: disciples.isEmpty
-                  ? 'No Disciples paired with you yet'
-                  : disciples.length == 1
-                  ? '1 Disciple paired with you'
-                  : '${disciples.length} Disciples paired with you',
-              icon: Icons.people_alt_outlined,
-              ink: ink,
-            ),
+                ),
+            ],
+          ),
         ],
       ],
     );
 
-    if (!_useGreen) return AppCard(onTap: open, child: body);
-
-    return Material(
-      color: ink.card,
-      borderRadius: BorderRadius.circular(28),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: open,
-        child: Padding(padding: const EdgeInsets.all(22), child: body),
+    return Container(
+      decoration: BoxDecoration(
+        color: p.surface,
+        // In dark mode a shadow barely shows on black, so the card lifts
+        // by light instead: a slightly brighter surface, lit from the top,
+        // and a hairline edge.
+        gradient: dark
+            ? LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.lerp(p.surface, Colors.white, 0.08)!,
+                  Color.lerp(p.surface, Colors.white, 0.03)!,
+                ],
+              )
+            : null,
+        border: dark
+            ? Border.all(color: Colors.white.withValues(alpha: 0.09))
+            : null,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: dark ? 0.6 : 0.07),
+            blurRadius: 28,
+            offset: const Offset(0, 10),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: dark ? 0.2 : 0.03),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(28),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => context.push(Routes.myGroup),
+          child: Padding(padding: const EdgeInsets.all(22), child: body),
+        ),
       ),
     );
   }
 
-  /// "a Discipler", "the Leader and a Discipler".
-  static String _withArticle(List<String> roles) =>
-      [for (final r in roles) r == 'Leader' ? 'the Leader' : 'a $r']
-          .join(' and ');
+  static String _first(String fullName) => fullName.split(' ').first;
 }
 
-/// Up to five overlapping avatars in their name colours, then "+n".
-class _AvatarStack extends StatelessWidget {
-  const _AvatarStack({
-    required this.names,
-    required this.ring,
-    required this.counter,
-    required this.counterText,
+/// The group's make-up as one rounded bar: Disciplers in the deep green,
+/// Disciples in lime, people waiting for setup hatched.
+class _MakeUpBar extends StatelessWidget {
+  const _MakeUpBar({
+    required this.disciplers,
+    required this.disciples,
+    required this.setup,
   });
 
-  final List<String> names;
-  final Color ring;
-  final Color counter;
-  final Color counterText;
+  final int disciplers;
+  final int disciples;
+  final int setup;
 
   @override
   Widget build(BuildContext context) {
-    if (names.isEmpty) return const SizedBox.shrink();
-    const radius = 17.0;
-    const step = 24.0;
-    final shown = names.take(5).toList();
-    final extra = names.length - shown.length;
-    final count = shown.length + (extra > 0 ? 1 : 0);
-    return ExcludeSemantics(
+    final p = context.palette;
+    final total = disciplers + disciples + setup;
+    if (total == 0) return const SizedBox.shrink();
+    return Semantics(
+      label:
+          '$disciplers Disciplers, $disciples Disciples'
+          '${setup > 0 ? ', $setup waiting for setup' : ''}',
+      excludeSemantics: true,
       child: SizedBox(
-        width: step * (count - 1) + radius * 2 + 4,
-        height: radius * 2 + 4,
-        child: Stack(
+        height: 14,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            for (var i = 0; i < shown.length; i++)
-              Positioned(
-                left: step * i,
-                child: CircleAvatar(
-                  radius: radius + 2,
-                  backgroundColor: ring,
-                  child: InitialsAvatar(name: shown[i], radius: radius),
-                ),
+            if (disciplers > 0)
+              Expanded(
+                flex: disciplers,
+                child: _Segment(color: _deepGreen(context)),
               ),
-            if (extra > 0)
-              Positioned(
-                left: step * shown.length,
-                child: CircleAvatar(
-                  radius: radius + 2,
-                  backgroundColor: ring,
-                  child: CircleAvatar(
-                    radius: radius,
-                    backgroundColor: counter,
-                    child: Text(
-                      '+$extra',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: counterText,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
+            if (disciplers > 0 && (disciples > 0 || setup > 0))
+              const SizedBox(width: 3),
+            if (disciples > 0)
+              Expanded(
+                flex: disciples,
+                child: _Segment(color: p.brand),
+              ),
+            if (disciples > 0 && setup > 0) const SizedBox(width: 3),
+            if (setup > 0)
+              Expanded(
+                flex: setup,
+                child: const _Segment(color: Colors.transparent, hatched: true),
               ),
           ],
         ),
@@ -258,57 +293,57 @@ class _AvatarStack extends StatelessWidget {
   }
 }
 
-/// One person who matters to the viewer: avatar, name, and their relation
-/// in plain muted text rather than a pill.
-class _Person extends StatelessWidget {
-  const _Person({
-    required this.name,
-    required this.ink,
-    this.role,
-    this.icon,
-    this.trailing,
-  });
+class _Segment extends StatelessWidget {
+  const _Segment({required this.color, this.hatched = false});
 
-  final String name;
-  final _Ink ink;
-  final String? role;
-  final IconData? icon;
-  final Widget? trailing;
+  final Color color;
+  final bool hatched;
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          if (icon == null)
-            InitialsAvatar(name: name, radius: 16)
-          else
-            SizedBox(width: 32, child: Icon(icon, size: 20, color: ink.text)),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: text.bodyMedium?.copyWith(
-                    color: ink.text,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (role != null)
-                  Text(
-                    role!,
-                    style: text.bodySmall?.copyWith(color: ink.muted),
-                  ),
-              ],
-            ),
-          ),
-          ?trailing,
-        ],
+    // Stripes over the segment: darker on the light card, brighter on the
+    // dark one, so the part still to set up reads in either mode.
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final stripe = dark
+        ? Colors.white.withValues(alpha: 0.45)
+        : Colors.black.withValues(alpha: 0.3);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(7),
+      child: CustomPaint(
+        foregroundPainter: hatched ? _Hatch(stripe) : null,
+        child: ColoredBox(color: color),
       ),
     );
   }
 }
+
+/// Diagonal stripes, as the reference bar marks what is still to come.
+class _Hatch extends CustomPainter {
+  _Hatch(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 2;
+    for (var x = -size.height; x < size.width; x += 6) {
+      canvas.drawLine(
+        Offset(x, size.height),
+        Offset(x + size.height, 0),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_Hatch old) => old.color != color;
+}
+
+/// The Disciplers' colour: the brand's deep green in light mode; in dark
+/// mode a soft green, so the bar keeps two tones beside the lime.
+Color _deepGreen(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark
+    ? Color.lerp(context.palette.brand, Colors.black, 0.5)!
+    : pillColors(context, PillTone.brand).$2;

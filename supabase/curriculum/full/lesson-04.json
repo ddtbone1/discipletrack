@@ -425,7 +425,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Acts 5:42 and 6:1,7?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -433,7 +434,8 @@
       "tier": "DISCIPLE",
       "section": "A",
       "body": {
-        "text": "Here’s a “water cooler” scenario: What would you say to invite a friend to your church and why they should visit?\n\nHere’s another one: A neighbor says “I don’t think we should put the 10 Commandments on display because it breaks the wall of separation between church and state.” How would you respond?"
+        "text": "Here’s a “water cooler” scenario: What would you say to invite a friend to your church and why they should visit?\n\nHere’s another one: A neighbor says “I don’t think we should put the 10 Commandments on display because it breaks the wall of separation between church and state.” How would you respond?",
+        "respond": "write"
       }
     },
     {
@@ -670,7 +672,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Luke 23:42-43?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -678,7 +681,8 @@
       "tier": "DISCIPLE",
       "section": "B",
       "body": {
-        "text": "Here’s a “water cooler” scenario: You have a young disciple and they ask you if baptism will wash away their sin. How would you respond?"
+        "text": "Here’s a “water cooler” scenario: You have a young disciple and they ask you if baptism will wash away their sin. How would you respond?",
+        "respond": "write"
       }
     },
     {
@@ -786,16 +790,7 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 5,
-        "text": "A disciple is faithful in a biblical local church from Ephesians 4:11-12."
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "<<< See a video message from John or Cathy Honeycutt."
-        ]
+        "text": "A disciple is faithful in a biblical local church from Ephesians 4:11-12. <<< See a video message from John or Cathy Honeycutt."
       }
     },
     {
@@ -803,7 +798,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 1,
-        "text": "Review any memory verses you have learned with your Discipler now."
+        "text": "Review any memory verses you have learned with your Discipler now.",
+        "respond": "task"
       }
     },
     {
@@ -811,17 +807,7 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Answer the questions for Lesson 4 below on a separate piece of paper and bring them to your next",
-          "meeting:"
-        ]
+        "text": "Answer the questions for Lesson 4 below on a separate piece of paper and bring them to your next meeting:"
       }
     },
     {
@@ -829,7 +815,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 1,
-        "text": "Explain 1st Corinthians 10:32."
+        "text": "Explain 1st Corinthians 10:32.",
+        "respond": "write"
       }
     },
     {
@@ -837,7 +824,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": "Read Acts 19:10 and explain how it was possible that all of Asia heard the Word of the Lord."
+        "text": "Read Acts 19:10 and explain how it was possible that all of Asia heard the Word of the Lord.",
+        "respond": "write"
       }
     },
     {
@@ -845,7 +833,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 3,
-        "text": "Who started the first Bible-Believing Churches?"
+        "text": "Who started the first Bible-Believing Churches?",
+        "respond": "write"
       }
     },
     {
@@ -853,7 +842,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 4,
-        "text": "What is a true New Testament Bible-Believing Church?"
+        "text": "What is a true New Testament Bible-Believing Church?",
+        "respond": "write"
       }
     },
     {
@@ -861,7 +851,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 5,
-        "text": "What is the purpose of the Church Leadership?"
+        "text": "What is the purpose of the Church Leadership?",
+        "respond": "write"
       }
     },
     {
@@ -869,7 +860,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 6,
-        "text": "How should you regard the church leaders who follow the Word of God?"
+        "text": "How should you regard the church leaders who follow the Word of God?",
+        "respond": "write"
       }
     },
     {
@@ -877,7 +869,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 7,
-        "text": "What should you look for in a church?"
+        "text": "What should you look for in a church?",
+        "respond": "write"
       }
     },
     {
@@ -885,7 +878,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 8,
-        "text": "Explain what the Bible teaches about the role of ladies in the church."
+        "text": "Explain what the Bible teaches about the role of ladies in the church.",
+        "respond": "write"
       }
     },
     {
@@ -893,7 +887,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 9,
-        "text": "What is your responsibility to the Local Church?"
+        "text": "What is your responsibility to the Local Church?",
+        "respond": "write"
       }
     },
     {
@@ -901,7 +896,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 10,
-        "text": "Explain why we need to be baptized."
+        "text": "Explain why we need to be baptized.",
+        "respond": "write"
       }
     },
     {
@@ -909,17 +905,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 11,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Give two examples of someone who was baptized after salvation. Support your answers with",
-          "Scripture."
-        ]
+        "text": "Give two examples of someone who was baptized after salvation. Support your answers with Scripture.",
+        "respond": "write"
       }
     },
     {
@@ -927,7 +914,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 12,
-        "text": "What is the Biblical way to be baptized?"
+        "text": "What is the Biblical way to be baptized?",
+        "respond": "write"
       }
     },
     {
@@ -935,7 +923,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 13,
-        "text": "(True or False) Baptism is necessary for salvation."
+        "text": "(True or False) Baptism is necessary for salvation.",
+        "respond": "truefalse"
       }
     },
     {
@@ -943,7 +932,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 14,
-        "text": "Have you been baptized?"
+        "text": "Have you been baptized?",
+        "respond": "write"
       }
     },
     {
@@ -951,7 +941,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 15,
-        "text": "Where and by whom?"
+        "text": "Where and by whom?",
+        "respond": "write"
       }
     },
     {
@@ -959,7 +950,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 16,
-        "text": "Write the new Bible verses you are memorizing now."
+        "text": "Write the new Bible verses you are memorizing now.",
+        "respond": "write"
       }
     },
     {
@@ -967,18 +959,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 17,
-        "text": "Write your answers to all the Water Cooler Scenarios in the lesson."
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Note to the disciple: It rarely happens, but if you feel something is being taught that you are still not clear",
-          "about, or if your Discipler will not meet with you regularly, please see your Pastor about this. Most of the",
-          "time it is a misunderstanding and your Pastor can clear things up."
-        ]
+        "text": "Write your answers to all the Water Cooler Scenarios in the lesson.\n\nNote to the disciple: It rarely happens, but if you feel something is being taught that you are still not clear about, or if your Discipler will not meet with you regularly, please see your Pastor about this. Most of the time it is a misunderstanding and your Pastor can clear things up.",
+        "respond": "task"
       }
     },
     {

@@ -20,6 +20,9 @@ class ActivityEvent {
     required this.title,
     this.detail,
     this.outcome,
+    this.lessonNumber,
+    this.lessonTitle,
+    this.meeting,
   });
 
   final DateTime at;
@@ -33,6 +36,13 @@ class ActivityEvent {
 
   /// For a recorded meeting, its outcome.
   final AttendanceOutcome? outcome;
+
+  /// The lesson the event belongs to.
+  final int? lessonNumber;
+  final String? lessonTitle;
+
+  /// For a meeting event, the recorded meeting, for its details.
+  final MeetingHistoryEntry? meeting;
 }
 
 /// The journey's factual events, newest first.
@@ -55,6 +65,8 @@ List<ActivityEvent> journeyActivity(
           at: l.startedAt!,
           kind: ActivityKind.lessonStarted,
           title: 'Lesson ${l.number} started',
+          lessonNumber: l.number,
+          lessonTitle: l.title,
         ),
         0,
       ));
@@ -68,6 +80,8 @@ List<ActivityEvent> journeyActivity(
           detail: ownJourney || l.confirmedByName == null
               ? null
               : 'by ${l.confirmedByName}',
+          lessonNumber: l.number,
+          lessonTitle: l.title,
         ),
         2,
       ));
@@ -92,6 +106,9 @@ List<ActivityEvent> journeyActivity(
           if (!m.isVoided) m.outcome.label else 'Not counted',
         ].join(' · '),
         outcome: m.isVoided ? null : m.outcome,
+        lessonNumber: m.lessonNumber,
+        lessonTitle: m.lessonTitle,
+        meeting: m,
       ),
       1,
     ));
@@ -106,6 +123,9 @@ List<ActivityEvent> journeyActivity(
             'Lesson ${m.lessonNumber}',
             if (m.voidedByName != null) 'by ${m.voidedByName}',
           ].join(' · '),
+          lessonNumber: m.lessonNumber,
+          lessonTitle: m.lessonTitle,
+          meeting: m,
         ),
         3,
       ));

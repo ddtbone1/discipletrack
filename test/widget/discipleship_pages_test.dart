@@ -270,7 +270,7 @@ void main() {
       );
       expect(find.text('Diana Cruz'), findsOneWidget);
       // The current lesson comes first: number, title, Discipler.
-      expect(find.text('Lesson 4'), findsOneWidget);
+      expect(find.text('Lesson 4'), findsWidgets);
       expect(find.text('Lesson title 4'), findsOneWidget);
       expect(find.text('Discipler: Mark Reyes'), findsOneWidget);
       expect(
@@ -399,12 +399,9 @@ void main() {
       tester,
     ) async {
       await pump(tester, repo());
-      expect(find.text('Lesson 4'), findsOneWidget);
+      expect(find.textContaining('Lesson 4  ·  with'), findsOneWidget);
       expect(find.text('Lesson title 4'), findsOneWidget);
-      expect(
-        find.text('On Lesson 3. Record their meeting separately.'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('is on Lesson 3; record'), findsOneWidget);
       expect(
         find.textContaining('Records a Lesson 4 meeting on'),
         findsOneWidget,

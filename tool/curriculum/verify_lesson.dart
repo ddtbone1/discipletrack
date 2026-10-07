@@ -35,7 +35,21 @@ List<String> blockWords(Map<String, dynamic> b) {
   List<String> list(String k) => [for (final x in body[k] as List) '$x'];
   switch (b['type']) {
     case 'ASSIGNMENT':
-      return ['${body['number']}.', ...words(s('text'))];
+      return [
+        '${body['number']}.',
+        ...words(s('text')),
+        for (final p in (body['parts'] as List? ?? const []).cast<Map>()) ...[
+          if (p['label'] != null) '${p['label']}',
+          ...words('${p['text']}'),
+        ],
+      ];
+    case 'LIST' when body['field'] != null:
+      // A reading plan: readings, the printed date labels and lines.
+      return [
+        for (final i in list('items')) ...words(i),
+        for (final w in list('fieldWords')) w,
+        ...words(s('note')),
+      ];
     case 'LIST':
     case 'DISCUSSION_PROMPTS':
       return [for (final i in list('items')) ...words(i)];
@@ -210,12 +224,16 @@ Future<void> main(List<String> args) async {
   for (final b in blocks) {
     final body = (b['body'] as Map).cast<String, dynamic>();
     final answers = b['answers'] as List?;
-    final text = body['text'];
+    final text = [
+      body['text'],
+      for (final p in (body['parts'] as List? ?? const []).cast<Map>())
+        p['text'],
+    ].whereType<String>().join(' ');
     if (answers != null && body['blanks'] != answers.length) {
       fail('blanks/answers count differs in ${b['type']}: $text');
     }
     if (answers != null &&
-        text is String &&
+        body['text'] is String &&
         b['type'] != 'VERSE_WRITING' &&
         blankCount(text) != answers.length) {
       fail(

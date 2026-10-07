@@ -16,7 +16,10 @@ import 'lesson_index_page.dart';
 class LessonCarousel extends ConsumerStatefulWidget {
   const LessonCarousel({required this.journey, super.key});
 
-  final DiscipleJourney journey;
+  /// The reader's own journey, which labels the cards and picks the first
+  /// one; null for a Discipler without a journey, who sees the ten lessons
+  /// from Lesson 1, all open (ADR-019 decision 16).
+  final DiscipleJourney? journey;
 
   @override
   ConsumerState<LessonCarousel> createState() => _LessonCarouselState();
@@ -29,8 +32,10 @@ class _LessonCarouselState extends ConsumerState<LessonCarousel> {
   );
 
   int get _startIndex {
-    final lessons = widget.journey.lessons;
-    final current = widget.journey.currentLesson;
+    final journey = widget.journey;
+    if (journey == null) return 0;
+    final lessons = journey.lessons;
+    final current = journey.currentLesson;
     if (current == null) return lessons.isEmpty ? 0 : lessons.length - 1;
     final i = lessons.indexWhere((l) => l.lessonId == current.lessonId);
     return i < 0 ? 0 : i;
@@ -44,41 +49,63 @@ class _LessonCarouselState extends ConsumerState<LessonCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    final lessons = widget.journey.lessons;
+    final access =
+        ref.watch(lessonAccessProvider(null)).value ?? const <LessonAccess>[];
     final open = {
-      for (final a in ref.watch(lessonAccessProvider(null)).value ?? const [])
+      for (final a in access)
         if (a.isOpen) a.lessonId,
     };
     final covers = ref.watch(lessonCoversProvider).value ?? const {};
+    final journey = widget.journey;
+    // One card per lesson: from the journey when there is one, else from
+    // the lesson list.
+    final cards = journey != null
+        ? [
+            for (final l in journey.lessons)
+              (
+                id: l.lessonId,
+                number: l.number,
+                title: l.title,
+                caption: switch (l.state) {
+                  _ when l.isCurrent => 'Lesson ${l.number} · Now',
+                  LessonState.completed => 'Lesson ${l.number} · Done',
+                  _ => 'Lesson ${l.number}',
+                },
+              ),
+          ]
+        : [
+            for (final a in access)
+              (
+                id: a.lessonId,
+                number: a.number,
+                title: a.title,
+                caption: 'Lesson ${a.number}',
+              ),
+          ];
+    if (cards.isEmpty) return const SizedBox(height: 150);
     return SizedBox(
       height: 150,
       child: PageView.builder(
         controller: _controller,
         padEnds: false,
-        itemCount: lessons.length,
+        itemCount: cards.length,
         itemBuilder: (context, i) {
-          final l = lessons[i];
-          final isOpen = open.contains(l.lessonId);
+          final c = cards[i];
+          final isOpen = open.contains(c.id);
           return Padding(
             padding: const EdgeInsets.only(right: AppSpacing.sm),
             child: LessonCoverCard(
               height: 150,
-              caption: switch (l.state) {
-                _ when l.isCurrent => 'Lesson ${l.number} · Now',
-                LessonState.completed => 'Lesson ${l.number} · Done',
-                _ => 'Lesson ${l.number}',
-              },
+              caption: c.caption,
               lesson: LessonAccess(
-                lessonId: l.lessonId,
-                number: l.number,
-                title: l.title,
+                lessonId: c.id,
+                number: c.number,
+                title: c.title,
                 discipleTier: isOpen,
                 disciplerTier: false,
               ),
-              cover: covers[l.lessonId],
-              onTap: isOpen
-                  ? () => context.push(Routes.lessonFor(l.lessonId))
-                  : null,
+              cover: covers[c.id],
+              onTap: isOpen ? () => context.push(Routes.lessonFor(c.id)) : null,
             ),
           );
         },

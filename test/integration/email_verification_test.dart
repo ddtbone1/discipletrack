@@ -124,7 +124,7 @@ void main() {
     await expectLater(
       anonClient().auth.signUp(
         email: confirmed.email,
-        password: 'another-password',
+        password: 'Another-password-1',
         data: {'full_name': 'Second'},
       ),
       throwsAuthCode('user_already_exists'),
@@ -173,9 +173,11 @@ void main() {
       AuthRepository.repeatSignUpGap + const Duration(seconds: 1),
     );
 
-    final repeat = await AuthRepository(
-      anonClient(),
-    ).signUp(email: email, password: 'a-different-password', fullName: 'Other');
+    final repeat = await AuthRepository(anonClient()).signUp(
+      email: email,
+      password: 'A-different-password-1',
+      fullName: 'Other',
+    );
     expect(repeat, isA<SignUpAlreadyRegistered>());
 
     // GoTrue kept the first password: the second one is not accepted, and the
@@ -184,7 +186,7 @@ void main() {
     await expectLater(
       anonClient().auth.signInWithPassword(
         email: email,
-        password: 'a-different-password',
+        password: 'A-different-password-1',
       ),
       throwsAuthCode('invalid_credentials'),
     );

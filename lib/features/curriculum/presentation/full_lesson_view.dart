@@ -104,7 +104,21 @@ class FullLessonView extends StatelessWidget {
                     children: [
                       // The book lists them without numbers.
                       SizedBox(width: 18, child: Text('•', style: body)),
-                      Expanded(child: Text(q, style: body)),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(q, style: body),
+                            if (workbook != null)
+                              AnswerBox(
+                                workbook: workbook!,
+                                blockId: b.blockId,
+                                place: 'q$i',
+                                style: body,
+                              ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -119,7 +133,19 @@ class FullLessonView extends StatelessWidget {
               Icon(Icons.forum_outlined, color: p.muted),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: _RichBlanks(block: b, workbook: workbook, style: body),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _RichBlanks(block: b, workbook: workbook, style: body),
+                    if (workbook != null && b.respond == 'write')
+                      AnswerBox(
+                        workbook: workbook!,
+                        blockId: b.blockId,
+                        place: 'w',
+                        style: body,
+                      ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -146,10 +172,12 @@ class FullLessonView extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: _RichBlanks(block: b, workbook: workbook, style: body),
+              child: _Assignment(block: b, workbook: workbook, style: body),
             ),
           ],
         );
+      case BlockType.list when b.field != null:
+        return _ReadingPlan(block: b, workbook: workbook, style: body);
       case BlockType.list:
         return Padding(
           padding: const EdgeInsets.only(left: 28),
@@ -177,20 +205,35 @@ class FullLessonView extends StatelessWidget {
 /// Text with its blanks: an empty line each for the Disciple, the answer
 /// for the Discipler. Paragraph breaks ("\n\n") are kept.
 class _RichBlanks extends StatelessWidget {
-  const _RichBlanks({required this.block, required this.style, this.workbook});
+  const _RichBlanks({
+    required this.block,
+    required this.style,
+    this.workbook,
+    this.text,
+    this.blankStart = 0,
+    this.fieldStart = 0,
+  });
 
   final Workbook? workbook;
 
   final ContentBlock block;
   final TextStyle? style;
 
+  /// The text to lay out, when not the block's own (a part of a question).
+  final String? text;
+
+  /// The block-wide index of this text's first blank and field, when the
+  /// text is a part after others.
+  final int blankStart;
+  final int fieldStart;
+
   @override
   Widget build(BuildContext context) {
-    final source = block.text ?? '';
+    final source = text ?? block.text ?? '';
     final answers = block.answerList;
     final paragraphs = source.split('\n\n');
-    var blank = 0;
-    var field = 0;
+    var blank = blankStart;
+    var field = fieldStart;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -232,7 +275,7 @@ class _RichBlanks extends StatelessWidget {
       );
     }
     final wb = workbook;
-    if (wb != null) return _fillable(wb, 'b$i', 'blank');
+    if (wb != null) return _fillable(wb, 'b$i', 'blank', blank: i);
     return _line(context, 'blank');
   }
 
@@ -244,17 +287,19 @@ class _RichBlanks extends StatelessWidget {
     return _line(context, 'writing space');
   }
 
-  InlineSpan _fillable(Workbook wb, String place, String label) => WidgetSpan(
-    alignment: PlaceholderAlignment.baseline,
-    baseline: TextBaseline.alphabetic,
-    child: BlankField(
-      workbook: wb,
-      blockId: block.blockId,
-      place: place,
-      style: style,
-      label: label,
-    ),
-  );
+  InlineSpan _fillable(Workbook wb, String place, String label, {int? blank}) =>
+      WidgetSpan(
+        alignment: PlaceholderAlignment.baseline,
+        baseline: TextBaseline.alphabetic,
+        child: BlankField(
+          workbook: wb,
+          blockId: block.blockId,
+          place: place,
+          style: style,
+          label: label,
+          blank: blank,
+        ),
+      );
 
   /// An empty line to write on: a blank, or a field the source never
   /// answers (a date, a signature).
@@ -275,6 +320,174 @@ class _RichBlanks extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// A numbered question or assignment, as the book prints it, with the
+/// answer it asks for: a written answer, a choice, True or False, or a
+/// task to tick off; its lettered or listed parts each with their own.
+/// Inputs appear only with a [workbook] (the Disciple's own lesson).
+class _Assignment extends StatelessWidget {
+  const _Assignment({required this.block, required this.style, this.workbook});
+
+  final ContentBlock block;
+  final TextStyle? style;
+  final Workbook? workbook;
+
+  Widget? _respond(String? kind, String place) {
+    final wb = workbook;
+    if (wb == null || kind == null) return null;
+    return switch (kind) {
+      'write' => AnswerBox(
+        workbook: wb,
+        blockId: block.blockId,
+        place: place,
+        style: style,
+      ),
+      'truefalse' => PickOne(
+        workbook: wb,
+        blockId: block.blockId,
+        place: place,
+        options: const ['True', 'False'],
+        style: style,
+      ),
+      'task' => TaskCheck(workbook: wb, blockId: block.blockId, place: place),
+      _ => null,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final text = block.text ?? '';
+    final parts = block.parts;
+    final choice = block.respond == 'choice';
+    // Blanks and fields are numbered across the text and its parts.
+    final blankStarts = <int>[];
+    final fieldStarts = <int>[];
+    var blanks = blankToken.allMatches(text).length;
+    var fields = fieldToken.allMatches(text).length;
+    for (final part in parts) {
+      blankStarts.add(blanks);
+      fieldStarts.add(fields);
+      blanks += blankToken.allMatches(part.text).length;
+      fields += fieldToken.allMatches(part.text).length;
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (text.isNotEmpty)
+          _RichBlanks(block: block, workbook: workbook, style: style),
+        if (!choice) ?_respond(block.respond, 'w'),
+        if (choice && workbook != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: PickOne(
+              workbook: workbook!,
+              blockId: block.blockId,
+              place: 'c',
+              options: [for (final p in parts) p.text],
+              labels: [for (final p in parts) p.label],
+              style: style,
+            ),
+          )
+        else
+          for (final (i, part) in parts.indexed)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xs),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (part.label != null)
+                    SizedBox(
+                      width: 26,
+                      child: Text(
+                        part.label!,
+                        style: style?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _RichBlanks(
+                          block: block,
+                          workbook: workbook,
+                          style: style,
+                          text: part.text,
+                          blankStart: blankStarts[i],
+                          fieldStart: fieldStarts[i],
+                        ),
+                        ?_respond(part.respond, 'p$i'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+      ],
+    );
+  }
+}
+
+/// A reading plan (Daily in the Word): each reading on its own row with
+/// its date to write, as the printed chart has a date line per reading.
+class _ReadingPlan extends StatelessWidget {
+  const _ReadingPlan({required this.block, required this.style, this.workbook});
+
+  final ContentBlock block;
+  final TextStyle? style;
+  final Workbook? workbook;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final field = block.field ?? 'Date';
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (block.note != null) ...[
+            Text(block.note!, style: context.supportingStyle),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+          for (final (i, reading) in block.items.indexed)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: Text(
+                      reading,
+                      style: style?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Text('$field ', style: context.captionStyle),
+                  SizedBox(
+                    width: 110,
+                    child: workbook == null
+                        ? Container(
+                            height: 20,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(color: p.border),
+                              ),
+                            ),
+                          )
+                        : BlankField(
+                            workbook: workbook!,
+                            blockId: block.blockId,
+                            place: 'r$i',
+                            style: style,
+                            label: '$field for $reading',
+                          ),
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }

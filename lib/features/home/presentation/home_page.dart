@@ -61,13 +61,14 @@ class HomePage extends ConsumerWidget {
           const SizedBox(height: AppSpacing.md),
           AppPageHeader(
             name: profile?.fullName ?? 'Friend',
+            avatar: profile?.avatarUrl,
             subtitle: church?.name ?? 'Your church workspace',
             onAvatarTap: () => context.go(Routes.profile),
             actions: const [ThemeModeToggle()],
           ),
           const SizedBox(height: AppSpacing.xl),
 
-          // A greeting line, then the day's slogan as the body's title.
+          // The greeting as the page's title: the name in the text colour.
           HomeGreeting(firstName: profile?.firstName ?? 'friend'),
           const SizedBox(height: AppSpacing.lg),
 

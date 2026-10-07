@@ -586,14 +586,14 @@ void main() {
       final (repo, popped) = await pumpAdd(tester);
 
       expect(find.text('3 members in no D Group'), findsOneWidget);
-      expect(find.text('No one chosen yet'), findsOneWidget);
+      expect(find.text('Tick the people to add'), findsOneWidget);
 
       await tester.tap(find.text('Mara Villanueva'));
       await tester.tap(find.text('Rosa Diaz'));
       await tester.pump();
       expect(find.text('2 chosen'), findsOneWidget);
 
-      await tester.tap(find.text('Add 2'));
+      await tester.tap(find.text('Add 2 members'));
       await tester.pumpAndSettle();
 
       expect(repo.added.single.groupId, _groupId);
@@ -620,7 +620,7 @@ void main() {
       await tester.pump();
       await tester.tap(find.text('Clear'));
       await tester.pump();
-      expect(find.text('No one chosen yet'), findsOneWidget);
+      expect(find.text('Tick the people to add'), findsOneWidget);
     });
 
     testWidgets('says so when everyone is already in a group', (tester) async {
@@ -637,7 +637,7 @@ void main() {
       );
       await tester.tap(find.text('Mara Villanueva'));
       await tester.pump();
-      await tester.tap(find.text('Add'));
+      await tester.tap(find.text('Add 1 member'));
       await tester.pumpAndSettle();
 
       expect(find.text('Add members'), findsOneWidget);
@@ -722,9 +722,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Your Leader'), findsOneWidget);
+      expect(find.text('Walking with you'), findsOneWidget);
       expect(find.text('+63 900 111'), findsOneWidget);
-      expect(find.text('Your Discipler'), findsOneWidget);
+      expect(find.text('Discipler'), findsWidgets);
       expect(find.text('+63 900 222'), findsOneWidget);
       expect(find.text('Dan Disciple'), findsOneWidget);
       expect(find.text('Your Disciples'), findsNothing);
@@ -739,7 +739,7 @@ void main() {
           ..ministryContext = _discipleContext(paired: false),
       );
       await tester.pumpAndSettle();
-      expect(find.text('Not paired yet'), findsOneWidget);
+      expect(find.text('Not paired with a Discipler yet'), findsOneWidget);
     });
 
     testWidgets('a Discipler sees Your Disciples with their phones', (
@@ -790,9 +790,9 @@ void main() {
 
       expect(find.text('Manage members'), findsOneWidget);
       expect(find.text('Your Disciples'), findsOneWidget);
-      expect(find.text('Your Leader'), findsNothing);
+      expect(find.text('Walking with you'), findsNothing);
       // Roles are coloured text, never pills (UI_DESIGN_SYSTEM section 39).
-      expect(find.text('You · Leader'), findsOneWidget);
+      expect(find.textContaining("You're the Leader"), findsOneWidget);
     });
 
     testWidgets('someone not set up yet sees their group and Leader only', (
@@ -842,7 +842,7 @@ void main() {
 
     testWidgets('Leader: the My D Group row', (tester) async {
       await pumpHome(tester, ministryContext: _leaderContext());
-      expect(find.text('My D Group'), findsOneWidget);
+      expect(find.textContaining("You're the Leader"), findsOneWidget);
       expect(find.text('Young Adults A'), findsOneWidget);
     });
 
@@ -859,25 +859,28 @@ void main() {
           roster: _leaderContext().roster,
         ),
       );
-      expect(find.text('11 members'), findsOneWidget);
+      // Members, and the bar: one Leader, ten waiting for setup.
+      expect(find.text('Members'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+      expect(find.text('10 need setup'), findsOneWidget);
     });
 
     testWidgets('Disciple: the group card with Leader and Discipler', (
       tester,
     ) async {
       await pumpHome(tester, ministryContext: _discipleContext());
-      expect(find.text('Ana Leader'), findsOneWidget);
-      expect(find.text('Your Leader'), findsOneWidget);
-      expect(find.text('Ben Discipler'), findsOneWidget);
-      expect(find.text('Your Discipler'), findsOneWidget);
-      expect(find.text("You're a Disciple"), findsOneWidget);
+      expect(find.text('Leader'), findsOneWidget);
+      expect(find.text('Ana'), findsOneWidget);
+      expect(find.text('Discipler'), findsOneWidget);
+      expect(find.text('Ben'), findsOneWidget);
+      expect(find.textContaining('a Disciple'), findsOneWidget);
     });
 
     testWidgets('Disciple without a Discipler: "not paired yet"', (
       tester,
     ) async {
       await pumpHome(tester, ministryContext: _discipleContext(paired: false));
-      expect(find.text('Not paired with a Discipler yet'), findsOneWidget);
+      expect(find.text('Not paired'), findsOneWidget);
     });
 
     testWidgets('added but not set up: which group, and who sets it up', (

@@ -9,6 +9,7 @@ import '../../../core/connectivity/connection_status.dart';
 import '../../../core/supabase/postgrest_failure.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../domain/lesson_content.dart';
+import '../domain/workbook.dart';
 
 /// A failed curriculum read, with a message fit to show a person.
 class CurriculumFailure implements Exception, NetworkAwareFailure {
@@ -67,6 +68,30 @@ class CurriculumRepository {
 
   /// `get_lesson_covers()`: each lesson's cover photo (base64 JPEG), for
   /// the lesson list. Readable by every active member.
+  /// Checks the reader's blanks against the book (Migration 020): per
+  /// submitted blank, right or not and the answer. [responses]: block id
+  /// to what was written in each blank, in order.
+  Future<List<({String blockId, BlankResult result})>> checkAnswers(
+    String lessonId,
+    Map<String, List<String>> responses,
+  ) => _guard('Could not check your answers.', () async {
+    final rows = await _client.rpc<List<dynamic>>(
+      'check_lesson_answers',
+      params: {'p_lesson_id': lessonId, 'p_responses': responses},
+    );
+    return [
+      for (final r in rows.cast<Map<String, dynamic>>())
+        (
+          blockId: r['block_id'] as String,
+          result: BlankResult(
+            blank: r['blank'] as int,
+            correct: r['correct'] as bool,
+            answer: r['answer'] as String,
+          ),
+        ),
+    ];
+  });
+
   Future<Map<String, String>> fetchCovers() =>
       _guard('Could not load the lesson covers.', () async {
         final rows = await _client.rpc<List<dynamic>>('get_lesson_covers');

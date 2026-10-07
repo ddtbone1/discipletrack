@@ -243,7 +243,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Matthew 18:15-16?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -251,7 +252,8 @@
       "tier": "DISCIPLE",
       "section": "A",
       "body": {
-        "text": "Here’s a “water cooler” scenario: A friend at work asks you, “If Jesus is so great, why are some of his followers such jerks?” How would you respond?\n\nHere’s another one: Your neighbor says, “I don’t go to church anymore because there are so many hypocrites there.” How would you reply?"
+        "text": "Here’s a “water cooler” scenario: A friend at work asks you, “If Jesus is so great, why are some of his followers such jerks?” How would you respond?\n\nHere’s another one: Your neighbor says, “I don’t go to church anymore because there are so many hypocrites there.” How would you reply?",
+        "respond": "write"
       }
     },
     {
@@ -392,7 +394,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Acts 17:10-11?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -400,7 +403,8 @@
       "tier": "DISCIPLE",
       "section": "B",
       "body": {
-        "text": "Here’s a “water cooler” scenario: After you explain the Gospel to a friend, he says to you, “It’s great that you found something that works for you.” How would you continue to draw him to Christ?\n\nHere’s another one: An acquaintance asks you, “Why are Christians so homophobic?” How do you respond?"
+        "text": "Here’s a “water cooler” scenario: After you explain the Gospel to a friend, he says to you, “It’s great that you found something that works for you.” How would you continue to draw him to Christ?\n\nHere’s another one: An acquaintance asks you, “Why are Christians so homophobic?” How do you respond?",
+        "respond": "write"
       }
     },
     {
@@ -588,7 +592,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you give your testimony of salvation that would use the method in this section?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -596,7 +601,8 @@
       "tier": "DISCIPLE",
       "section": "C",
       "body": {
-        "text": "Here’s a “water cooler” scenario: You are witnessing to a neighbor and he says, “But there’s so much evidence for evolution.” How would you continue to draw him to Christ?\n\nHere’s another one: A co-worker says to you, “I’ve got several gay friends. I would say they’re just like you and me. Being gay is just the way they were born.” How would you respond?\n\nHere’s another one: You are witnessing to a family member and she says, “I would never tell anyone their religion is wrong.” How would you continue to draw her to Christ?"
+        "text": "Here’s a “water cooler” scenario: You are witnessing to a neighbor and he says, “But there’s so much evidence for evolution.” How would you continue to draw him to Christ?\n\nHere’s another one: A co-worker says to you, “I’ve got several gay friends. I would say they’re just like you and me. Being gay is just the way they were born.” How would you respond?\n\nHere’s another one: You are witnessing to a family member and she says, “I would never tell anyone their religion is wrong.” How would you continue to draw her to Christ?",
+        "respond": "write"
       }
     },
     {
@@ -909,7 +915,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 1,
-        "text": "With your Discipler, complete the Discipleship Training Module(s) on the following pages."
+        "text": "With your Discipler, complete the Discipleship Training Module(s) on the following pages.",
+        "respond": "task"
       }
     },
     {
@@ -917,22 +924,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "The disciple will present, teach and explain the Spiritual Map to one or more persons with the Discipler",
-          "present. An appointment should be made with the person or persons to whom the disciple will teach the",
-          "lesson, and the disciple will present the Assurance Chart to someone with the Discipler present.",
-          "Important Note: You are close to finishing these lessons. At the end of these lessons you should be ready to",
-          "lead someone to Christ and disciple them to do the same. Share the Spiritual Map with the lost so that you",
-          "can begin discipling when you receive final approval from the church leadership and your Discipler. Have you",
-          "led anyone to Christ?"
-        ]
+        "text": "The disciple will present, teach and explain the Spiritual Map to one or more persons with the Discipler present. An appointment should be made with the person or persons to whom the disciple will teach the lesson, and the disciple will present the Assurance Chart to someone with the Discipler present. Important Note: You are close to finishing these lessons. At the end of these lessons you should be ready to lead someone to Christ and disciple them to do the same. Share the Spiritual Map with the lost so that you can begin discipling when you receive final approval from the church leadership and your Discipler. Have you led anyone to Christ?",
+        "respond": "write"
       }
     },
     {
@@ -940,7 +933,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 3,
-        "text": "Write your answers to all the Water Cooler Scenarios in the lesson."
+        "text": "Write your answers to all the Water Cooler Scenarios in the lesson.",
+        "respond": "task"
       }
     },
     {
@@ -948,24 +942,34 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 4,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Memorize and quote or write, at your next meeting, the 8 Steps of Discipleship as they are listed below.",
-          "Step #1 Become a Believer by trusting Jesus Christ as Savior from John 3:16.",
-          "Step #2 A disciple is in the Word of God every day from John 8:31.",
-          "Step #3 A disciple is in prayer to God every day from Luke 11:1.",
-          "Step #4 A disciple and discipler meet together every week from John 13:33-35.",
-          "Step #5 A disciple is faithful in a biblical local church from Ephesians 4:11-12",
-          "Step #6 A disciple is obedient to the Word of God and becomes a disciple maker from Luke 14:33.",
-          "Step #7 A discipler leads people to Christ and disciples them from John 15:8",
-          "Step #8 A discipler multiplies disciplers who multiply disciplers from John 15:16."
-        ]
+        "text": "Memorize and quote or write, at your next meeting, the 8 Steps of Discipleship as they are listed below.",
+        "parts": [
+          {
+            "text": "Step #1 Become a Believer by trusting Jesus Christ as Savior from John 3:16."
+          },
+          {
+            "text": "Step #2 A disciple is in the Word of God every day from John 8:31."
+          },
+          {
+            "text": "Step #3 A disciple is in prayer to God every day from Luke 11:1."
+          },
+          {
+            "text": "Step #4 A disciple and discipler meet together every week from John 13:33-35."
+          },
+          {
+            "text": "Step #5 A disciple is faithful in a biblical local church from Ephesians 4:11-12"
+          },
+          {
+            "text": "Step #6 A disciple is obedient to the Word of God and becomes a disciple maker from Luke 14:33."
+          },
+          {
+            "text": "Step #7 A discipler leads people to Christ and disciples them from John 15:8"
+          },
+          {
+            "text": "Step #8 A discipler multiplies disciplers who multiply disciplers from John 15:16."
+          }
+        ],
+        "respond": "task"
       }
     },
     {
@@ -973,18 +977,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 5,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Write your “prompting” phrases and your testimony on paper (following the plan given in this lesson) this",
-          "week and bring it to your Discipler at your next meeting. To get more resources for evangelism, go to",
-          "www.TheJourneyForum.com including the Spiritual Map and Gospel Tracts."
-        ]
+        "text": "Write your “prompting” phrases and your testimony on paper (following the plan given in this lesson) this week and bring it to your Discipler at your next meeting. To get more resources for evangelism, go to www.TheJourneyForum.com including the Spiritual Map and Gospel Tracts.",
+        "respond": "write"
       }
     },
     {

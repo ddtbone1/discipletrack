@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_pill.dart';
 import '../../../core/widgets/app_scaffold.dart';
@@ -11,6 +12,7 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/person_row.dart';
+import '../../ministry/application/ministry_providers.dart';
 import '../application/curriculum_providers.dart';
 import '../data/curriculum_repository.dart';
 import '../domain/lesson_content.dart';
@@ -23,7 +25,7 @@ import 'full_lesson_view.dart';
 /// Disciple tier as lettered sections, and the Discipler tier, when it is
 /// present, in its own group. It never decides access itself. Block types
 /// it does not know render nothing.
-class LessonReaderPage extends ConsumerWidget {
+class LessonReaderPage extends ConsumerStatefulWidget {
   const LessonReaderPage({
     required this.lessonId,
     this.forMembershipId,
@@ -34,7 +36,53 @@ class LessonReaderPage extends ConsumerWidget {
   final String? forMembershipId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LessonReaderPage> createState() => _LessonReaderPageState();
+}
+
+class _LessonReaderPageState extends ConsumerState<LessonReaderPage> {
+  /// For someone who is both a Disciple and a Discipler, reading their own
+  /// lesson: whether they chose to see the book's answers (ADR-021).
+  bool _showAnswers = false;
+  bool _checking = false;
+
+  Future<void> _check(LessonContent lesson, Workbook workbook) async {
+    final responses = {
+      for (final b in lesson.checkable)
+        b.blockId: workbook.blanksOf(b.blockId, b.blankCount),
+    }..removeWhere((_, v) => v.every((x) => x.isEmpty));
+    final messenger = ScaffoldMessenger.of(context);
+    if (responses.isEmpty) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Fill in some blanks first.')),
+      );
+      return;
+    }
+    setState(() => _checking = true);
+    try {
+      final results = await ref
+          .read(curriculumRepositoryProvider)
+          .checkAnswers(widget.lessonId, responses);
+      workbook.showResults(results);
+      final right = results.where((r) => r.result.correct).length;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            '$right of ${results.length} right. '
+            '${right == results.length ? 'Well done.' : 'The answers are shown under the others.'}',
+          ),
+        ),
+      );
+    } on CurriculumFailure catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+    } finally {
+      if (mounted) setState(() => _checking = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final lessonId = widget.lessonId;
+    final forMembershipId = widget.forMembershipId;
     final key = (lessonId: lessonId, forMembershipId: forMembershipId);
     final content = ref.watch(lessonContentProvider(key));
     final access = ref
@@ -42,6 +90,11 @@ class LessonReaderPage extends ConsumerWidget {
         .value
         ?.where((l) => l.lessonId == lessonId)
         .firstOrNull;
+    // Reading their own lesson as a Disciple; a Leader or Discipler who is
+    // not a Disciple reads the book with its answers (ADR-020).
+    final ownJourney =
+        forMembershipId == null &&
+        (ref.watch(myMinistryContextProvider).value?.isDisciple ?? false);
 
     return AppScaffold(
       title: access == null ? 'Lesson' : 'Lesson ${access.number}',
@@ -68,18 +121,77 @@ class LessonReaderPage extends ConsumerWidget {
                       onRetry: () => ref.invalidate(lessonContentProvider(key)),
                     ),
                   ),
-            data: (lesson) => LessonBody(
-              lesson: lesson,
-              access: access,
-              // Only the Disciple, in their own lesson, writes in it.
-              workbook: forMembershipId == null && !lesson.hasDisciplerTier
+            data: (full) {
+              final both = ownJourney && full.hasAnswers;
+              final lesson = both && !_showAnswers ? full.discipleView : full;
+              // Only the reader's own lesson, as a Disciple, is written in.
+              final workbook = forMembershipId == null && !lesson.hasAnswers
                   ? ref.watch(workbookProvider(lessonId)).value
-                  : null,
-            ),
+                  : null;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (both)
+                    _AnswersSwitch(
+                      value: _showAnswers,
+                      onChanged: (v) => setState(() => _showAnswers = v),
+                    ),
+                  LessonBody(
+                    lesson: lesson,
+                    access: access,
+                    workbook: workbook,
+                  ),
+                  if (workbook != null && lesson.checkable.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.lg),
+                    AppButton(
+                      label: 'Check my answers',
+                      icon: Icons.fact_check_outlined,
+                      isLoading: _checking,
+                      requiresConnection: true,
+                      offlineAction: 'check your answers',
+                      onPressed: () => _check(lesson, workbook),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Compares your blanks with the book. Nothing is '
+                      'graded or sent to anyone.',
+                      textAlign: TextAlign.center,
+                      style: context.captionStyle,
+                    ),
+                  ],
+                ],
+              );
+            },
           ),
           const SizedBox(height: AppSpacing.xl),
         ],
       ),
+    );
+  }
+}
+
+/// "Show answers": for a Disciple who is also a Discipler, in their own
+/// lesson.
+class _AnswersSwitch extends StatelessWidget {
+  const _AnswersSwitch({required this.value, required this.onChanged});
+
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            value ? 'Showing the answers' : 'Answer it yourself first',
+            style: context.supportingStyle,
+          ),
+        ),
+        Text('Show answers', style: context.captionStyle),
+        const SizedBox(width: AppSpacing.xs),
+        Switch(value: value, onChanged: onChanged),
+      ],
     );
   }
 }

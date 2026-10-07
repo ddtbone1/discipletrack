@@ -326,6 +326,52 @@ void main() {
     });
   });
 
+  group('checking blanks (Migration 020)', () {
+    Future<List<Map<String, dynamic>>> check(
+      SupabaseClient c,
+      Map<String, dynamic> responses,
+    ) async => (await c.rpc<List<dynamic>>(
+      'check_lesson_answers',
+      params: {'p_lesson_id': lesson(1), 'p_responses': responses},
+    )).cast<Map<String, dynamic>>();
+
+    test('the Disciple learns right or wrong and the answer, only for what '
+        'they wrote; nobody outside the lesson may ask', () async {
+      final fill = (await content(
+        p.disciple.user.client,
+        1,
+      )).firstWhere((r) => r['block_type'] == 'FILL_IN');
+      final id = fill['block_id'] as String;
+      expect(fill['answers'], isNull, reason: 'the read itself has no key');
+
+      final right = await check(p.disciple.user.client, {
+        id: ['  Loved! '],
+      });
+      expect(right.single['correct'], isTrue, reason: 'any accepted answer');
+      expect(right.single['answer'], 'loves');
+
+      final wrong = await check(p.disciple.user.client, {
+        id: ['hates'],
+      });
+      expect(wrong.single['correct'], isFalse);
+
+      expect(
+        await check(p.disciple.user.client, {
+          id: [''],
+        }),
+        isEmpty,
+        reason: 'an empty blank reveals nothing',
+      );
+
+      await expectLater(
+        check(plain.user.client, {
+          id: ['loves'],
+        }),
+        refused(),
+      );
+    });
+  });
+
   group('lesson covers', () {
     test('every active member of the church reads them, locked lessons '
         'included; nobody else, and never directly', () async {

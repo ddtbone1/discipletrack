@@ -177,6 +177,31 @@ class AuthRepository {
     });
   }
 
+  /// The signed-in person's email.
+  String? get currentEmail => _client.auth.currentUser?.email;
+
+  /// Confirms the signed-in person knows their password before an account
+  /// change: a fresh sign-in with it. A wrong password is
+  /// [AuthFailureCode.invalidCredentials].
+  Future<void> _confirmPassword(String password) async {
+    final email = currentEmail;
+    if (email == null) {
+      throw const AuthFailure('Sign in again to change your account.');
+    }
+    await _client.auth.signInWithPassword(email: email, password: password);
+  }
+
+  /// Changes the password, after confirming the current one.
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) {
+    return _guard(() async {
+      await _confirmPassword(currentPassword);
+      await _client.auth.updateUser(UserAttributes(password: newPassword));
+    });
+  }
+
   /// gotrue removes the local session before it tells the server, so the
   /// person is signed out on this device even when that call cannot get
   /// through. Only that transport failure is ignored; an offline sign-out
@@ -229,9 +254,19 @@ class AuthRepository {
           'A code was sent a moment ago. Wait a little before asking again.',
           code: AuthFailureCode.resendTooSoon,
         );
+      case 'same_password':
+        return const AuthFailure(
+          'Choose a password different from your current one.',
+          code: AuthFailureCode.weakPassword,
+        );
+      case 'email_exists':
+        return const AuthFailure(
+          'Another account already uses that email.',
+          code: AuthFailureCode.invalidEmail,
+        );
       case 'weak_password':
         return const AuthFailure(
-          'Password must be at least 6 characters.',
+          'Use at least 8 characters with an uppercase letter, a lowercase letter, a number and a symbol.',
           code: AuthFailureCode.weakPassword,
         );
       case 'validation_failed':

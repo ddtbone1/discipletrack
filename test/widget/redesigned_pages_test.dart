@@ -78,17 +78,16 @@ void main() {
   });
 
   group('ProfilePage', () {
-    testWidgets('hides "Joined church" when there is no join date', (
+    testWidgets('without a join date, member since is the account date', (
       tester,
     ) async {
       await pumpPage(tester, const ProfilePage(), church: null);
       await tester.pumpAndSettle();
-      expect(find.text('Joined church'), findsNothing);
-      expect(find.text('Account created'), findsOneWidget);
-      expect(find.text('Not in a church yet'), findsWidgets);
+      expect(find.text('Member since'), findsOneWidget);
+      expect(find.text('March 14, 2026'), findsOneWidget);
     });
 
-    testWidgets('shows the church join date separately from account creation', (
+    testWidgets('member since is the church join date when there is one', (
       tester,
     ) async {
       await pumpPage(
@@ -100,15 +99,24 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.text('Joined church'), findsOneWidget);
       expect(find.text('March 20, 2026'), findsOneWidget);
-      expect(find.text('March 14, 2026'), findsOneWidget);
     });
 
-    testWidgets('keeps the Edit profile action', (tester) async {
+    testWidgets('personal info, the account actions and the avatar', (
+      tester,
+    ) async {
       await pumpPage(tester, const ProfilePage());
       await tester.pumpAndSettle();
-      expect(find.text('Edit profile'), findsOneWidget);
+      expect(find.text('Personal info'), findsOneWidget);
+      expect(find.text('Edit'), findsOneWidget);
+      expect(find.text('member@example.com'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('Change password'), 200);
+      expect(find.text('Change password'), findsOneWidget);
+
+      await tester.ensureVisible(find.byIcon(Icons.edit_outlined));
+      await tester.tap(find.byIcon(Icons.edit_outlined));
+      await tester.pumpAndSettle();
+      expect(find.text('Choose an avatar'), findsOneWidget);
     });
 
     testWidgets('holds Sign out, which calls the repository', (tester) async {

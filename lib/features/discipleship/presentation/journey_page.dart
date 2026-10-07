@@ -64,6 +64,9 @@ class _JourneyPageState extends ConsumerState<JourneyPage>
           children: [
             TabBar(
               controller: _tabs,
+              // The active line spans the whole tab; no rule under the bar.
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
               tabs: const [
                 Tab(text: 'My Journey'),
                 Tab(text: 'My Disciples'),

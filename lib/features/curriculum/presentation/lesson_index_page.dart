@@ -128,21 +128,32 @@ class LessonCoverCard extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 if (cover != null)
-                  Image.memory(
-                    cover!,
-                    fit: BoxFit.cover,
-                    gaplessPlayback: true,
-                    color: open ? null : const Color(0x8C000000),
-                    colorBlendMode: open ? null : BlendMode.darken,
+                  // The photo is quietened so the card reads as one calm
+                  // surface (user, 2026-10-07): less colour, a little
+                  // darker, darker still when locked.
+                  ColorFiltered(
+                    colorFilter: ColorFilter.matrix(
+                      _muted(open ? 0.85 : 0.55, saturation: 0.7),
+                    ),
+                    child: Image.memory(
+                      cover!,
+                      fit: BoxFit.cover,
+                      gaplessPlayback: true,
+                    ),
                   ),
-                // Keeps the words readable on any photo.
+                // A soft veil over the whole photo and a deep shade at the
+                // foot, where the words sit.
                 const DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      stops: [0.2, 1],
-                      colors: [Color(0x00000000), Color(0xE0000000)],
+                      stops: [0, 0.45, 1],
+                      colors: [
+                        Color(0x26000000),
+                        Color(0x4D000000),
+                        Color(0xEB000000),
+                      ],
                     ),
                   ),
                 ),
@@ -193,4 +204,17 @@ class LessonCoverCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A colour matrix that scales brightness and saturation.
+List<double> _muted(double brightness, {required double saturation}) {
+  const r = 0.2126, g = 0.7152, b = 0.0722;
+  final s = saturation;
+  final k = brightness;
+  return [
+    k * (r + (1 - r) * s), k * (g - g * s), k * (b - b * s), 0, 0, //
+    k * (r - r * s), k * (g + (1 - g) * s), k * (b - b * s), 0, 0, //
+    k * (r - r * s), k * (g - g * s), k * (b + (1 - b) * s), 0, 0, //
+    0, 0, 0, 1, 0,
+  ];
 }

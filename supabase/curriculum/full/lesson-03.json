@@ -484,7 +484,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain 1st Corinthians 6:17?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -492,7 +493,8 @@
       "tier": "DISCIPLE",
       "section": "A",
       "body": {
-        "text": "Here’s a “water cooler” scenario: If your neighbor asks you, “What about those who never hear about Jesus? What will happen to them?” How would you respond?"
+        "text": "Here’s a “water cooler” scenario: If your neighbor asks you, “What about those who never hear about Jesus? What will happen to them?” How would you respond?",
+        "respond": "write"
       }
     },
     {
@@ -782,7 +784,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Matthew 6:7?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -790,7 +793,8 @@
       "tier": "DISCIPLE",
       "section": "B",
       "body": {
-        "text": "Here’s a “water cooler” scenario: Your co-worker says to you, “I prayed for a promotion and I didn’t get it. I thought prayer worked.” How would you respond to them?"
+        "text": "Here’s a “water cooler” scenario: Your co-worker says to you, “I prayed for a promotion and I didn’t get it. I thought prayer worked.” How would you respond to them?",
+        "respond": "write"
       }
     },
     {
@@ -1114,17 +1118,7 @@
       "section": "C",
       "body": {
         "number": 4,
-        "text": "A disciple and discipler meet together every week from John 13:33-35."
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "section": "C",
-      "body": {
-        "items": [
-          "There are a total of eight Steps of Discipleship to help us reach the Destinations of Spiritual Formation."
-        ]
+        "text": "A disciple and discipler meet together every week from John 13:33-35.\n\nThere are a total of eight Steps of Discipleship to help us reach the Destinations of Spiritual Formation."
       }
     },
     {
@@ -1149,7 +1143,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Romans 12:1-2?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -1157,7 +1152,8 @@
       "tier": "DISCIPLE",
       "section": "C",
       "body": {
-        "text": "Here’s a “water cooler” scenario: A person you work with asks you, “Why did my mother die from cancer?” How would you respond?"
+        "text": "Here’s a “water cooler” scenario: A person you work with asks you, “Why did my mother die from cancer?” How would you respond?",
+        "respond": "write"
       }
     },
     {
@@ -1240,20 +1236,7 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 1,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Now your assignment is to read, write and say the Gospel according to Mark. You should have",
-          "finished writing 1st John in your Daily in the Word by now. Building God’s Word in your life makes a",
-          "permanent difference. This book was written by a disciple of Jesus Christ. Read, write and say at least",
-          "3 to 5 verses everyday. If you want to do more, that’s awesome. You can see a writing plan on the",
-          "following pages."
-        ]
+        "text": "Now your assignment is to read, write and say the Gospel according to Mark. You should have finished writing 1st John in your Daily in the Word by now. Building God’s Word in your life makes a permanent difference. This book was written by a disciple of Jesus Christ. Read, write and say at least 3 to 5 verses everyday. If you want to do more, that’s awesome. You can see a writing plan on the following pages."
       }
     },
     {
@@ -1261,38 +1244,82 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "What should my prayer requests be? In order to grow in prayer, keep a list of prayer requests in the",
-          "Prayer section of your notebook to see how God is working. Write the requests you have for others and",
-          "yourself and write down the answers when they come. Here is your assignment: look up the verses",
-          "below this week. Find the prayer request(s) in the verses. Bring your answers to your Discipler at the",
-          "next meeting and use them as prayer requests in your prayer time:",
-          "2nd Chronicles 16:12",
-          "Psalms 19:14",
-          "Psalms 34:4",
-          "Psalms 37:5",
-          "Psalms 51:2,10",
-          "Psalms 119:18, 34, 133",
-          "Matthew 5:44",
-          "Matthew 6:11",
-          "Matthew 9:37-38",
-          "Matthew 26:41",
-          "Acts 4:29",
-          "Romans 15:30",
-          "Ephesians 6:19-20",
-          "2nd Thessalonians 3:1",
-          "1st Timothy 2:1-4",
-          "James 1:5",
-          "James 5:14",
-          "1st Peter 5:7"
-        ]
+        "text": "What should my prayer requests be? In order to grow in prayer, keep a list of prayer requests in the Prayer section of your notebook to see how God is working. Write the requests you have for others and yourself and write down the answers when they come. Here is your assignment: look up the verses below this week. Find the prayer request(s) in the verses. Bring your answers to your Discipler at the next meeting and use them as prayer requests in your prayer time:",
+        "parts": [
+          {
+            "text": "2nd Chronicles 16:12",
+            "respond": "write"
+          },
+          {
+            "text": "Psalms 19:14",
+            "respond": "write"
+          },
+          {
+            "text": "Psalms 34:4",
+            "respond": "write"
+          },
+          {
+            "text": "Psalms 37:5",
+            "respond": "write"
+          },
+          {
+            "text": "Psalms 51:2,10",
+            "respond": "write"
+          },
+          {
+            "text": "Psalms 119:18, 34, 133",
+            "respond": "write"
+          },
+          {
+            "text": "Matthew 5:44",
+            "respond": "write"
+          },
+          {
+            "text": "Matthew 6:11",
+            "respond": "write"
+          },
+          {
+            "text": "Matthew 9:37-38",
+            "respond": "write"
+          },
+          {
+            "text": "Matthew 26:41",
+            "respond": "write"
+          },
+          {
+            "text": "Acts 4:29",
+            "respond": "write"
+          },
+          {
+            "text": "Romans 15:30",
+            "respond": "write"
+          },
+          {
+            "text": "Ephesians 6:19-20",
+            "respond": "write"
+          },
+          {
+            "text": "2nd Thessalonians 3:1",
+            "respond": "write"
+          },
+          {
+            "text": "1st Timothy 2:1-4",
+            "respond": "write"
+          },
+          {
+            "text": "James 1:5",
+            "respond": "write"
+          },
+          {
+            "text": "James 5:14",
+            "respond": "write"
+          },
+          {
+            "text": "1st Peter 5:7",
+            "respond": "write"
+          }
+        ],
+        "respond": "write"
       }
     },
     {
@@ -1300,42 +1327,73 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 3,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Begin to memorize all the Bible verses below. They are all verses that will help you witness and",
-          "share the Gospel with others. Your goal is to know them by Lesson Nine. Quote or write new verses",
-          "each time you meet with your Discipler and review what you have already learned.",
-          "Genesis 1:1",
-          "Ephesians 2:4",
-          "See a video",
-          "message",
-          "1st John 5:7",
-          "Isaiah 14:12-15",
-          "Matthew 25:41",
-          "Genesis 1:26-27",
-          "Genesis 2:16-17",
-          "Romans 5:12",
-          "10 Commandments",
-          "John 11:43-44",
-          "John 11:25-26",
-          "John 14:6",
-          "John 10:28",
-          "Mark 8:36",
-          "Luke 5:20",
-          "Luke 7:48",
-          "John 3:16",
-          "1st Cor. 15:3-6",
-          "John 3:36",
-          "Revelation 20:15",
-          "John 20:31",
-          "Romans 10:13"
-        ]
+        "text": "Begin to memorize all the Bible verses below. They are all verses that will help you witness and share the Gospel with others. Your goal is to know them by Lesson Nine. Quote or write new verses each time you meet with your Discipler and review what you have already learned.",
+        "parts": [
+          {
+            "text": "Genesis 1:1"
+          },
+          {
+            "text": "Ephesians 2:4 See a video message"
+          },
+          {
+            "text": "1st John 5:7"
+          },
+          {
+            "text": "Isaiah 14:12-15"
+          },
+          {
+            "text": "Matthew 25:41"
+          },
+          {
+            "text": "Genesis 1:26-27"
+          },
+          {
+            "text": "Genesis 2:16-17"
+          },
+          {
+            "text": "Romans 5:12 10 Commandments"
+          },
+          {
+            "text": "John 11:43-44"
+          },
+          {
+            "text": "John 11:25-26"
+          },
+          {
+            "text": "John 14:6"
+          },
+          {
+            "text": "John 10:28"
+          },
+          {
+            "text": "Mark 8:36"
+          },
+          {
+            "text": "Luke 5:20"
+          },
+          {
+            "text": "Luke 7:48"
+          },
+          {
+            "text": "John 3:16"
+          },
+          {
+            "text": "1st Cor. 15:3-6"
+          },
+          {
+            "text": "John 3:36"
+          },
+          {
+            "text": "Revelation 20:15"
+          },
+          {
+            "text": "John 20:31"
+          },
+          {
+            "text": "Romans 10:13"
+          }
+        ],
+        "respond": "task"
       }
     },
     {
@@ -1343,37 +1401,68 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 4,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Answer the questions for Lesson 3 below on a separate piece of paper and bring them to your",
-          "next meeting:",
-          "",
-          "A.",
-          "What are some things we know about God",
-          "from praying?",
-          "B. Why should you pray?",
-          "C. How should you pray?",
-          "D. What does the Bible teach about idols?",
-          "E. When should you pray?",
-          "F. How will your prayers be answered?",
-          "G. What is your plan for prayer?",
-          "H. What does the Lord’s Prayer teach you?",
-          "I.",
-          "What keeps your prayers from being",
-          "answered?",
-          "J. How does God see your sin after salvation?",
-          "K.",
-          "Why should you be in the Word of God",
-          "everyday?",
-          "L.",
-          "Write your answers to every Water Cooler",
-          "Scenario in this lesson."
+        "text": "Answer the questions for Lesson 3 below on a separate piece of paper and bring them to your next meeting:",
+        "parts": [
+          {
+            "label": "A.",
+            "text": "What are some things we know about God from praying?",
+            "respond": "write"
+          },
+          {
+            "label": "B.",
+            "text": "Why should you pray?",
+            "respond": "write"
+          },
+          {
+            "label": "C.",
+            "text": "How should you pray?",
+            "respond": "write"
+          },
+          {
+            "label": "D.",
+            "text": "What does the Bible teach about idols?",
+            "respond": "write"
+          },
+          {
+            "label": "E.",
+            "text": "When should you pray?",
+            "respond": "write"
+          },
+          {
+            "label": "F.",
+            "text": "How will your prayers be answered?",
+            "respond": "write"
+          },
+          {
+            "label": "G.",
+            "text": "What is your plan for prayer?",
+            "respond": "write"
+          },
+          {
+            "label": "H.",
+            "text": "What does the Lord’s Prayer teach you?",
+            "respond": "write"
+          },
+          {
+            "label": "I.",
+            "text": "What keeps your prayers from being answered?",
+            "respond": "write"
+          },
+          {
+            "label": "J.",
+            "text": "How does God see your sin after salvation?",
+            "respond": "write"
+          },
+          {
+            "label": "K.",
+            "text": "Why should you be in the Word of God everyday?",
+            "respond": "write"
+          },
+          {
+            "label": "L.",
+            "text": "Write your answers to every Water Cooler Scenario in this lesson.",
+            "respond": "task"
+          }
         ]
       }
     },
@@ -1399,10 +1488,205 @@
       }
     },
     {
-      "type": "PARAGRAPH",
+      "type": "LIST",
       "tier": "DISCIPLE",
       "body": {
-        "text": "Date Date Date Mark 1:1-4 Mark 4:1-4 Mark 6:30-31 Mark 1: 5-8 Mark 4:5-9 Mark 6:32-34 Mark 1:9-11 Mark 4:10-12 Mark 6:35-38 Mark 1:12-15 Mark 4:13-15 Mark 6:39-40 Mark 1:16-20 Mark 4:16-20 Mark 6:41-44 Mark 1:21-25 Mark 4:21-25 Mark 6:45-46 Mark 1:26-28 Mark 4:26-29 Mark 6:47-50 Mark 1:29-31 Mark 4:30-35 Mark 6:51-52 Mark 1:32-34 Mark 4:36-41 Mark 6:53-56 Mark 1:35-39 Mark 5:1-4 Mark 7:1-4 Mark 1:40-42 Mark 5:5-9 Mark 7:5-8 Mark 1:43-45 Mark 5:10-13 Mark 7:9-13 Mark 2:1-3 Mark 5:14-17 Mark 7:14-16 Mark 2:4-8 Mark 5:18-20 Mark 7:17-20 Mark 2:9-13 Mark 5:21-24 Mark 7:21-23 Mark 2:14-17 Mark 5:25-29 Mark 7:24-26 Mark 2:18-20 Mark 5:30-34 Mark 7:27-30 Mark 2:21-22 Mark 5:35-37 Mark 7:31-34 Mark 2:23-28 Mark 5:38-40 Mark 7:35-37 Mark 3:1-4 Mark 5:41-43 Mark 8:1-3 Mark 3:5-8 Mark 6:1-4 Mark 8:4-9 Mark 3:9-12 Mark 6:5-6 Mark 8:10-13 Mark 3:13-15 Mark 6:7-9 Mark 8:14-18 Mark 3:16-19 Mark 6:10-13 Mark 8:19-21 Mark 3:20-22 Mark 6:14-16 Mark 8:22-26 Mark 3:23-25 Mark 6:17-20 Mark 8:27-29 Mark 3:26-30 Mark 6:21-24 Mark 8:30-33 Mark 3:31-35 Mark 6:25-29 Mark 8:34-38 See a video message Date Date Date Mark 9:1-3 Mark 12:1-3 Mark 14:41-42 Mark 9:4-7 Mark 12:4-8 Mark 14:43-45 Mark 9:8-10 Mark 12:9-12 Mark 14:46-47 Mark 9:11-13 Mark 12:13-17 Mark 14:48-52 Mark 9:14-18 Mark 12:18-22 Mark 14:53-55 Mark 9:19-23 Mark 12:23-27 Mark 14:56-59 Mark 9:24-27 Mark 12:28-31 Mark 14:60-62 Mark 9:28-29 Mark 12:32-34 Mark 14:63-65 Mark 9:30-32 Mark 12:35-37 Mark 14:66-68 Mark 9:33-37 Mark 12:38-40 Mark 14:69-72 Mark 9:38-41 Mark 12:41-44 Mark 15:1-3 Mark 9:42-46 Mark 13:1-2 Mark 15:4-6 Mark 9:47-50 Mark 13:3-6 Mark 15:7-10 Mark 10:1-5 Mark 13:7-9 Mark 15:11-14 Mark 10:6-9 Mark 13:10-13 Mark 15:15-18 Mark 10:10-12 Mark 13:14-17 Mark 15:19-22 Mark 10:13-16 Mark 13:18-20 Mark 15:23-25 Mark 10:17-18 Mark 13:21-23 Mark 15:26-28 Mark 10:19-22 Mark 13:24-27 Mark 15:29-31 Mark 10:23-27 Mark 13:28-31 Mark 15:32-35 Mark 10:28-31 Mark 13:32-34 Mark 15:36-38 Mark 10:32-34 Mark 13:34-37 Mark 15:39-41 Mark 10:35-40 Mark 14:1-2 Mark 15:42-44 Mark 10:41-45 Mark 14:3-5 Mark 15:45-47 Mark 10:46-48 Mark 14:6-9 Mark 16:1-4 Mark 10:49-52 Mark 14:10-11 Mark 16:5-6 Mark 11:1-4 Mark 14:12-16 Mark:16:7-8 Mark 11:5-10 Mark 14:17-21 Mark 16:9-11 Mark 11:11-14 Mark 14:22-25 Mark 16:12-13 Mark 11:15-18 Mark 14:26-28 Mark 16:14-16 Mark 11:19-21 Mark 14:29-31 Mark 16:17-18 Mark 11:22-26 Mark 14:32-34 Mark 16:19-20 Mark 11:27-31 Mark 14:35-38 Mark 11:32-33 Mark 14:39-40"
+        "items": [
+          "Mark 1:1-4",
+          "Mark 1: 5-8",
+          "Mark 1:9-11",
+          "Mark 1:12-15",
+          "Mark 1:16-20",
+          "Mark 1:21-25",
+          "Mark 1:26-28",
+          "Mark 1:29-31",
+          "Mark 1:32-34",
+          "Mark 1:35-39",
+          "Mark 1:40-42",
+          "Mark 1:43-45",
+          "Mark 2:1-3",
+          "Mark 2:4-8",
+          "Mark 2:9-13",
+          "Mark 2:14-17",
+          "Mark 2:18-20",
+          "Mark 2:21-22",
+          "Mark 2:23-28",
+          "Mark 3:1-4",
+          "Mark 3:5-8",
+          "Mark 3:9-12",
+          "Mark 3:13-15",
+          "Mark 3:16-19",
+          "Mark 3:20-22",
+          "Mark 3:23-25",
+          "Mark 3:26-30",
+          "Mark 3:31-35",
+          "Mark 4:1-4",
+          "Mark 4:5-9",
+          "Mark 4:10-12",
+          "Mark 4:13-15",
+          "Mark 4:16-20",
+          "Mark 4:21-25",
+          "Mark 4:26-29",
+          "Mark 4:30-35",
+          "Mark 4:36-41",
+          "Mark 5:1-4",
+          "Mark 5:5-9",
+          "Mark 5:10-13",
+          "Mark 5:14-17",
+          "Mark 5:18-20",
+          "Mark 5:21-24",
+          "Mark 5:25-29",
+          "Mark 5:30-34",
+          "Mark 5:35-37",
+          "Mark 5:38-40",
+          "Mark 5:41-43",
+          "Mark 6:1-4",
+          "Mark 6:5-6",
+          "Mark 6:7-9",
+          "Mark 6:10-13",
+          "Mark 6:14-16",
+          "Mark 6:17-20",
+          "Mark 6:21-24",
+          "Mark 6:25-29",
+          "Mark 6:30-31",
+          "Mark 6:32-34",
+          "Mark 6:35-38",
+          "Mark 6:39-40",
+          "Mark 6:41-44",
+          "Mark 6:45-46",
+          "Mark 6:47-50",
+          "Mark 6:51-52",
+          "Mark 6:53-56",
+          "Mark 7:1-4",
+          "Mark 7:5-8",
+          "Mark 7:9-13",
+          "Mark 7:14-16",
+          "Mark 7:17-20",
+          "Mark 7:21-23",
+          "Mark 7:24-26",
+          "Mark 7:27-30",
+          "Mark 7:31-34",
+          "Mark 7:35-37",
+          "Mark 8:1-3",
+          "Mark 8:4-9",
+          "Mark 8:10-13",
+          "Mark 8:14-18",
+          "Mark 8:19-21",
+          "Mark 8:22-26",
+          "Mark 8:27-29",
+          "Mark 8:30-33",
+          "Mark 8:34-38",
+          "Mark 9:1-3",
+          "Mark 9:4-7",
+          "Mark 9:8-10",
+          "Mark 9:11-13",
+          "Mark 9:14-18",
+          "Mark 9:19-23",
+          "Mark 9:24-27",
+          "Mark 9:28-29",
+          "Mark 9:30-32",
+          "Mark 9:33-37",
+          "Mark 9:38-41",
+          "Mark 9:42-46",
+          "Mark 9:47-50",
+          "Mark 10:1-5",
+          "Mark 10:6-9",
+          "Mark 10:10-12",
+          "Mark 10:13-16",
+          "Mark 10:17-18",
+          "Mark 10:19-22",
+          "Mark 10:23-27",
+          "Mark 10:28-31",
+          "Mark 10:32-34",
+          "Mark 10:35-40",
+          "Mark 10:41-45",
+          "Mark 10:46-48",
+          "Mark 10:49-52",
+          "Mark 11:1-4",
+          "Mark 11:5-10",
+          "Mark 11:11-14",
+          "Mark 11:15-18",
+          "Mark 11:19-21",
+          "Mark 11:22-26",
+          "Mark 11:27-31",
+          "Mark 11:32-33",
+          "Mark 12:1-3",
+          "Mark 12:4-8",
+          "Mark 12:9-12",
+          "Mark 12:13-17",
+          "Mark 12:18-22",
+          "Mark 12:23-27",
+          "Mark 12:28-31",
+          "Mark 12:32-34",
+          "Mark 12:35-37",
+          "Mark 12:38-40",
+          "Mark 12:41-44",
+          "Mark 13:1-2",
+          "Mark 13:3-6",
+          "Mark 13:7-9",
+          "Mark 13:10-13",
+          "Mark 13:14-17",
+          "Mark 13:18-20",
+          "Mark 13:21-23",
+          "Mark 13:24-27",
+          "Mark 13:28-31",
+          "Mark 13:32-34",
+          "Mark 13:34-37",
+          "Mark 14:1-2",
+          "Mark 14:3-5",
+          "Mark 14:6-9",
+          "Mark 14:10-11",
+          "Mark 14:12-16",
+          "Mark 14:17-21",
+          "Mark 14:22-25",
+          "Mark 14:26-28",
+          "Mark 14:29-31",
+          "Mark 14:32-34",
+          "Mark 14:35-38",
+          "Mark 14:39-40",
+          "Mark 14:41-42",
+          "Mark 14:43-45",
+          "Mark 14:46-47",
+          "Mark 14:48-52",
+          "Mark 14:53-55",
+          "Mark 14:56-59",
+          "Mark 14:60-62",
+          "Mark 14:63-65",
+          "Mark 14:66-68",
+          "Mark 14:69-72",
+          "Mark 15:1-3",
+          "Mark 15:4-6",
+          "Mark 15:7-10",
+          "Mark 15:11-14",
+          "Mark 15:15-18",
+          "Mark 15:19-22",
+          "Mark 15:23-25",
+          "Mark 15:26-28",
+          "Mark 15:29-31",
+          "Mark 15:32-35",
+          "Mark 15:36-38",
+          "Mark 15:39-41",
+          "Mark 15:42-44",
+          "Mark 15:45-47",
+          "Mark 16:1-4",
+          "Mark 16:5-6",
+          "Mark:16:7-8",
+          "Mark 16:9-11",
+          "Mark 16:12-13",
+          "Mark 16:14-16",
+          "Mark 16:17-18",
+          "Mark 16:19-20"
+        ],
+        "field": "Date",
+        "fieldWords": [
+          "Date",
+          "Date",
+          "Date",
+          "Date",
+          "Date",
+          "Date"
+        ],
+        "note": "See a video message"
       }
     }
   ]

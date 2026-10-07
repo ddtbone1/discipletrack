@@ -18,6 +18,7 @@ import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/role_badge.dart';
 import '../../discipleship/application/discipleship_providers.dart';
 import '../../discipleship/domain/disciple_progress_summary.dart';
+import '../../profile/presentation/member_avatar.dart';
 import '../application/ministry_providers.dart';
 import '../application/ministry_structure_controller.dart';
 import '../domain/d_group_detail.dart';
@@ -304,7 +305,10 @@ class _DetailBodyState extends ConsumerState<_DetailBody> {
             name: leader?.fullName ?? 'No Leader',
             leading: leader == null
                 ? null
-                : InitialsAvatar(name: leader.fullName),
+                : MemberAvatar(
+                    name: leader.fullName,
+                    membershipId: leader.churchMembershipId,
+                  ),
             detail: leader?.phone,
             pills: [
               if (leader != null) ...const [
@@ -648,7 +652,10 @@ class _MemberRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            InitialsAvatar(name: person.fullName),
+            MemberAvatar(
+              name: person.fullName,
+              membershipId: person.churchMembershipId,
+            ),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(

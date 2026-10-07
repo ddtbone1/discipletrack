@@ -373,6 +373,7 @@ Future<void> pumpPage(
     ProviderScope(
       overrides: [
         currentUserIdProvider.overrideWithValue(userId),
+        currentUserEmailProvider.overrideWithValue('member@example.com'),
         // No platform plugin in widget tests; the store has its own tests.
         offlineSnapshotStoreProvider.overrideWithValue(
           OfflineSnapshotStore(enabled: false),

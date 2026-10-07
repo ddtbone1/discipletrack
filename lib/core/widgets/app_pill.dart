@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import 'avatar_art.dart';
 import '../theme/app_spacing.dart';
 
 /// The colours pills, avatars, steps and progress may use: the brand theme
@@ -177,12 +178,21 @@ class InitialsAvatar extends StatelessWidget {
     this.radius = 20,
     this.background,
     this.foreground,
+    this.progress,
+    this.preset,
     super.key,
   });
+
+  /// The member's picked avatar ("preset:n"), shown instead of initials.
+  final String? preset;
 
   final String name;
   final PillTone? tone;
   final double radius;
+
+  /// Lessons completed out of the curriculum (0 to 1), drawn as a lime ring
+  /// around the avatar; null for no ring.
+  final double? progress;
 
   /// Overrides the tone, for avatars on a coloured card.
   final Color? background;
@@ -196,14 +206,41 @@ class InitialsAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (bg, fg) = pillColors(context, tone ?? toneForName(name));
+    final asset = presetAvatarAsset(preset);
+    final avatar = asset != null
+        ? PresetAvatar(asset: asset, size: radius * 2)
+        : CircleAvatar(
+            radius: radius,
+            backgroundColor: background ?? bg,
+            foregroundColor: foreground ?? fg,
+            child: Text(
+              initialsOf(name),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: radius * 0.7,
+              ),
+            ),
+          );
+    final value = progress;
+    if (value == null) return ExcludeSemantics(child: avatar);
+    const stroke = 3.0;
     return ExcludeSemantics(
-      child: CircleAvatar(
-        radius: radius,
-        backgroundColor: background ?? bg,
-        foregroundColor: foreground ?? fg,
-        child: Text(
-          initialsOf(name),
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: radius * 0.7),
+      child: SizedBox.square(
+        dimension: radius * 2 + stroke * 2 + 4,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned.fill(
+              child: CircularProgressIndicator(
+                value: value.clamp(0.0, 1.0),
+                strokeWidth: stroke,
+                strokeCap: StrokeCap.round,
+                color: progressColor(context),
+                backgroundColor: neutralFill(context),
+              ),
+            ),
+            avatar,
+          ],
         ),
       ),
     );

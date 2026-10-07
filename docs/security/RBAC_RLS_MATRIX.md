@@ -1558,6 +1558,18 @@ get_lesson_content(), list_lesson_access(), get_my_readable_content()
   for the device copy; the app replaces the copy on each refresh and
   clears it on sign-out
 
+get_church_avatars() (Migration 021)
+→ an ACTIVE member; returns the avatar key of each ACTIVE member of their
+  own church who chose one; nothing else about the person
+→ profiles.avatar_url is written only by the person (profiles_update_own)
+
+check_lesson_answers() (Migration 020, ADR-021 decision 7)
+→ any caller who may read the lesson's Disciple tier in their own context
+  (private.can_read_lesson_tier(lesson, 'DISCIPLE', null)); PT403 otherwise
+→ returns, only for blanks the caller wrote in, whether each is right and
+  the book's answer; blanks of Disciple-tier blocks of the current
+  publication only; nothing is stored
+
 get_lesson_covers(), set_lesson_cover() (Migration 019, ADR-019
 decision 17)
 → get_lesson_covers(): any ACTIVE member, the covers of their church's

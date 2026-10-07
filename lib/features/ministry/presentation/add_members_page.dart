@@ -7,12 +7,13 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
-import '../../../core/widgets/app_pill.dart';
+import '../../../core/widgets/app_text_link.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
+import '../../profile/presentation/member_avatar.dart';
 import '../application/ministry_providers.dart';
 import '../application/ministry_structure_controller.dart';
 import '../domain/d_group_placement.dart';
@@ -263,13 +264,12 @@ class _MemberTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final p = context.palette;
     final joined = member.joinedAt;
     return Semantics(
       selected: selected,
       button: true,
       child: Material(
-        color: selected ? p.brand.withValues(alpha: 0.16) : Colors.transparent,
+        color: Colors.transparent,
         child: InkWell(
           onTap: enabled ? onTap : null,
           child: Padding(
@@ -279,23 +279,9 @@ class _MemberTile extends StatelessWidget {
             ),
             child: Row(
               children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 150),
-                  child: selected
-                      ? CircleAvatar(
-                          key: const ValueKey('on'),
-                          radius: 20,
-                          backgroundColor: p.brand,
-                          child: Icon(
-                            Icons.check_rounded,
-                            color: p.onBrand,
-                            size: 22,
-                          ),
-                        )
-                      : InitialsAvatar(
-                          key: const ValueKey('off'),
-                          name: member.fullName,
-                        ),
+                MemberAvatar(
+                  name: member.fullName,
+                  membershipId: member.churchMembershipId,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
@@ -360,34 +346,38 @@ class _SelectionBar extends StatelessWidget {
           AppSpacing.page,
           AppSpacing.sm,
         ),
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              child: count == 0
-                  ? Text('No one chosen yet', style: context.supportingStyle)
-                  : Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            '$count chosen',
-                            style: Theme.of(context).textTheme.titleSmall,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: enabled ? onClear : null,
-                          child: const Text('Clear'),
-                        ),
-                      ],
-                    ),
-            ),
+            // Grey until someone is chosen.
             AppButton(
-              label: count <= 1 ? 'Add' : 'Add $count',
+              label: count == 0
+                  ? 'Add to group'
+                  : count == 1
+                  ? 'Add 1 member'
+                  : 'Add $count members',
               icon: Icons.person_add_alt_1_rounded,
               requiresConnection: true,
-              expand: false,
               isLoading: busy,
               onPressed: count == 0 || !enabled ? null : onAdd,
             ),
+            const SizedBox(height: 4),
+            if (count == 0)
+              Text(
+                'Tick the people to add',
+                textAlign: TextAlign.center,
+                style: context.captionStyle,
+              )
+            else
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('$count chosen', style: context.captionStyle),
+                  const Text('  ·  '),
+                  AppTextLink(label: 'Clear', onTap: enabled ? onClear : null),
+                ],
+              ),
           ],
         ),
       ),

@@ -292,7 +292,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Ephesians 6:13-18?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -300,7 +301,8 @@
       "tier": "DISCIPLE",
       "section": "A",
       "body": {
-        "text": "Here’s a “water cooler” scenario: A neighbor says to you, “There are so many religions in the world, how can anyone know which one is right?” What would you say?"
+        "text": "Here’s a “water cooler” scenario: A neighbor says to you, “There are so many religions in the world, how can anyone know which one is right?” What would you say?",
+        "respond": "write"
       }
     },
     {
@@ -466,7 +468,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Romans 14:10?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -474,7 +477,8 @@
       "tier": "DISCIPLE",
       "section": "B",
       "body": {
-        "text": "Here’s a “water cooler” scenario: A family member tells you he’s leaving his wife of 15 years to be with a man so he doesn’t have to live a lie anymore. How do you respond?"
+        "text": "Here’s a “water cooler” scenario: A family member tells you he’s leaving his wife of 15 years to be with a man so he doesn’t have to live a lie anymore. How do you respond?",
+        "respond": "write"
       }
     },
     {
@@ -595,7 +599,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 1,
-        "text": "With your Discipler, complete the Discipleship Training Module(s) on the following pages."
+        "text": "With your Discipler, complete the Discipleship Training Module(s) on the following pages.",
+        "respond": "task"
       }
     },
     {
@@ -603,22 +608,40 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": "Pick 5 or more of the verses below and explain what they mean on a separate sheet of paper:"
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "2nd Timothy 2:3",
-          "Ephesians 6:12",
-          "James 4:7",
-          "1st John 2:14",
-          "1st John 4:4",
-          "Ephesians 6:13-18",
-          "2nd Corinthians 5:10",
-          "1st Corinthians 3:13-15"
+        "text": "Pick 5 or more of the verses below and explain what they mean on a separate sheet of paper:",
+        "parts": [
+          {
+            "text": "2nd Timothy 2:3",
+            "respond": "write"
+          },
+          {
+            "text": "Ephesians 6:12",
+            "respond": "write"
+          },
+          {
+            "text": "James 4:7",
+            "respond": "write"
+          },
+          {
+            "text": "1st John 2:14",
+            "respond": "write"
+          },
+          {
+            "text": "1st John 4:4",
+            "respond": "write"
+          },
+          {
+            "text": "Ephesians 6:13-18",
+            "respond": "write"
+          },
+          {
+            "text": "2nd Corinthians 5:10",
+            "respond": "write"
+          },
+          {
+            "text": "1st Corinthians 3:13-15",
+            "respond": "write"
+          }
         ]
       }
     },
@@ -627,7 +650,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 3,
-        "text": "Draw and label this chart on your own paper."
+        "text": "Draw and label this chart on your own paper.",
+        "respond": "task"
       }
     },
     {
@@ -661,21 +685,28 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 4,
-        "text": "Memorize and quote or write the Steps of Discipleship as listed below at your next meeting"
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Step #1 Become a Believer by trusting Jesus Christ as Savior from John 3:16.",
-          "Step #2 A disciple is in the Word of God every day from John 8:31.",
-          "Step #3 A disciple is in prayer to God every day from Luke 11:1.",
-          "Step #4 A disciple and discipler meet together every week from John 13:33-35.",
-          "Step #5 A disciple is faithful in a biblical local church from Ephesians 4:11-12.",
-          "Step #6 A disciple is obedient to the Word of God and becomes a disciple maker from Luke 14:33."
-        ]
+        "text": "Memorize and quote or write the Steps of Discipleship as listed below at your next meeting",
+        "parts": [
+          {
+            "text": "Step #1 Become a Believer by trusting Jesus Christ as Savior from John 3:16."
+          },
+          {
+            "text": "Step #2 A disciple is in the Word of God every day from John 8:31."
+          },
+          {
+            "text": "Step #3 A disciple is in prayer to God every day from Luke 11:1."
+          },
+          {
+            "text": "Step #4 A disciple and discipler meet together every week from John 13:33-35."
+          },
+          {
+            "text": "Step #5 A disciple is faithful in a biblical local church from Ephesians 4:11-12."
+          },
+          {
+            "text": "Step #6 A disciple is obedient to the Word of God and becomes a disciple maker from Luke 14:33."
+          }
+        ],
+        "respond": "write"
       }
     },
     {
@@ -683,7 +714,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 5,
-        "text": "Write your answers to all the Water Cooler Scenarios in the lesson."
+        "text": "Write your answers to all the Water Cooler Scenarios in the lesson.",
+        "respond": "task"
       }
     },
     {

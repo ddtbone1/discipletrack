@@ -24,6 +24,7 @@ import '../features/onboarding/presentation/join_church_page.dart';
 import '../features/onboarding/presentation/no_access_page.dart';
 import '../features/onboarding/presentation/pending_approval_page.dart';
 import '../features/onboarding/presentation/welcome_page.dart';
+import '../features/profile/presentation/account_pages.dart';
 import '../features/profile/presentation/edit_profile_page.dart';
 import '../features/profile/presentation/profile_page.dart';
 import '../features/session/application/session_state.dart';
@@ -166,6 +167,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: Routes.editProfile,
             pageBuilder: (c, s) =>
                 buildPage(state: s, child: const EditProfilePage()),
+          ),
+          GoRoute(
+            path: Routes.changePassword,
+            pageBuilder: (c, s) =>
+                buildPage(state: s, child: const ChangePasswordPage()),
           ),
           GoRoute(
             path: Routes.pendingMembers,

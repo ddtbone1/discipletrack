@@ -107,6 +107,25 @@ class ContentBlock {
     for (final a in answers ?? const []) a is List ? a.join(' / ') : '$a',
   ];
   String? get title => body['title'] as String?;
+
+  /// How the Disciple answers this block: "write", "choice", "truefalse"
+  /// or "task"; null for text that asks for nothing.
+  String? get respond => body['respond'] as String?;
+
+  /// A question's lettered or listed parts, each with its own answer kind.
+  List<BlockPart> get parts => [
+    for (final p in (body['parts'] as List?) ?? const [])
+      BlockPart.fromMap((p as Map).cast<String, dynamic>()),
+  ];
+
+  /// A reading plan's field ("Date"): each item is a reading with a date
+  /// to write.
+  String? get field => body['field'] as String?;
+  String? get note => body['note'] as String?;
+
+  /// The number of blanks in the block's text and parts.
+  int get blankCount => (body['blanks'] as int?) ?? 0;
+
   List<String> get items => [
     for (final i in (body['items'] as List?) ?? const []) '$i',
   ];
@@ -132,6 +151,23 @@ class ContentBlock {
 
   @override
   int get hashCode => blockId.hashCode;
+}
+
+/// One part of a question: "A." and its question, a choice "a." to pick,
+/// or a verse to explain.
+@immutable
+class BlockPart {
+  const BlockPart({required this.text, this.label, this.respond});
+
+  factory BlockPart.fromMap(Map<String, dynamic> map) => BlockPart(
+    label: map['label'] as String?,
+    text: '${map['text'] ?? ''}',
+    respond: map['respond'] as String?,
+  );
+
+  final String? label;
+  final String text;
+  final String? respond;
 }
 
 /// A lettered section of a lesson: its title, when the publication has
@@ -161,6 +197,36 @@ class LessonContent {
 
   /// In publication order.
   final List<ContentBlock> blocks;
+
+  /// The lesson as a Disciple reads it: the Disciple tier, no answers. For
+  /// someone who is both a Disciple and a Discipler, reading their own
+  /// lesson (ADR-021); the database still decides what they may read.
+  LessonContent get discipleView => LessonContent(
+    lessonId: lessonId,
+    blocks: [
+      for (final b in blocks)
+        if (b.tier == ContentTier.disciple)
+          ContentBlock(
+            blockId: b.blockId,
+            lessonId: b.lessonId,
+            ordinal: b.ordinal,
+            sectionLabel: b.sectionLabel,
+            type: b.type,
+            tier: b.tier,
+            body: b.body,
+          ),
+    ],
+  );
+
+  /// Blocks with blanks the book answers, which a check can compare.
+  List<ContentBlock> get checkable => [
+    for (final b in blocks)
+      if (b.tier == ContentTier.disciple &&
+          b.blankCount > 0 &&
+          b.type != BlockType.verseWriting &&
+          b.type != BlockType.figure)
+        b,
+  ];
 
   /// Whether this is the faithful lesson (ADR-019 decision 12) rather than
   /// its identifying metadata only.
@@ -202,6 +268,11 @@ class LessonContent {
   ];
 
   bool get hasDisciplerTier => disciplerBlocks.isNotEmpty;
+
+  /// Whether the read carries the book's answers: a Discipler's read, even
+  /// of a lesson without Discipler-only blocks.
+  bool get hasAnswers =>
+      hasDisciplerTier || blocks.any((b) => b.answers != null);
 
   ContentBlock? _first(BlockType type) {
     for (final b in blocks) {

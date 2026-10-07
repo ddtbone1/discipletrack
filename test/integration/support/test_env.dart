@@ -41,7 +41,7 @@ final serviceKey =
     Platform.environment['SUPABASE_SERVICE_ROLE_KEY'] ??
     const String.fromEnvironment('SUPABASE_SERVICE_ROLE_KEY');
 
-const password = 'test-password-123';
+const password = 'Test-password-123';
 
 /// The church and admin provisioned by supabase/seed.sql on `db reset`.
 const seededChurchId = 'c0000000-0000-4000-8000-000000000001';

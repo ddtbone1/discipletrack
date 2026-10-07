@@ -59,12 +59,16 @@ void main() {
       final repo = FakeAuthRepository();
       await pumpSignUp(tester, repo);
 
+      await tester.ensureVisible(find.text('Create account'));
       await tester.tap(find.text('Create account'));
       await tester.pump();
 
       expect(find.text('Enter your full name'), findsOneWidget);
       expect(find.text('Enter your email'), findsOneWidget);
-      expect(find.text('Use at least 6 characters'), findsOneWidget);
+      expect(
+        find.text('Your password needs: at least 8 characters.'),
+        findsOneWidget,
+      );
       expect(repo.signUps, isEmpty, reason: 'nothing should reach the backend');
     });
 
@@ -74,7 +78,9 @@ void main() {
 
       await tester.enterText(find.byType(TextField).at(0), '   ');
       await tester.enterText(find.byType(TextField).at(1), 'a@b.test');
-      await tester.enterText(find.byType(TextField).at(2), 'password123');
+      await tester.enterText(find.byType(TextField).at(2), 'Password-123');
+      await tester.enterText(find.byType(TextField).at(3), 'Password-123');
+      await tester.ensureVisible(find.text('Create account'));
       await tester.tap(find.text('Create account'));
       await tester.pump();
 
@@ -88,7 +94,9 @@ void main() {
 
       await tester.enterText(find.byType(TextField).at(0), 'Juan');
       await tester.enterText(find.byType(TextField).at(1), 'not-an-email');
-      await tester.enterText(find.byType(TextField).at(2), 'password123');
+      await tester.enterText(find.byType(TextField).at(2), 'Password-123');
+      await tester.enterText(find.byType(TextField).at(3), 'Password-123');
+      await tester.ensureVisible(find.text('Create account'));
       await tester.tap(find.text('Create account'));
       await tester.pump();
 
@@ -96,17 +104,37 @@ void main() {
       expect(repo.signUps, isEmpty);
     });
 
-    testWidgets('rejects a password under 6 characters', (tester) async {
+    testWidgets('rejects a confirmation that does not match', (tester) async {
+      final repo = FakeAuthRepository();
+      await pumpSignUp(tester, repo);
+
+      await tester.enterText(find.byType(TextField).at(0), 'Juan');
+      await tester.enterText(find.byType(TextField).at(1), 'a@b.test');
+      await tester.enterText(find.byType(TextField).at(2), 'Password-123');
+      await tester.enterText(find.byType(TextField).at(3), 'Password-124');
+      await tester.ensureVisible(find.text('Create account'));
+      await tester.tap(find.text('Create account'));
+      await tester.pump();
+
+      expect(find.text('The passwords do not match'), findsOneWidget);
+      expect(repo.signUps, isEmpty);
+    });
+
+    testWidgets('rejects a password under 8 characters', (tester) async {
       final repo = FakeAuthRepository();
       await pumpSignUp(tester, repo);
 
       await tester.enterText(find.byType(TextField).at(0), 'Juan');
       await tester.enterText(find.byType(TextField).at(1), 'a@b.test');
       await tester.enterText(find.byType(TextField).at(2), '12345');
+      await tester.ensureVisible(find.text('Create account'));
       await tester.tap(find.text('Create account'));
       await tester.pump();
 
-      expect(find.text('Use at least 6 characters'), findsOneWidget);
+      expect(
+        find.text('Your password needs: at least 8 characters.'),
+        findsOneWidget,
+      );
       expect(repo.signUps, isEmpty);
     });
   });
@@ -118,7 +146,9 @@ void main() {
         '  Juan dela Cruz  ',
       );
       await tester.enterText(find.byType(TextField).at(1), 'juan@example.test');
-      await tester.enterText(find.byType(TextField).at(2), 'password123');
+      await tester.enterText(find.byType(TextField).at(2), 'Password-123');
+      await tester.enterText(find.byType(TextField).at(3), 'Password-123');
+      await tester.ensureVisible(find.text('Create account'));
       await tester.tap(find.text('Create account'));
       await tester.pumpAndSettle();
     }
@@ -209,7 +239,7 @@ void main() {
           find.byType(TextField).at(0),
           'juan@example.test',
         );
-        await tester.enterText(find.byType(TextField).at(1), 'password123');
+        await tester.enterText(find.byType(TextField).at(1), 'Password-123');
         await tester.tap(find.widgetWithText(AppButton, 'Login'));
         await tester.pumpAndSettle();
 
@@ -232,7 +262,7 @@ void main() {
       await pumpWithRouter(tester, repo, initialLocation: Routes.signIn);
 
       await tester.enterText(find.byType(TextField).at(0), 'juan@example.test');
-      await tester.enterText(find.byType(TextField).at(1), 'password123');
+      await tester.enterText(find.byType(TextField).at(1), 'Password-123');
       await tester.tap(find.widgetWithText(AppButton, 'Login'));
       await tester.pumpAndSettle();
 

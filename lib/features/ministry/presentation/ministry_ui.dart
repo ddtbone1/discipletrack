@@ -5,6 +5,8 @@ import '../../../core/format/app_format.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_pill.dart';
+import '../domain/d_group_member.dart';
 
 export '../../../core/widgets/confirm_dialog.dart';
 export '../../../core/widgets/person_row.dart';
@@ -63,3 +65,11 @@ class PairingProgress extends StatelessWidget {
     );
   }
 }
+
+/// Each responsibility's colour, the same everywhere: its badge on My D
+/// Group and its name in text (Home's group card).
+PillTone roleTone(DGroupResponsibility r) => switch (r) {
+  DGroupResponsibility.leader => PillTone.ink,
+  DGroupResponsibility.discipler => PillTone.brand,
+  DGroupResponsibility.disciple => PillTone.info,
+};

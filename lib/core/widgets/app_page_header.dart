@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import 'avatar_art.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
@@ -28,6 +29,7 @@ class AppPageHeader extends StatelessWidget {
     required this.name,
     this.subtitle,
     this.onAvatarTap,
+    this.avatar,
     this.status,
     this.actions = const [],
     super.key,
@@ -39,6 +41,9 @@ class AppPageHeader extends StatelessWidget {
   /// The second line, lighter, smaller and thinner.
   final String? subtitle;
   final VoidCallback? onAvatarTap;
+
+  /// The person's picked avatar ("preset:n").
+  final String? avatar;
 
   /// Optional status under the header row, such as a [StatusPill].
   final Widget? status;
@@ -54,7 +59,7 @@ class AppPageHeader extends StatelessWidget {
       children: [
         Row(
           children: [
-            AppAvatar(size: 48, onTap: onAvatarTap),
+            AppAvatar(size: 48, onTap: onAvatarTap, preset: avatar),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(
@@ -106,25 +111,35 @@ class AppPageHeader extends StatelessWidget {
 /// the page in both light and dark mode rather than standing out as an accent.
 /// There is no image upload path yet, so there is nothing else to show.
 class AppAvatar extends StatelessWidget {
-  const AppAvatar({this.size = 46, this.onTap, super.key});
+  const AppAvatar({this.size = 46, this.onTap, this.preset, super.key});
 
   final double size;
   final VoidCallback? onTap;
 
+  /// The person's picked avatar ("preset:n"); the person icon when none.
+  final String? preset;
+
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    final avatar = Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: p.surface,
-        shape: BoxShape.circle,
-        border: Border.all(color: p.border),
-      ),
-      child: Icon(Icons.person_rounded, size: size * 0.56, color: p.muted),
-    );
+    final asset = presetAvatarAsset(preset);
+    final avatar = asset != null
+        ? PresetAvatar(asset: asset, size: size)
+        : Container(
+            width: size,
+            height: size,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: p.surface,
+              shape: BoxShape.circle,
+              border: Border.all(color: p.border),
+            ),
+            child: Icon(
+              Icons.person_rounded,
+              size: size * 0.56,
+              color: p.muted,
+            ),
+          );
 
     if (onTap == null) return ExcludeSemantics(child: avatar);
 

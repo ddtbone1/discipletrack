@@ -14,6 +14,7 @@ import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/app_text_link.dart';
 import '../../membership/application/membership_providers.dart';
+import '../../profile/presentation/member_avatar.dart';
 import '../application/ministry_providers.dart';
 import '../application/ministry_structure_controller.dart';
 import '../../../core/connectivity/connection_status.dart';
@@ -22,6 +23,7 @@ import '../domain/discipler_candidate.dart';
 import 'appoint_discipler_dialog.dart';
 import 'ministry_ui.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/charts.dart';
 
 /// The Coordinator's list of D Groups, with New group.
 ///
@@ -48,30 +50,28 @@ class DGroupsPage extends ConsumerWidget {
               message: 'The list of D Groups is for your church Coordinator.',
             )
           else ...[
-            if (unplaced != null) ...[
-              Text(
-                unplaced == 0
-                    ? 'Every active member is in a D Group.'
-                    : '${MinistryFormat.count(unplaced, 'member')} not in a '
-                          'D Group yet.',
-                style: context.supportingStyle,
-              ),
-              const SizedBox(height: AppSpacing.md),
-            ],
+            // 1. The church at a glance: who is in a group, and as what.
+            if (groups.value case final items?)
+              _ChurchOverview(groups: items, unplaced: unplaced ?? 0),
+            const SizedBox(height: AppSpacing.sm),
             AppButton(
               label: 'New group',
               requiresConnection: true,
               icon: Icons.add_rounded,
               onPressed: () => context.push(Routes.newDGroup),
             ),
-            const SizedBox(height: AppSpacing.xs),
-            AppButton(
-              label: 'Curriculum',
-              variant: AppButtonVariant.secondary,
-              icon: Icons.menu_book_outlined,
-              onPressed: () => context.push(Routes.lessons),
-            ),
+
+            // 2. The groups.
             const SizedBox(height: AppSpacing.lg),
+            SectionHeading(
+              groups.value == null
+                  ? 'Groups'
+                  : 'Groups  ·  ${groups.value!.length}',
+              trailing: AppTextLink(
+                label: 'Curriculum',
+                onTap: () => context.push(Routes.lessons),
+              ),
+            ),
             groups.when(
               loading: () => const SizedBox(height: 240, child: LoadingState()),
               error: (e, _) => SizedBox(
@@ -101,13 +101,54 @@ class DGroupsPage extends ConsumerWidget {
                       ],
                     ),
             ),
+            // 3. People waiting on the Coordinator.
             const SizedBox(height: AppSpacing.lg),
             const _Candidates(),
-            const _SetupPeriodCard(),
-            const SizedBox(height: AppSpacing.lg),
             const _Unplaced(),
+
+            // 4. The church's setup, last.
+            const SizedBox(height: AppSpacing.lg),
+            const _SetupPeriodCard(),
           ],
           const SizedBox(height: AppSpacing.xl),
+        ],
+      ),
+    );
+  }
+}
+
+/// The church at a glance: a ring of every active member by where they
+/// are, with the counts beside it.
+class _ChurchOverview extends StatelessWidget {
+  const _ChurchOverview({required this.groups, required this.unplaced});
+
+  final List<DGroupSummary> groups;
+  final int unplaced;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    int sum(int Function(DGroupSummary) f) =>
+        groups.fold<int>(0, (t, g) => t + f(g));
+    final placed = sum((g) => g.memberCount ?? 0);
+    final disciplers = sum((g) => g.disciplerCount);
+    final disciples = sum((g) => g.discipleCount);
+    return AppCard(
+      child: DonutChart(
+        centerValue: '${placed + unplaced}',
+        centerLabel: 'members',
+        slices: [
+          (
+            value: disciplers,
+            color: pillColors(context, PillTone.brand).$2,
+            label: 'Disciplers',
+          ),
+          (value: disciples, color: p.brand, label: 'Disciples'),
+          (
+            value: unplaced,
+            color: pillColors(context, PillTone.warning).$2,
+            label: 'Not in a group',
+          ),
         ],
       ),
     );
@@ -190,7 +231,10 @@ class _Unplaced extends ConsumerWidget {
                 for (final m in unplaced)
                   PersonRow(
                     name: m.fullName,
-                    leading: InitialsAvatar(name: m.fullName),
+                    leading: MemberAvatar(
+                      name: m.fullName,
+                      membershipId: m.churchMembershipId,
+                    ),
                     detail: 'Approved, in no D Group',
                   ),
               ],
@@ -346,7 +390,10 @@ class _Candidates extends ConsumerWidget {
               for (final c in candidates)
                 PersonRow(
                   name: c.fullName,
-                  leading: InitialsAvatar(name: c.fullName),
+                  leading: MemberAvatar(
+                    name: c.fullName,
+                    membershipId: c.churchMembershipId,
+                  ),
                   detail:
                       '${c.dGroupName} · eligible since '
                       '${MinistryFormat.shortDate(c.eligibleSince)}',

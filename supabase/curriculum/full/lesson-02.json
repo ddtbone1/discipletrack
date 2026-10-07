@@ -342,7 +342,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain 2nd Peter 1:20-21?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -350,7 +351,8 @@
       "tier": "DISCIPLE",
       "section": "A",
       "body": {
-        "text": "Here’s a “water cooler” scenario: If a friend at work says, “We can’t really believe the Bible - it has too many contradictions” or “You Christians just believe everything you read in the Bible with blind faith” how would you respond? Need ideas? Visit www.TheJourneyForum.com."
+        "text": "Here’s a “water cooler” scenario: If a friend at work says, “We can’t really believe the Bible - it has too many contradictions” or “You Christians just believe everything you read in the Bible with blind faith” how would you respond? Need ideas? Visit www.TheJourneyForum.com.",
+        "respond": "write"
       }
     },
     {
@@ -601,7 +603,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Romans 5:1?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -609,7 +612,8 @@
       "tier": "DISCIPLE",
       "section": "B",
       "body": {
-        "text": "Here’s a “water cooler” scenario: A family member says to you, “How can anyone know for sure they are going to heaven?” What would you say? Need ideas? Visit www.TheJourneyForum.com."
+        "text": "Here’s a “water cooler” scenario: A family member says to you, “How can anyone know for sure they are going to heaven?” What would you say? Need ideas? Visit www.TheJourneyForum.com.",
+        "respond": "write"
       }
     },
     {
@@ -797,7 +801,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Romans 8:9?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -805,7 +810,8 @@
       "tier": "DISCIPLE",
       "section": "C",
       "body": {
-        "text": "Here’s a “water cooler” scenario: How would you answer this question, “Why are there so many religions if there is only one God?” And how would you respond if a friend says, “I don’t feel saved, I think I lost it or never had it.”"
+        "text": "Here’s a “water cooler” scenario: How would you answer this question, “Why are there so many religions if there is only one God?” And how would you respond if a friend says, “I don’t feel saved, I think I lost it or never had it.”",
+        "respond": "write"
       }
     },
     {
@@ -941,7 +947,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Romans 8:15?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -949,7 +956,8 @@
       "tier": "DISCIPLE",
       "section": "D",
       "body": {
-        "text": "Here’s a “water cooler” scenario: A new Christian expresses doubts about his salvation to you. How would you explain assurance of salvation?\n\nHere’s another “water cooler” scenario: After witnessing to a family member and telling her about your salvation she says, “It’s great that you’ve found something that works for you.” How would you respond?"
+        "text": "Here’s a “water cooler” scenario: A new Christian expresses doubts about his salvation to you. How would you explain assurance of salvation?\n\nHere’s another “water cooler” scenario: After witnessing to a family member and telling her about your salvation she says, “It’s great that you’ve found something that works for you.” How would you respond?",
+        "respond": "write"
       }
     },
     {
@@ -1038,7 +1046,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 1,
-        "text": "Get alone and pray asking God to speak to you through His Word."
+        "text": "Get alone and pray asking God to speak to you through His Word.",
+        "respond": "task"
       }
     },
     {
@@ -1046,16 +1055,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": "Find the section in the Bible assigned to you by your Discipler. Write the date and time at the top of"
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "the page of your Daily in the Word notebook."
-        ]
+        "text": "Find the section in the Bible assigned to you by your Discipler. Write the date and time at the top of the page of your Daily in the Word notebook.",
+        "respond": "write"
       }
     },
     {
@@ -1063,16 +1064,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 3,
-        "text": "Write the book, chapter and verse that you are starting to write on the next line in your notebook."
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Notice the words in the verses many times are divided by punctuation marks."
-        ]
+        "text": "Write the book, chapter and verse that you are starting to write on the next line in your notebook. Notice the words in the verses many times are divided by punctuation marks.",
+        "respond": "write"
       }
     },
     {
@@ -1080,16 +1073,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 4,
-        "text": "Now, read the words out loud up to the punctuation mark then write them on one line in your Daily"
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "in the Word notebook (and it’s good to say the words again as you write them)."
-        ]
+        "text": "Now, read the words out loud up to the punctuation mark then write them on one line in your Daily in the Word notebook (and it’s good to say the words again as you write them).",
+        "respond": "write"
       }
     },
     {
@@ -1097,7 +1082,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 5,
-        "text": "Read the next part but write the words one line down in your notebook."
+        "text": "Read the next part but write the words one line down in your notebook.",
+        "respond": "write"
       }
     },
     {
@@ -1113,16 +1099,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 7,
-        "text": "Write a minimum of 3 to 5 verses each day. Of course if you write more that’s great. You are to do"
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "your Daily in the Word every day."
-        ]
+        "text": "Write a minimum of 3 to 5 verses each day. Of course if you write more that’s great. You are to do your Daily in the Word every day.",
+        "respond": "write"
       }
     },
     {
@@ -1130,16 +1108,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 8,
-        "text": "Do this every day and be ready to show your discipler your Daily in the Word Notebook the next time"
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "you meet, and your discipler will show you their Daily in the Word."
-        ]
+        "text": "Do this every day and be ready to show your discipler your Daily in the Word Notebook the next time you meet, and your discipler will show you their Daily in the Word.",
+        "respond": "task"
       }
     },
     {
@@ -1178,30 +1148,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 1,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Your first assignment in being Daily in the Word, is to handwrite the book of 1st John. You",
-          "can see a writing plan on the next page. Be sure to show your discipler what you have accomplished",
-          "each time you meet. After you complete writing the book of 1st John, you may choose from several",
-          "options which will be explained later. The important thing is for you to be obedient to Christ to continue",
-          "in His Word.",
-          "This is the 2nd Step of Discipleship to know: a disciple is in the Word of God every day.",
-          "Join a tradition that God has used: think about this, until the printing press was invented, the only",
-          "copies of the Bible were hand written. This went on for centuries. We have the Bible today because",
-          "Christians wrote God’s Word. Many, many Disciplers involved in Daily in the Word have finished their",
-          "own copy of God’s Word. Some, in other countries, have witnessed Bibles burned and banned and it",
-          "means so much to them to write their own copy. Perhaps you would like to carry on this tradition that God",
-          "has used to preserve His Word and write your own copy of the Word of God.",
-          "Remember, you are not just writing words. You are writing The Word. You will see the Truth...say",
-          "the Truth... hear the Truth... remember the Truth and form the Truth in your heart as it flows from your pen",
-          "onto paper."
-        ]
+        "text": "Your first assignment in being Daily in the Word, is to handwrite the book of 1st John. You can see a writing plan on the next page. Be sure to show your discipler what you have accomplished each time you meet. After you complete writing the book of 1st John, you may choose from several options which will be explained later. The important thing is for you to be obedient to Christ to continue in His Word.\n\nThis is the 2nd Step of Discipleship to know: a disciple is in the Word of God every day. Join a tradition that God has used: think about this, until the printing press was invented, the only copies of the Bible were hand written. This went on for centuries. We have the Bible today because Christians wrote God’s Word. Many, many Disciplers involved in Daily in the Word have finished their own copy of God’s Word. Some, in other countries, have witnessed Bibles burned and banned and it means so much to them to write their own copy. Perhaps you would like to carry on this tradition that God has used to preserve His Word and write your own copy of the Word of God.\n\nRemember, you are not just writing words. You are writing The Word. You will see the Truth...say the Truth... hear the Truth... remember the Truth and form the Truth in your heart as it flows from your pen onto paper.",
+        "respond": "write"
       }
     },
     {
@@ -1209,17 +1157,7 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Answer the questions for Lesson 2 below on a separate piece of paper and bring them to your",
-          "next meeting:"
-        ]
+        "text": "Answer the questions for Lesson 2 below on a separate piece of paper and bring them to your next meeting:"
       }
     },
     {
@@ -1239,7 +1177,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": "What is meant by “assurance of salvation”?"
+        "text": "What is meant by “assurance of salvation”?",
+        "respond": "write"
       }
     },
     {
@@ -1247,7 +1186,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 3,
-        "text": "What did you do to receive salvation?"
+        "text": "What did you do to receive salvation?",
+        "respond": "write"
       }
     },
     {
@@ -1255,7 +1195,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 4,
-        "text": "What three things is your assurance based upon?"
+        "text": "What three things is your assurance based upon?",
+        "respond": "write"
       }
     },
     {
@@ -1288,7 +1229,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 7,
-        "text": "Explain what 2nd Peter 1:20-21 and 2nd Timothy 3:16 teach?"
+        "text": "Explain what 2nd Peter 1:20-21 and 2nd Timothy 3:16 teach?",
+        "respond": "write"
       }
     },
     {
@@ -1296,7 +1238,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 8,
-        "text": "How does Satan attack the Bible?"
+        "text": "How does Satan attack the Bible?",
+        "respond": "write"
       }
     },
     {
@@ -1304,7 +1247,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 9,
-        "text": "Write a verse about the Bible being preserved."
+        "text": "Write a verse about the Bible being preserved.",
+        "respond": "write"
       }
     },
     {
@@ -1312,7 +1256,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 10,
-        "text": "What is the most important reason to believe the Bible is our final authority?"
+        "text": "What is the most important reason to believe the Bible is our final authority?",
+        "respond": "write"
       }
     },
     {
@@ -1333,7 +1278,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 12,
-        "text": "Write some of God’s promises about your salvation."
+        "text": "Write some of God’s promises about your salvation.",
+        "respond": "write"
       }
     },
     {
@@ -1341,7 +1287,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 13,
-        "text": "How can you learn the Bible?"
+        "text": "How can you learn the Bible?",
+        "respond": "write"
       }
     },
     {
@@ -1349,7 +1296,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 14,
-        "text": "Write two things about the Holy Spirit and His work in your assurance of salvation."
+        "text": "Write two things about the Holy Spirit and His work in your assurance of salvation.",
+        "respond": "write"
       }
     },
     {
@@ -1357,17 +1305,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 15,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Can you ever lose your salvation? Why? and write your answers to all the Water Cooler Scenarios",
-          "in the lesson."
-        ]
+        "text": "Can you ever lose your salvation? Why? and write your answers to all the Water Cooler Scenarios in the lesson.",
+        "respond": "write"
       }
     },
     {
@@ -1385,10 +1324,108 @@
       }
     },
     {
-      "type": "PARAGRAPH",
+      "type": "LIST",
       "tier": "DISCIPLE",
       "body": {
-        "text": "1st John 1:1-2 Date: [~] 1st John 1:3-4 Date: [~] 1st John 1:5-7 Date: [~] 1st John 1:8-10 Date: [~] 1st John 2:1-2 Date: [~] 1st John 2:3-6 Date: [~] 1st John 2:7-11 Date: [~] 1st John 2:12-14 Date: [~] 1st John 2:15-17 Date: [~] 1st John 2:18-19 Date: [~] 1st John 2:20-25 Date: [~] 1st John 2:26-29 Date: [~] 1st John 3:1-3 Date: [~] 1st John 3:4-7 Date: [~] 1st John 3:8-10 Date: [~] 1st John 3:11-13 Date: [~] 1st John 3:14-17 Date: [~] 1st John 3:18-22 Date: [~] 1st John 3:23-24 Date: [~] 1st John 4:1-3 Date: [~] 1st John 4:4-6 Date: [~] 1st John 4:7-9 Date: [~] 1st John 4:10-13 Date: [~] 1st John 4:14-16 Date: [~] 1st John 4:17-21 Date: [~] 1st John 5:1-5 Date: [~] 1st John 5:6-9 Date: [~] 1st John 5:10-13 Date: [~] 1st John 5:14-15 Date: [~] 1st John 5:16-17 Date: [~] 1st John 5:18-21 Date: [~] Assignment: 1st John The verses below are arranged by topics and/or stories. It’s fine to write more than one group of verses per day. Some even write a chapter a day from the Bible. Take time every day to do your Daily in the Word. Note: Taking shortcuts and skipping assignments, especially the Daily in the Word, severely hinders the spiritual growth and multiplication of your disciples."
+        "items": [
+          "1st John 1:1-2",
+          "1st John 1:3-4",
+          "1st John 1:5-7",
+          "1st John 1:8-10",
+          "1st John 2:1-2",
+          "1st John 2:3-6",
+          "1st John 2:7-11",
+          "1st John 2:12-14",
+          "1st John 2:15-17",
+          "1st John 2:18-19",
+          "1st John 2:20-25",
+          "1st John 2:26-29",
+          "1st John 3:1-3",
+          "1st John 3:4-7",
+          "1st John 3:8-10",
+          "1st John 3:11-13",
+          "1st John 3:14-17",
+          "1st John 3:18-22",
+          "1st John 3:23-24",
+          "1st John 4:1-3",
+          "1st John 4:4-6",
+          "1st John 4:7-9",
+          "1st John 4:10-13",
+          "1st John 4:14-16",
+          "1st John 4:17-21",
+          "1st John 5:1-5",
+          "1st John 5:6-9",
+          "1st John 5:10-13",
+          "1st John 5:14-15",
+          "1st John 5:16-17",
+          "1st John 5:18-21"
+        ],
+        "field": "Date",
+        "fieldWords": [
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "Date:",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]",
+          "[~]"
+        ],
+        "note": "Assignment: 1st John The verses below are arranged by topics and/or stories. It’s fine to write more than one group of verses per day. Some even write a chapter a day from the Bible. Take time every day to do your Daily in the Word. Note: Taking shortcuts and skipping assignments, especially the Daily in the Word, severely hinders the spiritual growth and multiplication of your disciples."
       }
     },
     {

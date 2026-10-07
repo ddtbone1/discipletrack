@@ -10,6 +10,8 @@ import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/app_text_link.dart';
 import '../../../core/widgets/error_state.dart';
 import '../application/auth_providers.dart';
+import '../domain/password_policy.dart';
+import 'password_checklist.dart';
 import '../data/auth_repository.dart';
 import 'auth_form_layout.dart';
 
@@ -34,21 +36,21 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   final _fullName = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
+  final _confirm = TextEditingController();
 
   String? _nameError;
+  String? _confirmError;
   String? _emailError;
   String? _passwordError;
   bool _alreadyRegistered = false;
   bool _obscure = true;
-
-  /// Matches `auth.minimum_password_length` in supabase/config.toml.
-  static const _minPasswordLength = 6;
 
   @override
   void dispose() {
     _fullName.dispose();
     _email.dispose();
     _password.dispose();
+    _confirm.dispose();
     super.dispose();
   }
 
@@ -61,12 +63,16 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
       _emailError = email.isEmpty
           ? 'Enter your email'
           : (!email.contains('@') ? 'Enter a valid email' : null);
-      _passwordError = password.length < _minPasswordLength
-          ? 'Use at least $_minPasswordLength characters'
+      _passwordError = passwordProblem(password, email: email);
+      _confirmError = _confirm.text != password
+          ? 'The passwords do not match'
           : null;
       _alreadyRegistered = false;
     });
-    return _nameError == null && _emailError == null && _passwordError == null;
+    return _nameError == null &&
+        _emailError == null &&
+        _passwordError == null &&
+        _confirmError == null;
   }
 
   Future<void> _submit() async {
@@ -165,10 +171,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
             hint: 'Create a password',
             errorText: _passwordError,
             obscureText: _obscure,
-            textInputAction: TextInputAction.done,
+            textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.newPassword],
             enabled: !isLoading,
-            onSubmitted: (_) => _submit(),
             trailing: IconButton(
               icon: Icon(
                 _obscure
@@ -179,6 +184,28 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               ),
               onPressed: () => setState(() => _obscure = !_obscure),
             ),
+            onChanged: (_) => setState(() {}),
+          ),
+          if (_password.text.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.xs),
+            PasswordChecklist(password: _password.text),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+          AppTextField(
+            label: 'Confirm password',
+            pill: true,
+            leadingIcon: Icons.lock_outline_rounded,
+            controller: _confirm,
+            hint: 'Type it again',
+            errorText: _confirmError,
+            obscureText: _obscure,
+            textInputAction: TextInputAction.done,
+            autofillHints: const [AutofillHints.newPassword],
+            enabled: !isLoading,
+            onSubmitted: (_) => _submit(),
+            onChanged: (_) {
+              if (_confirmError != null) setState(() => _confirmError = null);
+            },
           ),
 
           const SizedBox(height: AppSpacing.xs),

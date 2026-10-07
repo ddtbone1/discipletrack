@@ -248,7 +248,7 @@ void main() {
 
     testWidgets('no action without the courtesy flags', (tester) async {
       await pump(tester);
-      expect(find.text('Lesson 4'), findsOneWidget);
+      expect(find.text('Lesson 4'), findsWidgets);
       expect(find.text('Mark Lesson 4 completed'), findsNothing);
       expect(find.textContaining('Undo Lesson'), findsNothing);
     });

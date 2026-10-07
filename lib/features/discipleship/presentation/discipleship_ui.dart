@@ -107,7 +107,6 @@ class DiscipleProgressRow extends StatelessWidget {
         AppSpacing.sm,
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           LessonRing(
             total: d.lessonsTotal,

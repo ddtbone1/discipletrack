@@ -1,6 +1,7 @@
 import 'package:discipletrack/core/supabase/postgrest_failure.dart';
 import 'package:discipletrack/features/curriculum/data/curriculum_repository.dart';
 import 'package:discipletrack/features/curriculum/domain/lesson_content.dart';
+import 'package:discipletrack/features/curriculum/domain/workbook.dart';
 
 /// Lesson ids for the fakes: `lesson-1` to `lesson-10`.
 String sampleLessonId(int number) => 'lesson-$number';
@@ -103,6 +104,32 @@ class FakeCurriculumRepository implements CurriculumRepository {
   }) async {
     if (offline) throw _network;
     return access;
+  }
+
+  /// Answer keys for checking, by block id: one answer per blank.
+  Map<String, List<String>> keys = {};
+
+  @override
+  Future<List<({String blockId, BlankResult result})>> checkAnswers(
+    String lessonId,
+    Map<String, List<String>> responses,
+  ) async {
+    if (offline) throw _network;
+    String norm(String x) =>
+        x.toLowerCase().replaceAll(RegExp(r'[^a-z0-9 ]'), '').trim();
+    return [
+      for (final e in responses.entries)
+        for (final (i, given) in e.value.indexed)
+          if (given.trim().isNotEmpty && i < (keys[e.key]?.length ?? 0))
+            (
+              blockId: e.key,
+              result: BlankResult(
+                blank: i,
+                correct: norm(given) == norm(keys[e.key]![i]),
+                answer: keys[e.key]![i],
+              ),
+            ),
+    ];
   }
 
   @override

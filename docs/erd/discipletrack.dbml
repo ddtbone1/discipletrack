@@ -446,7 +446,7 @@ Table profiles {
   full_name varchar [not null]
 
   phone varchar
-  avatar_url varchar
+  avatar_url varchar [note: 'A bundled preset key, preset:1 to preset:12, or null (Migration 021). No uploaded photos.']
 
   created_at timestamptz [not null]
   updated_at timestamptz [not null]

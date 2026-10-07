@@ -316,7 +316,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Matthew 10:37?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -324,7 +325,8 @@
       "tier": "DISCIPLE",
       "section": "A",
       "body": {
-        "text": "Here’s a “water cooler” scenario: Your neighbor wants to know what makes the Christian life so good; what would your answer be?"
+        "text": "Here’s a “water cooler” scenario: Your neighbor wants to know what makes the Christian life so good; what would your answer be?",
+        "respond": "write"
       }
     },
     {
@@ -675,7 +677,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Colossians 3:1-2?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -683,7 +686,8 @@
       "tier": "DISCIPLE",
       "section": "B",
       "body": {
-        "text": "Here’s a “water cooler” scenario: You have a young disciple who asks you if he is to tithe on his net income or his gross income. How would you respond?"
+        "text": "Here’s a “water cooler” scenario: You have a young disciple who asks you if he is to tithe on his net income or his gross income. How would you respond?",
+        "respond": "write"
       }
     },
     {
@@ -822,7 +826,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 1,
-        "text": "With your Discipler, complete the Discipleship Training Module(s) on the following pages."
+        "text": "With your Discipler, complete the Discipleship Training Module(s) on the following pages.",
+        "respond": "task"
       }
     },
     {
@@ -830,17 +835,7 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Answer the questions for Lesson 5 below on a separate piece of paper and bring them to your next",
-          "meeting:"
-        ]
+        "text": "Answer the questions for Lesson 5 below on a separate piece of paper and bring them to your next meeting:"
       }
     },
     {
@@ -848,7 +843,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 1,
-        "text": "Explain how we obey 2nd Timothy 2:2."
+        "text": "Explain how we obey 2nd Timothy 2:2.",
+        "respond": "write"
       }
     },
     {
@@ -856,7 +852,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": "What is God’s plan to get the Gospel all over the world?"
+        "text": "What is God’s plan to get the Gospel all over the world?",
+        "respond": "write"
       }
     },
     {
@@ -864,7 +861,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 3,
-        "text": "What is the cost of discipleship?"
+        "text": "What is the cost of discipleship?",
+        "respond": "write"
       }
     },
     {
@@ -872,7 +870,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 4,
-        "text": "Why did Jesus require believers to become disciples?"
+        "text": "Why did Jesus require believers to become disciples?",
+        "respond": "write"
       }
     },
     {
@@ -880,7 +879,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 5,
-        "text": "What are the most important reasons for you to give offerings to the Lord?"
+        "text": "What are the most important reasons for you to give offerings to the Lord?",
+        "respond": "write"
       }
     },
     {
@@ -888,7 +888,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 6,
-        "text": "What are the 4 levels of giving?"
+        "text": "What are the 4 levels of giving?",
+        "respond": "write"
       }
     },
     {
@@ -896,17 +897,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 7,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "The Christian should give of his time, ministry and resources through the local church. Explain why",
-          "this is true."
-        ]
+        "text": "The Christian should give of his time, ministry and resources through the local church. Explain why this is true.",
+        "respond": "write"
       }
     },
     {
@@ -914,7 +906,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 8,
-        "text": "Write the new Bible verses you are memorizing now."
+        "text": "Write the new Bible verses you are memorizing now.",
+        "respond": "write"
       }
     },
     {
@@ -922,7 +915,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 9,
-        "text": "Write the six Steps of Discipleship you have learned so far with their Bible verses."
+        "text": "Write the six Steps of Discipleship you have learned so far with their Bible verses.",
+        "respond": "write"
       }
     },
     {
@@ -930,17 +924,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 10,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Answer this “water cooler” scenario: A Christian says to you “Don’t I have the right to do what I want",
-          "with my own money?” What would you say?"
-        ]
+        "text": "Answer this “water cooler” scenario: A Christian says to you “Don’t I have the right to do what I want with my own money?” What would you say?",
+        "respond": "write"
       }
     },
     {
@@ -948,18 +933,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 11,
-        "text": "Write your answers to all the Water Cooler Scenarios in the lesson."
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "There are many resources for Journey online. Also, we have a certificate for you for making such great",
-          "progress in Journey. Please e-mail us at lesson5@thejourneyforum.com to inform us that you",
-          "completed Lesson 5. We have a free download for you. Thank you."
-        ]
+        "text": "Write your answers to all the Water Cooler Scenarios in the lesson.\n\nThere are many resources for Journey online. Also, we have a certificate for you for making such great progress in Journey. Please e-mail us at lesson5@thejourneyforum.com to inform us that you completed Lesson 5. We have a free download for you. Thank you.",
+        "respond": "task"
       }
     },
     {

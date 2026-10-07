@@ -3,6 +3,7 @@
 library;
 
 import 'lesson_source.dart';
+import 'lesson_structure.dart';
 
 /// What the text layer cannot say, for one lesson. Every entry is a
 /// placement or a transcription of image-only text, never a rewording.
@@ -522,6 +523,8 @@ BuildResult buildLesson(List<SourcePage> pages, LessonHints hints) {
     }
     left.clear();
   }
+
+  structureLesson(blocks);
 
   for (final b in blocks) {
     final answers = b['answers'] as List?;

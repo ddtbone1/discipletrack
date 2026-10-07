@@ -1353,6 +1353,12 @@ job and they are never swapped:
 - A **pill** carries a state on a card or page: In progress, Completed, Not
   paired, a meeting outcome. Pills are used sparingly.
 
+**Green text means tappable or a lesson state (user, 2026-10-07).** Inline
+links are the brand green, bold, without underline. A lesson's state may
+take its tone ("In progress", "Not started"). Plain facts beside a link,
+such as "5 of 10 completed" or a date, use the text colour with weight for
+emphasis, so nothing that cannot be tapped looks like a link.
+
 List rows stay to three short lines: name, badges, one fact. Row actions
 are compact round icon buttons with a tooltip (Set up, Pair, Change
 Discipler), never wide text pills. The overflow menu is the horizontal
@@ -1983,7 +1989,12 @@ concept used in several places:
 | DiscipleProgressRow | Lesson ring, name, and one coloured line: the lesson's state and the last recorded meeting | PersonRow |
 | LessonCarousel | Home, for a Disciple: "n of 10 completed · Last met" over the ten LessonCoverCards to swipe, starting on the current one ("Lesson n · Now"); reached lessons open, the rest are locked | PageView of LessonCoverCard |
 | FilterTabs | List filters with counts in one fixed row that shares the width (each tab sized by its label, one type size); the active tab is its text in the brand colour and a thin lime outline, no fill | Row of stadium tabs |
-| BlankField | A blank or writing field the Disciple types into, inline, growing with the answer; saved on the device (ADR-021) | TextField, underline only |
+| BlankField | A blank or writing field the Disciple types into, inline, growing with the answer; saved on the device (ADR-021). After Check: green or red line, the book's answer under a wrong one | TextField, underline only |
+| AnswerBox | A written answer under a question, prompt or scenario | filled TextField, multi-line |
+| PickOne | One choice among the book's options, or True / False | radio rows |
+| TaskCheck | "Mark as done" for a task the book sets | icon + label |
+| ReadingPlan | Daily in the Word: one reading per row with its date | card of rows |
+| Avatar progress ring | A Disciple's lessons completed, as a lime ring around their initials | InitialsAvatar(progress:) |
 | MeetingHistoryRow | Outcome, counted or not, recorder, voided state, Void where allowed | PersonRow layout |
 | OutcomeSelector | Present, Late, Absent, Excused, with the counting hint | a segmented control |
 | MonthMeetingView | Recorded meetings by month (section 20) | added only with that view |

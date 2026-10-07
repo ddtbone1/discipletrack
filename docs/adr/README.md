@@ -35,7 +35,7 @@ ADRs explain why a decision exists so future developers and AI coding agents can
 | ADR-018 | Direct D Group Placement, Needs Setup, and Initial Rollout Recognition of Disciplers | Accepted (supersedes Slice 3 placement by invitation); Leader self-add replaced by ADR-020 |
 | ADR-019 | Curriculum Licensing Posture, Tiered Content and Progression-Gated Access | Accepted |
 | ADR-020 | Every D Group Leader Holds the Discipler Role | Accepted; amends ADR-018 |
-| ADR-021 | A Disciple's Lesson Answers Stay on Their Device (Before the Workbook) | Accepted; anticipates ADR-013 without writing it |
+| ADR-021 | A Disciple's Lesson Answers Stay on Their Device (Before the Workbook) | Accepted; anticipates ADR-013 without writing it; amended 2026-10-07 (answer kinds, checking blanks; amends ADR-019 decision 6 for blanks) |
 
 ADR numbers are identifiers, not implementation order.
 

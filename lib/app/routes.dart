@@ -24,6 +24,7 @@ abstract final class Routes {
   static const home = '/home';
   static const profile = '/profile';
   static const editProfile = '/profile/edit';
+  static const changePassword = '/profile/password';
 
   /// Membership-request review for Admins and Coordinators.
   static const pendingMembers = '/members/pending';
@@ -87,7 +88,7 @@ abstract final class Routes {
   /// RBAC section 3 grants "User -> own profile" without gating it on
   /// membership, and section 1a lets a PENDING member see their own onboarding
   /// state, so the profile screens are not restricted to ACTIVE members.
-  static const profileRoutes = {profile, editProfile};
+  static const profileRoutes = {profile, editProfile, changePassword};
 
   /// The lesson list and the lesson reader (Slice 7). [lessonsFor] and
   /// [lessonFor] add `?for=<membershipId>` to read in the context of a

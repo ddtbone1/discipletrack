@@ -660,7 +660,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain 1st John 5:7?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -668,7 +669,8 @@
       "tier": "DISCIPLE",
       "section": "A",
       "body": {
-        "text": "Here’s a “water cooler” scenario: If your friend, over coffee, asks you “How could a loving God allow thousands of innocent people to be killed by terrorists or by disasters like tsunamis?” How would you respond to that question? *Need ideas? Visit www.TheJourneyForum.com."
+        "text": "Here’s a “water cooler” scenario: If your friend, over coffee, asks you “How could a loving God allow thousands of innocent people to be killed by terrorists or by disasters like tsunamis?” How would you respond to that question? *Need ideas? Visit www.TheJourneyForum.com.",
+        "respond": "write"
       }
     },
     {
@@ -1103,7 +1105,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Romans 10:13?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -1111,7 +1114,8 @@
       "tier": "DISCIPLE",
       "section": "B",
       "body": {
-        "text": "Here’s a “water cooler” scenario: If your neighbor asks you, “Why do you think Jesus is anything more than a good teacher?” Or “Why are Christians so intolerant to think that Jesus is the only way?” How would you respond?"
+        "text": "Here’s a “water cooler” scenario: If your neighbor asks you, “Why do you think Jesus is anything more than a good teacher?” Or “Why are Christians so intolerant to think that Jesus is the only way?” How would you respond?",
+        "respond": "write"
       }
     },
     {
@@ -1145,19 +1149,7 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 1,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "The Word of God, the Bible, brought you into salvation. Your attitude about God and His Word are so",
-          "important, it will determine the direction of your life. It is important that you know the Bible is the very",
-          "words of God and every word is pure. The Bible tells us the very thoughts of God. You can know your",
-          "Heavenly Father by knowing His Word."
-        ]
+        "text": "The Word of God, the Bible, brought you into salvation. Your attitude about God and His Word are so important, it will determine the direction of your life. It is important that you know the Bible is the very words of God and every word is pure. The Bible tells us the very thoughts of God. You can know your Heavenly Father by knowing His Word."
       }
     },
     {
@@ -1165,17 +1157,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Read 1st Thessalonians 2:13. If you received Christ, the Bible will work in you. And each word is",
-          "important. The way to know God is through His Word."
-        ]
+        "text": "Read 1st Thessalonians 2:13. If you received Christ, the Bible will work in you. And each word is important. The way to know God is through His Word.",
+        "respond": "task"
       }
     },
     {
@@ -1183,17 +1166,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 3,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Read Hebrews 4:12. You and I do not judge the Bible; it judges and knows us. We are to respect the",
-          "Word of God and allow it to change us. You must obey the Word of God."
-        ]
+        "text": "Read Hebrews 4:12. You and I do not judge the Bible; it judges and knows us. We are to respect the Word of God and allow it to change us. You must obey the Word of God.",
+        "respond": "task"
       }
     },
     {
@@ -1201,27 +1175,7 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 4,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "It is very important that you decide now to give time to God and His Word everyday. Our Lord Jesus",
-          "said, in John 8:31, to those which believed on him, that if they would continue in His word, then they",
-          "would be His disciples. And God’s plan for your life is that you become His disciple. A disciple is a",
-          "trained follower who places Christ first.",
-          "There are specific steps to discipleship in the Word of God and your discipler is with you to help you",
-          "through each one successfully. You will learn how to meet with your Heavenly Father every day. If He is",
-          "not leading you, your life will be too complicated.",
-          "All the problems and trials in life can be solved by our Heavenly Father. God is always at work and always",
-          "moving. God wants to bring comfort and peace to your life even when you are in the middle of those",
-          "troubles.",
-          "There is a spiritual struggle going on and you are on the winning side. Sometimes life is difficult because",
-          "evil is fighting against God, but God will help you."
-        ]
+        "text": "It is very important that you decide now to give time to God and His Word everyday. Our Lord Jesus said, in John 8:31, to those which believed on him, that if they would continue in His word, then they would be His disciples. And God’s plan for your life is that you become His disciple. A disciple is a trained follower who places Christ first.\n\nThere are specific steps to discipleship in the Word of God and your discipler is with you to help you through each one successfully. You will learn how to meet with your Heavenly Father every day. If He is not leading you, your life will be too complicated.\n\nAll the problems and trials in life can be solved by our Heavenly Father. God is always at work and always moving. God wants to bring comfort and peace to your life even when you are in the middle of those troubles.\n\nThere is a spiritual struggle going on and you are on the winning side. Sometimes life is difficult because evil is fighting against God, but God will help you."
       }
     },
     {
@@ -1236,17 +1190,7 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 1,
-        "text": "The Spiritual Map is a summary of lesson one to use as a witnessing tool."
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "<<<",
-          "witnessing tool."
-        ]
+        "text": "The Spiritual Map is a summary of lesson one to use as a witnessing tool. <<< witnessing tool."
       }
     },
     {
@@ -1254,26 +1198,7 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Today, you might see a Hindu family across the street or Muslims in the stores or Buddhists in the",
-          "airport. People from non-Christian beliefs are all around us and many are receptive to the Gospel. Are",
-          "you prepared to share the truth of God’s Word with genuine concern, drawing them to Christ?",
-          "There are tools to help you respond with the unique truths of biblical Christianity to point them to Jesus",
-          "Christ, to answer questions, and win souls for eternity.",
-          "Check the resources at www.TheJourneyForum.com regularly which include information on: Major",
-          "Religions in our world, such as: Catholicism, Islam, Buddhism, Hinduism, Judaism. Major Cults in our",
-          "world, such as: Jehovah Witnesses, Mormonism, Scientology, and others. Witnessing Tools like the",
-          "Spiritual Map, Gospel Tracts, and more.",
-          "Go to www.TheJourneyForum.com and click on “Users.”",
-          "Go to the website today and download this free"
-        ]
+        "text": "Today, you might see a Hindu family across the street or Muslims in the stores or Buddhists in the airport. People from non-Christian beliefs are all around us and many are receptive to the Gospel. Are you prepared to share the truth of God’s Word with genuine concern, drawing them to Christ? There are tools to help you respond with the unique truths of biblical Christianity to point them to Jesus Christ, to answer questions, and win souls for eternity.\n\nCheck the resources at www.TheJourneyForum.com regularly which include information on: Major Religions in our world, such as: Catholicism, Islam, Buddhism, Hinduism, Judaism. Major Cults in our world, such as: Jehovah Witnesses, Mormonism, Scientology, and others. Witnessing Tools like the Spiritual Map, Gospel Tracts, and more.\n\nGo to www.TheJourneyForum.com and click on “Users.”\n\nGo to the website today and download this free"
       }
     },
     {
@@ -1281,18 +1206,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 1,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Get a note book with rings that you can put paper into. Then divide the paper with these sections:",
-          "Daily in the Word, Prayer, Special Verses, Message Notes, and Bible Study. You need blank paper in",
-          "each section."
-        ]
+        "text": "Get a note book with rings that you can put paper into. Then divide the paper with these sections: Daily in the Word, Prayer, Special Verses, Message Notes, and Bible Study. You need blank paper in each section.",
+        "respond": "task"
       }
     },
     {
@@ -1300,17 +1215,7 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Answer the questions for Lesson 1 below on a separate piece of paper and bring them to your next",
-          "meeting:"
-        ]
+        "text": "Answer the questions for Lesson 1 below on a separate piece of paper and bring them to your next meeting:"
       }
     },
     {
@@ -1318,18 +1223,22 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 1,
-        "text": "Which statement is true?"
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "a. God started evolution",
-          "b. God created everything out of nothing",
-          "c. God is in the trees, plants and wind"
-        ]
+        "text": "Which statement is true?",
+        "parts": [
+          {
+            "label": "a.",
+            "text": "God started evolution"
+          },
+          {
+            "label": "b.",
+            "text": "God created everything out of nothing"
+          },
+          {
+            "label": "c.",
+            "text": "God is in the trees, plants and wind"
+          }
+        ],
+        "respond": "choice"
       }
     },
     {
@@ -1337,7 +1246,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": "Write out a Bible verse that teaches God is three in one."
+        "text": "Write out a Bible verse that teaches God is three in one.",
+        "respond": "write"
       }
     },
     {
@@ -1345,17 +1255,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 3,
-        "text": ""
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Does the Bible teach that Jesus Christ is God? [_]. Write your reasons with",
-          "Bible verses."
-        ],
+        "text": "Does the Bible teach that Jesus Christ is God? [_]. Write your reasons with Bible verses.",
+        "respond": "write",
         "blanks": 1
       },
       "answers": [
@@ -1367,7 +1268,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 4,
-        "text": "Where did evil start?"
+        "text": "Where did evil start?",
+        "respond": "write"
       }
     },
     {
@@ -1375,7 +1277,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 5,
-        "text": "What does it mean that man was made in the image of God?"
+        "text": "What does it mean that man was made in the image of God?",
+        "respond": "write"
       }
     },
     {
@@ -1383,7 +1286,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 6,
-        "text": "What does it mean to be born in the image of Adam?"
+        "text": "What does it mean to be born in the image of Adam?",
+        "respond": "write"
       }
     },
     {
@@ -1391,7 +1295,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 7,
-        "text": "Why is salvation not by our morality or religious good deeds or works?"
+        "text": "Why is salvation not by our morality or religious good deeds or works?",
+        "respond": "write"
       }
     },
     {
@@ -1399,7 +1304,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 8,
-        "text": "What do you believe about Jesus Christ?"
+        "text": "What do you believe about Jesus Christ?",
+        "respond": "write"
       }
     },
     {
@@ -1407,7 +1313,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 9,
-        "text": "How do we receive salvation?"
+        "text": "How do we receive salvation?",
+        "respond": "write"
       }
     },
     {
@@ -1415,7 +1322,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 10,
-        "text": "Write your answers to all Water Cooler Questions in this lesson."
+        "text": "Write your answers to all Water Cooler Questions in this lesson.",
+        "respond": "task"
       }
     },
     {

@@ -5,6 +5,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
+import 'app_pill.dart';
 
 /// An inline text link: optional muted [prefix] text followed by the tappable
 /// [label], for example "New here? **Create an account**".
@@ -42,7 +43,11 @@ class AppTextLink extends StatelessWidget {
     final p = context.palette;
     final blocked = requiresConnection && ConnectionScope.isOffline(context);
     final enabled = onTap != null && !blocked;
-    final linkColor = enabled ? p.textPrimary : p.disabled;
+    // Brand green: lime in dark mode; in light mode the readable green of
+    // the brand, bold and without underline (user, 2026-10-07).
+    final linkColor = enabled
+        ? pillColors(context, PillTone.brand).$2
+        : p.disabled;
 
     final link = Semantics(
       link: true,
@@ -66,9 +71,7 @@ class AppTextLink extends StatelessWidget {
                 label,
                 style: AppTypography.supporting.copyWith(
                   color: linkColor,
-                  fontWeight: FontWeight.w600,
-                  decoration: TextDecoration.underline,
-                  decorationColor: linkColor,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),

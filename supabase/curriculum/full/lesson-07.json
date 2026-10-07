@@ -389,7 +389,8 @@
           "Are there parts of this section that you disagree with?",
           "How would you explain Romans 12:1-2?",
           "Are there any verses we want to memorize?"
-        ]
+        ],
+        "respond": "write"
       }
     },
     {
@@ -397,7 +398,8 @@
       "tier": "DISCIPLE",
       "section": "A",
       "body": {
-        "text": "Here’s a “water cooler” scenario: A friend says to you, ”I hope when I get married, it’s for life. That’s why I’m going to live together with someone first, just to make sure they’re the right one before making that kind of commitment.” Or a Christian says to you in passing, “Hey, they’re not married, but it’s working for them.” How would you respond to these statements? After you make your comments to them, they say to you, “Judge not, lest ye be judged.” What do you say then? Need ideas, visit www.TheJourneyForum.com"
+        "text": "Here’s a “water cooler” scenario: A friend says to you, ”I hope when I get married, it’s for life. That’s why I’m going to live together with someone first, just to make sure they’re the right one before making that kind of commitment.” Or a Christian says to you in passing, “Hey, they’re not married, but it’s working for them.” How would you respond to these statements? After you make your comments to them, they say to you, “Judge not, lest ye be judged.” What do you say then? Need ideas, visit www.TheJourneyForum.com",
+        "respond": "write"
       }
     },
     {
@@ -503,7 +505,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 1,
-        "text": "With your Discipler, complete the Discipleship Training Module(s) on the following pages."
+        "text": "With your Discipler, complete the Discipleship Training Module(s) on the following pages.",
+        "respond": "task"
       }
     },
     {
@@ -511,17 +514,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 2,
-        "text": "Download or read online the study on “How to Know God’s Will” before your next meeting. If you have"
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "any questions, please write them down and discuss them with your Discipler. Look up each Bible verse",
-          "in the study. (Go to www.TheJourneyForum.com and click on Users)"
-        ]
+        "text": "Download or read online the study on “How to Know God’s Will” before your next meeting. If you have any questions, please write them down and discuss them with your Discipler. Look up each Bible verse in the study. (Go to www.TheJourneyForum.com and click on Users)",
+        "respond": "write"
       }
     },
     {
@@ -529,25 +523,52 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 3,
-        "text": "Pick 6 or more of the verses below and explain what they mean on a separate sheet of paper:"
-      }
-    },
-    {
-      "type": "LIST",
-      "tier": "DISCIPLE",
-      "body": {
-        "items": [
-          "Romans 8:29",
-          "Romans 12:1-2",
-          "2nd Corinthians 10:3-5",
-          "1st John 2:15-16",
-          "1st Corinthians 7:1",
-          "1st Thessalonians 4:3-7",
-          "1st Peter 2:11",
-          "1st Corinthians 6:13-20",
-          "Hebrews 13:4",
-          "1st Peter 3:1",
-          "2nd Peter 3:18"
+        "text": "Pick 6 or more of the verses below and explain what they mean on a separate sheet of paper:",
+        "parts": [
+          {
+            "text": "Romans 8:29",
+            "respond": "write"
+          },
+          {
+            "text": "Romans 12:1-2",
+            "respond": "write"
+          },
+          {
+            "text": "2nd Corinthians 10:3-5",
+            "respond": "write"
+          },
+          {
+            "text": "1st John 2:15-16",
+            "respond": "write"
+          },
+          {
+            "text": "1st Corinthians 7:1",
+            "respond": "write"
+          },
+          {
+            "text": "1st Thessalonians 4:3-7",
+            "respond": "write"
+          },
+          {
+            "text": "1st Peter 2:11",
+            "respond": "write"
+          },
+          {
+            "text": "1st Corinthians 6:13-20",
+            "respond": "write"
+          },
+          {
+            "text": "Hebrews 13:4",
+            "respond": "write"
+          },
+          {
+            "text": "1st Peter 3:1",
+            "respond": "write"
+          },
+          {
+            "text": "2nd Peter 3:18",
+            "respond": "write"
+          }
         ]
       }
     },
@@ -556,7 +577,8 @@
       "tier": "DISCIPLE",
       "body": {
         "number": 4,
-        "text": "Write your answers to all the Water Cooler Scenarios in the lesson."
+        "text": "Write your answers to all the Water Cooler Scenarios in the lesson.",
+        "respond": "task"
       }
     },
     {

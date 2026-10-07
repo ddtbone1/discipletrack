@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../core/widgets/app_pill.dart';
+import '../../profile/presentation/member_avatar.dart';
 import '../domain/d_group_detail.dart';
 import '../domain/d_group_member.dart';
 import 'ministry_ui.dart';
@@ -67,7 +67,10 @@ Future<PairSelection?> showPairSheet(
                 ),
               for (final d in disciplers)
                 ListTile(
-                  leading: InitialsAvatar(name: d.fullName),
+                  leading: MemberAvatar(
+                    name: d.fullName,
+                    membershipId: d.churchMembershipId,
+                  ),
                   title: Text(
                     d.fullName,
                     style: AppTypography.body.copyWith(color: p.textPrimary),

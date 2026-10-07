@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/routes.dart';
 import '../../../core/format/app_format.dart';
 import '../../../core/connectivity/connection_status.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
@@ -18,6 +19,7 @@ import '../../discipleship/domain/journey_views.dart';
 import '../../discipleship/presentation/discipleship_ui.dart';
 import '../../discipleship/presentation/my_disciples_page.dart';
 import '../../ministry/application/ministry_providers.dart';
+import '../../ministry/presentation/no_disciples_guide.dart';
 
 /// Home's blocks per relationship (plan section F2, user rule 2L): the
 /// person's own journey when they are a Disciple, and their discipleships
@@ -45,13 +47,30 @@ class JourneyBlocks extends ConsumerWidget {
           const _OwnJourney(),
           const SizedBox(height: AppSpacing.lg),
         ],
-        if (views.hasDisciples) ...[
+        // A Discipler without a journey of their own (every Leader who is
+        // not a Disciple) reads all ten lessons (ADR-019 decision 16).
+        if (!views.hasOwnJourney && views.isAppointed) ...[
           SectionHeading(
-            'Your discipleships',
+            'Lessons',
             trailing: AppTextLink(
               label: 'See all',
-              onTap: () => context.go(Routes.journeyDisciples),
+              onTap: () => context.push(Routes.lessons),
             ),
+          ),
+          const LessonCarousel(journey: null),
+          const SizedBox(height: AppSpacing.lg),
+        ],
+        // Every Discipler, a Disciple too or not, sees their Disciples here,
+        // or why there are none yet (user, 2026-10-07).
+        if (views.hasDisciples || views.isAppointed) ...[
+          SectionHeading(
+            'Your Disciples',
+            trailing: views.hasDisciples
+                ? AppTextLink(
+                    label: 'See all',
+                    onTap: () => context.go(Routes.journeyDisciples),
+                  )
+                : null,
           ),
           const _Discipleships(),
           const SizedBox(height: AppSpacing.lg),
@@ -94,7 +113,9 @@ class _OwnJourney extends ConsumerWidget {
                 TextSpan(
                   text: '${j.lessonsCompleted} of ${j.lessonsTotal} completed',
                   style: TextStyle(
-                    color: pillColors(context, PillTone.brand).$2,
+                    // A fact, not a link: the text colour, bold (green is
+                    // kept for what can be tapped and for lesson states).
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -132,6 +153,7 @@ class _Discipleships extends ConsumerWidget {
             )
           : const SizedBox(height: 48);
     }
+    if (rows.isEmpty) return const NoDisciplesGuide();
     final recordable = [
       for (final d in rows)
         if (d.currentLessonNumber != null) d,

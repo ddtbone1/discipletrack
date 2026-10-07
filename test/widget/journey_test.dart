@@ -131,7 +131,7 @@ void main() {
       );
       expect(find.byType(TabBar), findsNothing);
       // The current lesson is the first thing on the page.
-      expect(find.text('Lesson 4'), findsOneWidget);
+      expect(find.text('Lesson 4'), findsWidgets);
     });
 
     testWidgets('a Discipler with no journey of their own sees My Disciples '
@@ -199,7 +199,7 @@ void main() {
         _context(disciple: true),
         _repo(),
       );
-      expect(find.text('Lesson 4'), findsOneWidget);
+      expect(find.text('Lesson 4'), findsWidgets);
       expect(find.text('Discipler: Mark Reyes'), findsOneWidget);
       // One line: the lesson's state and the last recorded meeting.
       expect(
@@ -239,9 +239,9 @@ void main() {
       expect(find.text('Lesson 4 · Now'), findsOneWidget);
       expect(find.textContaining('3 of 12 completed'), findsOneWidget);
       // Once, on the D Group card; not repeated in the journey block.
-      expect(find.text('Mark Reyes'), findsOneWidget);
-      expect(find.text('Your Discipler'), findsOneWidget);
-      expect(find.text('Your discipleships'), findsNothing);
+      expect(find.text('Mark'), findsOneWidget);
+      expect(find.text('Discipler'), findsOneWidget);
+      expect(find.text('Your Disciples'), findsNothing);
     });
 
     testWidgets('a Discipler sees their discipleships with Record a meeting', (
@@ -253,10 +253,25 @@ void main() {
         _context(discipler: true, disciples: ['Ana Lim', 'Ben Cruz']),
         _repo(disciples: ['Ana Lim', 'Ben Cruz']),
       );
-      expect(find.text('Your discipleships'), findsOneWidget);
+      expect(find.text('Your Disciples'), findsOneWidget);
       expect(find.text('Ana Lim'), findsOneWidget);
       expect(find.text('Record a meeting'), findsOneWidget);
       expect(find.text('Your journey'), findsNothing);
+    });
+
+    testWidgets('a Disciple who is also a Discipler, with nobody paired yet, '
+        'sees their journey and an empty Your Disciples', (tester) async {
+      await _pump(
+        tester,
+        const HomePage(),
+        _context(disciple: true, discipler: true),
+        _repo(),
+      );
+      expect(find.text('Your journey'), findsOneWidget);
+      expect(find.text('Your Disciples'), findsOneWidget);
+      expect(find.text('No Disciples yet'), findsOneWidget);
+      expect(find.text('See all'), findsOneWidget, reason: 'journey only');
+      expect(find.text('Record a meeting'), findsNothing);
     });
 
     testWidgets('the Coordinator sees active discipleships as a figure', (
@@ -287,10 +302,13 @@ void main() {
         ),
         _repo(),
       );
-      expect(find.text('Disciple · Discipler'), findsOneWidget);
-      expect(find.text('Ana Lim and Ben Cruz'), findsOneWidget);
+      expect(find.textContaining('Discipler'), findsWidgets);
       expect(
-        find.text('Lesson 4 of 12 · 3 lessons completed · Lesson 4 current'),
+        find.text('Ana Lim and Ben Cruz', skipOffstage: false),
+        findsOneWidget,
+      );
+      expect(
+        find.text('3 of 12 lessons completed', skipOffstage: false),
         findsOneWidget,
       );
     });
@@ -306,14 +324,15 @@ void main() {
         _repo(disciples: ['Ana Lim', 'Ben Cruz']),
       );
       expect(find.text('Young Adults A'), findsOneWidget);
-      expect(find.text('You · Discipler'), findsOneWidget);
-      expect(find.text('Disciples'), findsOneWidget);
+      expect(find.textContaining("You're a Discipler"), findsOneWidget);
+      expect(find.text('Disciples'), findsWidgets);
       // Each Disciple carries their lesson and last recorded meeting.
       // One line each: the lesson in colour, then the last meeting.
       expect(
         find.text(
           'Lesson 3 of 12  ·  No meeting recorded yet',
           findRichText: true,
+          skipOffstage: false,
         ),
         findsNWidgets(2),
       );

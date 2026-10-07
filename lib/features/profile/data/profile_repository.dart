@@ -89,6 +89,45 @@ class ProfileRepository {
     }
   }
 
+  /// Sets the person's avatar to a bundled preset, or back to initials
+  /// with null (Migration 021 accepts preset keys only).
+  Future<Profile> updateAvatar({
+    required String userId,
+    required String? avatar,
+  }) async {
+    try {
+      final row = await _client
+          .from('profiles')
+          .update({'avatar_url': avatar})
+          .eq('id', userId)
+          .select(_columns)
+          .single();
+      return Profile.fromMap(row);
+    } on PostgrestException catch (e) {
+      throw ProfileFailure(_friendly(e));
+    } on Exception {
+      throw const ProfileFailure(
+        'Could not save your avatar.',
+        isNetwork: true,
+      );
+    }
+  }
+
+  /// The avatars of the person's church, by church membership id.
+  Future<Map<String, String>> fetchChurchAvatars() async {
+    try {
+      final rows = await _client.rpc<List<dynamic>>('get_church_avatars');
+      return {
+        for (final r in rows.cast<Map<String, dynamic>>())
+          r['church_membership_id'] as String: r['avatar'] as String,
+      };
+    } on PostgrestException catch (e) {
+      throw ProfileFailure(_friendly(e));
+    } on Exception {
+      throw const ProfileFailure('Could not load avatars.', isNetwork: true);
+    }
+  }
+
   String _friendly(PostgrestException e) {
     final raw = '${e.message} ${e.details ?? ''}'.toLowerCase();
     if (raw.contains('profiles_full_name_not_blank_check')) {

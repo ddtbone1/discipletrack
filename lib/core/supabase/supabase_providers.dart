@@ -31,3 +31,8 @@ final currentSessionProvider = Provider<Session?>((ref) {
 final currentUserIdProvider = Provider<String?>((ref) {
   return ref.watch(currentSessionProvider)?.user.id;
 });
+
+/// The signed-in person's sign-in email.
+final currentUserEmailProvider = Provider<String?>((ref) {
+  return ref.watch(currentSessionProvider)?.user.email;
+});

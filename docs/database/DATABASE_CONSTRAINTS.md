@@ -771,6 +771,13 @@ curriculum_publications, lesson_content_blocks, lesson_block_answers
   RLS enabled with no client grant; written only by set_lesson_cover()
   (service_role), read only through get_lesson_covers(). A cover is not
   content and opens nothing.
+- check_lesson_answers() (Migration 020, ADR-021) reads lesson_block_answers
+  for the caller's own attempted blanks and writes nothing; a Disciple's
+  answers live on their device only.
+- profiles.avatar_url (Migration 021) is null or a bundled preset key,
+  "preset:1" to "preset:12" (CHECK). Photo uploads are not in the MVP; they
+  would need file storage and their own decision. Fellow ACTIVE members of
+  the church read avatar keys through get_church_avatars().
 - Content never drives progress. No progress, meeting or completion
   row references a block or publication, and a new publication changes
   no one's journey (ADR-010 decisions 5 and 6).

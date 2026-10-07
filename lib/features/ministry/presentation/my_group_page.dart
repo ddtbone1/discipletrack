@@ -11,6 +11,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_pill.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_text_link.dart';
+import '../../../core/widgets/charts.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
@@ -21,8 +22,10 @@ import '../application/ministry_providers.dart';
 import '../domain/d_group_detail.dart';
 import '../domain/d_group_member.dart';
 import '../domain/ministry_context.dart';
+import '../../profile/presentation/member_avatar.dart';
 import 'ministry_ui.dart';
 import 'needs_setup_notice.dart';
+import 'no_disciples_guide.dart';
 
 /// The roster for everyone in a group: their group at a glance, their
 /// Leader, their own Discipler, a Discipler's own Disciples with where each
@@ -78,11 +81,7 @@ class MyGroupPage extends ConsumerWidget {
 
 /// Role colours, used the same way on every D Group page. Avatars use a
 /// pastel chosen from the name; the role is coloured text (section 39).
-PillTone _toneOf(DGroupResponsibility r) => switch (r) {
-  DGroupResponsibility.leader => PillTone.ink,
-  DGroupResponsibility.discipler => PillTone.brand,
-  DGroupResponsibility.disciple => PillTone.info,
-};
+PillTone _toneOf(DGroupResponsibility r) => roleTone(r);
 
 class _Roster extends ConsumerWidget {
   const _Roster({required this.ministry});
@@ -104,59 +103,66 @@ class _Roster extends ConsumerWidget {
       ?discipler?.churchMembershipId,
       for (final d in disciples) d.churchMembershipId,
     };
-    final others = [
-      for (final m in c.groupMates)
-        if (!shown.contains(m.churchMembershipId)) m,
-    ];
+    // Everyone else, clustered by role.
+    List<RosterEntry> othersIn(DGroupResponsibility r) {
+      final seen = <String>{};
+      return [
+        for (final m in c.roster)
+          if (m.responsibility == r &&
+              !m.isMe &&
+              !shown.contains(m.churchMembershipId) &&
+              seen.add(m.churchMembershipId))
+            m,
+      ];
+    }
+
+    final otherDisciplers = othersIn(DGroupResponsibility.discipler);
+    final otherDisciples = othersIn(DGroupResponsibility.disciple);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _GroupHeader(ministry: c),
+        // 1. The group at a glance: who it is made of.
+        _GroupOverview(ministry: c),
         if (c.isLeader) ...[
           const SizedBox(height: AppSpacing.sm),
           _LeaderControls(ministry: c),
         ],
-        const SizedBox(height: AppSpacing.lg),
-        if (leader != null) ...[
-          const SectionHeading('Your Leader'),
-          AppCard(
-            padding: EdgeInsets.zero,
-            child: _PersonTile(
-              name: leader.fullName,
-              role: DGroupResponsibility.leader,
-              phone: leader.phone,
-            ),
-          ),
+
+        // 2. The people who walk with this person.
+        if (leader != null || c.isDisciple) ...[
           const SizedBox(height: AppSpacing.lg),
-        ],
-        if (c.isDisciple) ...[
-          const SectionHeading('Your Discipler'),
-          AppCard(
-            padding: EdgeInsets.zero,
-            child: discipler == null
-                ? const _PersonTile(
-                    name: 'Not paired yet',
-                    detail:
-                        'Your Leader or the Coordinator will pair you with a '
-                        'Discipler.',
-                    pills: [
-                      AppPill(
-                        tone: PillTone.warning,
+          const SectionHeading('Walking with you'),
+          TileGroup(
+            children: [
+              if (leader != null)
+                _PersonTile(
+                  name: leader.fullName,
+                  membershipId: leader.churchMembershipId,
+                  role: DGroupResponsibility.leader,
+                  phone: leader.phone,
+                ),
+              if (c.isDisciple)
+                discipler == null
+                    ? const _PersonTile(
+                        name: 'Not paired with a Discipler yet',
                         icon: Icons.link_off_rounded,
-                        label: 'Not paired',
+                        iconTone: PillTone.warning,
+                        detail: 'Your Leader pairs you with one.',
+                      )
+                    : _PersonTile(
+                        name: discipler.fullName,
+                        membershipId: discipler.churchMembershipId,
+                        role: DGroupResponsibility.discipler,
+                        phone: discipler.phone,
                       ),
-                    ],
-                  )
-                : _PersonTile(
-                    name: discipler.fullName,
-                    role: DGroupResponsibility.discipler,
-                    phone: discipler.phone,
-                  ),
+            ],
           ),
-          const SizedBox(height: AppSpacing.lg),
         ],
+
+        // 3. The people this person disciples, with where they are.
         if (c.isDiscipler) ...[
+          const SizedBox(height: AppSpacing.lg),
           SectionHeading(
             'Your Disciples',
             trailing: disciples.isEmpty
@@ -166,40 +172,52 @@ class _Roster extends ConsumerWidget {
                     onTap: () => context.go(Routes.journeyDisciples),
                   ),
           ),
-          TileGroup(
-            children: [
-              if (disciples.isEmpty)
-                const _PersonTile(
-                  name: 'No Disciples paired with you yet',
-                  detail:
-                      'Your Leader or the Coordinator pairs Disciples with '
-                      'you.',
-                ),
-              for (final d in disciples)
-                _PersonTile(
-                  name: d.fullName,
-                  phone: d.phone,
-                  pills: _progressPills(
-                    context,
-                    progress[d.churchMembershipId],
+          if (disciples.isEmpty)
+            const NoDisciplesGuide()
+          else ...[
+            TileGroup(
+              children: [
+                for (final d in disciples)
+                  _PersonTile(
+                    name: d.fullName,
+                    membershipId: d.churchMembershipId,
+                    phone: d.phone,
+                    pills: _progressPills(
+                      context,
+                      progress[d.churchMembershipId],
+                    ),
+                    progress: switch (progress[d.churchMembershipId]) {
+                      final s? when s.lessonsTotal > 0 =>
+                        s.lessonsCompleted / s.lessonsTotal,
+                      _ => 0,
+                    },
+                    onTap: () => context.push(
+                      Routes.discipleDetailFor(d.churchMembershipId),
+                    ),
                   ),
-                  onTap: () => context.push(
-                    Routes.discipleDetailFor(d.churchMembershipId),
+              ],
+            ),
+          ],
+        ],
+
+        // 4. The rest of the group, by role.
+        for (final (title, people) in [
+          ('Disciplers', otherDisciplers),
+          ('Disciples', otherDisciples),
+        ])
+          if (people.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.lg),
+            SectionHeading('$title  ·  ${people.length}'),
+            TileGroup(
+              children: [
+                for (final m in people)
+                  _PersonTile(
+                    name: m.fullName,
+                    membershipId: m.churchMembershipId,
                   ),
-                ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.lg),
-        ],
-        if (others.isNotEmpty) ...[
-          const SectionHeading('In your group'),
-          TileGroup(
-            children: [
-              for (final m in others)
-                _PersonTile(name: m.fullName, role: m.responsibility),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
       ],
     );
   }
@@ -233,10 +251,10 @@ class _Roster extends ConsumerWidget {
   }
 }
 
-/// The group at a glance: its name, the person's own responsibilities as
-/// pills, and how many people hold each role.
-class _GroupHeader extends StatelessWidget {
-  const _GroupHeader({required this.ministry});
+/// The group at a glance: its name, the person's own place in it, and a
+/// ring of who it is made of, with the counts beside it.
+class _GroupOverview extends StatelessWidget {
+  const _GroupOverview({required this.ministry});
 
   final MinistryContext ministry;
 
@@ -248,114 +266,73 @@ class _GroupHeader extends StatelessWidget {
       for (final e in ministry.roster)
         if (e.responsibility == r) e.churchMembershipId,
     }.length;
+    final placed = {for (final e in ministry.roster) e.churchMembershipId};
+    final setup = (ministry.groupSize - placed.length).clamp(0, 999);
     final mine = [
       for (final r in DGroupResponsibility.values)
-        if (ministry.myResponsibilities.contains(r)) r,
+        if (ministry.myResponsibilities.contains(r) &&
+            !(ministry.isLeader && r == DGroupResponsibility.discipler))
+          r,
     ];
 
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: neutralFill(context),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(Icons.groups_2_rounded, color: p.textPrimary),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      ministry.dGroupName,
-                      style: text.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xxs),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 4,
-                      children: [
-                        for (final r in mine)
-                          RoleBadge(
-                            label: 'You · ${r.label}',
-                            tone: _toneOf(r),
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          Text(
+            ministry.dGroupName,
+            style: text.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
-          const Divider(height: AppSpacing.lg * 1.5),
-          Row(
-            children: [
-              for (final r in DGroupResponsibility.values)
-                Expanded(
-                  child: _RoleCount(
-                    count: count(r),
-                    label: switch (r) {
-                      DGroupResponsibility.leader => 'Leader',
-                      DGroupResponsibility.discipler =>
-                        count(r) == 1 ? 'Discipler' : 'Disciplers',
-                      DGroupResponsibility.disciple =>
-                        count(r) == 1 ? 'Disciple' : 'Disciples',
-                    },
-                    tone: _toneOf(r),
+          const SizedBox(height: 2),
+          Text.rich(
+            TextSpan(
+              children: [
+                const TextSpan(text: "You're "),
+                for (final (i, r) in mine.indexed) ...[
+                  if (i > 0) const TextSpan(text: ' and '),
+                  TextSpan(
+                    text: r == DGroupResponsibility.leader ? 'the ' : 'a ',
                   ),
+                  TextSpan(
+                    text: r.label,
+                    style: TextStyle(
+                      color: pillColors(context, _toneOf(r)).$2,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            style: text.bodySmall?.copyWith(color: p.muted),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          DonutChart(
+            centerValue: '${ministry.groupSize}',
+            centerLabel: 'members',
+            slices: [
+              (
+                value: count(DGroupResponsibility.leader),
+                color: p.textPrimary,
+                label: 'Leader',
+              ),
+              (
+                value: count(DGroupResponsibility.discipler),
+                color: pillColors(context, PillTone.brand).$2,
+                label: 'Disciplers',
+              ),
+              (
+                value: count(DGroupResponsibility.disciple),
+                color: p.brand,
+                label: 'Disciples',
+              ),
+              if (setup > 0)
+                (
+                  value: setup,
+                  color: pillColors(context, PillTone.warning).$2,
+                  label: 'Needs setup',
                 ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _RoleCount extends StatelessWidget {
-  const _RoleCount({
-    required this.count,
-    required this.label,
-    required this.tone,
-  });
-
-  final int count;
-  final String label;
-  final PillTone tone;
-
-  @override
-  Widget build(BuildContext context) {
-    final (_, fg) = pillColors(context, tone);
-    return MergeSemantics(
-      child: Column(
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(color: fg, shape: BoxShape.circle),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                '$count',
-                style: AppTypography.metricSmall.copyWith(
-                  color: context.palette.textPrimary,
-                ),
-              ),
-            ],
-          ),
-          Text(label, style: context.captionStyle),
         ],
       ),
     );
@@ -372,6 +349,10 @@ class _PersonTile extends StatelessWidget {
     this.detail,
     this.pills = const [],
     this.onTap,
+    this.progress,
+    this.membershipId,
+    this.icon,
+    this.iconTone = PillTone.neutral,
   });
 
   final String name;
@@ -380,6 +361,16 @@ class _PersonTile extends StatelessWidget {
   final String? detail;
   final List<Widget> pills;
   final VoidCallback? onTap;
+
+  /// Lessons completed out of the curriculum, for a Disciple's ring.
+  final double? progress;
+
+  /// The person's church membership id, for their avatar.
+  final String? membershipId;
+
+  /// For an empty row: an icon in place of a person's initials.
+  final IconData? icon;
+  final PillTone iconTone;
 
   @override
   Widget build(BuildContext context) {
@@ -393,9 +384,23 @@ class _PersonTile extends StatelessWidget {
         AppSpacing.sm,
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          InitialsAvatar(name: name),
+          if (icon == null)
+            MemberAvatar(
+              name: name,
+              membershipId: membershipId,
+              progress: progress,
+            )
+          else
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: pillColors(context, iconTone).$1,
+              child: Icon(
+                icon,
+                size: 20,
+                color: pillColors(context, iconTone).$2,
+              ),
+            ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
@@ -449,11 +454,7 @@ class _PersonTile extends StatelessWidget {
               ],
             ),
           ),
-          if (onTap != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Icon(Icons.chevron_right_rounded, color: p.muted),
-            ),
+          if (onTap != null) Icon(Icons.chevron_right_rounded, color: p.muted),
         ],
       ),
     );

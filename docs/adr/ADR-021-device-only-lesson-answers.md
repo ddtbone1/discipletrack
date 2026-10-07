@@ -25,4 +25,22 @@ Saving answers on the server is the workbook (Slice 8, ADR-013). That needs deci
 - Reinstalling the app, clearing its data or changing phones loses the answers. This is accepted until Slice 8.
 - The Discipler cannot see the Disciple's answers. Reviewing answers together stays in person, as in the printed book.
 - Slice 8 can migrate device answers to the server: the per-block keys (`b0`, `f0`, `v`, `s0`) map onto a future response table.
-- Changes: `WorkbookStore` and `Workbook` (client only), `workbookProvider`, fillable fields in `FullLessonView`. No database change.
+- Changes: `WorkbookStore` and `Workbook` (client only), `workbookProvider`, fillable fields in `FullLessonView`. No table is added; Migration 020 adds only the read-only check (decision 7).
+
+## Amendment: every question answerable in the app, and checking (2026-10-07)
+
+User decisions of 2026-10-07: nothing in a lesson is answered on a separate piece of paper, no wording is changed, and a Disciple checks their blanks after answering a set.
+
+6. **Each question gets the input its wording asks for.** The converter (`tool/curriculum/lesson_structure.dart`) keeps every word of the book and adds the answer kind each item needs:
+   - **Blanks** stay inline fill-in items.
+   - **Questions and written tasks** ("What…?", "Explain…", "Write…", lettered questions A. to K., a verse list to explain) get a written-answer field each.
+   - **"(True or False)"** gets a True/False pick. Lettered statements under "Which…?" become a single choice.
+   - **Tasks** ("Read…", "Memorize…") get a "Done" tick.
+   - **Reading plans** (Daily in the Word) list each reading with its date to write.
+   - **Water Cooler scenarios and Reflect & Transfer prompts** get an answer field each.
+   - **Teaching text and instructions** stay as text.
+
+   The book's own instruction ("on a separate piece of paper") is kept verbatim, because the wording is not changed; the field beneath it is where the answer goes. `verify_lesson.dart` still checks every word against the source.
+7. **Checking blanks (Migration 020).** `check_lesson_answers()` compares what the reader wrote in a lesson's blanks with the book's answers. Matching ignores case, spacing and punctuation, and any accepted answer counts. It returns, per submitted blank, right or not and the book's answer. It answers only blanks the reader actually wrote in (an empty blank reveals nothing), only for a lesson whose Disciple tier the reader may read in their own context, and it stores nothing. Written answers, choices and True/False have no key in the book, so they are not checked; the Discipler goes over them at the meeting.
+   - **This amends ADR-019 decision 6** ("never the Disciple" for answers) for blanks only. A Disciple sees a blank's answer after attempting it, as a Discipler would show it at the meeting. The full key, Discipler notes and training modules stay Discipler tier.
+8. **A Disciple who is also a Discipler** reads their own lessons in the Disciple view (fillable, no answers) with a "Show answers" switch, because the database lets them read the answers (ADR-019 decision 16). With their Disciples they keep the Discipler view.

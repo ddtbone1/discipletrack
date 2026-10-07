@@ -263,6 +263,46 @@ Follow-up, 2026-10-07 (user):
   licence reference names the church as publisher. Lesson text is shown with
   references in bold text and green kept for answers only.
 
+Follow-up 2, 2026-10-07 (user): every question answerable in the app
+(ADR-021 decisions 6 to 8).
+
+- **Structure:** `lesson_structure.dart` merges each assignment with its
+  lines, splits lettered questions and choices, gives each item its answer
+  kind, and turns the Daily in the Word charts (Lesson 2, 1st John; Lesson 3,
+  Mark, 184 readings) into one row per reading with a date. All ten lessons
+  still pass `verify_lesson.dart` word for word. One choice item (Lesson 1),
+  one True/False (Lesson 4); the rest are blanks, written answers and tasks.
+- **Check:** "Check my answers" at the end of a lesson (Migration 020).
+- **Rosa:** her own lessons in the Disciple view, with "Show answers".
+- **Lists:** chevrons centred; a lime progress ring around a Disciple's
+  avatar on My D Group; inline links in the brand green, bold, no
+  underline (lime in dark mode).
+
+Follow-up 3, 2026-10-07 (user): profile and account.
+
+- **Profile** in the reference's layout: avatar with a pencil badge, name,
+  church and roles; Personal info (Edit), Ministry and Account cards;
+  Sign out as a red text link.
+- **Avatars (Migration 021):** twelve bundled CC0 illustrations (DiceBear
+  Notionists), stored as "preset:n"; shown everywhere initials were.
+  Photo uploads are left for a later decision (file storage, ADR).
+- **Account:** Change password on its own page (current password first,
+  then a new one meeting every rule, typed twice). Password rules, enforced by
+  the auth server (`minimum_password_length = 8`, `password_requirements =
+  "lower_upper_letters_digits_symbols"`) and shown as a live checklist on
+  sign-up and change password; sign-up asks for the password twice. The
+  sign-in email stays the one used at registration (user decision; no change
+  of email in the app). The theme switch moved here.
+- **D Group screens:** My D Group in clusters (overview with a donut of who
+  the group is made of, Walking with you, Your Disciples, the rest by role);
+  D Groups (Coordinator) with a church donut, the groups, then people
+  waiting on the Coordinator, then the setup period. Charts are drawn in the
+  app (`core/widgets/charts.dart`), no library.
+- **Lessons:** a Leader, or a Discipler who is not a Disciple, reads lessons
+  with answers and gets the Lessons carousel on Home.
+- **Record a meeting** and the Journey history page restyled; tabs with a
+  full-width line.
+
 ### Known limits
 
 - Rosa, a Disciple who is also a Discipler, reads her own lessons ahead and

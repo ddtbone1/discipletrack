@@ -8,12 +8,13 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_pill.dart';
-import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_scaffold.dart';
+import '../../../core/widgets/app_text_link.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/person_row.dart';
+import '../../profile/presentation/member_avatar.dart';
 import '../application/discipleship_providers.dart';
 import '../data/discipleship_repository.dart';
 import '../domain/attendance_outcome.dart';
@@ -48,13 +49,7 @@ class RecordMeetingPage extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            "Record what happened at a meetup, including one that didn't take "
-            'place.',
-            style: context.supportingStyle,
-          ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.md),
           options.when(
             loading: () => const SizedBox(height: 320, child: LoadingState()),
             error: (e, _) =>
@@ -238,171 +233,115 @@ class _RecordMeetingFormState extends ConsumerState<RecordMeetingForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // The lesson, shown, not chosen.
-        AppCard(
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: neutralFill(context),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(Icons.menu_book_rounded, color: p.textPrimary),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Lesson ${_target.lessonNumber}',
-                      style: text.labelSmall?.copyWith(
-                        color: p.muted,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                    Text(
-                      _target.lessonTitle,
-                      style: text.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      'With ${_target.disciplerName}',
-                      style: text.bodySmall?.copyWith(color: p.muted),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+        // The lesson, shown, not chosen: one heading, no card.
+        Text(
+          'Lesson ${_target.lessonNumber}  ·  with ${_target.disciplerName}',
+          style: text.bodySmall?.copyWith(color: p.muted),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          _target.lessonTitle,
+          style: text.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.3,
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
 
         const SectionHeading('When'),
-        AppCard(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  for (final day in _quickDays)
-                    ChoiceChip(
-                      label: Text(_dayLabel(day)),
-                      selected: day == _day,
-                      onSelected: (_) => setState(() {
-                        _day = day;
-                        _problem = null;
-                      }),
-                    ),
-                  ActionChip(
-                    avatar: const Icon(Icons.calendar_month_rounded, size: 18),
-                    label: Text(
-                      _quickDays.contains(_day)
-                          ? 'Other date…'
-                          : AppFormat.shortDate(_day.toUtc()),
-                    ),
-                    onPressed: _pickDay,
-                  ),
-                ],
+        // Recent days as one row of tabs, the calendar for any other day.
+        Row(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    for (final day in _quickDays)
+                      _DayTab(
+                        label: _dayLabel(day),
+                        selected: day == _day,
+                        onTap: () => setState(() {
+                          _day = day;
+                          _problem = null;
+                        }),
+                      ),
+                    if (!_quickDays.contains(_day))
+                      _DayTab(
+                        label: AppFormat.shortDate(_day.toUtc()),
+                        selected: true,
+                        onTap: _pickDay,
+                      ),
+                  ],
+                ),
               ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                'Meetings are recorded after they happen.',
-                style: text.bodySmall?.copyWith(color: p.muted),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(width: AppSpacing.xs),
+            IconButton.filledTonal(
+              tooltip: 'Other date',
+              onPressed: _pickDay,
+              icon: const Icon(Icons.calendar_month_outlined, size: 20),
+            ),
+          ],
         ),
         const SizedBox(height: AppSpacing.lg),
 
         SectionHeading(
           'Who came',
-          trailing: OutlinedButton.icon(
-            onPressed: _nobodyCame,
-            icon: const Icon(Icons.person_off_outlined, size: 18),
-            label: const Text('Nobody came'),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(
-            left: AppSpacing.xxs,
-            bottom: AppSpacing.xs,
-          ),
-          child: Text(
-            "Present and Late count toward the lesson. Absent and Excused "
-            "don't.",
-            style: text.bodySmall?.copyWith(color: p.muted),
-          ),
+          trailing: AppTextLink(label: 'Nobody came', onTap: _nobodyCame),
         ),
         TileGroup(children: [for (final o in _sameLesson) _participant(o)]),
-        if (_otherLesson.isNotEmpty) ...[
-          const SizedBox(height: AppSpacing.sm),
-          for (final o in _otherLesson)
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-              child: AppCard(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Row(
-                  children: [
-                    InitialsAvatar(name: o.fullName, radius: 16),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(o.fullName, style: text.bodyMedium),
-                          Text(
-                            'On Lesson ${o.lessonNumber}. Record their meeting '
-                            'separately.',
-                            style: text.bodySmall?.copyWith(color: p.muted),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-        ],
-        const SizedBox(height: AppSpacing.lg),
-
-        const SectionHeading('Notes'),
-        AppCard(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: TextField(
-            controller: _notes,
-            minLines: 2,
-            maxLines: 5,
-            textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(
-              labelText: 'Notes (optional)',
-              helperText: 'Shared with the Disciples in this meeting.',
-              border: OutlineInputBorder(),
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.lg),
-
-        if (draft != null)
-          AppCard(
-            padding: const EdgeInsets.all(AppSpacing.md),
+        for (final o in _otherLesson)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.fact_check_outlined, color: p.muted),
+                MemberAvatar(
+                  name: o.fullName,
+                  membershipId: o.membershipId,
+                  radius: 14,
+                ),
                 const SizedBox(width: AppSpacing.sm),
-                Expanded(child: Text(draft.reviewLine, style: text.bodyMedium)),
+                Expanded(
+                  child: Text(
+                    '${o.fullName} is on Lesson ${o.lessonNumber}; record '
+                    'separately.',
+                    style: text.bodySmall?.copyWith(color: p.muted),
+                  ),
+                ),
               ],
             ),
           ),
+        const SizedBox(height: AppSpacing.lg),
+
+        const SectionHeading('Notes'),
+        TextField(
+          controller: _notes,
+          minLines: 3,
+          maxLines: 6,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: InputDecoration(
+            hintText: 'Optional. The Disciples in this meeting see it.',
+            filled: true,
+            fillColor: p.surface,
+            contentPadding: const EdgeInsets.all(AppSpacing.md),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(color: p.brand, width: 2),
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+
         if (error != null) ...[
-          const SizedBox(height: AppSpacing.sm),
           Semantics(
             liveRegion: true,
             child: Text(
@@ -410,8 +349,8 @@ class _RecordMeetingFormState extends ConsumerState<RecordMeetingForm> {
               style: AppTypography.supporting.copyWith(color: p.error),
             ),
           ),
+          const SizedBox(height: AppSpacing.sm),
         ],
-        const SizedBox(height: AppSpacing.md),
         AppButton(
           label: 'Record meeting',
           variant: AppButtonVariant.record,
@@ -421,6 +360,15 @@ class _RecordMeetingFormState extends ConsumerState<RecordMeetingForm> {
           offlineAction: 'record this meeting',
           onPressed: _submit,
         ),
+        // What will be saved, in one quiet line.
+        if (draft != null) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            draft.reviewLine,
+            textAlign: TextAlign.center,
+            style: text.bodySmall?.copyWith(color: p.muted),
+          ),
+        ],
       ],
     );
   }
@@ -453,7 +401,11 @@ class _RecordMeetingFormState extends ConsumerState<RecordMeetingForm> {
         children: [
           Row(
             children: [
-              InitialsAvatar(name: o.fullName, radius: 18),
+              MemberAvatar(
+                name: o.fullName,
+                membershipId: o.membershipId,
+                radius: 18,
+              ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
@@ -491,6 +443,55 @@ class _RecordMeetingFormState extends ConsumerState<RecordMeetingForm> {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// A day to record on, as a tab: text, and a thin lime outline when
+/// chosen (as the Members and history tabs).
+class _DayTab extends StatelessWidget {
+  const _DayTab({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: InkWell(
+        customBorder: const StadiumBorder(),
+        onTap: onTap,
+        child: Container(
+          height: 38,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          alignment: Alignment.center,
+          decoration: ShapeDecoration(
+            shape: StadiumBorder(
+              side: selected
+                  ? BorderSide(color: p.brand, width: 1.2)
+                  : BorderSide.none,
+            ),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+              color: selected
+                  ? pillColors(context, PillTone.brand).$2
+                  : p.muted,
+            ),
+          ),
+        ),
       ),
     );
   }
