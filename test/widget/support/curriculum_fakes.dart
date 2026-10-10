@@ -88,6 +88,9 @@ class FakeCurriculumRepository implements CurriculumRepository {
   List<LessonAccess> access;
   Map<String, LessonContent> content;
 
+  /// Each Disciple context's lesson list; [access] for any other.
+  Map<String, List<LessonAccess>> contextAccess = {};
+
   /// Every read fails as an unreachable server would.
   bool offline;
 
@@ -103,7 +106,9 @@ class FakeCurriculumRepository implements CurriculumRepository {
     String? forMembershipId,
   }) async {
     if (offline) throw _network;
-    return access;
+    return forMembershipId == null
+        ? access
+        : contextAccess[forMembershipId] ?? access;
   }
 
   /// Answer keys for checking, by block id: one answer per blank.
@@ -156,12 +161,18 @@ class FakeCurriculumRepository implements CurriculumRepository {
   }
 
   @override
-  Future<ReadableContent> fetchMyReadableContent(String userId) async {
+  Future<ReadableContent> fetchMyReadableContent(
+    String userId, {
+    Iterable<String> contextIds = const [],
+  }) async {
     if (offline) throw _network;
     return ReadableContent(
       userId: userId,
       savedAt: DateTime.utc(2026, 10, 6),
       lessons: access,
+      contexts: {
+        for (final id in contextIds) id: contextAccess[id] ?? const [],
+      },
       blocks: [for (final c in content.values) ...c.blocks],
     );
   }

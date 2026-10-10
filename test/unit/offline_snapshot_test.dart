@@ -5,6 +5,9 @@ import 'package:discipletrack/features/membership/domain/church_membership.dart'
 import 'package:discipletrack/features/ministry/domain/d_group_member.dart';
 import 'package:discipletrack/features/ministry/domain/ministry_context.dart';
 import 'package:discipletrack/features/offline/data/offline_snapshot.dart';
+import 'package:discipletrack/features/platform/application/platform_providers.dart';
+import 'package:discipletrack/features/platform/data/platform_repository.dart';
+import 'package:discipletrack/features/platform/domain/platform_models.dart';
 import 'package:discipletrack/features/profile/data/profile_repository.dart';
 import 'package:discipletrack/features/profile/domain/profile.dart';
 import 'package:discipletrack/features/session/application/session_state.dart';
@@ -91,6 +94,18 @@ class _MembershipRepo implements MembershipRepository {
     if (failure != null) throw failure!;
     return value;
   }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName}');
+}
+
+/// The platform role read fails as an unreachable server would, so it comes
+/// from the snapshot.
+class _OfflinePlatformRepo implements PlatformRepository {
+  @override
+  Future<Set<PlatformRole>> fetchMyRoles(String userId) async =>
+      throw const PlatformFailure('offline', isNetwork: true);
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>
@@ -303,6 +318,7 @@ void main() {
           membershipRepositoryProvider.overrideWithValue(
             _MembershipRepo()..failure = _membershipOffline,
           ),
+          platformRepositoryProvider.overrideWithValue(_OfflinePlatformRepo()),
         ],
       );
       addTearDown(c.dispose);
@@ -310,6 +326,8 @@ void main() {
       c.listen(sessionStateProvider, (_, _) {});
       await c.read(myProfileProvider.future);
       await c.read(myMembershipProvider.future);
+      await c.read(myPlatformAccessProvider.future);
+      await c.read(myChurchProvider.future);
 
       expect(c.read(sessionStateProvider), SessionState.active);
       expect(c.read(isOfflineProvider), isTrue);

@@ -8,6 +8,8 @@ import '../../../core/connectivity/connection_status.dart';
 import '../../../core/supabase/postgrest_failure.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../../membership/application/membership_providers.dart';
+import '../../ministry/application/ministry_providers.dart';
+import '../../ministry/domain/d_group_member.dart';
 import '../../offline/application/offline_providers.dart';
 import '../data/curriculum_repository.dart';
 import '../data/workbook_store.dart';
@@ -57,24 +59,46 @@ Duration? _retry(int count, Object error) =>
     ? null
     : ProviderContainer.defaultRetry(count, error);
 
-bool _isActive(Ref ref) {
-  final membership = ref.watch(myMembershipProvider).value;
-  return membership != null && membership.status.grantsChurchAccess;
-}
+/// An ACTIVE membership in an ACTIVE church (ADR-022): nothing of the
+/// curriculum is read, or kept on the device, otherwise.
+bool _isActive(Ref ref) => ref.watch(hasChurchAccessProvider);
 
 /// Everything the person may read now, refreshed from the server and saved
 /// as the device copy. Each save replaces the last, so content the person
 /// may no longer read leaves the device on the next refresh.
 final myReadableContentProvider = FutureProvider<ReadableContent?>((ref) async {
   final userId = ref.watch(currentUserIdProvider);
-  if (userId == null || !_isActive(ref)) return null;
+  if (userId == null) return null;
   final store = ref.read(curriculumCacheStoreProvider);
+  if (!_isActive(ref)) {
+    // A church known to be SUSPENDED or ARCHIVED keeps nothing of its
+    // curriculum on the device (ADR-022 decision 14). Only on a live answer:
+    // offline, the church row may itself be the saved one.
+    final church = ref.watch(myChurchProvider).value;
+    if (church != null && !church.isAvailable && !ref.read(isOfflineProvider)) {
+      await store.clear(userId);
+    }
+    return null;
+  }
+  // The Disciple contexts the reader may read in (ADR-023): the Disciples
+  // paired with them and, for a Leader, every Disciple of the group. The
+  // database decides what each opens; refused contexts are left out.
+  final ministry = ref.watch(myMinistryContextProvider).value;
+  final contextIds = <String>{
+    if (ministry != null) ...[
+      for (final d in ministry.myDisciples) d.churchMembershipId,
+      if (ministry.isLeader)
+        for (final e in ministry.roster)
+          if (e.responsibility == DGroupResponsibility.disciple && !e.isMe)
+            e.churchMembershipId,
+    ],
+  };
   return _liveOrCopy(
     ref,
     live: () async {
       final content = await ref
           .read(curriculumRepositoryProvider)
-          .fetchMyReadableContent(userId);
+          .fetchMyReadableContent(userId, contextIds: contextIds);
       await store.write(content);
       return content;
     },
@@ -100,20 +124,21 @@ final lessonAccessProvider = FutureProvider.family<List<LessonAccess>, String?>(
       live: () => ref
           .read(curriculumRepositoryProvider)
           .fetchLessonAccess(forMembershipId: forMembershipId),
-      // Offline, a lesson is open when its content was synced.
-      fromCopy: (copy) => [
-        for (final l in copy.lessons)
-          forMembershipId == null
-              ? l
-              : LessonAccess(
-                  lessonId: l.lessonId,
-                  number: l.number,
-                  title: l.title,
-                  theme: l.theme,
-                  discipleTier: copy.lesson(l.lessonId) != null,
-                  disciplerTier: false,
-                ),
-      ],
+      // Offline, the saved access of that context. A context that was not
+      // saved opens nothing: the copy's blocks belong to every context
+      // together, so they never decide access on their own (ADR-023).
+      fromCopy: (copy) =>
+          copy.accessFor(forMembershipId) ??
+          [
+            for (final l in copy.lessons)
+              LessonAccess(
+                lessonId: l.lessonId,
+                number: l.number,
+                title: l.title,
+                discipleTier: false,
+                disciplerTier: false,
+              ),
+          ],
     );
   },
   retry: _retry,
@@ -132,7 +157,8 @@ final lessonContentProvider = FutureProvider.family<LessonContent, LessonKey>((
     live: () => ref
         .read(curriculumRepositoryProvider)
         .fetchLessonContent(key.lessonId, forMembershipId: key.forMembershipId),
-    fromCopy: (copy) => copy.lesson(key.lessonId),
+    // Only what this context may read, from the copy of every context.
+    fromCopy: (copy) => copy.lessonIn(key.lessonId, key.forMembershipId),
   );
 }, retry: _retry);
 

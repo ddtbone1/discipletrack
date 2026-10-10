@@ -358,6 +358,36 @@ Future<void> deleteUser(String userId) async {
     membershipIds: _ids(memberships),
     actorId: userId,
   );
+  // A church whose Coordinator this person is gets archived first, so their
+  // role rows can go without breaking the ACTIVE-church invariant (ADR-022).
+  final membershipIds = _ids(memberships);
+  final coordinated = await service
+      .from('church_role_assignments')
+      .select('church_memberships!inner(church_id)')
+      .eq('role', 'COORDINATOR')
+      .or(
+        [
+          if (membershipIds.isNotEmpty)
+            'church_membership_id.in.(${membershipIds.join(',')})',
+          'assigned_by.eq.$userId',
+        ].join(','),
+      );
+  final churchIds = {
+    for (final r in coordinated)
+      (r['church_memberships'] as Map<String, dynamic>)['church_id'] as String,
+  };
+  for (final churchId in churchIds) {
+    final others = await service
+        .from('church_role_assignments')
+        .select('id, church_memberships!inner(church_id, status, user_id)')
+        .eq('role', 'COORDINATOR')
+        .isFilter('ended_at', null)
+        .eq('church_memberships.church_id', churchId)
+        .eq('church_memberships.status', 'ACTIVE')
+        .neq('church_memberships.user_id', userId)
+        .neq('assigned_by', userId);
+    if (others.isEmpty) await archiveChurch(churchId);
+  }
   for (final m in memberships) {
     await service
         .from('church_role_assignments')
@@ -369,6 +399,10 @@ Future<void> deleteUser(String userId) async {
       .delete()
       .eq('assigned_by', userId);
   await service.from('audit_events').delete().eq('actor_user_id', userId);
+  await service
+      .from('platform_roles')
+      .delete()
+      .or('user_id.eq.$userId,granted_by.eq.$userId,ended_by.eq.$userId');
   await service.from('church_memberships').delete().eq('user_id', userId);
   await service.from('church_memberships').delete().eq('approved_by', userId);
   await service.from('profiles').delete().eq('id', userId);
@@ -393,21 +427,23 @@ typedef TestChurch = ({
   String approverMembershipId,
 });
 
-/// A fresh church with an ACTIVE approver holding the given roles.
+/// A fresh church whose ACTIVE approver is its Coordinator.
 ///
 /// Seeded through the service role rather than bootstrap so each test owns an
 /// independent church and its rows can be removed afterwards. The seeded
 /// bootstrap church is exercised by bootstrap_test.dart.
-Future<TestChurch> seedChurch({
-  String name = 'Test Church',
-  Set<String> approverRoles = const {'ADMIN', 'COORDINATOR'},
-}) async {
+///
+/// Each service-role write is its own transaction, and an ACTIVE church must
+/// have a Coordinator at every commit (ADR-022). So the church is created
+/// SUSPENDED and activated once its Coordinator exists. The church ADMIN role
+/// is retired and cannot be granted.
+Future<TestChurch> seedChurch({String name = 'Test Church'}) async {
   final approver = await createUser(fullName: 'Approver Person', tag: 'appr');
   final joinCode = randomJoinCode();
 
   final church = await service
       .from('churches')
-      .insert({'name': name, 'join_code': joinCode})
+      .insert({'name': name, 'join_code': joinCode, 'status': 'SUSPENDED'})
       .select('id')
       .single();
   final churchId = church['id'] as String;
@@ -430,14 +466,16 @@ Future<TestChurch> seedChurch({
       .single();
   final membershipId = membership['id'] as String;
 
-  for (final role in approverRoles) {
-    await service.from('church_role_assignments').insert({
-      'church_membership_id': membershipId,
-      'role': role,
-      'assigned_by': approver.userId,
-      'started_at': DateTime.now().toUtc().toIso8601String(),
-    });
-  }
+  await service.from('church_role_assignments').insert({
+    'church_membership_id': membershipId,
+    'role': 'COORDINATOR',
+    'assigned_by': approver.userId,
+    'started_at': DateTime.now().toUtc().toIso8601String(),
+  });
+  await service
+      .from('churches')
+      .update({'status': 'ACTIVE'})
+      .eq('id', churchId);
 
   return (
     churchId: churchId,
@@ -507,6 +545,38 @@ Future<Map<String, dynamic>> rpcRow(
   return rows.single as Map<String, dynamic>;
 }
 
+/// A confirmed user holding the platform SUPER_ADMIN role and no church
+/// membership, granted through the service-role function the grant tool
+/// uses (ADR-022). No client path can grant it.
+Future<TestUser> createSuperAdmin({String tag = 'super'}) async {
+  final user = await createUser(fullName: 'Super Admin $tag', tag: tag);
+  await sqlRows(
+    "select private.grant_platform_role('${user.userId}', 'SUPER_ADMIN')",
+  );
+  return user;
+}
+
+/// Sets a test church to ARCHIVED, its final status, unless it already is.
+Future<void> archiveChurch(String churchId) => service
+    .from('churches')
+    .update({'status': 'ARCHIVED'})
+    .eq('id', churchId)
+    .neq('status', 'ARCHIVED');
+
+/// A role row for a former church ADMIN: started yesterday and already ended,
+/// as the Slice 8 migration left every ADMIN row (ADR-022). An active ADMIN
+/// row is refused by the database.
+Map<String, dynamic> formerAdminRow(String membershipId, String assignedBy) => {
+  'church_membership_id': membershipId,
+  'role': 'ADMIN',
+  'assigned_by': assignedBy,
+  'started_at': DateTime.now()
+      .toUtc()
+      .subtract(const Duration(days: 1))
+      .toIso8601String(),
+  'ended_at': DateTime.now().toUtc().toIso8601String(),
+};
+
 /// Removes a church and everything hanging off it, then its approver.
 Future<void> deleteChurch(TestChurch church) async {
   await deleteChurchRows(church.churchId);
@@ -514,6 +584,9 @@ Future<void> deleteChurch(TestChurch church) async {
 }
 
 Future<void> deleteChurchRows(String churchId) async {
+  // Archived first, so removing its Coordinator does not break the
+  // ACTIVE-church invariant (ADR-022) during teardown.
+  await archiveChurch(churchId);
   final groups = await service
       .from('d_groups')
       .select('id')

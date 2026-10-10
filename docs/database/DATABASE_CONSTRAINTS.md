@@ -26,6 +26,8 @@ Revision 2026-10-06 (ADR-020, Migration 018): every active Leader holds DISCIPLE
 
 Revision 2026-10-05 (user decision, ninth): the curriculum has ten lessons, not twelve. Section 0: ten lesson rows and postconditions, and the Slice 5 migration's replacement of the bootstrap functions; examples in sections 4, 5, 11 and 12.
 
+Revision 2026-10-08 (ADR-022, ADR-023, Slice 8; specified before implementation): section 0, bootstrap grants COORDINATOR only, postconditions and nature (in-app provisioning by the Super Admin is now a runtime operation). Section 1: Rules (church ADMIN retired; one church per person), "Last Coordinator Protection" replaced by "Coordinator Invariant" (an ACTIVE church has an active Coordinator at every commit, deferred constraint triggers), Constraints, Join Code Regeneration, Membership Request (approval COORDINATOR only; IN_ANOTHER_CHURCH), First-Entry Onboarding (provisioned Coordinators), and the new Church Status, Coordinator Provisioning and Platform Roles subsections. Section 9: platform audit events. Section 11: Reached Lessons note on the relationship-scoped read (ADR-023). Section 12: operation list. Amended the same day after the Phase 1 review: the Coordinator reads the join code (Join Code Format), one church per person recorded as an MVP limitation (Rules), the Coordinator Invariant verified with its trigger requirements and church row lock (Coordinator Invariant), and reading never affects progression (section 11).
+
 ---
 
 # 0. Bootstrap and Initial State
@@ -38,6 +40,13 @@ church. Other documents reference it rather than restating it.
 Bootstrap is trusted deployment and setup tooling. It is not a runtime
 controlled operation and is deliberately absent from the controlled
 operations list in RBAC_RLS_MATRIX.md.
+
+Since ADR-022 (Slice 8) a church can also be created at runtime by a
+Super Admin through create_church() (section 1, Coordinator
+Provisioning). That operation produces the same records and the same
+postconditions as bootstrap, with the Coordinator in place of the
+initial user. Bootstrap stays for the first church of a deployment and
+for the local seed.
 
 It is never reachable from Flutter. If implemented as a SQL function,
 EXECUTE must be revoked from the anon and authenticated roles and it
@@ -72,7 +81,8 @@ All within one transaction:
 1. churches — supplied id, name, join code, status ACTIVE
 2. church_settings — consecutive_absence_threshold = 3, consecutive_missed_meeting_threshold = 3, follow_up_due_days = 7
 3. church_memberships — the initial user, status ACTIVE
-4. church_role_assignments — two active rows, ADMIN and COORDINATOR
+4. church_role_assignments — one active row, COORDINATOR (until Slice 8
+   the bootstrap also granted ADMIN; that role is retired, ADR-022)
 5. curricula — church-owned, status ACTIVE
 6. curriculum_lessons — ten rows, lesson_number 1 through 10, required_meetings = 4
 7. audit_events — CHURCH_BOOTSTRAPPED
@@ -113,9 +123,11 @@ also removes Lessons 11 and 12 from existing ACTIVE curricula only when
 no meeting or progress row references them; otherwise the migration
 stops.
 
-The initial user holds both ADMIN and COORDINATOR for the single-church
-deployment. COORDINATOR is required because follow-up escalation
-terminates there.
+The initial user holds COORDINATOR. It is required because follow-up
+escalation terminates there and because an ACTIVE church always has an
+active Coordinator (section 1, Coordinator Invariant). The initial user
+holds no platform role; a Super Admin is granted separately
+(section 1, Platform Roles).
 
 ## Transaction Boundary
 
@@ -141,14 +153,19 @@ These are assertable and serve as the bootstrap test:
 - the initial user holds an ACTIVE membership, with onboarding_completed_at
   set: the founder set up the church and sees no first-entry welcome
   (Migration 018)
-- that membership has an active ADMIN and an active COORDINATOR role
+- that membership has an active COORDINATOR role and no active ADMIN
+  role (ADR-022)
+- the initial user holds no membership in any other church
 - exactly one ACTIVE curriculum for the church
 - exactly ten lessons, numbered 1 to 10, each with required_meetings = 4
 - join_code is unique and meets the entropy rule in section 1
 
 ## Out of Scope
 
-Runtime church creation and multi-church onboarding are future scope.
+Self-service church creation by the public is out of scope. Runtime
+creation exists only for a Super Admin (ADR-022). Moving a person between
+churches, and cross-church administration beyond the Super Admin's
+platform operations, are future scope.
 
 ---
 
@@ -161,32 +178,206 @@ Runtime church creation and multi-church onboarding are future scope.
 - Clients may not INSERT or DELETE profiles. They may UPDATE only explicitly permitted self-service fields.
 - profiles.full_name is required and must never be blank.
 - A user may only have one membership per church.
+- One church per person (ADR-022 decision 9): a user holds membership
+  rows, of any status, in at most one church. Enforced by UNIQUE on
+  church_memberships(user_id). A rejected or departed person therefore
+  cannot join a different church in the MVP; moving churches is future
+  scope. This is an intentional MVP limitation, not a domain invariant
+  (Phase 1 review, 2026-10-08). Multi-church membership later requires
+  a forward migration that drops this key, plus a rule and app support
+  for choosing the church a session acts in (ADR-022 decision 9). No
+  other constraint depends on it: domain records key to
+  church_memberships.id, which stays church-scoped.
 - churches.join_code must be unique.
 - churches.join_code must have sufficient entropy to make guessing impractical. The alphabet and length are fixed under Join Code Format below.
-- Joining through a church code must never automatically grant ADMIN or COORDINATOR.
+- Joining through a church code must never automatically grant COORDINATOR or any platform role.
 - Only ACTIVE church members may receive active church roles.
 - The same church role cannot be active twice for the same member.
 - Historical role assignments must be ended using ended_at, not deleted.
-- The church must preserve at least one active COORDINATOR, because follow-up escalation terminates there. (The former second reason, the Coordinator as fallback gathering attendance recorder, is withdrawn with gatherings, ADR-014.)
+- ADMIN is retired (ADR-022): no active ADMIN row may exist. Enforced by
+  CHECK church_role_assignments_admin_retired (role <> 'ADMIN' or
+  ended_at IS NOT NULL), added after the Slice 8 migration has ended
+  every active ADMIN row with an audit event each.
+- An ACTIVE church always has an active COORDINATOR, because follow-up escalation terminates there and the church needs someone to approve members. (The former second reason, the Coordinator as fallback gathering attendance recorder, is withdrawn with gatherings, ADR-014.) See Coordinator Invariant below.
 
-## Last Coordinator Protection
+## Coordinator Invariant
 
-No operation may leave a church with zero active COORDINATOR role
-assignments.
+Replaces "Last Coordinator Protection" (ADR-022 decision 11,
+2026-10-08).
 
-The last active Coordinator cannot be removed, demoted, or have their
-membership deactivated until another active Coordinator exists.
+An active Coordinator of a church is an active COORDINATOR row
+(ended_at IS NULL) on an ACTIVE church_memberships row of that church.
+
+Invariant: a church whose status is ACTIVE has at least one active
+Coordinator at every commit. It never lapses, not even for an instant
+visible to another transaction.
 
 Enforcement:
 
-- assign_church_role() and any operation that ends a role assignment
-  reject the change with a usable error
-- constraint trigger on church_role_assignments as defence in depth
-- membership status transitions are also blocked by the same rule, since
-  a non-ACTIVE membership makes its roles ineffective
+- deferred constraint triggers (DEFERRABLE INITIALLY DEFERRED, checked
+  at commit) that re-check the affected church on:
+  - churches: INSERT, and UPDATE of status to ACTIVE
+  - church_role_assignments: INSERT, UPDATE (including ending) and
+    DELETE (DELETE is not granted to anyone; checked for defence)
+  - church_memberships: UPDATE of status
+- the controlled operations check the same rule first and refuse with
+  last_coordinator, so a person gets a usable error rather than a
+  failed commit
+- replacement is one operation, replace_church_coordinator(), which ends
+  the old row and grants the new one in one transaction (RBAC section
+  10); because the check is deferred, the order of the two writes does
+  not matter
 
-Bootstrap establishes this invariant by assigning COORDINATOR to the
-initial user.
+Trigger requirements, from the verification below:
+
+- **Re-read state at commit.** The check function re-reads the church's
+  current status and its active Coordinators. It never relies on the
+  NEW or OLD values of the row that fired it, because later statements
+  in the same transaction may have changed them.
+- **Every affected church.** It checks each affected church: NEW and
+  OLD church_id where a membership row changes.
+- **Lock the church row first.** It takes SELECT ... FOR UPDATE on the
+  churches row before counting. Without it, two concurrent transactions
+  that each end a different one of two Coordinators would each count the
+  other's Coordinator as still active and both commit (write skew). With
+  it, the second waits for the first. Under READ COMMITTED its next
+  statement then sees the first's commit, and it is rejected. The
+  controlled operations take the same lock at their start, so their
+  usable refusal (last_coordinator) is decided on the same view.
+- **Refusal.** church_requires_coordinator, SQLSTATE 23514, as for
+  leader_must_be_discipler (ADR-020).
+- **Volatile, SECURITY DEFINER, search_path ''**, with EXECUTE revoked
+  from public, anon and authenticated.
+
+Bootstrap and create_church() establish the invariant by creating the
+church and its Coordinator in one transaction.
+
+Verification (Phase 1 review, 2026-10-08), by analysis of PostgreSQL
+deferred constraint triggers and by the repository's own precedent. The
+local stack was not running; the phase 2 tests below make it executable.
+
+1. **Atomic creation is permitted.** A constraint trigger that is
+   DEFERRABLE INITIALLY DEFERRED is queued when its row event occurs and
+   runs at COMMIT. create_church() inserts the ACTIVE church first, then
+   the membership and the COORDINATOR row. When the queued check for the
+   churches insert runs at commit, it re-reads the state and finds the
+   Coordinator, so the transaction commits. The order of the writes
+   inside the transaction does not matter. Migration 018 relies on
+   exactly this for ADR-020 (create_d_group() writes the LEADER row,
+   then the DISCIPLER row), and test/integration/ministry_structure_test.dart
+   passes against it.
+2. **A committed ACTIVE church without a Coordinator is rejected.** Each
+   of these leaves an ACTIVE church with no Coordinator at commit, so the
+   check raises and the whole transaction rolls back:
+   - an ACTIVE church inserted with no Coordinator row;
+   - the last COORDINATOR row ended;
+   - the last Coordinator's membership set to a non-ACTIVE status;
+   - a SUSPENDED church set to ACTIVE with none.
+
+   A single PostgREST or service-role write is its own transaction, so
+   trusted tooling cannot leave the state committed either. The
+   ministry_structure_test.dart case "even a trusted direct write cannot
+   leave a Leader without it" shows the same behaviour for ADR-020.
+3. **SET CONSTRAINTS ... IMMEDIATE** only moves the check earlier. It
+   makes the creation order matter, by checking after the church insert
+   before the Coordinator exists, so it can only refuse more, never
+   less. No client can issue it, because clients run no SQL.
+4. **What can bypass it.** Disabling triggers needs the table owner or a
+   superuser (ALTER TABLE ... DISABLE TRIGGER, session_replication_role).
+   That is outside every app and tooling path; operational discipline,
+   as for every trigger in the schema.
+5. **Concurrency.** Covered by the church row lock above. The Slice 8 migration
+verifies it for every existing ACTIVE church before creating the
+triggers, and stops, changing nothing, if any ACTIVE church lacks an
+active Coordinator.
+
+A SUSPENDED or ARCHIVED church is not covered by the database check.
+end_church_coordinator() still refuses to end the last Coordinator of a
+SUSPENDED church, so reactivation never meets a church without one. An
+ARCHIVED church's Coordinator rows are left as they are, as history.
+
+As first written, this rule ("No operation may leave a church with zero
+active COORDINATOR role assignments", with a constraint trigger as
+defence in depth) was not implemented: no operation ended a role before
+Slice 8.
+
+## Church Status
+
+church_status: ACTIVE, SUSPENDED (added by Slice 8, in its own
+migration because ALTER TYPE ... ADD VALUE cannot be used in the
+transaction that adds it), ARCHIVED.
+
+Allowed transitions, only through set_church_status() (Super Admin,
+audited as CHURCH_STATUS_CHANGED):
+
+ACTIVE    → SUSPENDED | ARCHIVED
+SUSPENDED → ACTIVE | ARCHIVED
+ARCHIVED  → none (final in the app)
+
+Enforced by a trigger on churches that refuses any other transition,
+including one written by a SECURITY DEFINER function by mistake.
+
+- To ACTIVE requires an active Coordinator (Coordinator Invariant).
+- A status change writes nothing else: no membership, role, group,
+  placement, assignment, meeting or progress row changes. That is what
+  makes SUSPENDED → ACTIVE restore the church exactly as it was.
+- No MVP rule depends on elapsed time (the undo window, the initial
+  setup period and Discipler eligibility are all derived from records),
+  so a suspension expires nothing. A later slice that adds a
+  time-based rule (for example follow-up due dates, Slice 10) must
+  state what suspension does to it.
+- The effective-membership predicate (RBAC section 1a) requires
+  churches.status = 'ACTIVE', so a SUSPENDED or ARCHIVED church grants no
+  church access to anyone. Every controlled operation that acts on church
+  data refuses with its usual authorization refusal (PT403 not_authorized, or not found); reads return nothing. There is no separate church_not_active code (Migration 025): the app learns the status from the churches row.
+- Join-code lookup and join requests match ACTIVE churches only.
+- PENDING memberships stay PENDING; approval and rejection are refused.
+- The status itself stays resolvable: a PENDING or ACTIVE member reads
+  their own church's id, name and status (never the join code) and their
+  own membership row, so the app can show the unavailable state. Nothing
+  else of the church is readable.
+
+Enforcement as built (Migration 025): the nine caller helpers join the
+caller's membership to an ACTIVE church, and the five operations that
+identify the caller inline check private.church_is_active(). Every new or
+changed operation, policy or helper must keep this (mandatory review item,
+AGENTS.md and RBAC section 10). The registry sweep in
+test/integration/church_status_test.dart classifies every client-callable
+function and calls each one as a suspended church's Coordinator.
+
+## Coordinator Provisioning
+
+ADR-022 decisions 7 and 8. Super Admin only (RBAC section 10).
+
+- The account is found by its sign-in email among registered accounts
+  and must have a confirmed email.
+- Never the caller (cannot_assign_self).
+- Never a person with a membership row in another church
+  (member_of_another_church, one church per person).
+- The membership is created ACTIVE, or the existing row of this church
+  is reactivated to ACTIVE from any status. onboarding_completed_at and
+  joined_at are set only if NULL (coalesce). approved_by and approved_at
+  stay as they were: the membership is provisioned, not approved.
+- Reactivating from INACTIVE, TRANSFERRED or ARCHIVED restores no
+  earlier D Group responsibility (Membership Lifecycle below).
+- COORDINATOR is granted with assigned_by = the Super Admin.
+
+## Platform Roles
+
+ADR-022 decisions 4 to 6. Table platform_roles (DBML).
+
+- platform_role enum: SUPER_ADMIN.
+- One active row per (user_id, role): partial UNIQUE where ended_at IS
+  NULL.
+- CHECK ended_at IS NULL OR ended_at > started_at.
+- Rows are ended (ended_at, ended_by), never deleted.
+- granted_by is NULL only for a grant by trusted tooling.
+- Written only by private.grant_platform_role() and
+  private.end_platform_role(), service_role only. No client role holds
+  INSERT, UPDATE, DELETE or TRUNCATE; RLS is enabled with a SELECT policy
+  for the person's own rows only.
+- A platform role is independent of church membership: no foreign key
+  or rule ties it to a church, and it grants no church data.
 
 ## Profile Creation and full_name
 
@@ -265,23 +456,31 @@ no longer has ACTIVE ministry access.
 Reactivation restores no previous D Group responsibility or assignment
 automatically.
 
-The Last Coordinator Protection above also applies here: a membership
-holding the only active COORDINATOR role cannot leave ACTIVE.
+The Coordinator Invariant above also applies here: a membership holding
+the only active COORDINATOR role of an ACTIVE church cannot leave
+ACTIVE.
 
 ## Constraints
 
 UNIQUE:
 
 - church_memberships(church_id, user_id)
+- church_memberships(user_id), one church per person (Slice 8; the
+  migration first verifies that no user holds rows in two churches and
+  stops if one does)
 - churches(join_code)
 
 Partial unique index:
 
 - Active church role per member and role where ended_at IS NULL
+- Active platform role per user and role where ended_at IS NULL
 
 CHECK:
 
 - church_role_assignments: ended_at IS NULL OR ended_at > started_at
+- church_role_assignments_admin_retired: role <> 'ADMIN' OR ended_at
+  IS NOT NULL (Slice 8)
+- platform_roles: ended_at IS NULL OR ended_at > started_at
 
 Authorization:
 
@@ -302,12 +501,27 @@ generated by private.generate_join_code() from a cryptographic source;
 a code supplied to bootstrap or regeneration is validated against the
 same pattern.
 
+Regeneration (ADR-022 decision 10): regenerate_join_code() (Super
+Admin, ACTIVE or SUSPENDED church) replaces churches.join_code with a
+new generated code and sets join_code_updated_at. A unique violation is
+retried with a fresh code a bounded number of times, then refused. The
+old code stops matching at once, because lookup and request compare the
+current column; no list of old codes is kept. A PENDING request made
+with the old code stays PENDING. The audit event records the
+regeneration, never a code value.
+
 Normalisation: lookup and request uppercase the input and strip
 whitespace and hyphens, and nothing else.
 
-join_code is never readable by a client. Column-level SELECT on
-churches for authenticated covers id, name and status only; anon has
-no grant. The code is compared inside the controlled operations.
+join_code has no client column grant. Column-level SELECT on churches
+for authenticated covers id, name and status only; anon has no grant.
+The code is compared inside the controlled operations. Two controlled
+reads return it (ADR-022):
+- list_churches(), to a Super Admin;
+- get_church_join_code(), to the church's own active Coordinator while
+  the church is ACTIVE (decision 10a, Phase 1 review 2026-10-08).
+
+Only the Super Admin generates or regenerates a code.
 
 Rate limit, per authenticated user, recorded in
 private.join_code_attempts:
@@ -331,14 +545,15 @@ confirms the church the person saw and accepted, so a leaked church id
 cannot bypass the code. Outcomes are returned, not raised: REQUESTED,
 ALREADY_PENDING, ALREADY_ACTIVE, NOT_REQUESTABLE (an INACTIVE,
 TRANSFERRED or ARCHIVED row exists; only controlled reactivation or
-reinstatement may leave those states) and INVALID_CODE. Nothing but a
-PENDING membership row is ever written: no role, no D Group
-responsibility.
+reinstatement may leave those states), INVALID_CODE and, from Slice 8,
+IN_ANOTHER_CHURCH (a row exists in another church; one church per
+person). Nothing but a PENDING membership row is ever written: no role,
+no D Group responsibility.
 
 approve_church_membership() and reject_church_membership() require the
-caller to hold an active ADMIN or COORDINATOR role on an ACTIVE
-membership in the target's church (RBAC sections 1a and 2). The target
-must be PENDING. Both are audited as MEMBERSHIP_APPROVED and
+caller to hold an active COORDINATOR role on an ACTIVE membership in the
+target's church, and the church to be ACTIVE (RBAC sections 1a and 2;
+ADMIN also qualified until ADR-022). The target must be PENDING. Both are audited as MEMBERSHIP_APPROVED and
 MEMBERSHIP_REJECTED.
 
 Field semantics:
@@ -361,8 +576,10 @@ rejected applicant therefore cannot request again from the app.
 church_memberships.onboarding_completed_at records the one-time
 first-entry welcome. It is NULL until the member, with an ACTIVE
 membership, completes the welcome through complete_onboarding(), which
-is idempotent and keeps the original timestamp. The founding Admin's
-membership is created with it set by bootstrap (Migration 018). It is server-backed so
+is idempotent and keeps the original timestamp. The founder's
+membership is created with it set by bootstrap (Migration 018), and a
+Coordinator provisioned by a Super Admin has it set by the provisioning
+operation (ADR-022), so neither sees the welcome. It is server-backed so
 a reinstall or another device never replays the welcome, and it is not
 reset by reactivation. Clients have no direct write path to it.
 
@@ -371,6 +588,8 @@ reset by reactivation. Clients have no direct write path to it.
 A PENDING member may read their own membership row and the id, name and
 status of the church they requested. That is the minimum onboarding
 state (RBAC section 1a). No other church data is visible until ACTIVE.
+The same minimum applies to a PENDING or ACTIVE member of a SUSPENDED or
+ARCHIVED church (Church Status above).
 
 ---
 
@@ -1628,6 +1847,16 @@ Examples:
 - follow-up reassignment
 - administrative correction
 - privileged settings changes
+- platform operations (ADR-022): PLATFORM_ROLE_GRANTED,
+  PLATFORM_ROLE_ENDED, CHURCH_CREATED, JOIN_CODE_REGENERATED (never the
+  code value), COORDINATOR_ASSIGNED, COORDINATOR_REPLACED,
+  COORDINATOR_ENDED, CHURCH_STATUS_CHANGED (old and new status), and
+  CHURCH_ROLE_ENDED with reason admin_retired for each ADMIN row the
+  Slice 8 migration ends (actor: the row's assigned_by, as for the
+  Migration 018 backfill)
+
+audit_events.church_id is NULL for events that concern no church
+(platform role grants and ends).
 
 Domain tables remain the primary source of truth.
 
@@ -1842,6 +2071,18 @@ the lesson at once. Derived at read time, never stored. Implemented by
 private.has_reached_lesson(membership, lesson). It decides lesson
 content access only, never progress.
 
+Who may read in whose context is RBAC_RLS_MATRIX.md section 5 (ADR-023,
+2026-10-08; own context amended by ADR-024): "reached" governs the own
+context of a reader who holds no DISCIPLER row, and a Leader's read for
+the other Disciples of their group. A Discipler's read, every Leader
+included, in their own context (ADR-024, Migration 027) and in a
+currently assigned Disciple's context does not depend on reached
+lessons (all ten), and the Coordinator's read depends on nothing.
+
+The dependency runs one way only (ADR-023 decision 11): access is
+derived from progress, and no read, in any tier or context, writes
+progress or changes what is reached, current, completed or eligible.
+
 ## Active Discipleships
 
 Definition (decision A3, verified against the schema):
@@ -1868,7 +2109,7 @@ in RBAC_RLS_MATRIX.md section 2b.
 ## Candidate: Lessons Completed This Month
 
 Not defined and not governing (decision 9). Recorded here only as a
-candidate Reporting / Oversight metric, owned by Slice 11. It does not
+candidate Reporting / Oversight metric, owned by Slice 12. It does not
 block Slice 5. Before adoption it needs:
 
 - a precise definition;
@@ -1920,6 +2161,9 @@ Examples:
 - reopen lesson completion
 - appoint Discipler (ADR-012; appoint_discipler(), Migration 014)
 - add members to a D Group, set up a member, remove a member (ADR-018)
+- create a church with its Coordinator, assign, replace or end a
+  Coordinator, regenerate a join code, set church status (ADR-022)
+- the Coordinator Invariant, as deferred constraint triggers (section 1)
 - resolve/recalculate monitoring conditions
 - same-church validation where ordinary foreign keys cannot express it
 

@@ -11,11 +11,13 @@ import '../domain/discipler_candidate.dart';
 import '../domain/member_option.dart';
 import '../domain/ministry_context.dart';
 
-/// The person's ACTIVE membership, or null. Every ministry read starts here:
-/// RBAC section 1a gives nothing to a non-ACTIVE membership.
+/// The person's ACTIVE membership in an ACTIVE church, or null. Every
+/// ministry read starts here: RBAC section 1a gives nothing to a non-ACTIVE
+/// membership, or to anyone while the church is SUSPENDED or ARCHIVED
+/// (ADR-022).
 ChurchMembership? _activeMembership(Ref ref) {
   final membership = ref.watch(myMembershipProvider).value;
-  if (membership == null || !membership.status.grantsChurchAccess) return null;
+  if (membership == null || !ref.watch(hasChurchAccessProvider)) return null;
   return membership;
 }
 

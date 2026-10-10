@@ -69,7 +69,7 @@ class DGroupsPage extends ConsumerWidget {
                   : 'Groups  ·  ${groups.value!.length}',
               trailing: AppTextLink(
                 label: 'Curriculum',
-                onTap: () => context.push(Routes.lessons),
+                onTap: () => context.push(Routes.curriculum),
               ),
             ),
             groups.when(

@@ -139,6 +139,15 @@ class DiscipleJourney {
   /// From the curriculum, never a literal (BR-036).
   int get lessonsTotal => lessons.length;
 
+  /// The lessons this journey has reached: every completed lesson and the
+  /// current one (DATABASE_CONSTRAINTS section 11, Reached Lessons). My
+  /// Journey opens only these, whatever else the reader may read elsewhere
+  /// (ADR-023 decision 10).
+  Set<String> get reachedLessonIds => {
+    for (final l in lessons)
+      if (l.state == LessonState.completed || l.isCurrent) l.lessonId,
+  };
+
   /// Confirmed COMPLETED only; a submitted lesson is not completed.
   int get lessonsCompleted =>
       lessons.where((l) => l.state == LessonState.completed).length;

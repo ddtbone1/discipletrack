@@ -24,6 +24,12 @@ import '../features/onboarding/presentation/join_church_page.dart';
 import '../features/onboarding/presentation/no_access_page.dart';
 import '../features/onboarding/presentation/pending_approval_page.dart';
 import '../features/onboarding/presentation/welcome_page.dart';
+import '../features/platform/application/platform_providers.dart';
+import '../features/platform/presentation/new_church_page.dart';
+import '../features/platform/presentation/platform_church_page.dart';
+import '../features/platform/presentation/platform_churches_page.dart';
+import '../features/membership/presentation/church_info_page.dart';
+import '../features/membership/presentation/church_unavailable_page.dart';
 import '../features/profile/presentation/account_pages.dart';
 import '../features/profile/presentation/edit_profile_page.dart';
 import '../features/profile/presentation/profile_page.dart';
@@ -40,9 +46,11 @@ String destinationFor(SessionState state) => switch (state) {
   SessionState.unknown => Routes.splash,
   SessionState.signedOut => Routes.start,
   SessionState.noMembership => Routes.joinChurch,
+  SessionState.platform => Routes.platform,
   SessionState.pending => Routes.pendingApproval,
   SessionState.activeFirstEntry => Routes.welcome,
   SessionState.active => Routes.home,
+  SessionState.churchUnavailable => Routes.churchUnavailable,
   SessionState.noAccess => Routes.noAccess,
 };
 
@@ -61,11 +69,17 @@ Set<String> allowedFor(SessionState state) => switch (state) {
   SessionState.noMembership ||
   SessionState.pending ||
   SessionState.noAccess => Routes.profileRoutes,
+  // The Platform area is their destination; the profile stays reachable.
+  SessionState.platform => Routes.profileRoutes,
+  // Nothing of the church, only the person's own profile and account
+  // (ADR-022 decision 14).
+  SessionState.churchUnavailable => Routes.profileRoutes,
   // The welcome is shown exactly once and cannot be skipped by navigating.
   SessionState.activeFirstEntry => const {},
   SessionState.active => const {
     ...Routes.profileRoutes,
     Routes.pendingMembers,
+    Routes.churchInfo,
     ...Routes.ministryRoutes,
     ...Routes.discipleshipRoutes,
     ...Routes.curriculumRoutes,
@@ -78,11 +92,26 @@ Set<String> allowedFor(SessionState state) => switch (state) {
 /// in, for example `/groups/:groupId`, so one entry in [allowedFor] covers
 /// every group. An empty pattern (nothing matched) is never allowed.
 ///
+/// A Super Admin ([isSuperAdmin]) also reaches the Platform area from any
+/// resolved, signed-in state, a church member or not (ADR-022 decision 16).
+/// The database checks the platform role on every call regardless.
+///
 /// Returns null to stay put, or the path to redirect to.
-String? redirectFor(SessionState state, String routePattern) {
+String? redirectFor(
+  SessionState state,
+  String routePattern, {
+  bool isSuperAdmin = false,
+}) {
   final destination = destinationFor(state);
   if (routePattern == destination) return null;
   if (allowedFor(state).contains(routePattern)) return null;
+  if (isSuperAdmin &&
+      Routes.platformRoutes.contains(routePattern) &&
+      state != SessionState.unknown &&
+      state != SessionState.signedOut &&
+      state != SessionState.activeFirstEntry) {
+    return null;
+  }
   return destination;
 }
 
@@ -92,6 +121,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final refresh = ValueNotifier<int>(0);
   ref.listen(sessionStateProvider, (_, _) => refresh.value++);
   ref.listen(introCompleteProvider, (_, _) => refresh.value++);
+  ref.listen(isSuperAdminProvider, (_, _) => refresh.value++);
   ref.onDispose(refresh.dispose);
 
   return GoRouter(
@@ -102,7 +132,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (!ref.read(introCompleteProvider)) {
         return state.matchedLocation == Routes.splash ? null : Routes.splash;
       }
-      return redirectFor(ref.read(sessionStateProvider), state.fullPath ?? '');
+      return redirectFor(
+        ref.read(sessionStateProvider),
+        state.fullPath ?? '',
+        isSuperAdmin: ref.read(isSuperAdminProvider),
+      );
     },
     routes: [
       GoRoute(
@@ -145,6 +179,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (c, s) => buildPage(state: s, child: const NoAccessPage()),
       ),
       GoRoute(
+        path: Routes.churchUnavailable,
+        pageBuilder: (c, s) =>
+            buildPage(state: s, child: const ChurchUnavailablePage()),
+      ),
+      GoRoute(
         path: Routes.welcome,
         pageBuilder: (c, s) => buildPage(state: s, child: const WelcomePage()),
       ),
@@ -172,6 +211,59 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: Routes.changePassword,
             pageBuilder: (c, s) =>
                 buildPage(state: s, child: const ChangePasswordPage()),
+          ),
+          GoRoute(
+            path: Routes.churchInfo,
+            pageBuilder: (c, s) =>
+                buildPage(state: s, child: const ChurchInfoPage()),
+          ),
+          // The Platform area (ADR-022). `new` is declared before the church
+          // pattern so it is not read as a church id.
+          GoRoute(
+            path: Routes.platform,
+            pageBuilder: (c, s) =>
+                buildPage(state: s, child: const PlatformChurchesPage()),
+            routes: [
+              GoRoute(
+                path: 'new',
+                pageBuilder: (c, s) =>
+                    buildPage(state: s, child: const NewChurchPage()),
+                routes: [
+                  GoRoute(
+                    path: 'coordinator',
+                    pageBuilder: (c, s) => buildPage(
+                      state: s,
+                      child: const NewChurchCoordinatorPage(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'confirm',
+                    pageBuilder: (c, s) => buildPage(
+                      state: s,
+                      child: const NewChurchConfirmPage(),
+                    ),
+                  ),
+                ],
+              ),
+              // Outside `new`, so back from a created church returns to the
+              // list, not into a finished stepper.
+              GoRoute(
+                path: 'created',
+                pageBuilder: (c, s) => buildPage(
+                  state: s,
+                  child: NewChurchDonePage(created: s.extra as CreatedChurch?),
+                ),
+              ),
+              GoRoute(
+                path: 'churches/:churchId',
+                pageBuilder: (c, s) => buildPage(
+                  state: s,
+                  child: PlatformChurchPage(
+                    churchId: s.pathParameters['churchId']!,
+                  ),
+                ),
+              ),
+            ],
           ),
           GoRoute(
             path: Routes.pendingMembers,
@@ -223,6 +315,8 @@ final routerProvider = Provider<GoRouter>((ref) {
               state: s,
               child: LessonIndexPage(
                 forMembershipId: s.uri.queryParameters['for'],
+                oversight:
+                    s.uri.queryParameters['view'] == Routes.curriculumView,
               ),
             ),
             routes: [
@@ -233,6 +327,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                   child: LessonReaderPage(
                     lessonId: s.pathParameters['lessonId']!,
                     forMembershipId: s.uri.queryParameters['for'],
+                    oversight:
+                        s.uri.queryParameters['view'] == Routes.curriculumView,
                   ),
                 ),
               ),

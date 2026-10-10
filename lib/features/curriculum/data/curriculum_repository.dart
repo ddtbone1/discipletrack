@@ -101,23 +101,35 @@ class CurriculumRepository {
         };
       });
 
-  /// `get_my_readable_content()` plus the caller's own lesson list: the
-  /// device copy (ADR-019 decision 7).
-  Future<ReadableContent> fetchMyReadableContent(String userId) => _guard(
-    'Could not load your lessons.',
-    () async {
-      final rows = await _client.rpc<List<dynamic>>('get_my_readable_content');
-      final lessons = await fetchLessonAccess();
-      return ReadableContent(
-        userId: userId,
-        savedAt: DateTime.now().toUtc(),
-        lessons: lessons,
-        blocks: [
-          for (final r in rows) ContentBlock.fromMap(r as Map<String, dynamic>),
-        ],
-      );
-    },
-  );
+  /// `get_my_readable_content()` plus the caller's own lesson list and the
+  /// lesson list of each context in [contextIds]: the device copy (ADR-019
+  /// decision 7, ADR-023 decision 6). A context the database refuses (an
+  /// assignment that ended a moment ago) is left out rather than failing the
+  /// whole copy.
+  Future<ReadableContent> fetchMyReadableContent(
+    String userId, {
+    Iterable<String> contextIds = const [],
+  }) => _guard('Could not load your lessons.', () async {
+    final rows = await _client.rpc<List<dynamic>>('get_my_readable_content');
+    final lessons = await fetchLessonAccess();
+    final contexts = <String, List<LessonAccess>>{};
+    for (final id in contextIds.toSet()) {
+      try {
+        contexts[id] = await fetchLessonAccess(forMembershipId: id);
+      } on CurriculumFailure catch (e) {
+        if (!e.isRefused) rethrow;
+      }
+    }
+    return ReadableContent(
+      userId: userId,
+      savedAt: DateTime.now().toUtc(),
+      lessons: lessons,
+      contexts: contexts,
+      blocks: [
+        for (final r in rows) ContentBlock.fromMap(r as Map<String, dynamic>),
+      ],
+    );
+  });
 
   Future<T> _guard<T>(String fallback, Future<T> Function() action) async {
     try {
@@ -201,6 +213,16 @@ class CurriculumCacheStore {
       _covers,
       jsonEncode(covers),
     );
+  }
+
+  /// Removes one person's copy and the covers, so nothing of a church that
+  /// is SUSPENDED or ARCHIVED stays readable on the device (ADR-022 decision
+  /// 14). Their own answers (ADR-021) are kept: they live elsewhere.
+  Future<void> clear(String userId) async {
+    if (!enabled) return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('$_prefix$userId');
+    await prefs.remove(_covers);
   }
 
   Future<void> clearAll() async {

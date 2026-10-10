@@ -13,9 +13,12 @@
 --
 -- Local credentials (also listed in config/README.md):
 --
---   email      admin@discipletrack.local
+--   email      admin@discipletrack.local (the church's Coordinator)
 --   password   dev-password-123
 --   join code  7QK4MZP2XR
+--
+--   superadmin@discipletrack.local, same password: the platform Super
+--   Admin, with no church membership (Slice 8, ADR-022)
 --
 -- The join code is a fixed, random-looking value that conforms to
 -- the production format so the client normalisation path is
@@ -92,6 +95,79 @@ begin
     p_initial_user_id => v_user_id,
     p_join_code       => '7QK4MZP2XR'
   );
+end
+$$;
+
+
+-- ============================================================
+-- Platform Super Admin (Slice 8, ADR-022)
+-- ============================================================
+--
+--   superadmin@discipletrack.local   Dev Super Admin, password
+--                                    dev-password-123, no church
+--                                    membership
+--
+-- A separate account, so the platform experience is tested on its own:
+-- it holds the SUPER_ADMIN platform role and nothing in any church. Dev
+-- Admin stays the church's Coordinator only. Granted through
+-- private.grant_platform_role(), as tool/grant_super_admin.ps1 does on a
+-- hosted project.
+
+do $$
+declare
+  v_user_id   constant uuid := 'b0000000-0000-4000-8000-000000000001';
+  v_email     constant text := 'superadmin@discipletrack.local';
+  v_password  constant text := 'dev-password-123';
+  v_full_name constant text := 'Dev Super Admin';
+begin
+  if not exists (select 1 from auth.users u where u.id = v_user_id) then
+    insert into auth.users (
+      instance_id, id, aud, role, email, encrypted_password,
+      email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
+      created_at, updated_at,
+      confirmation_token, recovery_token, email_change_token_new, email_change,
+      is_sso_user, is_anonymous
+    )
+    values (
+      '00000000-0000-0000-0000-000000000000',
+      v_user_id,
+      'authenticated',
+      'authenticated',
+      v_email,
+      extensions.crypt(v_password, extensions.gen_salt('bf')),
+      now(),
+      '{"provider": "email", "providers": ["email"]}'::jsonb,
+      jsonb_build_object(
+        'sub', v_user_id::text,
+        'email', v_email,
+        'full_name', v_full_name,
+        'email_verified', true,
+        'phone_verified', false
+      ),
+      now(), now(),
+      '', '', '', '',
+      false, false
+    );
+
+    insert into auth.identities (
+      provider_id, user_id, identity_data, provider,
+      last_sign_in_at, created_at, updated_at
+    )
+    values (
+      v_user_id::text,
+      v_user_id,
+      jsonb_build_object(
+        'sub', v_user_id::text,
+        'email', v_email,
+        'email_verified', true,
+        'phone_verified', false
+      ),
+      'email',
+      now(), now(), now()
+    );
+  end if;
+
+  perform private.grant_platform_role(v_user_id, 'SUPER_ADMIN');
 end
 $$;
 

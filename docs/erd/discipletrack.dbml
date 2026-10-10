@@ -98,6 +98,21 @@
 // - Migration 015 (20261006000008): an appointment locks undo of the
 //   eligibility lesson and earlier lessons.
 //
+// Revised 2026-10-08 (ADR-022, ADR-023, Slice 8). Specified before
+// implementation; reaches the database through the Slice 8
+// migrations, applied migrations unchanged:
+// - platform_roles and the platform_role enum (SUPER_ADMIN): a
+//   platform-level role keyed to profiles.id, independent of church
+//   membership, written only by service-role tooling.
+// - church_status gains SUSPENDED (its own migration).
+// - church_role ADMIN retired: the value stays, no active row may
+//   exist (CHECK church_role_assignments_admin_retired).
+// - church_memberships(user_id) unique: one church per person.
+// - The Coordinator invariant (an ACTIVE church has an active
+//   Coordinator at every commit) is a deferred constraint trigger,
+//   noted on churches and church_role_assignments.
+// - No change for ADR-023: curriculum access is a function rule.
+//
 // ============================================================
 
 
@@ -223,6 +238,7 @@
 
 Enum church_status {
   ACTIVE
+  SUSPENDED [note: 'Slice 8 (ADR-022): reversible; no church access for anyone, data untouched']
   ARCHIVED
 }
 
@@ -237,8 +253,14 @@ Enum membership_status {
 
 
 Enum church_role {
-  ADMIN
+  ADMIN [note: 'Retired by ADR-022 (Slice 8): never granted, no active row may exist; value kept']
   COORDINATOR
+}
+
+
+// Platform-level roles (ADR-022, Slice 8). Independent of any church.
+Enum platform_role {
+  SUPER_ADMIN
 }
 
 
@@ -514,22 +536,37 @@ Table churches {
   future regeneration validate any supplied code against the same
   pattern.
 
-  join_code is never readable by a client. Column-level SELECT for
+  join_code has no client column grant. Column-level SELECT for
   authenticated covers id, name and status only; anon has no grant.
   Lookup happens inside lookup_church_by_join_code(), which returns
-  only id and name.
+  only id and name. Two controlled reads return the code (ADR-022):
+  list_churches() to a Super Admin, and get_church_join_code() to the
+  church's own active Coordinator while the church is ACTIVE
+  (read-only; only the Super Admin regenerates it).
 
   join_code_updated_at records when the current code was set, at
-  bootstrap or by a later regeneration.
+  bootstrap or creation, or by regenerate_join_code() (Super Admin,
+  ADR-022), which replaces the code so the old one stops matching.
 
   Row visibility: a person sees their own church only, while their
   membership there is PENDING or ACTIVE (RBAC section 1a). A PENDING
   member reads the name of the church they requested and nothing
-  else about it.
+  else about it. A Super Admin has no row policy and lists churches
+  through list_churches().
 
-  status ACTIVE → ARCHIVED is the only transition. ARCHIVED is terminal
-  in the MVP and means the workspace is closed; it is not a normal
-  single-church operation.
+  Created by trusted bootstrap or by create_church() (Super Admin),
+  always together with an active Coordinator.
+
+  status (ADR-022, DATABASE_CONSTRAINTS.md section 1, Church Status):
+
+  ACTIVE    → SUSPENDED | ARCHIVED
+  SUSPENDED → ACTIVE | ARCHIVED
+  ARCHIVED  → none (final in the app)
+
+  Changed only by set_church_status(). SUSPENDED and ARCHIVED give
+  nobody church access; the data is untouched. ACTIVE requires an
+  active Coordinator, checked at commit by a deferred constraint
+  trigger (the Coordinator invariant).
   '''
 }
 
@@ -558,10 +595,17 @@ Table church_memberships {
 
   indexes {
     (church_id, user_id) [unique]
+    user_id [unique, note: 'One church per person (ADR-022 decision 9, Slice 8)']
   }
 
   Note: '''
   Represents a user's long-lived membership in a church.
+
+  One church per person (Slice 8): a user has membership rows in at
+  most one church, of any status. An intentional MVP limitation:
+  multi-church membership later needs a forward migration dropping the
+  user_id key, plus app support for choosing the church a session acts
+  in (ADR-022 decision 9).
 
   Field semantics (DATABASE_CONSTRAINTS.md section 1):
 
@@ -585,9 +629,12 @@ Table church_memberships {
 
   Writes happen only through controlled operations:
   request_join_church(), approve_church_membership(),
-  reject_church_membership(), complete_onboarding() and the future
-  membership-management operations. Clients have no INSERT or UPDATE
-  path.
+  reject_church_membership(), complete_onboarding(), the Super Admin's
+  Coordinator provisioning (create_church(),
+  assign_church_coordinator(), replace_church_coordinator(): created
+  or reactivated ACTIVE, onboarding complete, approved_by NULL) and
+  the future membership-management operations. Clients have no INSERT
+  or UPDATE path.
 
   This becomes the stable ministry identity used by domains such as:
 
@@ -645,10 +692,20 @@ Table church_role_assignments {
   Note: '''
   Stores privileged church-level roles.
 
-  MVP roles:
+  MVP role:
 
-  ADMIN
   COORDINATOR
+
+  ADMIN is retired (ADR-022): every former row is ended and audited,
+  and CHECK church_role_assignments_admin_retired
+  (role <> 'ADMIN' OR ended_at IS NOT NULL) keeps an active one from
+  existing. Platform authority lives in platform_roles, not here.
+
+  Written only by bootstrap and the Super Admin's Coordinator
+  operations (RBAC section 10). An ACTIVE church always has an active
+  COORDINATOR row on an ACTIVE membership, checked at commit by a
+  deferred constraint trigger (DATABASE_CONSTRAINTS.md section 1,
+  Coordinator Invariant).
 
   Normal church membership does not require a MEMBER role row.
 
@@ -667,6 +724,54 @@ Table church_role_assignments {
 
   Active-role uniqueness will be implemented through PostgreSQL
   constraints / partial indexes where appropriate.
+  '''
+}
+
+
+// ============================================================
+// 4a. PLATFORM ROLES (ADR-022, Slice 8)
+// ============================================================
+
+Table platform_roles {
+  id uuid [pk]
+
+  user_id uuid [not null, note: 'profiles.id; no church']
+
+  role platform_role [not null]
+
+  granted_by uuid [note: 'profiles.id; NULL only for a grant by trusted tooling']
+
+  started_at timestamptz [not null]
+  ended_at timestamptz
+  ended_by uuid [note: 'profiles.id; NULL for an end by trusted tooling']
+
+  created_at timestamptz [not null]
+
+  indexes {
+    (user_id, role) [unique, note: 'partial: WHERE ended_at IS NULL']
+  }
+
+  Note: '''
+  Platform-level authority over churches (ADR-022). Independent of
+  church membership: a Super Admin needs no church_memberships row,
+  and holding this role grants no church data.
+
+  SUPER_ADMIN may create a church with its Coordinator, regenerate a
+  join code, assign, replace or end a Coordinator, set church status,
+  and read the platform overview (counts, and the active
+  Coordinators' name and email) and platform audit events. Nothing
+  else: no memberships, profiles, D Groups, meetings, progress,
+  lesson content or answers.
+
+  Written only by private.grant_platform_role() and
+  private.end_platform_role(), service_role only (tool and seed). RLS
+  enabled; SELECT of one's own rows only; no client write grant.
+
+  CHECK ended_at IS NULL OR ended_at > started_at. Rows are ended,
+  never deleted.
+
+  private.is_super_admin() reads this table for auth.uid(); never a
+  JWT claim, profile field or parameter.
   '''
 }
 
@@ -2221,6 +2326,13 @@ Table audit_events {
   - follow-up reassignment
   - administrative correction
   - privileged configuration change
+  - platform operations (ADR-022): church created, join code
+    regenerated, Coordinator assigned, replaced or ended, church
+    status changed, platform role granted or ended
+
+  church_id is NULL for events that concern no church (platform role
+  grants and ends). The Super Admin reads platform events only,
+  through list_platform_audit().
 
   Do NOT duplicate every domain record into this table.
 
@@ -2303,6 +2415,17 @@ Ref: church_memberships.approved_by > profiles.id
 Ref: church_role_assignments.church_membership_id > church_memberships.id
 
 Ref: church_role_assignments.assigned_by > profiles.id
+
+
+// ============================================================
+// Platform Roles (ADR-022)
+// ============================================================
+
+Ref: platform_roles.user_id > profiles.id
+
+Ref: platform_roles.granted_by > profiles.id
+
+Ref: platform_roles.ended_by > profiles.id
 
 
 // ============================================================

@@ -3,9 +3,17 @@
 const curriculumDefinitionPath = 'supabase/curriculum/journey-metadata.json';
 const curriculumSeedPath = 'supabase/seed_curriculum.sql';
 
+/// Line endings as LF. A Windows checkout with core.autocrlf turns the
+/// committed LF files into CRLF in the working tree; the content is the same.
+String normalizeLineEndings(String text) => text.replaceAll('\r\n', '\n');
+
 /// The seed SQL that publishes [definitionJson] for the local church as a
 /// METADATA publication (ADR-019 decision 2), published by the local admin.
+///
+/// Always LF, whatever the line endings of [definitionJson], so the output
+/// is the same on every platform.
 String curriculumSeedSql(String definitionJson) {
+  definitionJson = normalizeLineEndings(definitionJson);
   // Dollar quoting keeps the JSON verbatim; the tag cannot occur in it.
   const tag = r'$curriculum$';
   if (definitionJson.contains(tag)) {

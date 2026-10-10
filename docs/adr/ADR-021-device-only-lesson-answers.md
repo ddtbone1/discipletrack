@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted (2026-10-07, user decision: "Fillable, kept on device").
+Accepted (2026-10-07, user decision: "Fillable, kept on device"). Decision 8 is superseded by [ADR-023](ADR-023-relationship-scoped-curriculum-access.md) (2026-10-08).
 
 Partially anticipates ADR-013 (Curriculum Workbook and Guide Modes, reserved). It does not write ADR-013 and decides none of its server questions. It narrows ADR-019 decision 13 ("blanks are shown, not filled") for the Disciple's own reading.
 
@@ -10,7 +10,7 @@ Partially anticipates ADR-013 (Curriculum Workbook and Guide Modes, reserved). I
 
 The lessons are now reproduced in full (ADR-019 amendment). A Disciple reading their own lesson sees the book's blanks, writing fields, verse lines and self-check ratings as empty lines. The user asked that Disciples be able to answer them.
 
-Saving answers on the server is the workbook (Slice 8, ADR-013). That needs decisions that have not been made: who may read a Disciple's answers (their Discipler? the Leader?), how answers sync and resolve conflicts, how long they are kept, and whether Slice 8 stays in the MVP after the pilot.
+Saving answers on the server is the workbook (Slice 8, now Slice 9 after the 2026-10-08 renumbering; ADR-013). That needs decisions that have not been made: who may read a Disciple's answers (their Discipler? the Leader?), how answers sync and resolve conflicts, how long they are kept, and whether that slice stays in the MVP after the pilot.
 
 ## Decision
 
@@ -22,9 +22,9 @@ Saving answers on the server is the workbook (Slice 8, ADR-013). That needs deci
 
 ## Consequences
 
-- Reinstalling the app, clearing its data or changing phones loses the answers. This is accepted until Slice 8.
+- Reinstalling the app, clearing its data or changing phones loses the answers. This is accepted until the Workbook slice (Slice 9).
 - The Discipler cannot see the Disciple's answers. Reviewing answers together stays in person, as in the printed book.
-- Slice 8 can migrate device answers to the server: the per-block keys (`b0`, `f0`, `v`, `s0`) map onto a future response table.
+- The Workbook slice (Slice 9) can migrate device answers to the server: the per-block keys (`b0`, `f0`, `v`, `s0`) map onto a future response table.
 - Changes: `WorkbookStore` and `Workbook` (client only), `workbookProvider`, fillable fields in `FullLessonView`. No table is added; Migration 020 adds only the read-only check (decision 7).
 
 ## Amendment: every question answerable in the app, and checking (2026-10-07)
@@ -43,4 +43,4 @@ User decisions of 2026-10-07: nothing in a lesson is answered on a separate piec
    The book's own instruction ("on a separate piece of paper") is kept verbatim, because the wording is not changed; the field beneath it is where the answer goes. `verify_lesson.dart` still checks every word against the source.
 7. **Checking blanks (Migration 020).** `check_lesson_answers()` compares what the reader wrote in a lesson's blanks with the book's answers. Matching ignores case, spacing and punctuation, and any accepted answer counts. It returns, per submitted blank, right or not and the book's answer. It answers only blanks the reader actually wrote in (an empty blank reveals nothing), only for a lesson whose Disciple tier the reader may read in their own context, and it stores nothing. Written answers, choices and True/False have no key in the book, so they are not checked; the Discipler goes over them at the meeting.
    - **This amends ADR-019 decision 6** ("never the Disciple" for answers) for blanks only. A Disciple sees a blank's answer after attempting it, as a Discipler would show it at the meeting. The full key, Discipler notes and training modules stay Discipler tier.
-8. **A Disciple who is also a Discipler** reads their own lessons in the Disciple view (fillable, no answers) with a "Show answers" switch, because the database lets them read the answers (ADR-019 decision 16). With their Disciples they keep the Discipler view.
+8. **(Superseded by [ADR-023](ADR-023-relationship-scoped-curriculum-access.md), 2026-10-08.)** In their own context a Disciple who is also a Discipler now receives no Discipler tier, so their own lessons are fillable without answers and the "Show answers" switch is removed; with their Disciples they keep the Discipler view. As decided on 2026-10-07: **A Disciple who is also a Discipler** reads their own lessons in the Disciple view (fillable, no answers) with a "Show answers" switch, because the database lets them read the answers (ADR-019 decision 16). With their Disciples they keep the Discipler view.

@@ -260,7 +260,8 @@ void main() {
     });
 
     testWidgets('a Disciple who is also a Discipler, with nobody paired yet, '
-        'sees their journey and an empty Your Disciples', (tester) async {
+        'sees their journey, their own Lessons apart from it (ADR-024), and '
+        'an empty Your Disciples', (tester) async {
       await _pump(
         tester,
         const HomePage(),
@@ -268,10 +269,28 @@ void main() {
         _repo(),
       );
       expect(find.text('Your journey'), findsOneWidget);
+      expect(find.text('Lessons'), findsOneWidget);
       expect(find.text('Your Disciples'), findsOneWidget);
       expect(find.text('No Disciples yet'), findsOneWidget);
-      expect(find.text('See all'), findsOneWidget, reason: 'journey only');
+      expect(
+        find.text('See all'),
+        findsNWidgets(2),
+        reason: 'journey and Lessons, none for an empty Your Disciples',
+      );
       expect(find.text('Record a meeting'), findsNothing);
+    });
+
+    testWidgets('a Discipler without a journey of their own, every Leader '
+        'included, has their own Lessons on Home (ADR-024)', (tester) async {
+      await _pump(
+        tester,
+        const HomePage(),
+        _context(disciple: false, discipler: true),
+        _repo(),
+      );
+      expect(find.text('Your journey'), findsNothing);
+      expect(find.text('Lessons'), findsOneWidget);
+      expect(find.text('Your Disciples'), findsOneWidget);
     });
 
     testWidgets('the Coordinator sees active discipleships as a figure', (

@@ -102,6 +102,11 @@ decision.
 13. Lesson content contains no personal or ministry-care data, so ADR-004
     (Admin has no ministry-care access) is not affected.
 
+    Note (2026-10-08): decision 12's read scope was replaced by ADR-019
+    decision 6 and narrowed again by ADR-023. The church ADMIN role named
+    in decisions 12 and 13 is retired (ADR-022); a Super Admin without
+    COORDINATOR reads no lesson content.
+
 ## Alternatives Considered
 
 **Keep "no lesson content".** Rejected by the ministry: material is

@@ -5,7 +5,8 @@
 *Revision 2026-10-05:* D Group gatherings and gathering attendance removed; attendance exists only as a discipleship meeting outcome; one monitoring condition, consecutive recorded absences, for Disciples only; missed-meeting and inactivity conditions withdrawn (ADR-014). Discipler eligibility after confirmed Lesson 5, direct appointment, concurrent Disciple and Discipler responsibilities (ADR-012). Relationship-scoped Discipler progress visibility (N7); relationship-aware Journey (N8); factual 12-segment progress and no percentages (decisions 8, 22); read-only monthly meeting indicator (decisions 10, 11); "lessons completed this month" recorded as a candidate Reporting metric only (decision 9). Sections changed: 1, 2, 7 to 10, 15 and 16 (withdrawn, headings kept), 17, 19 to 24, 28 to 30, 32 to 34. Section 34 steps renumbered (simple numbered list; gathering steps removed, appointment steps rewritten).  
 *Revision 2026-10-05 (ADR-015):* the Discipler marks a lesson completed in one step; no Leader confirmation and no "awaiting confirmation" state; Leader and Coordinator fallback; undo within a window, then Coordinator reopen to In Progress. Recorded meeting history on Disciple detail and My Journey shown as a month calendar with outcome-marked dates. Sections changed: 8 to 10, 18 to 22, 29 (Leader Home focus), 34 (steps 9, 10, 17).
 *Revision 2026-10-06 (ADR-016):* a completion is locked once legitimate progress exists in a later lesson; undo is the normal correction; void corrects only erroneous records; the Coordinator's reopen is database-level recovery with no app action; deeper correction is outside the MVP. Sections 19 and 20.  
-*Revision 2026-10-05 (user decision, ninth):* the curriculum has ten lessons, not twelve. Sections changed: 18, 21, 22, 28, 29, 34 (steps 11, 19).
+*Revision 2026-10-05 (user decision, ninth):* the curriculum has ten lessons, not twelve. Sections changed: 18, 21, 22, 28, 29, 34 (steps 11, 19).  
+*Revision 2026-10-08 (ADR-022, ADR-023, Slice 8):* a platform Super Admin, separate from the church Coordinator, provisions churches (with their Coordinator), regenerates join codes, replaces Coordinators and sets church status (ACTIVE, SUSPENDED, ARCHIVED); the church Admin role is retired; approval is the Coordinator's alone; no public church creation; one church per person; curriculum access follows the relationship. Sections changed: 2, 3, 5, 6 (rewritten as Super Admin), 7, 11, 12, 18, 26, 31, 32, 33, 34 (step 1).
 
 ---
 
@@ -49,6 +50,13 @@ The architecture should avoid unnecessary assumptions that would make
 future expansion to additional churches difficult, but complex
 multi-church administration is not part of the MVP.
 
+The MVP does include a small platform layer (ADR-022, user decision
+2026-10-08): a Super Admin creates a church together with its first
+Coordinator, regenerates its join code, replaces its Coordinator and
+sets its status. That is provisioning, not multi-church administration:
+the Super Admin sees no ministry data, and no one administers several
+churches' ministry from one place.
+
 The MVP must support the complete core workflow:
 
 Church Setup
@@ -88,7 +96,9 @@ Primary technologies:
 - Flutter
 - Dart
 
-A separate web administration portal is not part of the MVP.
+A separate web administration portal is not part of the MVP. The
+Super Admin's Platform area (ADR-022) is a few screens inside the same
+mobile app.
 
 ---
 
@@ -127,14 +137,19 @@ A Discipler may be responsible for multiple Disciples.
 
 ## 5. System Roles vs D Group Responsibilities
 
-DiscipleTrack distinguishes between system/church authority and D Group
-responsibility.
+DiscipleTrack distinguishes between platform authority, church
+authority and D Group responsibility (ADR-022).
 
-### System / Church Roles
+### Platform Role
 
-- Admin
+- Super Admin (independent of any church membership)
+
+### Church Roles
+
 - Discipleship Coordinator
 - Member
+
+The church-level Admin role is retired (ADR-022).
 
 ### D Group Responsibilities
 
@@ -159,27 +174,32 @@ church-wide system authority.
 
 ---
 
-## 6. Admin
+## 6. Super Admin
 
-The Admin is primarily responsible for system and access administration.
+Rewritten 2026-10-08 (ADR-022). This section described a church-level
+Admin, now retired; its approval duty passed to the Coordinator.
 
-Responsibilities include:
+The Super Admin is a platform role, held independently of any church
+membership. Responsibilities:
 
-- configure church/system information
-- manage user accounts
-- manage church memberships
-- approve membership registrations where permitted
-- assign or revoke privileged system roles
-- manage Admin and Coordinator access
-- disable or revoke account access
-- manage system-level configuration
-- access appropriate security/audit information
+- create a church, together with its first Coordinator, in one step
+- regenerate a church's join code
+- assign, replace or end a church's Coordinator, chosen by the email of
+  an account that is already registered, after confirming the person
+  by name; never themselves
+- set a church's status: ACTIVE, SUSPENDED (reversible) or ARCHIVED
+  (final)
+- see per church its name, status, join code, aggregate counts and its
+  Coordinators' names and emails, and the platform's audit events
 
-Admin is not intended to be the primary operator of everyday
-discipleship workflows.
+The Super Admin is not a ministry role. They do not see members (beyond
+those counts and the Coordinators), D Groups, meetings, journeys,
+lesson content or follow-ups, and they do not approve memberships. A
+Super Admin who also serves in a church holds that church's role
+separately, assigned by someone else.
 
-Admin access does not automatically imply access to private ministry-care
-information.
+The first Super Admin is granted by trusted tooling; no one can become
+Super Admin from the app.
 
 ---
 
@@ -190,6 +210,11 @@ discipleship operations.
 
 Responsibilities include:
 
+- approve or reject membership requests (the Coordinator alone, since
+  ADR-022)
+- view and copy the church's join code to share it, read-only, on
+  Church information (ADR-022 decision 10a); only the Super Admin
+  generates or regenerates it
 - oversee all D Groups
 - create and manage D Groups
 - assign D Group Leaders
@@ -208,9 +233,12 @@ Responsibilities include:
 - manage ministry settings: the consecutive recorded absences threshold
   (one threshold, ADR-014) and follow-up due days
 
-Church and system configuration, including the join code, remains with
-the Admin. Ministry settings belong to the Coordinator because they
+Church identity, the join code and church status are the Super Admin's
+(section 6). Ministry settings belong to the Coordinator because they
 govern the follow-up workload the Coordinator is accountable for.
+
+An active church always has at least one Coordinator. Replacing one is
+a single step taken by the Super Admin (ADR-022).
 
 The Coordinator is a ministry operations role rather than primarily a
 technical administration role.
@@ -325,8 +353,15 @@ Install DiscipleTrack
 
 The church uses a reusable join code.
 
-The join code may be regenerated by an authorized Admin through an
-audited controlled operation.
+The join code may be regenerated by the Super Admin through an audited
+controlled operation (ADR-022). The old code stops working at once; a
+request already made with it stays pending.
+
+A person belongs to at most one church (ADR-022 decision 9). A join
+request from someone who already has a membership in another church is
+refused, with an explanation. This is an intentional MVP limitation:
+supporting several churches per person later requires a database
+migration and changes in the app.
 
 Entering the correct join code does not automatically grant privileged
 access.
@@ -350,10 +385,30 @@ Privileged roles and D Group responsibilities are assigned separately.
 
 Registration collects the user's full name, which is required.
 
-The initial church workspace, its join code, its settings, its
-curriculum and its first privileged user are created by a trusted
-deployment/bootstrap process rather than through the application. That
-process is specified in DATABASE_CONSTRAINTS.md section 0.
+There is no public or self-service church creation. A church, its join
+code, its settings, its curriculum and its first Coordinator are
+created either by the trusted deployment/bootstrap process
+(DATABASE_CONSTRAINTS.md section 0) or, in the app, by a Super Admin
+(ADR-022). Provisioning flow:
+
+Super Admin creates the church with its Coordinator (by the email of a
+registered account, confirmed by name)
+→ the join code is generated
+→ the Coordinator finds it under Church information (the Super Admin
+  sees it too)
+→ the Coordinator shares it with the church
+→ members request to join
+→ the Coordinator approves
+
+A provisioned Coordinator's membership is ACTIVE with the welcome
+already completed, so they go straight to Home.
+
+A church may be SUSPENDED (reversible) or ARCHIVED (final) by the Super
+Admin. While it is not ACTIVE, its members can still sign in and use
+their profile and account, but see a "church unavailable" screen and
+nothing of the church; nobody, the Coordinator included, can act in it;
+its join code finds nothing; pending requests wait. Reactivating a
+suspended church restores everything as it was (ADR-022 decision 14).
 
 ---
 
@@ -380,6 +435,12 @@ membership itself (church_memberships.onboarding_completed_at), so a
 reinstall or another device never shows it again. It is distinct from
 the splash screen, which appears on every launch while the session is
 restored.
+
+A Super Admin with no church membership skips Join Church and the
+welcome: after sign-in they enter the Platform area (ADR-022). A Super
+Admin who is also a church member enters the app as that member and
+reaches the Platform area from Profile. A Coordinator provisioned by a
+Super Admin is never shown Join Church or the welcome.
 
 ### Normal Subsequent Use
 
@@ -536,10 +597,20 @@ published into Supabase by trusted tooling and is readable offline once
 it has synced, without a per-lesson download. The curriculum has ten
 lessons. Content has a Disciple tier and a Discipler tier (answers,
 Discipler notes, training modules). Each person reads only the lessons
-their progression or relationship allows (ADR-019 decision 6): a
-Disciple their reached lessons, any Discipler (every Leader included)
-both tiers of all lessons (ADR-019 decision 16), the Coordinator
-everything. Until
+their progression or relationship allows (ADR-019 decision 6, ADR-023):
+a Discipler, every Leader included, reads all ten lessons in both tiers
+as their own, from appointment (ADR-024), and for each Disciple
+currently paired with them; a Discipler who is also a Disciple keeps
+My Journey gated by their own progression; anyone else reads in their
+own view only their own journey (the Disciple tier of the lessons they
+have reached); a Leader reads the Disciple tier of the
+reached lessons of the other Disciples of their group; the Coordinator
+reads everything, in their own view too, through Curriculum. A
+Coordinator who is also a Disciple keeps My Journey as their own
+journey, like any Disciple's (ADR-023 decision 10). Reading a lesson,
+for anyone, never changes progression: it never makes a lesson current
+or completed (decision 11). (ADR-019 decision 16, under which any Discipler read
+every lesson, is superseded.) Until
 permission to reproduce the source curriculum is confirmed, only
 identifying metadata is published. The source's pairing guidance (men
 with men, women with women, Pastor approval for family members and close
@@ -906,8 +977,8 @@ For the MVP, appropriate follow-up information may be visible to:
 
 The Disciple does not automatically see internal follow-up notes.
 
-Admin does not automatically receive access merely because they
-administer the system.
+The Super Admin receives no access to follow-ups, or to any other
+ministry information, because they administer the platform (ADR-022).
 
 More granular confidential-note visibility may be introduced later if
 required.
@@ -1046,7 +1117,7 @@ adopted it needs a precise definition; which timestamp or event counts
 (likely lessons reaching Completed in the month, that is
 their completion time); church time zone semantics; a privacy review
 (RBAC_RLS_MATRIX.md section 2b); and small-population suppression before
-broad member visibility. It is owned by Slice 11, Reporting / Oversight,
+broad member visibility. It is owned by Slice 12, Reporting / Oversight,
 and does not block Slice 5.
 
 The same application should use a consistent design system while
@@ -1093,7 +1164,9 @@ The MVP must enforce:
 
 - authentication
 - church isolation
-- system-role authorization
+- church status: no church access while a church is SUSPENDED or
+  ARCHIVED (ADR-022)
+- platform-role and church-role authorization, kept separate (ADR-022)
 - D Group authorization
 - assignment-based authorization
 - backend/database-side authorization
@@ -1116,7 +1189,10 @@ Important actions should retain enough information to determine:
 
 Important examples include:
 
-- role changes
+- role changes, including Coordinator assignment, replacement and
+  ending, and platform role grants (ADR-022)
+- church creation, join code regeneration and church status changes
+  (ADR-022)
 - D Group assignments
 - Discipler assignments
 - discipleship meeting records and voids, including each Disciple's
@@ -1157,7 +1233,13 @@ The following are intentionally postponed:
   changing meeting records)
 - private messaging/chat
 - announcement comments/reactions
-- complex multi-church administration
+- complex multi-church administration (the Super Admin's provisioning
+  operations, ADR-022, are not this: they reach no ministry data)
+- public or self-service church creation
+- invitation emails for a new Coordinator (email automation)
+- a person belonging to more than one church, or moving between
+  churches (an intentional limitation; lifting it needs a migration,
+  ADR-022 decision 9)
 - microservices
 - distributed infrastructure
 
@@ -1167,8 +1249,9 @@ The following are intentionally postponed:
 
 The MVP must support this end-to-end scenario:
 
-1. The church workspace is provisioned by the trusted bootstrap process
-   specified in DATABASE_CONSTRAINTS.md section 0.
+1. The church workspace is provisioned with its Coordinator, by the
+   trusted bootstrap process specified in DATABASE_CONSTRAINTS.md
+   section 0 or by a Super Admin in the app (ADR-022).
 2. A user installs DiscipleTrack and registers.
 3. The user enters the church join code.
 4. Membership is approved.

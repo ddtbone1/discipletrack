@@ -65,8 +65,8 @@ void main() {
       expect(rows, isEmpty);
     });
 
-    test('no database function reads required_meetings; only bootstrap '
-        'seeds and asserts it', () async {
+    test('no database function reads required_meetings; only bootstrap and '
+        'create_church() (ADR-022) seed and assert it', () async {
       final rows = await sqlRows('''
         select p.proname
         from pg_proc p
@@ -76,7 +76,11 @@ void main() {
         order by 1''');
       expect(
         [for (final r in rows) r.single],
-        ['assert_bootstrap_postconditions', 'bootstrap_church'],
+        [
+          'assert_bootstrap_postconditions',
+          'bootstrap_church',
+          'create_church',
+        ],
       );
     });
 

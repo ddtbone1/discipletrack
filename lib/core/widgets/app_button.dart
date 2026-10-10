@@ -20,6 +20,15 @@ enum AppButtonVariant {
 
   /// Recording a meeting: the brand lime with black text in both modes.
   record,
+
+  /// A reversible action that takes something away from other people for a
+  /// while (suspending a church): the secondary shape in the warning colour.
+  /// Semantic, never decoration (UI_DESIGN_SYSTEM section 7).
+  caution,
+
+  /// A final or removing action (archiving, removing): text only, in the
+  /// error colour, as Sign out. Never lime, never the primary (section 61).
+  destructive,
 }
 
 /// The single button in DiscipleTrack.
@@ -100,6 +109,16 @@ class AppButton extends StatelessWidget {
       AppButtonVariant.record => (
         enabled ? p.brand : p.surfaceAlt,
         enabled ? p.onBrand : p.disabled,
+        null,
+      ),
+      AppButtonVariant.caution => (
+        enabled ? p.surface : Colors.transparent,
+        enabled ? p.warning : p.disabled,
+        enabled ? p.warning.withValues(alpha: 0.5) : p.border,
+      ),
+      AppButtonVariant.destructive => (
+        Colors.transparent,
+        enabled ? p.error : p.disabled,
         null,
       ),
     };

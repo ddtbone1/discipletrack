@@ -22,6 +22,7 @@ import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../membership/application/membership_providers.dart';
+import '../../platform/application/platform_providers.dart';
 import '../application/profile_providers.dart';
 import '../domain/profile.dart';
 import 'ministry_summary.dart';
@@ -82,6 +83,9 @@ class _ProfileBody extends ConsumerWidget {
     final email = ref.watch(currentUserEmailProvider);
     final dark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final since = membership?.joinedAt ?? profile.createdAt;
+    final isSuperAdmin = ref.watch(isSuperAdminProvider);
+    final showChurchInfo =
+        ref.watch(isCoordinatorProvider) && ref.watch(hasChurchAccessProvider);
 
     final roles = [
       for (final r in DGroupResponsibility.values)
@@ -200,6 +204,31 @@ class _ProfileBody extends ConsumerWidget {
                   onTap: ministry.myDisciples.isEmpty
                       ? null
                       : () => context.go(Routes.journeyDisciples),
+                ),
+            ],
+          ),
+        ],
+        // Rare, audited configuration (UI_DESIGN_SYSTEM sections 22 and 70):
+        // the Coordinator's join code, and the Platform area for a Super
+        // Admin who is also a member, never in the dock.
+        if (showChurchInfo || isSuperAdmin) ...[
+          const SizedBox(height: AppSpacing.md),
+          _ProfileCard(
+            title: 'Administration',
+            rows: [
+              if (showChurchInfo)
+                _ProfileRow(
+                  icon: Icons.qr_code_2_rounded,
+                  label: 'Church information',
+                  value: 'Join code',
+                  onTap: () => context.push(Routes.churchInfo),
+                ),
+              if (isSuperAdmin)
+                _ProfileRow(
+                  icon: Icons.apartment_rounded,
+                  label: 'Platform',
+                  value: 'Churches',
+                  onTap: () => context.push(Routes.platform),
                 ),
             ],
           ),

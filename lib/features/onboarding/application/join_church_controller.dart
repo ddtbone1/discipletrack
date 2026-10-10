@@ -78,6 +78,11 @@ class JoinChurchController extends Notifier<JoinChurchState> {
       'Your membership with this church needs to be reactivated by your '
       'church. Please contact them.';
 
+  /// One church per person (ADR-022 decision 9, UI_DESIGN_SYSTEM section 70).
+  static const inAnotherChurchMessage =
+      'Your account already belongs to a church on DiscipleTrack. An '
+      'account can belong to one church.';
+
   Future<void> lookup(String rawCode) async {
     final code = normalizeJoinCode(rawCode);
     if (!isWellFormedJoinCode(code)) {
@@ -135,6 +140,12 @@ class JoinChurchController extends Notifier<JoinChurchState> {
           state = state.copyWith(
             phase: JoinPhase.found,
             error: notRequestableMessage,
+          );
+          return false;
+        case JoinRequestOutcome.inAnotherChurch:
+          state = state.copyWith(
+            phase: JoinPhase.found,
+            error: inAnotherChurchMessage,
           );
           return false;
         case JoinRequestOutcome.invalidCode:

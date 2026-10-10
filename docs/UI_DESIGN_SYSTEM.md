@@ -7,6 +7,23 @@
 > 2026-10-05); examples below that say "of 12" or "12 segments" are
 > historical.
 >
+> **Platform roles (ADR-022, 2026-10-08).** The church Admin role is
+> retired. Rows and columns below that name "Admin" or "Admin only" now
+> mean the platform Super Admin, whose experience is the Platform area
+> (section 70); membership requests are the Coordinator's alone. A member
+> of a SUSPENDED or ARCHIVED church sees the church unavailable screen
+> (section 70). Lessons follow the relationship (ADR-023), and a
+> Discipler, every Leader included, has the whole book as their own: a
+> Lessons section on Home and the whole-book list titled "Lessons",
+> opened with answers (ADR-024, Phase 4; "Curriculum" stays the
+> Coordinator's word). A Discipler who is also a Disciple keeps My
+> Journey gated by their own progression. The own-view "Show answers"
+> switch is removed. The Coordinator keeps the
+> whole book in Curriculum. If they are also a Disciple, My Journey stays
+> their own journey: lesson states from their progression, lessons opened
+> in the Disciple view (ADR-023 decision 10). The Coordinator views and
+> copies the church's join code on Church information (section 70).
+>
 > **No meeting minimum (ADR-017, 2026-10-06).** Meeting count never
 > determines completion, and no "Typical" number is shown. Lines below
 > about a typical number, or a minimum still being open, are historical.
@@ -764,16 +781,30 @@ with Journey added when the Coordinator has a discipleship
 relationship, and D Group reached through D Groups (or the Home entry)
 when they also lead one.
 
-### Admin without Coordinator
+### Super Admin without a church membership
 
-Home
+Churches
 Profile
+
+The Platform area (section 70). No Home of church data, no Journey, no
+D Groups. (Replaces "Admin without Coordinator", Home and Profile, for
+the retired church Admin role, ADR-022.)
+
+A Super Admin who is also a church member keeps that membership's dock
+unchanged and reaches the Platform area from a "Platform" row on
+Profile (destination class: settings / administration, never the dock).
+
+### Member of a church that is not ACTIVE
+
+No dock. One church unavailable screen with Profile reachable from it
+(section 70).
 
 ### Membership requests
 
 Pending membership requests are a Home attention tile ("2 people waiting
-to join") for Admin and Coordinator, not a permanent dock destination.
-Revisit only if usage shows it deserves primary navigation.
+to join") for the Coordinator, not a permanent dock destination. Until
+ADR-022 the Admin saw it too. Revisit only if usage shows it deserves
+primary navigation.
 
 ### Labels
 
@@ -1383,6 +1414,20 @@ Destructive Action
 
 Avoid screens containing several equally prominent primary buttons.
 
+Colour tells what an action does to what the person is looking at,
+with one colour per meaning and none added for decoration (user,
+2026-10-08, Slice 8 Phase 4):
+- **Primary (lime):** the one forward action, and restoring
+  (Reactivate church).
+- **Secondary (outline, text colour):** neutral and repeatable (Copy,
+  Regenerate code).
+- **Caution (outline and label in `warning`):** pauses something that
+  can be undone (Suspend church).
+- **Destructive (text action in `error`, no fill):** ends or removes
+  (Archive church, Remove). Its confirming dialog action uses `error`
+  too (`showConfirmDialog(destructive: true)`). Never lime, never the
+  primary.
+
 The primary button is a lime pill with a near-black label in both modes.
 Every button is fully rounded (pill). The dock is a small pill centred at
 the bottom: white in light mode, charcoal in dark. The active destination
@@ -1741,7 +1786,7 @@ Every screen and interaction is decided in this order:
 | Step | Question | Governing source |
 |---|---|---|
 | 1. Domain and workflow | Which MVP workflow step is this? What real event does it record or reveal? | MVP_SPEC section 2, BUSINESS_RULES |
-| 2. Affected role | Which responsibility uses it (Disciple, Discipler, Leader, Coordinator, Admin, Member without a group, Pending)? Who else sees its effects? | MVP_SPEC sections 5 to 10; RBAC sections 1, 2 |
+| 2. Affected role | Which responsibility uses it (Disciple, Discipler, Leader, Coordinator, Super Admin, Member without a group, Pending, member of a church that is not ACTIVE)? Who else sees its effects? | MVP_SPEC sections 5 to 10; RBAC sections 1, 2 |
 | 3. Intent | Consume, follow, conduct and record, observe and confirm, organise, or administer? | section 4 |
 | 4. Information | What must the person know? What may they not see? | RBAC sections 2, 2a, 2b, 5; DATABASE_CONSTRAINTS section 11 |
 | 5. Actions | Which actions does RBAC grant this role on this record? Never add one it does not. | RBAC sections 2, 10 |
@@ -1784,11 +1829,11 @@ Two tests apply at every step:
 |---|---|---|---|
 | Inline action (text link) | One tap, re-doable, effect visible in place | The action is protected or irreversibly affects someone else | Show all |
 | Inline expansion | Detail belongs to a row and is short | The detail has its own actions or is long | A lesson's meetings in the journey; a history row's shared notes |
-| Bottom sheet | A single choice or one to three short inputs in context | Long keyboard input, or input that must survive an error and retry | Set up a member (Disciple or Existing Discipler), Pair, choosing which Disciple to record for |
+| Bottom sheet | A single choice or one to three short inputs in context; the confirmation of a sensitive identity or role operation that names the account first | Long keyboard input, or input that must survive an error and retry | Set up a member (Disciple or Existing Discipler), Pair, choosing which Disciple to record for, Add or Replace Coordinator |
 | Dedicated task screen | Several inputs, keyboard use, server validation with recoverable errors | A single choice | Record Meeting, New group, Edit profile, Add members (`/groups/:groupId/add-members`: search and multi-select) |
 | Full-screen modal | A focused mode that leaves the dock | Ordinary forms (use a pushed page) | Possibly the lesson reader's focus mode |
 | Dialog | Confirming a destructive or hard-to-reverse action, saying what changes | Routine or re-doable actions, choices, errors | Remove, Unpair, Change Leader, Decline request, Void, Reopen, Confirm lesson completion |
-| Stepper | Later steps depend on earlier answers or a server check | Independent fields that can be shown together | Join church; not Record Meeting |
+| Stepper | Later steps depend on earlier answers or a server check | Independent fields that can be shown together | Join church, New church (one page per step, StepIndicator at the top); not Record Meeting |
 | Progressive disclosure | Optional or rare inputs; long histories | Required information | Notes in Record Meeting; older meetings; voided rows |
 | Tabs | Local or contextual only: two long views used separately, shown only when both contexts exist (N8) | Content consumed together; primary navigation; a tab that would be empty | Journey: My Journey and My Disciples, only for a person who is both a Disciple and an assigned Discipler |
 | Sections | Content consumed together | | Disciple detail |
@@ -1832,7 +1877,9 @@ Primary action by page:
 | Home | Disciple | Read Lesson n, inside the Your journey card (2026-10-06) |
 | Home | Discipler | Record Meeting |
 | Home | Leader | As a Discipler (ADR-020): Record Meeting when a Disciple is paired with them; otherwise none |
-| Home | Coordinator, Admin | None; attention tiles lead |
+| Home | Coordinator | None; attention tiles lead |
+| Churches (Platform) | Super Admin | New church |
+| Church detail (Platform) | Super Admin | None as a lime button; Regenerate code, Replace Coordinator and Change status are secondary, each behind a confirmation |
 | Journey, My Journey | Disciple | None, stated; "Read Lesson n" is secondary inside the lesson card, and the Lessons timeline opens every reached lesson |
 | Journey, My Disciples | Discipler | Record Meeting |
 | Disciple detail | Discipler | Record Meeting; "Mark Lesson n as finished" and, below it, "Read Lesson n" are secondary on the lesson card |
@@ -1848,12 +1895,14 @@ Primary action by page:
 
 ## 62. Role Experience Principles
 
-| | Disciple | Discipler | Leader | Coordinator | Admin only |
+| | Disciple | Discipler | Leader | Coordinator | Super Admin only |
 |---|---|---|---|---|---|
-| Intent | Follow own journey | Conduct and record | Observe, confirm, care | Oversee and organise | Administer access |
-| Home leads with | Current lesson and its factual state | Their Disciples and Record Meeting | Lessons awaiting confirmation, then progress per Disciple | Attention tiles (requests, unplaced members), then church figures | Requests |
-| Drill-down | Journey, lesson, own history | Disciple, journey, record | Group, person, journey, record | Groups, group, person, journey, record | Requests only |
-| Never shown | Others' outcomes or progress; follow-up notes | Progress and meeting rows of Disciples not currently assigned to them, including others in their D Group (N7; RBAC section 2) | Other groups | | Meeting outcomes, progress, attention, follow-ups, D Group data (ADR-004) |
+| Intent | Follow own journey | Conduct and record | Observe, confirm, care | Oversee and organise | Provision churches |
+| Home leads with | Current lesson and its factual state | Their Disciples and Record Meeting | Lessons awaiting confirmation, then progress per Disciple | Attention tiles (requests, unplaced members), then church figures | Churches, with status and counts (section 70) |
+| Drill-down | Journey, lesson, own history | Disciple, journey, record | Group, person, journey, record | Groups, group, person, journey, record | Church detail only |
+| Never shown | Others' outcomes or progress; follow-up notes | Progress and meeting rows of Disciples not currently assigned to them, including others in their D Group (N7; RBAC section 2); their own future lessons and answers in their own view (ADR-023) | Other groups; answers for Disciples not paired with them (ADR-023) | | Members beyond counts and the Coordinators' name and email; meetings, progress, lessons, attention, follow-ups, D Group data (ADR-004, ADR-022) |
+
+The "Super Admin only" column replaces "Admin only" (ADR-022).
 
 Combined responsibilities compose, ordered by the more frequent one,
 without duplicating a destination. A Member without a group sees the
@@ -1968,8 +2017,15 @@ folder. Before the Discipleship Meeting + Progress slice adds screens:
   cards.
 - One confirmation pattern: the shared confirmation dialog (moved to
   core) for every destructive or hard-to-reverse action, including
-  confirm lesson completion. No confirmation sheets and no per-page
-  dialogs.
+  confirm lesson completion. No per-page dialogs. One exception
+  (Slice 8 Phase 4 review, 2026-10-08): a sensitive identity or role
+  operation that must show whose account an entered email belongs to
+  before acting (Add Coordinator, Replace Coordinator) confirms in a
+  sheet. The sheet holds the email field, then names the person, with
+  "Not this person" to correct it. Other confirmations stay dialogs.
+- Sign out has no confirmation (Phase 4 review). It is kept off the
+  main path: a text action, not a button, at the end of Profile, apart
+  from the rows above it, so it is not tapped by accident.
 - ErrorState takes the subject it failed to load and fixed wording, and
   never displays an exception's text.
 - AppButton and AppTextLink explain themselves on tap when disabled
@@ -1987,7 +2043,9 @@ concept used in several places:
 | LessonCoverCard | One lesson over its cover photo: number, title, and a lock when it is not open. The lesson list is ten of these; a journey page has one, LessonsNavCard, its only way into the lessons (no timeline, no read button) | image card with a bottom shade |
 | JourneyProgress | "Lesson 6 of 12", 12 segments, "5 of 12 completed" (section 31); total from the active curriculum | text and segment marks, no percentage |
 | DiscipleProgressRow | Lesson ring, name, and one coloured line: the lesson's state and the last recorded meeting | PersonRow |
-| LessonCarousel | Home, for a Disciple: "n of 10 completed · Last met" over the ten LessonCoverCards to swipe, starting on the current one ("Lesson n · Now"); reached lessons open, the rest are locked | PageView of LessonCoverCard |
+| LessonCarousel | Home, for a Disciple: "n of 10 completed · Last met" over the ten LessonCoverCards to swipe, starting on the current one ("Lesson n · Now"); reached lessons open, the rest are locked. `LessonCarousel.book()`, Home's Lessons section for a Discipler (every Leader): the ten from Lesson 1, every lesson the database opens, each in the whole-book view with answers; See all opens that list, titled "Lessons" ("Curriculum" only for a Coordinator) (ADR-024) | PageView of LessonCoverCard |
+| StepIndicator | The top of each page of a multi-page task: one 6 px segment per step, brand colour up to the current step, border colour after, and "Step n of N · Name" beneath (one semantics label) | Row of segments over a caption |
+| Caution and destructive buttons | AppButton `caution` (outline and label in `warning`, for a pause that can be undone) and `destructive` (text in `error`, no fill, for ending or removing); section 40 | AppButton variants |
 | FilterTabs | List filters with counts in one fixed row that shares the width (each tab sized by its label, one type size); the active tab is its text in the brand colour and a thin lime outline, no fill | Row of stadium tabs |
 | BlankField | A blank or writing field the Disciple types into, inline, growing with the answer; saved on the device (ADR-021). After Check: green or red line, the book's answer under a wrong one | TextField, underline only |
 | AnswerBox | A written answer under a question, prompt or scenario | filled TextField, multi-line |
@@ -2031,7 +2089,7 @@ done (AGENTS.md).
 
 1. Domain and workflow: which MVP step, which real event, which rules.
 2. Roles: every role and state affected, including combined
-   responsibilities, Member without a group, Pending and Admin only.
+   responsibilities, Member without a group, Pending, Super Admin only (with and without a church membership) and a member of a church that is not ACTIVE.
 3. Real-world flow: what happens in the church before, during and
    after; the app records it rather than replacing it (no scheduling,
    no manufactured steps).
@@ -2070,3 +2128,159 @@ I cannot... Offline, I see...". Check for:
 - what every screen shows offline, and whether every disabled action
   explains itself;
 - consistent words (section 68).
+
+---
+
+## 70. Platform Area, Church Information and Church Unavailable
+
+Added 2026-10-08 (ADR-022, Slice 8). The Platform area is rare, audited
+configuration (archetype Settings / Administration, section 60). It is
+small and carries no ministry data.
+
+### Who sees it
+
+- A Super Admin without a church membership: it is their whole app,
+  with a dock of Churches and Profile (section 22).
+- A Super Admin who is also a church member: a "Platform" row on
+  Profile opens it. Their church dock is unchanged.
+- Nobody else. Holding the platform role is decided by the database;
+  the app only hides the entry.
+
+### Pages
+
+**Churches.** Purpose line: "The churches on DiscipleTrack." One row per
+church: name, a status pill (Active, Suspended, Archived), the counts
+("24 members · 3 D Groups") and the Coordinator's name, or "2
+Coordinators". Archived churches sit in a collapsed "Archived" section
+at the end. Primary action: New church. Empty: "No churches yet. Create
+the first one and choose its Coordinator."
+
+**New church.** A stepper of separate pages (section 60), not a sheet
+(user, 2026-10-08, Phase 4). Each page has the StepIndicator at the
+top: three segments filled in the brand colour up to the current step,
+and "Step n of 3 · Name" beneath, so the position never depends on
+colour alone.
+1. **Name** ("Name the church"): the church name. Next. A blank name
+   says "Enter the church name." in place and clears as it is typed.
+2. **Coordinator** ("Choose its Coordinator"): the church named above
+   the email field. Next checks the account on the server. A refusal
+   (table below) stays on this page, in words; nothing is created.
+3. **Confirm** ("Create {church}?"): a card with the church and "{full
+   name} · Coordinator" with the email, so a mistyped email is caught.
+   "Create church" (primary) and "Not this person" (back to step 2, the
+   email kept). Reached without the earlier steps, it offers "Start from
+   the name".
+
+On success the stepper is replaced by the created page: "{church} is
+ready", the join code with Copy, "{first name} can find this code under
+Profile, Church information, and share it with the church.", and Done,
+which opens the church. Back from it returns to Churches, never into
+the finished steps.
+
+**Church detail.** The name, status, join code with Copy, created date
+and counts, then:
+- Coordinators: name and email per row. Overflow: Replace; Remove when
+  there is more than one. "Add Coordinator" below the list.
+- Join code: "Regenerate code", secondary with a refresh icon, behind a
+  dialog: "The current code stops working at once. Requests already
+  sent stay waiting for the Coordinator."
+- Status, coloured by what each does (section 40): "Suspend church",
+  caution, with a pause icon (dialog: "Members can still sign in but
+  won't see the church, and nobody can act in it until you reactivate
+  it. Nothing is deleted."); "Reactivate church", primary, with a play
+  icon; and "Archive church", destructive, with an archive icon
+  (dialog: "Archiving is final in the app. Everything is kept, but the
+  church can't be reopened here.", its Archive action in `error`). An
+  archived church shows no actions and says "This church is archived,
+  so it can't be changed. Its records are kept."
+- The Coordinator overflow's Remove is in `error`, and so is its
+  dialog's Remove.
+- Activity: the platform audit events for this church, newest first,
+  as an activity timeline (section 34): what happened, when and by whom.
+
+Add and Replace Coordinator keep a short sheet (one field, then the
+confirmation naming the person, "Not this person" to correct it). The
+sheet opens above the dock.
+
+### Refusals, in words (section 68)
+
+| Reason | Sentence |
+|---|---|
+| account_not_found | "No DiscipleTrack account uses that email. Ask them to register first." |
+| email_not_confirmed | "That account hasn't confirmed its email yet." |
+| member_of_another_church | "That person already belongs to another church." |
+| cannot_assign_self | "You can't make yourself a Coordinator. Ask another Super Admin." |
+| already_coordinator | "{name} is already a Coordinator of this church." |
+| last_coordinator | "An active church needs a Coordinator. Replace this one instead." |
+| church_archived | "This church is archived, so it can't be changed." |
+
+### Church unavailable
+
+Shown instead of the app to a PENDING or ACTIVE member whose church is
+SUSPENDED or ARCHIVED. There is no dock. The page has the church's
+name and one sentence:
+
+- Suspended, ACTIVE member: "{church} isn't available on DiscipleTrack
+  right now. Nothing has been deleted. You can still update your
+  profile."
+- Suspended, PENDING: "{church} isn't available on DiscipleTrack right
+  now. Your request to join is kept."
+- Archived: "{church} has been closed on DiscipleTrack. Its records are
+  kept."
+
+Actions: Profile, Sign out and Try again (it refreshes the state). For
+a Super Admin who is also a member, the Platform row too. There is no
+Join Church, because a person belongs to one church (ADR-022 decision
+9).
+
+### Church information (Coordinator)
+
+Added after the Phase 1 review (ADR-022 decision 10a). A pushed page
+for the church's active Coordinator, reached from a "Church information"
+row on Profile (destination class: settings / administration, never the
+dock). The Pending members empty state also links to it ("Share your
+church's join code so people can ask to join.").
+
+- Purpose line: "Share this code so people can ask to join your church."
+- The church's name, then the join code in large, spaced characters,
+  with Copy ("Join code copied" snackbar) and the date it was set.
+- One sentence: "Only the DiscipleTrack administrator can change this
+  code."
+- No regenerate action and no other control. The page is read-only.
+- Shown only to an active Coordinator of an ACTIVE church. Anyone else
+  who reaches the route sees the restricted state (section 66), without
+  the code.
+- Offline: "This needs a connection." The code is not kept in the
+  device copy.
+
+### My Journey and Curriculum (Coordinator, Discipler)
+
+ADR-023 decision 10. A Coordinator who is also a Disciple has both:
+
+- My Journey works exactly as for any Disciple. Lesson states (completed,
+  current, locked) come from their progression. A lesson opened there is
+  the Disciple view, fillable, without the book's answers.
+- Curriculum (D Groups, Curriculum) is the oversight view: all ten
+  lessons, both tiers.
+
+Neither view changes progression. Opening a lesson, even one ahead of
+the Coordinator's own journey, never makes it current.
+
+The same two views serve a Discipler who is also a Disciple (ADR-024):
+My Journey and its carousel gated by their own progression, without
+answers, and the Lessons section on Home with all ten lessons and the
+Discipler's answers. Its See all opens the same whole-book list as the
+Coordinator's Curriculum, titled "Lessons" for anyone who is not a
+Coordinator (Phase 4 review). A Discipler or Leader without a journey
+has only the second.
+
+### Join Church, one church per person
+
+A request refused with IN_ANOTHER_CHURCH says: "Your account already
+belongs to a church on DiscipleTrack. An account can belong to one
+church."
+
+### Offline
+
+Platform pages are not in the device copy. Offline they say "This needs
+a connection." The church unavailable screen needs no device data.

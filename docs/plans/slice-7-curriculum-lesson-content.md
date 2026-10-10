@@ -1,5 +1,7 @@
 > **Working plan, not an authoritative document.** Proposed scope for Vertical Slice 7. Governing decisions: ADR-010 as amended by ADR-019, ADR-012, ADR-015 to ADR-018. Source facts: `docs/curriculum/SOURCE_ANALYSIS.md`. Do not start implementation without an explicit instruction.
 
+> Roadmap renumbered 2026-10-08: Slice 8 is now Platform roles and church provisioning (ADR-022), so later slice numbers in this document were shifted by one (Workbook / Guide 9, Monitoring / Follow-ups 10, Announcements 11, Reporting / Oversight 12). Nothing else was changed.
+
 # Vertical Slice 7: Curriculum and Lesson Content
 
 ## Goal
@@ -17,7 +19,7 @@ Deliver the curriculum content architecture and a lesson reader that already enf
 
 - Ten lessons; eligibility after Lesson 5 (ADR-012); completion by the Discipler (ADR-015, ADR-016, ADR-017).
 - Licensing posture, the two tiers, progression-gated access, the device copy, the book-versus-ADR rule and pairing guidance not enforced (ADR-019).
-- Workbook responses, verse writing, homework, Daily in the Word, memory verses, self-ratings and module sign-offs: Slice 8 under ADR-013, or later.
+- Workbook responses, verse writing, homework, Daily in the Word, memory verses, self-ratings and module sign-offs: Slice 9 under ADR-013, or later.
 - No new dock destination. No new dependency.
 
 ## Access rule as implemented
@@ -200,7 +202,7 @@ Replaces the metadata-only reader direction (ADR-019 amended, decisions 11 to
 - **Renderer.** One reader, two presentations: the Disciple view shows each
   blank as an empty line; the Discipler view shows the answer in the blank,
   marked as an answer. Verse-writing, self-check and sign-off areas are shown
-  as in the book but not yet filled or saved (Slice 8).
+  as in the book but not yet filled or saved (Slice 9).
 - **Where the text lives.** Converted lessons and hints are kept in
   `supabase/curriculum/full/` (git-ignored). Publishing: `publish_curriculum`
   at level FULL with the licence reference (ADR-019 decision 11).
@@ -314,7 +316,7 @@ Follow-up 3, 2026-10-07 (user): profile and account.
 
 ## Out of scope
 
-- Workbook responses and every Slice 8 item.
+- Workbook responses and every Slice 9 item.
 - Lesson text and answers until licensed.
 - Pairing policy.
 - Book approvals (Pastor, per lesson, final).

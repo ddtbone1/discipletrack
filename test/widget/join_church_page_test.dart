@@ -171,4 +171,30 @@ void main() {
       );
     },
   );
+
+  testWidgets(
+    'a member of another church is told one account belongs to one church '
+    '(ADR-022 decision 9)',
+    (tester) async {
+      final repo = FakeMembershipRepository()
+        ..lookupResult = sampleChurch
+        ..requestOutcome = JoinRequestOutcome.inAnotherChurch;
+      await pumpPage(
+        tester,
+        const JoinChurchPage(),
+        church: null,
+        membershipRepo: repo,
+      );
+      await tester.pumpAndSettle();
+
+      await findChurch(tester, 'ABCDEFGHJK');
+      await tester.tap(find.widgetWithText(AppButton, 'Join church'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(JoinChurchController.inAnotherChurchMessage),
+        findsOneWidget,
+      );
+    },
+  );
 }

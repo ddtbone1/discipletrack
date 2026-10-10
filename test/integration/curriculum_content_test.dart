@@ -101,12 +101,10 @@ void main() {
       fullName: 'CC Admin',
       tag: 'cc-admin',
     );
-    await service.from('church_role_assignments').insert({
-      'church_membership_id': adminOnly.membershipId,
-      'role': 'ADMIN',
-      'assigned_by': church.approver.userId,
-      'started_at': DateTime.now().toUtc().toIso8601String(),
-    });
+    // A former Admin: the role is retired and its rows ended (ADR-022).
+    await service
+        .from('church_role_assignments')
+        .insert(formerAdminRow(adminOnly.membershipId, church.approver.userId));
     await publish(definition());
     cleanup.addAll([
       g.leader.user.userId,
@@ -214,37 +212,51 @@ void main() {
       expect(hasAnswers(ahead), isTrue);
     });
 
-    test(
-      'with no journey of their own, reads every lesson for themselves',
-      () async {
-        expect(tiers(await content(p.discipler.user.client, 10)), {
-          'DISCIPLE',
-          'DISCIPLER',
-        });
-      },
-    );
+    test('with no journey of their own, reads every lesson, both tiers, in '
+        'their own context (ADR-024)', () async {
+      for (final n in [1, 10]) {
+        final rows = await content(p.discipler.user.client, n);
+        expect(tiers(rows), {'DISCIPLE', 'DISCIPLER'}, reason: 'Lesson $n');
+        expect(hasAnswers(rows), isTrue, reason: 'Lesson $n');
+      }
+      final own = (await p.discipler.user.client.rpc<List<dynamic>>(
+        'list_lesson_access',
+      )).cast<Map<String, dynamic>>();
+      expect(
+        own.every(
+          (r) => r['disciple_tier'] == true && r['discipler_tier'] == true,
+        ),
+        isTrue,
+      );
+    });
   });
 
   group('the Leader', () {
     test(
-      'holds the Discipler role (ADR-020), so reads both tiers with answers',
+      'with a Disciple of the group paired with someone else, reads what that '
+      'Disciple sees: the Disciple tier of reached lessons, never answers '
+      '(ADR-023)',
       () async {
         final rows = await content(
           g.leader.user.client,
           1,
           forId: p.disciple.membershipId,
         );
-        expect(tiers(rows), {'DISCIPLE', 'DISCIPLER'});
-        expect(hasAnswers(rows), isTrue);
+        expect(tiers(rows), {'DISCIPLE'});
+        expect(hasAnswers(rows), isFalse);
+        await expectLater(
+          content(g.leader.user.client, 3, forId: p.disciple.membershipId),
+          refused(),
+          reason: 'not reached by that Disciple',
+        );
       },
     );
 
-    test('of another group reads the curriculum but may not ask about the '
-        'person', () async {
-      // Content carries nothing of the person; as a Discipler they read it.
-      expect(
-        await content(g2.leader.user.client, 1, forId: p.disciple.membershipId),
-        isNotEmpty,
+    test('of another group reads nothing in the person\'s context and may not '
+        'ask about them', () async {
+      await expectLater(
+        content(g2.leader.user.client, 1, forId: p.disciple.membershipId),
+        refused(),
       );
       await expectLater(
         g2.leader.user.client.rpc<List<dynamic>>(
@@ -425,9 +437,12 @@ void main() {
       expect(tiers(discipler), {'DISCIPLE', 'DISCIPLER'});
       expect(hasAnswers(discipler), isTrue);
 
+      // The Leader holds the Discipler role (ADR-020), so their own context
+      // is the whole book, both tiers (ADR-024).
       final leader = (await g.leader.user.client.rpc<List<dynamic>>(
         'get_my_readable_content',
       )).cast<Map<String, dynamic>>();
+      expect({for (final r in leader) r['lesson_id']}, hasLength(10));
       expect(tiers(leader), {'DISCIPLE', 'DISCIPLER'});
       expect(hasAnswers(leader), isTrue);
 
@@ -608,14 +623,15 @@ void main() {
       );
     });
 
-    test('the Leader, a Discipler too, reads every answer', () async {
+    test('the Leader, not this Disciple\'s Discipler, reads the Disciple tier '
+        'without answers (ADR-023)', () async {
       final rows = await content(
         g.leader.user.client,
         1,
         forId: p.disciple.membershipId,
       );
-      expect(tiers(rows), {'DISCIPLE', 'DISCIPLER'});
-      expect(hasAnswers(rows), isTrue);
+      expect(tiers(rows), {'DISCIPLE'});
+      expect(hasAnswers(rows), isFalse);
     });
 
     test('a block needs exactly one answer per blank', () async {

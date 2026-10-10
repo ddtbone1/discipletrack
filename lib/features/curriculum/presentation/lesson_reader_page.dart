@@ -12,37 +12,44 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/person_row.dart';
-import '../../ministry/application/ministry_providers.dart';
 import '../application/curriculum_providers.dart';
 import '../data/curriculum_repository.dart';
 import '../domain/lesson_content.dart';
 import '../domain/workbook.dart';
 import 'full_lesson_view.dart';
 
-/// One lesson, read in the tiers the database allowed (ADR-019).
+/// One lesson, read in the tiers the database allowed (ADR-019, ADR-023).
 ///
 /// The reader only lays out what `get_lesson_content()` returned: the
 /// Disciple tier as lettered sections, and the Discipler tier, when it is
 /// present, in its own group. It never decides access itself. Block types
 /// it does not know render nothing.
+///
+/// In the reader's own view ([forMembershipId] null, not [oversight]) the
+/// lesson is their own journey, so it is always the Disciple view: fillable,
+/// without the book's answers (ADR-023 decision 10). The Coordinator's
+/// Curriculum ([oversight]) and a Disciple's context show everything the
+/// database returned. There is no "Show answers" switch (ADR-021 decision
+/// 8, superseded).
 class LessonReaderPage extends ConsumerStatefulWidget {
   const LessonReaderPage({
     required this.lessonId,
     this.forMembershipId,
+    this.oversight = false,
     super.key,
   });
 
   final String lessonId;
   final String? forMembershipId;
 
+  /// Opened from the Coordinator's Curriculum, not from My Journey.
+  final bool oversight;
+
   @override
   ConsumerState<LessonReaderPage> createState() => _LessonReaderPageState();
 }
 
 class _LessonReaderPageState extends ConsumerState<LessonReaderPage> {
-  /// For someone who is both a Disciple and a Discipler, reading their own
-  /// lesson: whether they chose to see the book's answers (ADR-021).
-  bool _showAnswers = false;
   bool _checking = false;
 
   Future<void> _check(LessonContent lesson, Workbook workbook) async {
@@ -90,11 +97,9 @@ class _LessonReaderPageState extends ConsumerState<LessonReaderPage> {
         .value
         ?.where((l) => l.lessonId == lessonId)
         .firstOrNull;
-    // Reading their own lesson as a Disciple; a Leader or Discipler who is
-    // not a Disciple reads the book with its answers (ADR-020).
-    final ownJourney =
-        forMembershipId == null &&
-        (ref.watch(myMinistryContextProvider).value?.isDisciple ?? false);
+    // Their own journey: what a Disciple sees, whatever else the database
+    // would return to this reader (ADR-023 decision 10).
+    final ownView = forMembershipId == null && !widget.oversight;
 
     return AppScaffold(
       title: access == null ? 'Lesson' : 'Lesson ${access.number}',
@@ -122,20 +127,14 @@ class _LessonReaderPageState extends ConsumerState<LessonReaderPage> {
                     ),
                   ),
             data: (full) {
-              final both = ownJourney && full.hasAnswers;
-              final lesson = both && !_showAnswers ? full.discipleView : full;
+              final lesson = ownView ? full.discipleView : full;
               // Only the reader's own lesson, as a Disciple, is written in.
-              final workbook = forMembershipId == null && !lesson.hasAnswers
+              final workbook = ownView
                   ? ref.watch(workbookProvider(lessonId)).value
                   : null;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (both)
-                    _AnswersSwitch(
-                      value: _showAnswers,
-                      onChanged: (v) => setState(() => _showAnswers = v),
-                    ),
                   LessonBody(
                     lesson: lesson,
                     access: access,
@@ -166,32 +165,6 @@ class _LessonReaderPageState extends ConsumerState<LessonReaderPage> {
           const SizedBox(height: AppSpacing.xl),
         ],
       ),
-    );
-  }
-}
-
-/// "Show answers": for a Disciple who is also a Discipler, in their own
-/// lesson.
-class _AnswersSwitch extends StatelessWidget {
-  const _AnswersSwitch({required this.value, required this.onChanged});
-
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            value ? 'Showing the answers' : 'Answer it yourself first',
-            style: context.supportingStyle,
-          ),
-        ),
-        Text('Show answers', style: context.captionStyle),
-        const SizedBox(width: AppSpacing.xs),
-        Switch(value: value, onChanged: onChanged),
-      ],
     );
   }
 }

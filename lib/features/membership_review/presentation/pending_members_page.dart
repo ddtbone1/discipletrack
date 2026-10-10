@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../app/routes.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -50,13 +53,21 @@ class PendingMembersPage extends ConsumerWidget {
               ),
             ),
             data: (items) => items.isEmpty
-                ? const EmptyState(
+                ? EmptyState(
                     illustration: Illustration.complete,
                     icon: Icons.inbox_outlined,
                     title: 'No pending requests',
                     message:
                         'When someone enters your church join code and asks '
                         'to join, their request appears here.',
+                    // The Coordinator shares the code (ADR-022 decision
+                    // 10a); only they review requests.
+                    action: AppButton(
+                      label: "Share your church's join code",
+                      variant: AppButtonVariant.text,
+                      icon: Icons.qr_code_2_rounded,
+                      onPressed: () => context.push(Routes.churchInfo),
+                    ),
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,

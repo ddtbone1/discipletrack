@@ -376,7 +376,7 @@ Widget homeApprover() => _wrap(
   const HomePage(),
   profile: _profile,
   membership: _membership(MembershipStatus.active),
-  roles: const {ChurchRole.admin, ChurchRole.coordinator},
+  roles: const {ChurchRole.coordinator},
   requests: _requests,
 );
 

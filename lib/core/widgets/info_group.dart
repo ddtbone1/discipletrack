@@ -120,26 +120,37 @@ class InfoRow extends StatelessWidget {
                   ],
                 ),
               )
-            else ...[
-              Flexible(
-                child: Text(
-                  label,
-                  style: AppTypography.body.copyWith(color: p.textPrimary),
+            else
+              // Label at the start, value at the end, whatever their lengths:
+              // each may take up to half the row before it wraps. (A
+              // Flexible label beside an Expanded value left the value
+              // ending wherever the label ended.)
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        label,
+                        style: AppTypography.body.copyWith(
+                          color: p.textPrimary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    if (value != null)
+                      Flexible(
+                        child: Text(
+                          value!,
+                          style: AppTypography.body.copyWith(color: p.muted),
+                          textAlign: TextAlign.right,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                  ],
                 ),
               ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: value == null
-                    ? const SizedBox.shrink()
-                    : Text(
-                        value!,
-                        style: AppTypography.body.copyWith(color: p.muted),
-                        textAlign: TextAlign.right,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-              ),
-            ],
             if (onTap != null) ...[
               const SizedBox(width: AppSpacing.xxs),
               Icon(Icons.chevron_right_rounded, size: 22, color: p.muted),

@@ -18,6 +18,41 @@ abstract final class Routes {
   /// INACTIVE, TRANSFERRED or ARCHIVED, including a rejected request.
   static const noAccess = '/onboarding/no-access';
 
+  /// A PENDING or ACTIVE membership in a SUSPENDED or ARCHIVED church
+  /// (ADR-022 decision 14).
+  static const churchUnavailable = '/church-unavailable';
+
+  /// The Coordinator's read-only view of the church's join code (ADR-022
+  /// decision 10a).
+  static const churchInfo = '/church/info';
+
+  /// The platform Super Admin's area (ADR-022, UI_DESIGN_SYSTEM section 70).
+  /// [platformChurch] is a pattern: build a path with [platformChurchFor].
+  static const platform = '/platform';
+  static const platformNewChurch = '/platform/new';
+
+  /// The New church stepper's later pages (UI_DESIGN_SYSTEM section 70).
+  static const platformNewChurchCoordinator = '/platform/new/coordinator';
+  static const platformNewChurchConfirm = '/platform/new/confirm';
+
+  /// Not under [platformNewChurch]: back from it returns to the list.
+  static const platformNewChurchDone = '/platform/created';
+  static const platformChurch = '/platform/churches/:churchId';
+
+  static String platformChurchFor(String churchId) =>
+      '/platform/churches/$churchId';
+
+  /// Reachable by a Super Admin from any resolved state; the database checks
+  /// the platform role on every call.
+  static const platformRoutes = {
+    platform,
+    platformNewChurch,
+    platformNewChurchCoordinator,
+    platformNewChurchConfirm,
+    platformNewChurchDone,
+    platformChurch,
+  };
+
   /// The one-time first-entry welcome.
   static const welcome = '/welcome';
 
@@ -96,13 +131,26 @@ abstract final class Routes {
   static const lessons = '/lessons';
   static const lessonReader = '/lessons/:lessonId';
 
+  /// The Coordinator's Curriculum: the lesson list as oversight, kept apart
+  /// from My Journey (ADR-023 decision 10). What opens is still the
+  /// database's answer; the view only decides how a lesson is presented.
+  static const curriculumView = 'curriculum';
+  static const curriculum = '/lessons?view=$curriculumView';
+
   static String lessonsFor({String? forMembershipId}) =>
       forMembershipId == null ? lessons : '/lessons?for=$forMembershipId';
 
-  static String lessonFor(String lessonId, {String? forMembershipId}) =>
-      forMembershipId == null
-      ? '/lessons/$lessonId'
-      : '/lessons/$lessonId?for=$forMembershipId';
+  static String lessonFor(
+    String lessonId, {
+    String? forMembershipId,
+    bool oversight = false,
+  }) => Uri(
+    path: '/lessons/$lessonId',
+    queryParameters: {
+      'for': ?forMembershipId,
+      if (oversight) 'view': curriculumView,
+    },
+  ).toString().replaceFirst(RegExp(r'\?$'), '');
 
   /// Curriculum screens. Reachable by any ACTIVE member; a lesson the reader
   /// may not open is refused by the database, never shown.

@@ -31,18 +31,28 @@ Then provision the local church. This applies every migration and runs
 npx supabase db reset
 ```
 
-The seed creates one church and its initial Admin + Coordinator:
+> **Slice 8 (ADR-022, ADR-023, ADR-024), Migrations 022 to 027.** The
+> church ADMIN role is retired: `admin@discipletrack.local` holds COORDINATOR
+> only, and `superadmin@discipletrack.local` is the platform Super Admin.
+> Every Discipler, every Leader included, opens all ten lessons, both tiers,
+> as their own (Home, Lessons); a Disciple's My Journey opens only their
+> reached lessons.
+
+The seed creates one church and its Coordinator, plus a separate platform
+Super Admin with no church membership:
 
 | | |
 |---|---|
 | Church | Liberty Bible Baptist Church - Gensan |
-| Admin email | `admin@discipletrack.local` |
-| Admin password | `dev-password-123` |
+| Coordinator email | `admin@discipletrack.local` (Dev Admin; the name is kept, the role is COORDINATOR only) |
+| Super Admin email | `superadmin@discipletrack.local` (Dev Super Admin; no church) |
+| Password (both) | `dev-password-123` |
 | Join code | `7QK4MZP2XR` |
 | Mailpit (verification emails) | http://127.0.0.1:54324 |
 
 Register a new account in the app, read its 6-digit code from Mailpit, verify,
-enter the join code, and approve the request while signed in as the admin.
+enter the join code, and approve the request while signed in as the
+Coordinator (`admin@`). The Super Admin cannot approve requests.
 
 The seed also builds one D Group, "Young Adults A", through the real
 controlled operations. Every account below is ACTIVE with onboarding complete
@@ -50,9 +60,10 @@ and uses the password `dev-password-123`:
 
 | Email | Name | Role | What to look at |
 |---|---|---|---|
-| `admin@discipletrack.local` | Dev Admin | Admin and Coordinator, not in a group; the founder, so no Welcome | Closes the initial setup period and appoints Paolo from D Groups; Home figures, including 7 active discipleships; any Disciple's detail by deep link |
-| `leader@discipletrack.local` | Lea Santos | Leader of Young Adults A, and its Discipler like every Leader (ADR-020) | Journey with My Disciples (Felix); My D Group roster with Manage members; every Disciple's detail in the group; recording on a Discipler's behalf |
-| `discipler@discipletrack.local` | Dino Reyes | Existing Discipler of Diana, Daniel, Ella and Rosa | My Disciples with four rows; Record a meeting with the choose-Disciple sheet |
+| `superadmin@discipletrack.local` | Dev Super Admin | Platform Super Admin, no church membership (ADR-022) | Opens straight into the Platform area, never Join Church or Welcome; the church listed with its counts, join code and Coordinator (Dev Admin); no members, groups or lessons anywhere |
+| `admin@discipletrack.local` | Dev Admin | Coordinator only (ADMIN retired, ADR-022), not in a group; the founder, so no Welcome | Approves membership requests; views and copies the join code on Profile, Church information (cannot change it); closes the initial setup period and appoints Paolo from D Groups; Home figures, including 7 active discipleships; any Disciple's detail by deep link |
+| `leader@discipletrack.local` | Lea Santos | Leader of Young Adults A, and its Discipler like every Leader (ADR-020) | Journey with My Disciples (Felix); My D Group roster with Manage members; every Disciple's detail in the group; recording on a Discipler's behalf; Home Lessons with all ten open, See all titled Lessons (ADR-024) |
+| `discipler@discipletrack.local` | Dino Reyes | Existing Discipler of Diana, Daniel, Ella and Rosa | My Disciples with four rows; Record a meeting with the choose-Disciple sheet; Home Lessons with all ten open (ADR-024) |
 | `disciple1@discipletrack.local` | Diana Cruz | Disciple of Dino | Lesson 1 completed and locked (Lesson 2 already has meetings, so no Undo); Lesson 2 in progress with 3 recorded absences in a row |
 | `disciple2@discipletrack.local` | Daniel Bautista | Disciple of Dino | Lesson 1 in progress with 7 counted meetings, ready for Dino to mark completed; one duplicate meeting voided |
 | `disciple3@discipletrack.local` | Ella Navarro | Disciple of Dino | Paired, no counted meeting; removed from one of Daniel's meetings where she was listed by mistake |
@@ -62,7 +73,7 @@ and uses the password `dev-password-123`:
 | `member@discipletrack.local` | Mara Villanueva | Approved, in no D Group | Listed by Add Members; no Journey in the dock; out of scope for everyone's progress |
 | `newcomer@discipletrack.local` | Nina Aquino | Added to Young Adults A, Needs setup | Home says her Leader will set up her role; Lea sees "Set up" on her row |
 | `disciple6@discipletrack.local` | Paolo Mendoza | Disciple of Grace, Lessons 1 to 5 completed | Eligible to disciple, not appointed: the Coordinator sees him under Eligible to disciple |
-| `disciple7@discipletrack.local` | Rosa Domingo | Disciple of Dino and appointed Discipler | Both My Journey and My Disciples (none paired yet); Lessons 1 to 5 locked against undo |
+| `disciple7@discipletrack.local` | Rosa Domingo | Disciple of Dino and appointed Discipler | Both My Journey and My Disciples (none paired yet); Lessons 1 to 5 locked against undo; on Home her journey (Lesson 6 now, 7 to 10 locked) and, apart from it, Lessons with all ten open (ADR-024) |
 | `leader2@discipletrack.local` | Ramon Garcia | Leader (and Discipler) of Men of Faith | Cannot see or act on Young Adults A |
 | `disciple8@discipletrack.local` | Tomas Villa | Disciple in Men of Faith, not paired | "Not paired yet" on My Journey; out of scope for Lea and her Disciplers |
 
@@ -102,18 +113,32 @@ dart run tool/curriculum/build_definition.dart "<licence reference>"
 dart run tool/curriculum/build_covers.dart
 ```
 
-What to look at, by account (ADR-019 decisions 6 and 16): Diana reads
-Lessons 1 and 2, and Lessons 3 to 10 show locked; Paolo reads Lessons 1 to 6;
-Dino, Lea, Ramon, Grace and Rosa are Disciplers, so every lesson opens for
-them in both tiers, with answers, from Journey or any Disciple's detail; the
-Admin (as Coordinator) opens every lesson from D Groups, Curriculum; Mara and
-Nina have no journey, so every lesson is locked.
+What to look at, by account (ADR-019 decision 6, ADR-023): Diana reads
+Lessons 1 and 2, and Lessons 3 to 10 show locked; Paolo reads Lessons 1 to 6.
+Disciplers read by relationship. In their own view Dino, Grace, Lea and Ramon
+have no journey, so nothing opens. From a paired Disciple's detail every
+lesson opens in both tiers, with answers: Dino for Diana, Daniel, Ella and
+Rosa; Grace for Hana and Paolo; Lea for Felix. From another Disciple of her
+group (Diana, say), Lea opens only that Disciple's reached lessons, without
+answers. Rosa reads her own Lessons 1 to 6 without answers, fillable, and has
+no paired Disciple yet. The Coordinator (Dev Admin) opens every lesson from D
+Groups, Curriculum. Mara and Nina have no journey, so every lesson is locked.
+The Super Admin reads no lesson.
 
 Use a separate browser profile per account to walk through the roles side by
 side.
 
 The join code is local-development-only. Real deployments let bootstrap
 generate one cryptographically; see `tool/bootstrap_church.ps1`.
+
+### Super Admin on a hosted project (Slice 8)
+
+No platform role exists until one is granted. After the migrations, grant
+the operator's already registered account with `tool/grant_super_admin.ps1`
+(psql in the service-role context, like the bootstrap tool). It calls
+`private.grant_platform_role()`, which no app user can execute; the same tool
+ends the role. From then on that account creates churches, with their
+Coordinator, in the app's Platform area.
 
 ## The service-role key is deliberately not committed
 

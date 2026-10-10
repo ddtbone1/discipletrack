@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-DiscipleTrack is primarily a mobile application used by church members, Disciplers, Leaders, Coordinators, and Admins.
+DiscipleTrack is primarily a mobile application used by church members, Disciplers, Leaders, Coordinators, and the platform Super Admin (ADR-022; the church Admin role is retired).
 
 The application requires:
 

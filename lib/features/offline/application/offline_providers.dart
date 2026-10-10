@@ -6,6 +6,7 @@ import '../../../core/connectivity/connection_status.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../../membership/application/membership_providers.dart';
 import '../../ministry/application/ministry_providers.dart';
+import '../../platform/application/platform_providers.dart';
 import '../../profile/application/profile_providers.dart';
 import '../data/offline_snapshot.dart';
 
@@ -56,6 +57,11 @@ Future<T> liveOrSaved<T>(
 ///
 /// Watched once by the app root. Nothing is written while offline, because
 /// the values on screen then came from the snapshot itself.
+///
+/// While the church is SUSPENDED or ARCHIVED, the roles and the roster are
+/// empty (they are gated on church access), so the saved snapshot drops
+/// them and keeps the church's status: offline, the person then sees the
+/// unavailable screen, not the church as it was (ADR-022 decision 14).
 final offlineSnapshotSyncProvider = Provider<void>((ref) {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null || ref.watch(isOfflineProvider)) return;
@@ -65,6 +71,7 @@ final offlineSnapshotSyncProvider = Provider<void>((ref) {
   final church = ref.watch(myChurchProvider);
   final roles = ref.watch(myChurchRolesProvider);
   final ministry = ref.watch(myMinistryContextProvider);
+  final platform = ref.watch(myPlatformAccessProvider);
 
   final parts = <AsyncValue<Object?>>[
     profile,
@@ -72,6 +79,7 @@ final offlineSnapshotSyncProvider = Provider<void>((ref) {
     church,
     roles,
     ministry,
+    platform,
   ];
   if (parts.any((p) => p.isLoading || p.hasError || !p.hasValue)) return;
 
@@ -86,6 +94,7 @@ final offlineSnapshotSyncProvider = Provider<void>((ref) {
           church: church.value,
           roles: roles.value ?? const {},
           ministry: ministry.value,
+          isSuperAdmin: platform.value?.isSuperAdmin ?? false,
         ),
       );
 });
@@ -101,6 +110,7 @@ Future<void> retryConnection(WidgetRef ref) async {
   if (!online) return;
   ref
     ..invalidate(myProfileProvider)
+    ..invalidate(myPlatformAccessProvider)
     ..invalidate(myChurchProvider)
     ..invalidate(myChurchRolesProvider)
     ..invalidate(myMinistryContextProvider);

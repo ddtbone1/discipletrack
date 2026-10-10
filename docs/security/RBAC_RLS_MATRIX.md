@@ -64,23 +64,73 @@ implemented. Section 5 `curricula` note names the content tables (no
 client policy or grant) and the controlled reads; section 10 adds
 publish_curriculum() and the three content reads.
 
+Revision 2026-10-08 (ADR-022, ADR-023, Slice 8, documented before
+implementation, then built as Migrations 022 to 026; the "as built" notes
+below name the Slice 8 migrations where they changed a rule): a platform-level Super Admin
+in `platform_roles`, independent of church membership; the church-level
+ADMIN role retired; approval, rejection and the reading of the church's
+memberships and their profiles COORDINATOR-only; church provisioning,
+join code regeneration, Coordinator assignment and replacement, and
+church status by the Super Admin through controlled operations; church
+status SUSPENDED; the effective-membership predicate requires an ACTIVE
+church; one church per person. Curriculum access narrowed from the
+Discipler role to the relationship (ADR-023, superseding ADR-019
+decision 16); a Discipler's own context reopened to the whole book by
+ADR-024 (Phase 4, Migration 027). Sections 1, 1a, 2 (Admin column replaced by Super Admin;
+lesson rows corrected), 2b, 3 (profiles, churches, church_memberships,
+church_role_assignments, the new platform_roles, and the ADMIN mentions
+in d_groups, d_group_placements and d_group_invitations), 5, 8, 9, 10,
+11 and the Core Authorization Rule. Amended the same day after the
+Phase 1 review: the Coordinator views and copies their own church's
+join code (section 2 row, section 3 churches, section 10
+get_church_join_code()); the Coordinator's full curriculum access, My
+Journey distinct, reading never affects progression (sections 2 and 5);
+the Coordinator invariant's church row lock (section 10).
+
 ---
 
 # 1. Role Model
 
+Three levels, each stored separately, none implying another (ADR-022):
+
+| Level | Stored in | Roles |
+|---|---|---|
+| Platform | platform_roles | SUPER_ADMIN |
+| Church | church_role_assignments, on an ACTIVE membership in an ACTIVE church | COORDINATOR |
+| D Group | d_group_memberships | LEADER, DISCIPLER, DISCIPLE |
+
+## Platform-Level Role
+
+### SUPER_ADMIN
+
+Responsible for the platform: creating churches together with their
+first Coordinator, regenerating join codes, assigning, replacing and
+ending Coordinators, and setting church status.
+
+- Stored in platform_roles, keyed to profiles.id, independent of any
+  church membership. Read only from that table, never from a JWT claim,
+  profile field, user metadata or operation parameter.
+- Granted and ended only by service-role tooling
+  (private.grant_platform_role(), tool/grant_super_admin.ps1) and the
+  local seed. There is no client write path.
+- Sees per church only its name, status, join code, creation date,
+  aggregate counts (members by status, D Groups, Coordinators) and the
+  full name and sign-in email of its active Coordinators. Nothing else
+  about any member, and no ministry data (ADR-022 decision 5).
+- Never assigns themselves as Coordinator (ADR-022 decision 6). A Super
+  Admin who also holds COORDINATOR in a church holds it through a
+  separate, audited assignment, and has that church's Coordinator access
+  through that row only.
+
 ## Church-Level Roles
 
-### ADMIN
+### ADMIN (retired)
 
-Responsible for technical/system administration.
-
-Examples:
-
-- Church configuration
-- Church membership administration
-- System-level role administration
-
-ADMIN does not automatically receive access to sensitive discipleship care notes.
+Retired by ADR-022 on 2026-10-08. The enum value remains; no operation
+grants it, the database refuses an active ADMIN row, and every former
+row is ended and audited. It grants nothing. Its only built power,
+approval, is the Coordinator's; its unbuilt ones (church configuration,
+church roles) are the Super Admin's platform operations.
 
 ### COORDINATOR
 
@@ -97,7 +147,14 @@ Examples:
 - Follow-ups
 - Discipler appointments (ADR-012)
 - The church's initial setup period (ADR-018)
+- Membership approval and rejection, and the church's member list
+  (COORDINATOR only since ADR-022)
+- The church's join code, to view and share, read-only (ADR-022
+  decision 10a); generating or regenerating it is the Super Admin's
 - Church announcements
+
+A church never has an ACTIVE status without at least one active
+COORDINATOR (ADR-022 decision 11; DATABASE_CONSTRAINTS.md section 1).
 
 Gathering "attendance oversight" is withdrawn (ADR-014). Attendance
 exists only as a discipleship meeting outcome, overseen through
@@ -138,7 +195,8 @@ Such a member may:
 - view their own church membership
 - view their church
 - view CHURCH-scope announcements
-- read the fixed curriculum
+- read the curriculum's lesson list and covers; no lesson content
+  without a journey or a relationship (ADR-019 decision 6, ADR-023)
 
 They may not access discipleship meeting records, discipleship
 progress, attention conditions, follow-ups or D Group announcements
@@ -162,9 +220,14 @@ everywhere.
 
 Wherever a policy in this document refers to a church member, it means:
 
-church_memberships.status = 'ACTIVE'
+church_memberships.status = 'ACTIVE' and churches.status = 'ACTIVE'
 
-Status effects:
+The church condition is added by ADR-022 (2026-10-08). Every role
+helper and policy relies on this one predicate, so a role, a D Group
+responsibility or an assignment grants nothing while the church is
+SUSPENDED or ARCHIVED.
+
+Membership status effects:
 
 PENDING
 → may access only the minimum onboarding state required: their own
@@ -184,6 +247,27 @@ INACTIVE / TRANSFERRED / ARCHIVED
 Privileged roles require an ACTIVE membership to be effective. A church
 role assignment attached to a non-ACTIVE membership grants nothing.
 
+Church status effects (ADR-022 decision 14, which has the full table):
+
+ACTIVE
+→ normal access according to the membership status above
+
+SUSPENDED (reversible) and ARCHIVED (final)
+→ a PENDING or ACTIVE member may read their own profile and account,
+  their own membership row and the church's id, name and status, and
+  nothing else of the church: no members, roster, D Groups, meetings,
+  progress, lesson list, lesson content, covers, avatars or settings
+→ no write to church data by anyone, the COORDINATOR included; every
+  controlled operation refuses with its usual PT403 not_authorized (or not found); the app reads the church status to explain it (Migration 025)
+→ lookup_church_by_join_code() finds nothing and request_join_church()
+  answers INVALID_CODE, so the status is not revealed
+→ PENDING requests stay PENDING and cannot be approved or rejected
+→ the Super Admin keeps only the platform operations ADR-022 allows
+  for that status (section 10)
+
+Profiles and accounts are platform-level: sign-in, the session and
+editing one's own profile are unaffected by church status.
+
 ---
 
 # 2. General Access Matrix
@@ -191,20 +275,30 @@ role assignment attached to a non-ACTIVE membership grants nothing.
 "Member" below means an ACTIVE church member who currently holds no
 D Group responsibility. This is a valid state, not a stored role.
 
-| Capability | Admin | Coordinator | Leader | Discipler | Disciple | Member |
+"Super Admin" means a person holding the platform SUPER_ADMIN role and
+no church role. A Super Admin who is also a church member has, in
+addition, the column of whatever they hold in that church. Every church
+column assumes an ACTIVE church (section 1a).
+
+| Capability | Super Admin | Coordinator | Leader | Discipler | Disciple | Member |
 |---|---|---|---|---|---|---|
 | View own profile | Yes | Yes | Yes | Yes | Yes | Yes |
 | Edit own profile | Yes | Yes | Yes | Yes | Yes | Yes |
-| View own church membership | Yes | Yes | Yes | Yes | Yes | Yes |
-| View own church | Yes | Yes | Yes | Yes | Yes | Yes |
-| Read curriculum | Yes | Yes | Yes | Yes | Yes | Yes |
-| Read lesson content, Disciple tier (ADR-019) | No | Any lesson | Active Disciples of own D Group, reached lessons | Assigned Disciples, reached lessons | Own reached lessons | No |
-| Read lesson content, Discipler tier: answers, notes, modules (ADR-019) | No | Any lesson | No (only as an assigned Discipler) | Assigned Disciples, reached lessons | No | No |
-| Manage church configuration | Yes | No | No | No | No | No |
+| View own church membership | No membership | Yes | Yes | Yes | Yes | Yes |
+| View own church | No membership | Yes | Yes | Yes | Yes | Yes |
+| Read curriculum (lesson list and covers) | No | Yes | Yes | Yes | Yes | Yes |
+| Read lesson content, Disciple tier (ADR-019, ADR-023, ADR-024) | No | Any lesson, any context | Own context: all ten. Own assigned Disciples: all ten. Other active Disciples of own D Group: their reached lessons | Own context: all ten. Currently assigned Disciples: all ten | Own reached lessons | No |
+| Read lesson content, Discipler tier: answers, notes, modules (ADR-019, ADR-023, ADR-024) | No | Any lesson, any context | Own context: all ten. Own assigned Disciples: all ten. Never for others' Disciples | Own context: all ten. Currently assigned Disciples: all ten | No | No |
+| Create church, with its Coordinator (ADR-022) | Yes | No | No | No | No | No |
+| Regenerate join code (ADR-022) | Yes, ACTIVE or SUSPENDED church | No | No | No | No | No |
+| View and copy own church's join code, read-only (ADR-022 decision 10a) | Yes, every church (list_churches()) | Own church, while ACTIVE | No | No | No | No |
+| Set church status (ADR-022) | Yes; ARCHIVED is final | No | No | No | No | No |
+| Assign, replace or end a Coordinator (ADR-022) | Yes, never themselves; never leaving an ACTIVE church without one | No | No | No | No | No |
+| View platform overview: churches, counts, Coordinators' name and email | Yes | No | No | No | No | No |
+| View platform audit events | Yes | No | No | No | No | No |
 | Manage ministry settings | No | Yes | No | No | No | No |
-| Approve church membership | Yes | Yes | No | No | No | No |
-| Manage church roles | Yes | No | No | No | No | No |
-| View church members | Yes | Yes | Own D Group | Assigned Disciples, own Leader | Self, own Leader and Discipler | Self |
+| Approve or reject church membership | No | Yes | No | No | No | No |
+| View church members | Counts only; Coordinators' name and email | Yes | Own D Group | Assigned Disciples, own Leader | Self, own Leader and Discipler | Self |
 | View D Group roster by name | No | Church-wide | Own D Group | Own D Group | Own D Group | No |
 | Create/manage D Groups | No | Yes | No | No | No | No |
 | Assign Leader | No | Yes | No | No | No | No |
@@ -231,11 +325,54 @@ D Group responsibility. This is a valid state, not a stored role.
 | Add follow-up action | No | Yes | Own D Group | Assigned Follow-ups | No | No |
 | Resolve follow-up | No | Yes | Own D Group | Assigned Follow-ups | No | No |
 | Create church announcement | No | Yes | No | No | No | No |
-| View church announcement | Yes | Yes | Yes | Yes | Yes | Yes |
+| View church announcement | No | Yes | Yes | Yes | Yes | Yes |
 | Create D Group announcement | No | Oversight | Own D Group | No | No | No |
 | View D Group announcement | No | Church-wide | Own D Group | Own D Group | Own D Group | No |
 
 Notes on specific cells:
+
+*Super Admin* (ADR-022). The rows "Manage church configuration" and
+"Manage church roles", held by the retired church ADMIN and never
+built, are replaced by the five platform rows above. Every platform
+capability is a SECURITY DEFINER operation (section 10) that returns
+only the listed fields; no table policy is broadened for the Super
+Admin, and the Super Admin column is "No" for every ministry row. Any
+future exception (support, recovery) needs its own justified, audited
+operation.
+
+*Approve or reject church membership* is COORDINATOR-only since
+ADR-022; ADMIN shared it before. It is refused while the church is not
+ACTIVE.
+
+*Read lesson content* (ADR-023, superseding ADR-019 decision 16; own
+context amended by ADR-024). A reader holding an active DISCIPLER row,
+every Leader included (ADR-020), opens all ten lessons in both tiers in
+their own context, from appointment until the responsibility ends.
+Anyone else's own context opens only their own journey: the Disciple
+tier of the lessons they have reached (COMPLETED, plus the current lesson
+while they hold an active DISCIPLE row). A Discipler who is also a
+Disciple keeps My Journey as their own journey, like the Coordinator
+below; their progression is recorded only by their Discipler. In the
+context of a currently assigned Disciple, the
+Discipler, a Leader among them, opens all ten lessons in both tiers. A
+Leader opens the Disciple tier of the reached lessons of the other
+active Disciples of the group they currently lead, never their Discipler
+tier. The COORDINATOR opens everything, in any context, their own
+included (ADR-023 decision 9). Access in another person's context ends
+with the assignment or the leadership.
+
+The Coordinator's access is oversight. A Coordinator who is also a
+Disciple keeps My Journey as their own journey: lesson states from their
+progression, lessons opened in the Disciple view. The full book is in
+Curriculum (ADR-023 decision 10). For every role, reading never affects
+progression: it never makes a lesson current, reached or completed, and
+never counts as a meeting (ADR-023 decision 11).
+
+*View and copy own church's join code* (ADR-022 decision 10a, Phase 1
+review). The church's active COORDINATOR reads the current code through
+get_church_join_code(), read-only, only while the church is ACTIVE.
+Nobody else in the church reads it, and only the Super Admin generates
+or regenerates it.
 
 *Withdrawn gathering rows (ADR-014).* The rows Create gathering, Record
 draft attendance, Finalize attendance, Cancel gathering and View
@@ -283,17 +420,17 @@ or Disciple sees everyone in their group by name only, through
 get_my_d_group_roster(). Profile rows, and therefore phone numbers,
 are readable only for the people in the *View church members* cell:
 for a Discipler their assigned Disciples and their own Leader, for a
-Disciple their own Leader and their own Discipler. ADMIN without
-COORDINATOR sees no D Group data.
+Disciple their own Leader and their own Discipler. A Super Admin
+without COORDINATOR sees no D Group data.
 
-*Manage church configuration* covers church identity, join code and
-system-level configuration. *Manage ministry settings* covers
+Church identity, the join code and church status are platform
+operations of the Super Admin (ADR-022), replacing the former *Manage
+church configuration* row. *Manage ministry settings* covers
 church_settings values that govern ministry behaviour, currently
 consecutive_absence_threshold (redefined, ADR-014),
 consecutive_missed_meeting_threshold (dormant, ADR-014) and
 follow_up_due_days (section 8). Ministry setting
-changes are audited. ADMIN retains read access to church_settings where
-operationally necessary.
+changes are audited. The Super Admin has no access to church_settings.
 
 *Record discipleship meeting* covers recording a discipleship meeting
 after the fact, including each participant's explicitly recorded
@@ -366,10 +503,12 @@ Group Leader is the normal authority. Coordinator capability exists as a
 ministry-oversight fallback, for example where a D Group currently has
 no active Leader.
 
-ADMIN has no access to discipleship meeting outcomes (attendance) or
-discipleship progress. Administering the system does not confer
-ministry-care access. Where the same person needs both, assign
-COORDINATOR separately.
+The Super Admin has no access to discipleship meeting outcomes
+(attendance), discipleship progress or any other ministry data (ADR-004
+as amended, ADR-022). Administering the platform does not confer
+ministry-care access. Where the same person needs both, COORDINATOR is
+assigned separately, by another Super Admin or trusted tooling, never by
+themselves.
 
 No person may record their own meeting outcome, in any role: a recorder
 is never a participant in a meeting they record (explicit check from
@@ -464,10 +603,13 @@ Active Discipleships (DATABASE_CONSTRAINTS.md section 11):
 | DISCIPLER | their own active assignments |
 | DISCIPLE | none as an aggregate; their own journey shows whether they are paired |
 | Member without a D Group | none |
-| ADMIN without COORDINATOR | none (ADR-004) |
+| Super Admin without COORDINATOR | none (ADR-004, ADR-022) |
 
-Being ADMIN never grants church-wide ministry progress or discipleship
-aggregates.
+Being Super Admin never grants church-wide ministry progress or
+discipleship aggregates. The platform overview (section 10,
+list_churches()) carries only membership and structure counts per
+church: members by membership status, D Groups and Coordinators. These
+are not discipleship aggregates and describe no person.
 
 Church-wide discipleship aggregates shown to every role (for example a
 church total on every member's Home) are not granted. They require a
@@ -479,7 +621,7 @@ ranks or compares people, Disciplers or D Groups, and no aggregate is a
 percentage, ratio or consistency score (decision 8).
 
 Candidate aggregate, not granted (decision 9): "lessons completed this
-month". It is a candidate Reporting / Oversight metric owned by Slice 11,
+month". It is a candidate Reporting / Oversight metric owned by Slice 12,
 not a defined or governing metric. Before any role is granted it, it
 needs a precise definition (likely lessons reaching COMPLETED
 with completed_at in the month), the church time zone semantics for
@@ -499,11 +641,16 @@ SELECT:
 - Coordinator → profiles required for church ministry operations
 - Leader → members of own active D Group
 - Discipler → assigned Disciples
-- Admin → profiles required for system/member administration
+- Super Admin → none through this table. The full name and sign-in
+  email of each church's active Coordinators, and of the account a
+  Coordinator email resolves to, are returned only by the platform
+  operations (section 10)
 
-Implemented: own profile; for ADMIN and COORDINATOR the profiles of
-anyone holding a membership row (any status) in a church they
-administer, which is what the membership-request list needs; and,
+Implemented: own profile; for the COORDINATOR the profiles of anyone
+holding a membership row (any status) in their church, which is what
+the membership-request list needs (ADMIN shared this until ADR-022;
+Slice 8 narrows private.can_view_profile_as_church_admin() to
+COORDINATOR); and,
 since Migration 006, the ministry scope
 (private.can_view_profile_in_ministry): a LEADER sees everyone actively
 placed in their group, including people who still need setup
@@ -537,23 +684,30 @@ SELECT:
 
 - Active church members → own church
 - PENDING members → own requested church (section 1a: id, name, status)
+- PENDING or ACTIVE members of a SUSPENDED or ARCHIVED church → own
+  church's id, name and status, so the app can explain the state
+  (section 1a)
+- Super Admin → no table policy; churches are listed through
+  list_churches() (section 10)
 
 Column-level: authenticated may SELECT only id, name and status.
 join_code is not readable by any client role, and `select=*` is refused.
-anon holds no grant.
+anon holds no grant. The Super Admin reads a church's join code only
+through list_churches(), and the church's active COORDINATOR reads their
+own church's code only through get_church_join_code() (ADR-022 decision
+10a); no column grant is opened for either.
 
 Lookup by join code is NOT available as a direct client SELECT. An
 unapproved user must use lookup_church_by_join_code(), a trusted
-controlled operation returning only minimal confirmation information.
+controlled operation returning only minimal confirmation information,
+for ACTIVE churches only.
 
-UPDATE:
+INSERT / UPDATE:
 
-- ADMIN → allowed church configuration
-
-Join code regeneration uses regenerate_join_code(), an audited
-ADMIN-only controlled operation.
-
-Church management should use controlled operations where appropriate.
+- No client policy or grant. Churches are created by create_church()
+  (Super Admin) or by trusted bootstrap tooling; the join code changes
+  only through regenerate_join_code() and the status only through
+  set_church_status(), both Super Admin and audited (ADR-022).
 
 ---
 
@@ -561,8 +715,8 @@ Church management should use controlled operations where appropriate.
 
 SELECT:
 
-- ADMIN → own church
-- COORDINATOR → own church
+- COORDINATOR → own church (ADMIN shared this until ADR-022)
+- Super Admin → none; counts only, through list_churches()
 - LEADER → everyone actively placed in own D Group, including people
   who still need setup
 - DISCIPLER → assigned Disciples, own Leader
@@ -583,8 +737,14 @@ Implemented: request_join_church() (INSERT as PENDING),
 approve_church_membership(), reject_church_membership() and
 complete_onboarding(). Clients hold no INSERT or UPDATE policy on the
 table. The pending-request list for approvers is a plain SELECT under
-the ADMIN / COORDINATOR own-church scope, embedding the applicant's
-profile through the user_id foreign key.
+the COORDINATOR own-church scope (ADMIN / COORDINATOR until ADR-022),
+embedding the applicant's profile through the user_id foreign key.
+
+Slice 8 (ADR-022) adds: create_church(), assign_church_coordinator()
+and replace_church_coordinator() create or reactivate the Coordinator's
+membership as ACTIVE with onboarding complete (Super Admin). One church
+per person: a person holds membership rows in at most one church,
+enforced by a unique key on user_id.
 
 ---
 
@@ -592,19 +752,50 @@ profile through the user_id foreign key.
 
 SELECT:
 
-- ADMIN → own church
 - COORDINATOR → role information needed for ministry operation
+- Super Admin → none through this table; the Coordinators of each
+  church through list_churches()
 - User → own roles where needed (implemented: own active and ended
   roles, so the client can show approver entry points; authority is
   still decided server-side on every operation)
 
 WRITE:
 
-- ADMIN only through controlled role-management operations.
+- Super Admin only, through create_church(), assign_church_coordinator(),
+  replace_church_coordinator() and end_church_coordinator() (ADR-022),
+  and trusted bootstrap tooling. COORDINATOR is the only role written;
+  an active ADMIN row is refused by the database.
 
 Migration 006 revokes INSERT, UPDATE, DELETE and TRUNCATE from
-authenticated, so no client write path exists until role management
-is built.
+authenticated, so no client write path exists; the Slice 8 operations
+write as SECURITY DEFINER.
+
+---
+
+## platform_roles
+
+Added by Slice 8 (ADR-022). Identity level: profiles.id.
+
+SELECT:
+
+- User → own rows (active and ended), so the client can show the
+  Platform area; authority is still decided server-side by
+  private.is_super_admin() on every operation
+- Nobody else, a Super Admin included: there is no list of Super
+  Admins in the app
+
+INSERT / UPDATE / DELETE:
+
+- No client policy and no grant to anon or authenticated, so no
+  client write path exists.
+- private.grant_platform_role() and private.end_platform_role(),
+  service_role only, run by tool/grant_super_admin.ps1 and the local
+  seed. Audited as PLATFORM_ROLE_GRANTED / PLATFORM_ROLE_ENDED.
+- Rows are ended (ended_at, ended_by), never deleted.
+
+private.is_super_admin() reads this table only, for (select auth.uid()).
+Changing local state, routes, profile fields, user metadata or an RPC
+parameter cannot grant it.
 
 ---
 
@@ -612,7 +803,7 @@ is built.
 
 SELECT:
 
-- ADMIN → own church where required
+- Super Admin → none (ADR-022)
 - COORDINATOR → all church D Groups
 - LEADER → own D Group
 - DISCIPLER → own D Group
@@ -629,7 +820,7 @@ memberships remain. See DATABASE_CONSTRAINTS.md section 2. (The former
 
 Implemented (Migration 006): COORDINATOR church-wide; LEADER,
 DISCIPLER and DISCIPLE own group (any active responsibility in it).
-ADMIN without COORDINATOR has no scope. Writes: create_d_group() and
+A Super Admin without COORDINATOR has no scope (the retired ADMIN had none either). Writes: create_d_group() and
 assign_d_group_leader(); set_d_group_status() is not built yet.
 Clients hold SELECT only; anon holds nothing.
 
@@ -649,7 +840,7 @@ SELECT:
 - COORDINATOR → church-wide, history included
 - LEADER → own D Group's, history included
 - Person → own placements
-- Anyone else, including ADMIN without COORDINATOR → none
+- Anyone else, including a Super Admin without COORDINATOR → none
 
 Implemented by d_group_placements_select_manager
 (private.can_manage_d_group_members) and d_group_placements_select_own.
@@ -734,7 +925,7 @@ SELECT:
 - LEADER → own D Group's, every status (a decline is shown to the
   inviter, who may invite again)
 - Invitee → own
-- DISCIPLER, DISCIPLE, ADMIN without COORDINATOR → none
+- DISCIPLER, DISCIPLE, Super Admin without COORDINATOR → none
 
 Until Migration 012 the invitee read their live invitation, with the
 group name and inviter name, through get_my_pending_invitation(), now
@@ -811,23 +1002,36 @@ Curriculum mutation is not part of the normal MVP user workflow.
 
 The MVP uses one fixed church curriculum.
 
-Lesson content (ADR-010, scope replaced by ADR-019 decision 6): the
-lesson list (curriculum_lessons) stays readable by ACTIVE members. Lesson
-content is tiered and gated by progression:
-- Disciple tier of lesson N: the person for lessons they have reached
-  (completed and current eligible), their current assigned Discipler and
-  the Leader of their current group for the same lessons while the
-  Disciple is active in that group, and the COORDINATOR for any lesson
-- Discipler tier (answers, Discipler notes, modules): the current
-  assigned Discipler for lessons the Disciple has reached, and the
-  COORDINATOR; never the Disciple, and never the LEADER as such
-  (recording on a Discipler's behalf grants no answers; a Leader who is
-  also a Discipler reads this tier only through their own assigned
-  Disciples)
+Lesson content (ADR-010; scope replaced by ADR-019 decision 6, widened
+by ADR-019 decision 16 on 2026-10-06, and narrowed to the relationship
+by ADR-023 on 2026-10-08): the lesson list (curriculum_lessons) and the
+covers stay readable by ACTIVE members of an ACTIVE church. Lesson
+content is tiered, and each read is decided for the pair (reader,
+context person):
+- own context, for a reader holding an active DISCIPLER row, every
+  LEADER included: all ten lessons in both tiers (ADR-024), from
+  appointment until the responsibility ends; My Journey still presents
+  their own journey when they are also a Disciple
+- own context, for everyone else: the Disciple tier of the reader's own
+  reached lessons; never the Discipler tier (the COORDINATOR excepted,
+  below)
+- context of a currently assigned Disciple: the Discipler, a Leader
+  among them, reads all ten lessons in both tiers
+- context of another active Disciple of the group the reader currently
+  leads: the LEADER reads the Disciple tier of that Disciple's reached
+  lessons, never the Discipler tier (recording or completing on a
+  Discipler's behalf grants no answers)
+- the COORDINATOR: both tiers of any lesson, in any context, their own
+  included (ADR-023 decision 9); as oversight, never through My Journey,
+  which presents the Coordinator's own journey like any Disciple's
+  (decision 10)
+- reading never affects progression for any role (decision 11)
 - "reached": lessons COMPLETED, plus the current lesson only while the
   person holds an active DISCIPLE responsibility; a default Lesson 1
   resolved for someone with no journey grants nothing
-- nobody else, including ADMIN without COORDINATOR
+- nobody else, including a Super Admin without COORDINATOR, a member
+  without a journey and a Discipler without Disciples (who reads only
+  their own journey)
 There is no client write path. Publishing is trusted tooling in the service-role context.
 Implemented in Migration 017: curriculum_publications,
 lesson_content_blocks and lesson_block_answers have RLS enabled, no
@@ -1143,15 +1347,17 @@ get_initial_setup_status().
 SELECT:
 
 - COORDINATOR
-- ADMIN where operationally necessary
+- Super Admin → none (ADR-022)
 
 UPDATE:
 
 - COORDINATOR
 
 The Coordinator owns ministry configuration because these values govern
-the follow-up workload they are accountable for. System and church
-configuration such as church identity and the join code remains ADMIN.
+the follow-up workload they are accountable for. Church identity, the
+join code and church status are platform operations of the Super Admin
+(ADR-022). create_church() inserts the settings row with the bootstrap
+defaults.
 
 Changes must be audited.
 
@@ -1173,6 +1379,15 @@ Restrict to authorized administrative/oversight use.
 
 Audit data must not become a way to bypass normal privacy restrictions.
 
+Super Admin (ADR-022): platform events only, through
+list_platform_audit(): PLATFORM_ROLE_GRANTED, PLATFORM_ROLE_ENDED,
+CHURCH_CREATED, JOIN_CODE_REGENERATED, COORDINATOR_ASSIGNED,
+COORDINATOR_REPLACED, COORDINATOR_ENDED, CHURCH_STATUS_CHANGED and
+CHURCH_ROLE_ENDED with reason admin_retired. The operation returns the
+action, the time, the church and the actor's name; metadata names no
+member other than a Coordinator. Church ministry events are never
+returned to the Super Admin.
+
 ---
 
 # 10. Controlled Database Operations
@@ -1181,9 +1396,10 @@ The following should NOT be implemented as multiple independent Flutter writes.
 
 Use transactional PostgreSQL functions / RPCs or equivalent trusted backend operations.
 
-Church provisioning is deliberately absent from this list. Bootstrap is
-trusted deployment tooling, not a runtime operation, and is specified in
-DATABASE_CONSTRAINTS.md section 0.
+Bootstrap stays trusted deployment tooling, not a runtime operation,
+specified in DATABASE_CONSTRAINTS.md section 0. In-app church
+provisioning by the Super Admin (ADR-022, Slice 8) is a runtime
+controlled operation and is listed below.
 
 Recommended operations:
 
@@ -1192,8 +1408,17 @@ Recommended operations:
 - approve_church_membership()
 - reject_church_membership()
 - complete_onboarding()
-- assign_church_role()
-- regenerate_join_code()
+- create_church() (ADR-022)
+- preview_coordinator_account() (ADR-022)
+- assign_church_coordinator() (ADR-022; replaces the planned assign_church_role())
+- replace_church_coordinator() (ADR-022)
+- end_church_coordinator() (ADR-022)
+- regenerate_join_code() (ADR-022)
+- set_church_status() (ADR-022)
+- list_churches() (ADR-022)
+- list_platform_audit() (ADR-022)
+- get_church_join_code() (ADR-022 decision 10a; the Coordinator)
+- private.grant_platform_role() / private.end_platform_role() (service role only; ADR-022)
 - create_d_group()
 - set_d_group_status()
 - assign_d_group_leader()
@@ -1238,19 +1463,23 @@ lookup_church_by_join_code()
 → SECURITY DEFINER
 → requires an authenticated caller
 → returns only minimal church confirmation information (id and name)
+→ ACTIVE churches only; a SUSPENDED or ARCHIVED church is a miss
 → rate limited; a miss returns an empty result rather than raising
   (DATABASE_CONSTRAINTS.md section 1, Join Code Format and Rate Limiting)
 
 request_join_church()
 → takes the church identifier returned by the prior lookup, together
-  with the join code, which must resolve to that church
+  with the join code, which must resolve to that ACTIVE church
 → creates a PENDING membership; returns REQUESTED, ALREADY_PENDING,
-  ALREADY_ACTIVE, NOT_REQUESTABLE or INVALID_CODE
+  ALREADY_ACTIVE, NOT_REQUESTABLE, INVALID_CODE or, from Slice 8,
+  IN_ANOTHER_CHURCH (the caller holds a membership row in another
+  church; one church per person, ADR-022 decision 9)
 → rate limited
 → writes no role and no D Group responsibility
 
 reject_church_membership()
-→ ADMIN or COORDINATOR of the same church, own membership ACTIVE
+→ COORDINATOR of the same church, own membership ACTIVE, church ACTIVE
+  (ADMIN or COORDINATOR until ADR-022)
 → PENDING → ARCHIVED, audited as MEMBERSHIP_REJECTED
 → approved_by / approved_at stay NULL
 
@@ -1374,12 +1603,105 @@ list_discipler_candidates(p_d_group_id, p_church_id) (Migration 014)
   group): the COORDINATOR
 → eligibility is not appointment
 
-regenerate_join_code()
-→ ADMIN only
-→ audited
+Platform operations (ADR-022, Slice 8). All are SECURITY DEFINER with
+search_path '', executable by authenticated, check
+private.is_super_admin() first and raise PT403 not_authorized otherwise,
+before reading anything, and write their audit event with church_id
+set where a church is concerned.
 
-assign_church_role() and any role-ending operation
-→ reject any change leaving the church with zero active COORDINATOR
+create_church(p_name, p_coordinator_email)
+→ creates, in one transaction: the church (ACTIVE) with a join code from
+  private.generate_join_code(), its church_settings with the bootstrap
+  defaults, its ACTIVE curriculum and ten lesson rows, the Coordinator's
+  ACTIVE membership (onboarding complete, approved_by NULL) and their
+  COORDINATOR row
+→ the email must belong to a registered account with a confirmed email
+  that holds no membership in any church (account_not_found,
+  email_not_confirmed, member_of_another_church); never the caller
+  (cannot_assign_self)
+→ returns the church id and join code; audited as CHURCH_CREATED and
+  COORDINATOR_ASSIGNED
+→ lesson content is published separately by trusted tooling, under the
+  church's own licence reference (ADR-019 decision 11)
+
+preview_coordinator_account(p_church_id, p_email)
+→ read-only; the confirmation step before create, assign or replace
+→ returns whether a registered, confirmed account exists for the email,
+  its full name, and whether it belongs to this church already, to
+  another church, or to none; nothing else about the person
+
+assign_church_coordinator(p_church_id, p_email)
+→ church ACTIVE or SUSPENDED; adds a Coordinator
+→ the account as for create_church(), or already a member of this
+  church: their membership is created or reactivated as ACTIVE, from any
+  status, with onboarding complete (coalesce) and joined_at kept
+  (coalesce); COORDINATOR granted (already_coordinator if held)
+→ audited as COORDINATOR_ASSIGNED, with the membership's prior status
+  when it was reactivated
+
+replace_church_coordinator(p_church_id, p_current_membership_id, p_email)
+→ church ACTIVE or SUSPENDED; ends the current COORDINATOR row and
+  grants the new one in the same transaction, so the church is never
+  without a Coordinator (ADR-022 decision 12)
+→ the replaced person stays an ACTIVE member; their D Group
+  responsibilities are untouched
+→ audited as COORDINATOR_REPLACED
+
+end_church_coordinator(p_church_id, p_membership_id)
+→ church ACTIVE or SUSPENDED; ends one of several Coordinators
+→ refused when it would leave the church with none (last_coordinator).
+  The deferred invariant enforces this for an ACTIVE church at commit;
+  the operation refuses it for a SUSPENDED church too, so that
+  reactivation never meets a church without one
+→ audited as COORDINATOR_ENDED
+
+regenerate_join_code(p_church_id)
+→ church ACTIVE or SUSPENDED
+→ a new code from private.generate_join_code(), retried on a unique
+  collision; sets join_code_updated_at; the old code stops matching at
+  once; PENDING requests made with it stay PENDING
+→ returns the new code; audited as JOIN_CODE_REGENERATED with no code
+  value in the metadata
+
+set_church_status(p_church_id, p_status)
+→ ACTIVE ↔ SUSPENDED; ACTIVE or SUSPENDED → ARCHIVED; ARCHIVED is final
+  (church_archived); a no-op change is refused (status_unchanged)
+→ to ACTIVE requires an active Coordinator (enforced at commit)
+→ changes no membership, role, group or progress row
+→ audited as CHURCH_STATUS_CHANGED with the old and new status
+
+list_churches()
+→ read-only; per church: id, name, status, join code, created_at,
+  member counts by membership status, D Group count, and the id, full
+  name and sign-in email of each active Coordinator; nothing else
+
+list_platform_audit(p_church_id default null, p_before default null)
+→ read-only; platform events only (section 9), newest first, paged
+
+private.grant_platform_role(p_user_id, p_role) / private.end_platform_role(p_user_id, p_role)
+→ service_role only; never executable by anon or authenticated
+→ grant is idempotent while an active row exists; end sets ended_at and
+  ended_by; audited as PLATFORM_ROLE_GRANTED / PLATFORM_ROLE_ENDED with
+  church_id NULL
+
+get_church_join_code(p_church_id) (ADR-022 decision 10a)
+→ not a platform operation: the caller must be an active COORDINATOR
+  of that church, on an ACTIVE membership, with the church ACTIVE;
+  PT403 not_authorized otherwise, including for a Super Admin without
+  COORDINATOR (who uses list_churches()) and for every other role
+→ read-only; returns the current join code and join_code_updated_at;
+  writes nothing and is not audited (a read)
+→ the Coordinator has no operation that generates or changes the code
+
+Role-ending operations, membership status transitions and church status
+changes
+→ never leave an ACTIVE church without an active COORDINATOR on an
+  ACTIVE membership; enforced at commit by deferred constraint triggers
+  (DATABASE_CONSTRAINTS.md section 1, Coordinator Invariant), which lock
+  the church row before counting so concurrent changes cannot both pass
+→ every operation that changes a Coordinator, a Coordinator's
+  membership status or a church's status takes the same church row lock
+  first
 
 create_d_group()
 → COORDINATOR only
@@ -1501,7 +1823,8 @@ set_discipler() (re-pair or unpair) and remove_from_d_group()
   (ADR-012)
 
 approve_church_membership()
-→ ADMIN or COORDINATOR of the same church, own membership ACTIVE
+→ COORDINATOR of the same church, own membership ACTIVE, church ACTIVE
+  (ADMIN or COORDINATOR until ADR-022)
 → PENDING → ACTIVE; sets approved_by, approved_at and joined_at
   (first activation only); audited as MEMBERSHIP_APPROVED
 → never the caller's own row
@@ -1543,11 +1866,26 @@ get_lesson_content(), list_lesson_access(), get_my_readable_content()
 (Migration 017, ADR-019)
 → ACTIVE member of the lesson's church; the only client reads of
   lesson content (the content tables have no client policy or grant)
-→ every block is checked with private.can_read_lesson_tier(): the
-  Coordinator both tiers of any lesson; any active Discipler of the
-  church (every Leader, ADR-020) both tiers of any lesson, in any
-  context (Migration 019, ADR-019 decision 16); the person themselves
-  the Disciple tier of reached lessons; nobody else
+→ every block is checked with private.can_read_lesson_tier(). As built
+  (Migration 019, ADR-019 decision 16): the Coordinator both tiers of
+  any lesson; any active Discipler of the church (every Leader, ADR-020)
+  both tiers of any lesson, in any context; the person themselves the
+  Disciple tier of reached lessons; nobody else. From Slice 8 (ADR-023)
+  the Discipler branch is removed: the Coordinator both tiers of any
+  lesson in any context; in own context the Disciple tier of the
+  reader's reached lessons; for a currently assigned Disciple all ten
+  lessons in both tiers; for another active Disciple of the group the
+  reader leads the Disciple tier of that Disciple's reached lessons;
+  nobody else, and nothing while the church is not ACTIVE. From Slice 8
+  Phase 4 (ADR-024, Migration 027) the own context of a reader holding
+  an active DISCIPLER row, every Leader included, opens both tiers of
+  every lesson
+→ get_my_readable_content() returns the union of what the reader may
+  read across their contexts (own, each currently assigned Disciple, each
+  active Disciple of a group they lead), unchanged in shape. The open
+  tiers of one context come from list_lesson_access(p_for_membership_id),
+  which the device copy stores per context so the reader applies the
+  context it is opened in (ADR-023 decision 6; Migration 026)
 → get_lesson_content() refuses with PT403 not_authorized when the caller
   may read neither tier; answers are returned only with the Discipler
   tier
@@ -1580,12 +1918,24 @@ decision 17)
 Each operation must:
 
 1. Authenticate the caller.
-2. Determine church membership.
+2. Determine church membership, and that the church is ACTIVE (a platform operation determines the platform role instead).
 3. Verify role/responsibility.
 4. Verify record scope.
 5. Validate business rules.
 6. Execute atomically where multiple writes are involved.
 7. Create audit information when required.
+
+Mandatory review item for every new or changed operation, policy or
+helper (ADR-022, AGENTS.md): step 2's church condition. Authority over
+church data is decided through the gated caller helpers (Migration 025),
+or with private.church_is_active() where the caller is identified inline.
+A suspended or archived church then refuses with the usual PT403
+not_authorized, or returns nothing; there is no separate status code. The
+app learns the status from the church's own row: id, name and status stay
+readable by its PENDING and ACTIVE members (section 3, churches). Each new
+client-callable function is classified in the registry sweep
+(test/integration/church_status_test.dart), which fails when one is
+missing.
 
 ---
 
@@ -1609,7 +1959,7 @@ All user-accessible domain tables should have Row Level Security enabled.
 
 Follow-up notes require stricter access than ordinary member information.
 
-ADMIN status alone does not automatically grant access to pastoral/discipleship care notes.
+Super Admin status alone grants no access to pastoral or discipleship care notes, or to any other ministry data (ADR-022).
 
 ## Historical Integrity
 
@@ -1622,6 +1972,8 @@ Complex business transitions must execute through controlled server-side operati
 ---
 
 # Core Authorization Rule
+
+The platform role determines authority over churches as such, never over ministry data.
 
 Church-level roles determine church-wide authority.
 

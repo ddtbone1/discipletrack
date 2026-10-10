@@ -23,6 +23,14 @@ import 'package:discipletrack/features/membership_review/data/membership_review_
 import 'package:discipletrack/features/membership_review/domain/membership_request.dart';
 import 'package:discipletrack/features/ministry/data/ministry_repository.dart';
 import 'package:discipletrack/features/offline/data/offline_snapshot.dart';
+import 'package:discipletrack/features/platform/application/platform_providers.dart';
+import 'package:discipletrack/features/platform/data/platform_repository.dart';
+import 'package:discipletrack/features/platform/domain/platform_models.dart';
+
+import 'platform_fakes.dart';
+
+export 'platform_fakes.dart';
+
 import 'package:discipletrack/features/ministry/domain/d_group.dart';
 import 'package:discipletrack/features/ministry/domain/d_group_detail.dart';
 import 'package:discipletrack/features/ministry/domain/d_group_placement.dart';
@@ -33,6 +41,7 @@ import 'package:discipletrack/features/ministry/domain/ministry_context.dart';
 import 'package:discipletrack/features/profile/application/profile_providers.dart';
 import 'package:discipletrack/features/profile/domain/profile.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -118,6 +127,24 @@ class FakeMembershipRepository implements MembershipRepository {
   @override
   Future<Set<ChurchRole>> fetchMyChurchRoles(String membershipId) async =>
       roles;
+
+  /// What `get_church_join_code()` answers; null refuses, as the database
+  /// refuses anyone but the church's Coordinator.
+  ChurchJoinCode? joinCode;
+  int joinCodeReads = 0;
+
+  @override
+  Future<ChurchJoinCode> fetchJoinCode(String churchId) async {
+    joinCodeReads++;
+    final code = joinCode;
+    if (code == null) {
+      throw const MembershipFailure(
+        'You are not allowed to do that.',
+        code: MembershipFailureCode.forbidden,
+      );
+    }
+    return code;
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>
@@ -362,6 +389,11 @@ Future<void> pumpPage(
   RememberedEmailStore? rememberedEmail,
   String userId = sampleUserId,
   ThemeMode mode = ThemeMode.light,
+  Set<PlatformRole> platformRoles = const {},
+  FakePlatformRepository? platformRepo,
+
+  /// Pumps a router instead of [page], for flows that push routes.
+  GoRouter? router,
 }) async {
   final repo = membershipRepo ?? FakeMembershipRepository()
     ..membership = membership;
@@ -398,6 +430,12 @@ Future<void> pumpPage(
         membershipRepositoryProvider.overrideWithValue(repo),
         myChurchProvider.overrideWith((ref) async => church),
         myChurchRolesProvider.overrideWith((ref) async => roles),
+        myPlatformAccessProvider.overrideWith(
+          (ref) async => PlatformAccess(userId: userId, roles: platformRoles),
+        ),
+        platformRepositoryProvider.overrideWithValue(
+          platformRepo ?? FakePlatformRepository(),
+        ),
         if (auth != null) authRepositoryProvider.overrideWithValue(auth),
         if (reviewRepo != null)
           membershipReviewRepositoryProvider.overrideWithValue(reviewRepo),
@@ -406,12 +444,19 @@ Future<void> pumpPage(
             (ref) async => reviewRepo.pending,
           ),
       ],
-      child: MaterialApp(
-        theme: AppTheme.light(),
-        darkTheme: AppTheme.dark(),
-        themeMode: mode,
-        home: page,
-      ),
+      child: router != null
+          ? MaterialApp.router(
+              theme: AppTheme.light(),
+              darkTheme: AppTheme.dark(),
+              themeMode: mode,
+              routerConfig: router,
+            )
+          : MaterialApp(
+              theme: AppTheme.light(),
+              darkTheme: AppTheme.dark(),
+              themeMode: mode,
+              home: page,
+            ),
     ),
   );
   await tester.pump();

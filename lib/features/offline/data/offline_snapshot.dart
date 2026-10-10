@@ -30,6 +30,7 @@ class OfflineSnapshot {
     required this.church,
     required this.roles,
     required this.ministry,
+    this.isSuperAdmin = false,
   });
 
   /// Bump when the stored shape changes; an older snapshot is then ignored
@@ -43,6 +44,10 @@ class OfflineSnapshot {
   final ChurchSummary? church;
   final Set<ChurchRole> roles;
   final MinistryContext? ministry;
+
+  /// Whether the person held the platform SUPER_ADMIN role (ADR-022), so the
+  /// Platform area is still found offline. Display only, like the rest.
+  final bool isSuperAdmin;
 
   static String? _at(DateTime? t) => t?.toUtc().toIso8601String();
 
@@ -72,7 +77,14 @@ class OfflineSnapshot {
             'approved_at': _at(membership!.approvedAt),
             'onboarding_completed_at': _at(membership!.onboardingCompletedAt),
           },
-    'church': church == null ? null : {'id': church!.id, 'name': church!.name},
+    'church': church == null
+        ? null
+        : {
+            'id': church!.id,
+            'name': church!.name,
+            'status': church!.status.toDb,
+          },
+    'is_super_admin': isSuperAdmin,
     'roles': [for (final r in roles) r.name.toUpperCase()],
     'roster': ministry == null
         ? const <Map<String, dynamic>>[]
@@ -116,6 +128,7 @@ class OfflineSnapshot {
           for (final r in json['roles'] as List<dynamic>)
             ChurchRole.fromDb(r as String),
         },
+        isSuperAdmin: json['is_super_admin'] as bool? ?? false,
         ministry: MinistryContext.fromRosterRows([
           for (final r in json['roster'] as List<dynamic>)
             (r as Map).cast<String, dynamic>(),

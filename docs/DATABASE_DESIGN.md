@@ -52,6 +52,11 @@ not planned (ADR-014 decisions 7, 13). The attendance percentage and
 name values that must not be stored; no percentage is an MVP metric
 (decision 8). The ADRs, the ERD and DATABASE_CONSTRAINTS.md govern.
 
+Revision 2026-10-08 (ADR-022): sections 4.3 and 5 updated. A
+platform-level Super Admin role lives in platform_roles, outside any
+church; the church ADMIN role is retired; churches gain SUSPENDED; a
+person belongs to at most one church.
+
 ---
 
 ## 1. Purpose
@@ -244,9 +249,18 @@ Proposed fields:
 Possible status:
 
 - ACTIVE
+- SUSPENDED (ADR-022: reversible; the church is unavailable to everyone,
+  its data untouched)
 - ARCHIVED
 
-The join code must not grant privileged system roles.
+The join code must not grant privileged roles.
+
+Why status, not membership changes, carries suspension: marking every
+member INACTIVE would end their D Group responsibilities and pairings
+(DATABASE_CONSTRAINTS.md section 1), so reactivation could not restore
+the church. A status on the church, checked by the one
+effective-membership predicate, blocks access and leaves every record
+as it was.
 
 ---
 
@@ -301,12 +315,29 @@ responsibilities.
 
 Roles:
 
-- ADMIN
 - COORDINATOR
+- ADMIN, retired by ADR-022 (the enum value remains; no active row may
+  exist)
 
 Normal church membership does not require a MEMBER role row.
 
 Being an active church member is represented by church_memberships.
+
+## 5.2 platform_roles
+
+Added 2026-10-08 (ADR-022). Illustrative; the ERD is authoritative.
+
+Why a separate table: a platform operator must not need a church
+membership, and their authority must not be tied to one church. A row
+here is keyed to profiles.id and grants authority over churches as
+such (creation, join codes, Coordinators, status), never over ministry
+data. Keeping it out of church_role_assignments means no church-scoped
+helper can ever mistake it for a church role, and no church policy has
+to be changed to exclude it.
+
+Why no client write path: it is the most privileged state in the
+system. It is granted only by service-role tooling, so no client
+request, profile field or token claim can create it.
 
 Proposed fields:
 

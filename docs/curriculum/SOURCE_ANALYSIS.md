@@ -1,5 +1,7 @@
 > **Working analysis, not an authoritative document.** Source analysis of the Journey lesson PDFs, made before the curriculum structure is resolved and before the Slice 7 plan is written. It describes structure and observations. It does not reproduce the lesson text: the PDFs stay local in `docs/curriculum/source/` (git-ignored).
 
+> Roadmap renumbered 2026-10-08: Slice 8 is now Platform roles and church provisioning (ADR-022), so later slice numbers in this document were shifted by one (Workbook / Guide 9, Monitoring / Follow-ups 10, Announcements 11, Reporting / Oversight 12). Nothing else was changed.
+
 # Curriculum Source Analysis: "Journey" Lessons 1 to 10
 
 Date: 2026-10-06. Sources are ten PDFs, one per lesson. All ten are vector InDesign exports, not scans.
@@ -78,9 +80,9 @@ Every section has a title, a one-line **Key Objective** and one to three headlin
 ## 5. Implications for the curriculum structure (observations, not decisions)
 
 1. **Licensing comes before structure.** ADR-010 decision 1 keeps the lesson material as Markdown in the repository and publishes it to Supabase for every ACTIVE member to read. That means reproducing a third-party, apparently commercial curriculum in the repository and in the app. The source has no licence notice, so the right to do that has to be established with the publisher first. It also cuts against keeping the PDFs out of git.
-2. **Two content tiers exist in the source.** The blank workbook (text layer) suits a Disciple. The answers, written verses and Training Modules suit the Discipler. ADR-010 gives every ACTIVE member the same read scope, and ADR-013 (reserved, Slice 8) is where Guide-only protection was expected. Slice 7 cannot publish the answer-filled edition under ADR-010's scope without exposing the answer key.
+2. **Two content tiers exist in the source.** The blank workbook (text layer) suits a Disciple. The answers, written verses and Training Modules suit the Discipler. ADR-010 gives every ACTIVE member the same read scope, and ADR-013 (reserved, Slice 9) is where Guide-only protection was expected. Slice 7 cannot publish the answer-filled edition under ADR-010's scope without exposing the answer key.
 3. **The progress model needs no change.** One completion per lesson, marked by the Discipler (ADR-015), corresponds to the Assignments-page "Date completed / Discipler signature". Lessons are sequential, as the source assumes.
-4. **Several elements are workbook features, not reading content.** These are the blanks, verse writing, homework answers, the Daily in the Word notebook, memory-verse tracking, self-assessment and the module sign-offs. Storing a person's responses is ADR-013 and Slice 8 territory (D17), not Slice 7.
+4. **Several elements are workbook features, not reading content.** These are the blanks, verse writing, homework answers, the Daily in the Word notebook, memory-verse tracking, self-assessment and the module sign-offs. Storing a person's responses is ADR-013 and Slice 9 territory (D17), not Slice 7.
 5. **The structure is regular enough to model.** Lesson, then sections (title, key objective, banners), then ordered blocks: paragraph, scripture reference, fill-in statement, discussion prompts, scenario, verse-writing exercise, assignment list, module. If the content is in scope, it can be held as structured data rather than free Markdown.
 6. **The guide fixes how the material is used in a meeting** (section 6). In particular, the Discipler holds the answers and gives them during the meeting, and the disciple must not work ahead. That bears directly on who may read what, and when.
 

@@ -65,6 +65,23 @@ List<DockItem> dockItemsFor({
   ),
 ];
 
+/// The dock of a Super Admin with no church membership (UI_DESIGN_SYSTEM
+/// section 22): the Platform area and Profile, nothing of any church.
+const platformDockItems = [
+  DockItem(
+    label: 'Churches',
+    icon: CupertinoIcons.building_2_fill,
+    activeIcon: CupertinoIcons.building_2_fill,
+    path: Routes.platform,
+  ),
+  DockItem(
+    label: 'Profile',
+    icon: CupertinoIcons.person_crop_circle,
+    activeIcon: CupertinoIcons.person_crop_circle_fill,
+    path: Routes.profile,
+  ),
+];
+
 Widget _house(Color color, double size, bool active) =>
     HouseOutline(color: color, size: size, filled: active);
 
@@ -84,7 +101,8 @@ int activeDockIndex(List<DockItem> items, String location) {
   return best;
 }
 
-/// Wraps every screen of an ACTIVE member with the floating dock.
+/// Wraps every screen of an ACTIVE member, and of a Super Admin in the
+/// Platform state, with the floating dock.
 ///
 /// The child is given extra bottom padding equal to the dock's footprint, so
 /// [AppScaffold]'s SafeArea keeps content clear of it. While the keyboard is
@@ -97,12 +115,17 @@ class DockShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (ref.watch(sessionStateProvider) != SessionState.active) return child;
+    final session = ref.watch(sessionStateProvider);
+    if (session != SessionState.active && session != SessionState.platform) {
+      return child;
+    }
 
-    final items = dockItemsFor(
-      isCoordinator: ref.watch(isCoordinatorProvider),
-      ministry: ref.watch(myMinistryContextProvider).value,
-    );
+    final items = session == SessionState.platform
+        ? platformDockItems
+        : dockItemsFor(
+            isCoordinator: ref.watch(isCoordinatorProvider),
+            ministry: ref.watch(myMinistryContextProvider).value,
+          );
     final media = MediaQuery.of(context);
     final keyboardOpen = media.viewInsets.bottom > 0;
     final footprint = keyboardOpen

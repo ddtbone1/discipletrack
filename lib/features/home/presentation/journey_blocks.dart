@@ -47,17 +47,18 @@ class JourneyBlocks extends ConsumerWidget {
           const _OwnJourney(),
           const SizedBox(height: AppSpacing.lg),
         ],
-        // A Discipler without a journey of their own (every Leader who is
-        // not a Disciple) reads all ten lessons (ADR-019 decision 16).
-        if (!views.hasOwnJourney && views.isAppointed) ...[
+        // Every Discipler, every Leader included, has the whole book of their
+        // own, apart from any journey (ADR-024): a Discipler who is also a
+        // Disciple keeps their gated journey above and this below.
+        if (views.isAppointed) ...[
           SectionHeading(
             'Lessons',
             trailing: AppTextLink(
               label: 'See all',
-              onTap: () => context.push(Routes.lessons),
+              onTap: () => context.push(Routes.curriculum),
             ),
           ),
-          const LessonCarousel(journey: null),
+          const LessonCarousel.book(),
           const SizedBox(height: AppSpacing.lg),
         ],
         // Every Discipler, a Disciple too or not, sees their Disciples here,

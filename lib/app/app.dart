@@ -11,6 +11,7 @@ import '../features/discipleship/application/discipleship_providers.dart';
 import '../features/membership/application/membership_providers.dart';
 import '../features/ministry/application/ministry_providers.dart';
 import '../features/offline/application/offline_providers.dart';
+import '../features/platform/application/platform_providers.dart';
 import 'router.dart';
 
 /// The root widget.
@@ -54,6 +55,13 @@ class _DiscipleTrackAppState extends ConsumerState<DiscipleTrackApp> {
           return;
         }
         ref.read(myMembershipProvider.notifier).refresh();
+        // A church suspended or reactivated, or a platform role granted or
+        // ended, while the app was in the background (ADR-022). The values
+        // are kept while they reload, so the session never drops to the
+        // splash.
+        ref
+          ..invalidate(myChurchProvider)
+          ..invalidate(myPlatformAccessProvider);
         // Being added to a group or set up, a pairing made, or a meeting
         // recorded by someone else, while the app was in the background.
         ref

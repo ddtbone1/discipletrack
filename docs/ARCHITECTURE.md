@@ -20,6 +20,12 @@ lessons, not twelve; sections 8, 9 and 19.
 
 Revision 2026-10-06 (ADR-018): sections 6 and 9, for Slice 6 as built.
 
+Revision 2026-10-08 (ADR-022, ADR-023, Slice 8): three authority levels
+(platform, church, D Group); the church Admin role retired; church
+status and the "church unavailable" state; one church per person;
+relationship-scoped curriculum access. Sections 4, 5, 10a, 14, 24, 25
+and 26 (rewritten as Platform Authority and Ministry Data).
+
 ---
 
 ## 1. Architecture Goal
@@ -123,18 +129,37 @@ duplicated across domain tables purely to enable composite foreign keys.
 Denormalized tenant keys are deferred, not rejected on principle. They
 may be justified by future multi-church scale.
 
+Several churches may exist from Slice 8 on: a platform Super Admin
+creates them (ADR-022). This adds no tenant infrastructure. Church
+ownership is already explicit, a person belongs to at most one church
+(a unique key on church_memberships.user_id), and the Super Admin's
+operations return only church-level fields and counts, never ministry
+data.
+
+One church per person is an intentional MVP limitation, not a design
+principle. Supporting several churches per person later means a forward
+migration that drops the unique key, a rule for which church a session
+acts in, and per-church session state in the app. The domain model
+needs no change for it: every record keys to the church-scoped
+church_memberships.id.
+
 ---
 
 ## 5. Domain Terminology
 
-DiscipleTrack separates system/church roles from contextual D Group
-responsibilities.
+DiscipleTrack separates three levels of authority (ADR-022): the
+platform role, church roles, and contextual D Group responsibilities.
 
-### System Roles
+### Platform Role
 
-- Admin
+- Super Admin (platform_roles; no church membership needed)
+
+### Church Roles
+
 - Discipleship Coordinator
 - Member
+
+The church Admin role is retired (ADR-022).
 
 ### D Group Responsibilities
 
@@ -325,7 +350,19 @@ Two kinds of device data exist:
   Content slice: only the tiers and lessons the server allows that
   person (ADR-019), synced once, readable offline, refreshed when the
   published version changes, and pruned to the current scope on every
-  refresh.
+  refresh. From Slice 8 the open tiers are recorded per context (the
+  reader's own, and each Disciple's), and the reader applies the context
+  it is opened in, so Discipler-tier content held for a Disciple is
+  never shown in the reader's own view (ADR-023). A Discipler's own
+  context holds the whole book, both tiers (ADR-024); the own view of
+  one who is also a Disciple still presents only their journey.
+
+When the server reports that the person's church is not ACTIVE
+(ADR-022), the next online refresh finds an empty scope and both
+copies are cleared of church data. A device that has not been online
+since keeps showing the last copy, view-only, like any offline copy.
+Lesson answers kept on the device (ADR-021) belong to the person and
+are not cleared.
 
 Supabase stays authoritative for both. Device data is display data,
 never authorizes anything, is cleared on sign-out, and never masks a
@@ -437,6 +474,17 @@ Oversight-oriented, not an attendance-entry workspace:
 - follow-ups
 - assignments
 - Discipler eligibility and appointment (ADR-012)
+- membership requests (the Coordinator alone, ADR-022)
+- the church's join code, read-only (ADR-022 decision 10a)
+
+### Super Admin
+
+Platform-oriented, never ministry data (ADR-022):
+
+- churches, with status, join code and counts
+- each church's Coordinators
+- create church, regenerate code, replace Coordinator, change status
+- platform audit events
 
 No role sees gathering attendance; it is not tracked (ADR-014).
 
@@ -701,6 +749,14 @@ The application must handle:
 - invalid session
 - revoked access
 - temporary connectivity failure
+- a church that is SUSPENDED or ARCHIVED (ADR-022): the person stays
+  signed in, keeps their profile and account, and sees a "church
+  unavailable" state instead of the church
+- a Super Admin without a church membership, who resolves to the
+  Platform area, never to Join Church
+
+Authentication is platform-level. Church status never signs a person
+out.
 
 Authentication answers:
 
@@ -720,9 +776,11 @@ Access may depend on:
 
 Authenticated User
 +
-Church Membership
+Platform Role (authority over churches only, never ministry data)
 +
-System Role
+Church Membership, in an ACTIVE church
++
+Church Role
 +
 D Group Membership
 +
@@ -743,15 +801,23 @@ Role alone is not always sufficient.
 
 ---
 
-## 26. Admin and Ministry Data
+## 26. Platform Authority and Ministry Data
 
-Admin privileges are primarily system/access privileges.
+Rewritten 2026-10-08 (ADR-022); this section was "Admin and Ministry
+Data", for the church Admin role now retired.
 
-Admin should not automatically gain access to private ministry-care
-information solely because the user administers the system.
+Super Admin privileges are platform privileges: churches, join codes,
+Coordinators and church status.
 
-If a person requires both system administration and ministry oversight,
-the appropriate separate responsibilities can be assigned.
+A Super Admin gains no access to ministry data by holding the role: no
+members beyond counts and the Coordinators' name and email, no D
+Groups, meetings, progress, lesson content or follow-ups. Their reads
+are controlled operations that return only those fields; no table
+policy is widened for them.
+
+If a person needs both platform and ministry authority, they hold
+COORDINATOR in a church through a separate assignment made by someone
+else, audited like any other.
 
 This follows least-privilege design.
 

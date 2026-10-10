@@ -2,16 +2,21 @@
 
 ## Status
 
-Accepted
+Accepted. Amended 2026-10-08 by [ADR-022](ADR-022-platform-super-admin-church-provisioning.md): the church-level ADMIN role is retired, and the separation of technical from ministry-care authority below now applies to the platform Super Admin.
 
 ## Context
 
 DiscipleTrack contains different authority levels.
 
-Church-level roles:
+Platform-level role (ADR-022):
 
-- ADMIN
+- SUPER_ADMIN, in `platform_roles`, independent of any church membership
+
+Church-level role:
+
 - COORDINATOR
+
+The church-level ADMIN role is retired (ADR-022). Its enum value remains; no operation grants it and no active row exists.
 
 D Group responsibilities:
 
@@ -53,12 +58,15 @@ RLS must be enabled on user-accessible domain tables.
 
 Policies must consider:
 
-- church membership
+- church membership, in a church whose status is ACTIVE (ADR-022)
+- the platform role, which grants no church data
 - church-level roles
 - D Group responsibility
 - Discipler assignments
 - record ownership/scope
 
-ADMIN does not receive ministry-care access by default. In the MVP this is absolute rather than merely limited: ADMIN has no access to attendance, discipleship progress, attention conditions or follow-up notes. Where one person needs both kinds of authority, COORDINATOR is assigned separately.
+The Super Admin does not receive ministry-care access. In the MVP this is absolute rather than merely limited: a Super Admin has no access to member identities, memberships, profiles, D Groups, meetings and their outcomes, discipleship progress, lesson content, attention conditions or follow-up notes. The one exception is the name and email of each church's active Coordinators (ADR-022 decision 5). Where one person needs both kinds of authority, COORDINATOR is assigned separately, by someone else (ADR-022 decision 6).
+
+As first written, this paragraph applied to the church-level ADMIN role, now retired.
 
 Technical authority and ministry-care authority remain separate.

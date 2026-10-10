@@ -76,12 +76,10 @@ void main() {
       fullName: 'Sec Admin Only',
       tag: 'sec-admin',
     );
-    await service.from('church_role_assignments').insert({
-      'church_membership_id': adminOnly.membershipId,
-      'role': 'ADMIN',
-      'assigned_by': church.approver.userId,
-      'started_at': DateTime.now().toUtc().toIso8601String(),
-    });
+    // A former Admin: the role is retired and its rows ended (ADR-022).
+    await service
+        .from('church_role_assignments')
+        .insert(formerAdminRow(adminOnly.membershipId, church.approver.userId));
 
     final leaderClient = g.leader.user.client;
     disciplerDgm = await place(leaderClient, g.groupId, discipler, 'DISCIPLER');

@@ -13,8 +13,7 @@ import '../domain/meeting_history_entry.dart';
 /// Discipleship reads need a connection: progress is not part of the Slice 4
 /// offline snapshot (plan decision 10), so offline these fail with a network
 /// failure and the screens say so.
-bool _isActive(Ref ref) =>
-    ref.watch(myMembershipProvider).value?.status.grantsChurchAccess ?? false;
+bool _isActive(Ref ref) => ref.watch(hasChurchAccessProvider);
 
 /// The caller's own currently assigned Disciples, longest since their last
 /// recorded meeting first.
@@ -69,7 +68,7 @@ final meetingSummaryProvider = FutureProvider.family<MeetingSummary, String>(
 /// read with it, through the same per-person reads as anyone else's.
 final myMembershipIdProvider = Provider<String?>((ref) {
   final m = ref.watch(myMembershipProvider).value;
-  return m != null && m.status.grantsChurchAccess ? m.id : null;
+  return m != null && ref.watch(hasChurchAccessProvider) ? m.id : null;
 });
 
 /// The caller's own journey, or null when they have no ACTIVE membership.

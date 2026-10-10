@@ -64,9 +64,11 @@ void main() {
     expect(modules, {1: 5, 2: 6, 3: 7, 4: 7, 5: 8, 6: 8, 7: 9});
   });
 
+  // Compared with LF line endings: a Windows checkout (core.autocrlf) holds
+  // the committed LF file as CRLF. Any other difference still fails.
   test('the generated seed matches the definition', () {
     expect(
-      File(curriculumSeedPath).readAsStringSync(),
+      normalizeLineEndings(File(curriculumSeedPath).readAsStringSync()),
       curriculumSeedSql(json),
       reason: 'run: dart run tool/generate_curriculum_seed.dart',
     );

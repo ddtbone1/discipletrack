@@ -5,6 +5,8 @@ import 'package:discipletrack/features/membership/application/membership_provide
 import 'package:discipletrack/features/membership/data/membership_repository.dart';
 import 'package:discipletrack/features/membership/domain/church_membership.dart';
 import 'package:discipletrack/features/offline/data/offline_snapshot.dart';
+import 'package:discipletrack/features/platform/application/platform_providers.dart';
+import 'package:discipletrack/features/platform/domain/platform_models.dart';
 import 'package:discipletrack/features/profile/application/profile_providers.dart';
 import 'package:discipletrack/features/profile/data/profile_repository.dart';
 import 'package:discipletrack/features/profile/domain/profile.dart';
@@ -49,6 +51,10 @@ class _SlowMembershipRepo implements MembershipRepository {
       membership.future;
 
   @override
+  Future<ChurchSummary?> fetchChurch(String churchId) async =>
+      ChurchSummary(id: churchId, name: 'Liberty Bible Baptist Church');
+
+  @override
   dynamic noSuchMethod(Invocation invocation) =>
       throw UnimplementedError('${invocation.memberName}');
 }
@@ -80,6 +86,13 @@ void main() {
         ),
         profileRepositoryProvider.overrideWithValue(_ProfileRepo()),
         membershipRepositoryProvider.overrideWithValue(membershipRepo),
+        // No platform role: an ordinary member (ADR-022).
+        myPlatformAccessProvider.overrideWith(
+          (ref) async => PlatformAccess(
+            userId: ref.watch(currentUserIdProvider) ?? '',
+            roles: const {},
+          ),
+        ),
       ],
     );
     addTearDown(c.dispose);
@@ -107,8 +120,12 @@ void main() {
       ),
     );
     await c.read(myMembershipProvider.future);
+    await c.read(myChurchProvider.future);
 
     expect(c.read(sessionStateProvider), SessionState.active);
+    // Never Join Church, the Platform area or the unavailable screen first.
+    expect(seen, isNot(contains(SessionState.platform)));
+    expect(seen, isNot(contains(SessionState.churchUnavailable)));
     expect(seen, isNot(contains(SessionState.noMembership)));
     expect(seen, isNot(contains(SessionState.activeFirstEntry)));
   });

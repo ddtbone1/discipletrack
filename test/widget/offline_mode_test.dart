@@ -146,21 +146,28 @@ void main() {
       expect(find.text('Not in a D Group yet'), findsOneWidget);
     });
 
-    testWidgets('an Admin or Coordinator does not', (tester) async {
-      for (final role in ChurchRole.values) {
-        await pumpPage(
-          tester,
-          const HomePage(),
-          membership: active,
-          roles: {role},
-        );
-        await tester.pumpAndSettle();
-        expect(
-          find.text('Not in a D Group yet'),
-          findsNothing,
-          reason: '$role',
-        );
-      }
+    testWidgets('a Coordinator does not', (tester) async {
+      await pumpPage(
+        tester,
+        const HomePage(),
+        membership: active,
+        roles: {ChurchRole.coordinator},
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Not in a D Group yet'), findsNothing);
+    });
+
+    testWidgets('the retired Admin role grants nothing: such a member is an '
+        'ordinary member (ADR-022)', (tester) async {
+      await pumpPage(
+        tester,
+        const HomePage(),
+        membership: active,
+        roles: {ChurchRole.admin},
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Not in a D Group yet'), findsOneWidget);
+      expect(find.text('Requests'), findsNothing);
     });
   });
 }

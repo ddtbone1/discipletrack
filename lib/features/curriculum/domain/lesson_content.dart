@@ -337,10 +337,15 @@ class LessonAccess {
       Object.hash(lessonId, discipleTier, disciplerTier, title, theme);
 }
 
-/// The device copy of everything the person may read (ADR-019 decision 7):
-/// their own lesson list and every block `get_my_readable_content()`
-/// returned. Display data only; replaced, never merged, on each refresh, so
-/// it is pruned to the current scope.
+/// The device copy of everything the person may read (ADR-019 decision 7,
+/// ADR-023 decision 6): their own lesson list, the lesson list of each
+/// Disciple context they may read in, and every block
+/// `get_my_readable_content()` returned. Display data only; replaced, never
+/// merged, on each refresh, so it is pruned to the current scope.
+///
+/// The blocks are the union over every context, so a lesson is read from
+/// the copy only through the access of the context it is opened in: a
+/// Discipler's own view never shows the book their Disciple's context opens.
 @immutable
 class ReadableContent {
   const ReadableContent({
@@ -348,16 +353,27 @@ class ReadableContent {
     required this.savedAt,
     required this.lessons,
     required this.blocks,
+    this.contexts = const {},
   });
 
-  static const version = 1;
+  /// 2: the per-context lesson lists (Slice 8). A copy of version 1 is
+  /// ignored and replaced on the next refresh.
+  static const version = 2;
 
   final String userId;
   final DateTime savedAt;
 
   /// The person's own lesson list (no context).
   final List<LessonAccess> lessons;
+
+  /// Each Disciple context's lesson list, by church membership id.
+  final Map<String, List<LessonAccess>> contexts;
   final List<ContentBlock> blocks;
+
+  /// The lesson list of [forMembershipId]'s context (own when null), or null
+  /// when that context was not saved.
+  List<LessonAccess>? accessFor(String? forMembershipId) =>
+      forMembershipId == null ? lessons : contexts[forMembershipId];
 
   /// The cached blocks of one lesson, or null when none were synced.
   LessonContent? lesson(String lessonId) {
@@ -370,11 +386,46 @@ class ReadableContent {
         : LessonContent(lessonId: lessonId, blocks: rows);
   }
 
+  /// One lesson as [forMembershipId]'s context may read it: only the tiers
+  /// its saved access opens, and answers only with the Discipler tier. Null
+  /// when the context was not saved or opens nothing of the lesson.
+  LessonContent? lessonIn(String lessonId, String? forMembershipId) {
+    final access = accessFor(forMembershipId)
+        ?.where((l) => l.lessonId == lessonId)
+        .firstOrNull;
+    if (access == null || !access.isOpen) return null;
+    final rows = [
+      for (final b in blocks)
+        if (b.lessonId == lessonId &&
+            (b.tier == ContentTier.disciple
+                ? access.discipleTier
+                : access.disciplerTier))
+          access.disciplerTier
+              ? b
+              : ContentBlock(
+                  blockId: b.blockId,
+                  lessonId: b.lessonId,
+                  ordinal: b.ordinal,
+                  type: b.type,
+                  tier: b.tier,
+                  body: b.body,
+                  sectionLabel: b.sectionLabel,
+                ),
+    ]..sort((a, b) => a.ordinal.compareTo(b.ordinal));
+    return rows.isEmpty
+        ? null
+        : LessonContent(lessonId: lessonId, blocks: rows);
+  }
+
   Map<String, dynamic> toJson() => {
     'version': version,
     'user_id': userId,
     'saved_at': savedAt.toUtc().toIso8601String(),
     'lessons': [for (final l in lessons) l.toMap()],
+    'contexts': {
+      for (final e in contexts.entries)
+        e.key: [for (final l in e.value) l.toMap()],
+    },
     'blocks': [for (final b in blocks) b.toMap()],
   };
 
@@ -382,13 +433,18 @@ class ReadableContent {
   static ReadableContent? fromJson(Map<String, dynamic> json) {
     try {
       if (json['version'] != version) return null;
+      List<LessonAccess> list(Object? raw) => [
+        for (final l in raw as List)
+          LessonAccess.fromMap((l as Map).cast<String, dynamic>()),
+      ];
       return ReadableContent(
         userId: json['user_id'] as String,
         savedAt: DateTime.parse(json['saved_at'] as String),
-        lessons: [
-          for (final l in json['lessons'] as List)
-            LessonAccess.fromMap((l as Map).cast<String, dynamic>()),
-        ],
+        lessons: list(json['lessons']),
+        contexts: {
+          for (final e in ((json['contexts'] as Map?) ?? const {}).entries)
+            e.key as String: list(e.value),
+        },
         blocks: [
           for (final b in json['blocks'] as List)
             ContentBlock.fromMap((b as Map).cast<String, dynamic>()),

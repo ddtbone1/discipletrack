@@ -6,6 +6,8 @@ Accepted (2026-10-06, user decisions after the curriculum source analysis, `docs
 
 Amended again on 2026-10-06 (user, "Slice 7 curriculum requirement correction"): permission to reproduce the curriculum digitally is confirmed, and DiscipleTrack must reproduce the lessons faithfully. Decisions 1 to 4 are superseded by decisions 11 to 15 below; decisions 5 to 10 stand.
 
+Decision 16 (Disciplers read every lesson, 2026-10-06) is **superseded by [ADR-023](ADR-023-relationship-scoped-curriculum-access.md)** (2026-10-08): curriculum access follows the relationship again. Decision 16 is kept below as history. References to "an Admin without Coordinator" now mean a Super Admin without Coordinator ([ADR-022](ADR-022-platform-super-admin-church-provisioning.md)); the church ADMIN role is retired.
+
 Partially supersedes [ADR-010](ADR-010-lesson-content-delivery.md):
 - decision 1, the repository Markdown as the source for publishing;
 - decision 12, every ACTIVE member reads all lesson content.
@@ -64,7 +66,7 @@ The book also prescribes workflow that the ministry has deliberately decided dif
 
    Answers are stored apart from the content they answer, so the database can withhold them by policy, not by client filtering.
 
-### Who may read what (replaces ADR-010 decision 12; the Discipler and Leader parts are superseded by decision 16)
+### Who may read what (replaces ADR-010 decision 12; the Discipler and Leader parts were superseded by decision 16, which ADR-023 in turn supersedes with a relationship-scoped rule)
 
 6. **Read scope:**
    - **Lesson list** (number and title, `curriculum_lessons`): unchanged, every ACTIVE member of the church, including those not in a D Group.
@@ -78,7 +80,7 @@ The book also prescribes workflow that the ministry has deliberately decided dif
      - the Coordinator, for any lesson.
      - Never the Disciple, including for their own completed lessons.
      - **Never the Leader (least privilege, amended 2026-10-06).** Recording a meeting on a Discipler's behalf (Slice 5 fallback) does not by itself grant access to answers, Discipler notes or training content. A Leader who is also a Discipler reads the Discipler tier only through their own assigned Disciples. A future ministry policy may expand Leader access to this tier explicitly.
-   - **Nobody else.** That includes an Admin without Coordinator, a member with no journey and no Disciples, and a Discipler for lessons none of their Disciples has reached.
+   - **Nobody else.** That includes an Admin without Coordinator (now: a Super Admin without Coordinator, ADR-022), a member with no journey and no Disciples, and a Discipler for lessons none of their Disciples has reached.
    - **"Reached" is derived from progress, never stored.** A person has reached every lesson they have COMPLETED. They have also reached their current lesson (`private.eligible_lesson()`), but only while they hold an active DISCIPLE responsibility. An undo or reopen that moves the current lesson back narrows access at once.
    - **No journey, no curriculum.** Internal progression logic resolves a default current lesson (Lesson 1) for anyone, including someone who has never been a Disciple. That default grants nothing. Curriculum authorization always requires the relationship or responsibility named above: an active Disciple journey, a current assignment as Discipler, leadership of the Disciple's group, or the Coordinator role.
    - Authority follows the relationship, never the responsibility in general (ADR-012 decision 8). A Disciple who is also a Discipler reads the Disciple tier for their own reached lessons, and the Discipler tier for their Disciples' reached lessons.
@@ -105,7 +107,7 @@ The book also prescribes workflow that the ministry has deliberately decided dif
 
 ### Deferred
 
-10. **The workbook belongs to Slice 8 or a later pilot decision, under ADR-013:**
+10. **The workbook belongs to Slice 8 (Slice 9 since the 2026-10-08 renumbering) or a later pilot decision, under ADR-013:**
    - a person's responses to blanks;
    - verse writing;
    - homework answers;
@@ -126,7 +128,7 @@ The book also prescribes workflow that the ministry has deliberately decided dif
 
 **Leave all lessons readable to everyone (ADR-010 as written).** Rejected. It contradicts the source's "not in advance" practice and would expose future material.
 
-**Defer the tier and access architecture to Slice 8.** Rejected. The tier boundary and progression gate shape the schema. Building them now means licensed content can be added later without a redesign or a security retrofit.
+**Defer the tier and access architecture to Slice 8 (the Workbook slice, now Slice 9).** Rejected. The tier boundary and progression gate shape the schema. Building them now means licensed content can be added later without a redesign or a security retrofit.
 
 ## Consequences
 
@@ -165,7 +167,7 @@ The user confirmed that permission to reproduce *Journey* digitally has been obt
     - **Disciple view:** the faithful lesson with every supplied answer withheld, shown as an unanswered blank.
     - **Discipler view:** the same lesson with the answers and the Discipler-only material (Training Modules, Discipler notes), under the relationship-scoped read rules of decision 6.
 
-    Answers stay in their own table and reach a client only with the Discipler tier (decision 5). Blanks, verse writing and homework are displayed, not yet answered or saved: workbook persistence stays in Slice 8 (decision 10).
+    Answers stay in their own table and reach a client only with the Discipler tier (decision 5). Blanks, verse writing and homework are displayed, not yet answered or saved: workbook persistence stays in Slice 8, now Slice 9 (decision 10).
 14. **Deterministic conversion, verified.** Lessons are converted by a repeatable tool from the source files, never retyped or summarized. Each conversion is checked automatically and by comparison with the source:
     1. every substantive source item is represented;
     2. wording is preserved (the word sequence of the converted lesson, read back, equals the source's);
@@ -177,11 +179,13 @@ The user confirmed that permission to reproduce *Journey* digitally has been obt
     One representative lesson establishes the schema and the mobile components and is verified first. The same conversion is then applied to all ten.
 15. **Where the text lives.** Since the church publishes Journey (decision 11, 2026-10-07), the converted lesson files and the resized covers are versioned in the repository (`supabase/curriculum/full/`) and published by `db reset`. The source PDFs and original cover images stay local and git-ignored (`docs/curriculum/source/`). The text lives in the database and in each reader's device copy (decision 7). The repository holds the schema, the converter, the renderers, and the metadata definition used for local development.
 
-## Amendment: Disciplers read every lesson (2026-10-06)
+## Amendment: Disciplers read every lesson (2026-10-06), superseded by ADR-023
+
+> **Superseded on 2026-10-08 by [ADR-023](ADR-023-relationship-scoped-curriculum-access.md).** A Discipler now reads their own journey in their own context; all ten lessons in both tiers only in the context of a currently assigned Disciple; and, as a Leader, the Disciple tier of reached lessons for the other Disciples of their group. The text below is the decision as it was taken.
 
 User decision of 2026-10-06, made after the full lessons were in the app. It replaces the Discipler and Leader parts of decision 6. The Disciple's own gating is unchanged.
 
-16. **Any Discipler reads all ten lessons, both tiers, with answers.** A person who holds an active DISCIPLER responsibility in any D Group of the church reads every lesson of that church's curriculum, in their own context and in any Disciple's context. Every Leader holds DISCIPLER (ADR-020), so every Leader reads them too. The Coordinator reads everything, as before.
+16. **(Superseded by ADR-023.) Any Discipler reads all ten lessons, both tiers, with answers.** A person who holds an active DISCIPLER responsibility in any D Group of the church reads every lesson of that church's curriculum, in their own context and in any Disciple's context. Every Leader holds DISCIPLER (ADR-020), so every Leader reads them too. The Coordinator reads everything, as before.
     - **Why:** a Discipler prepares lessons ahead of the Disciple and teaches from the Discipler's Copy, which in print they already hold whole. Gating them by a Disciple's progress only got in the way.
     - **What stays gated:** a Disciple who is not a Discipler reads only the Disciple tier of the lessons they have reached (completed, plus the current one). The next lesson opens only when the current one is marked completed. Answers and Discipler-only material stay with the Discipler tier.
     - **Person data is unaffected.** Lesson content carries nothing about a person. `list_lesson_access()` still refuses a context person outside the caller's scope, so who someone is and how far they have come stays as private as before.

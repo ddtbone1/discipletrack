@@ -70,11 +70,27 @@ final myChurchProvider = FutureProvider<ChurchSummary?>((ref) async {
   );
 });
 
-/// The person's active church roles. Empty unless the membership is ACTIVE,
-/// matching RBAC section 1a: a role on a non-ACTIVE membership grants nothing.
+/// Whether the person has church access at all: an ACTIVE membership in a
+/// church that is ACTIVE (RBAC section 1a, ADR-022). False while the church
+/// is SUSPENDED or ARCHIVED, or not known yet. Every church read starts here,
+/// so an unavailable church loads nothing and nothing stale is saved to the
+/// device. Presentation only; the database applies the same predicate.
+final hasChurchAccessProvider = Provider<bool>((ref) {
+  final membership = ref.watch(myMembershipProvider).value;
+  final church = ref.watch(myChurchProvider).value;
+  return membership != null &&
+      membership.status.grantsChurchAccess &&
+      church != null &&
+      church.id == membership.churchId &&
+      church.isAvailable;
+});
+
+/// The person's active church roles. Empty unless the membership is ACTIVE
+/// in an ACTIVE church, matching RBAC section 1a: a role grants nothing
+/// otherwise.
 final myChurchRolesProvider = FutureProvider<Set<ChurchRole>>((ref) async {
   final membership = ref.watch(myMembershipProvider).value;
-  if (membership == null || !membership.status.grantsChurchAccess) {
+  if (membership == null || !ref.watch(hasChurchAccessProvider)) {
     return const {};
   }
   final repo = ref.watch(membershipRepositoryProvider);
@@ -86,10 +102,10 @@ final myChurchRolesProvider = FutureProvider<Set<ChurchRole>>((ref) async {
 });
 
 /// Whether the person may review membership requests (RBAC section 2:
-/// Approve church membership, ADMIN and COORDINATOR). Presentation only; the
-/// database checks the same thing on every call.
+/// Approve or reject church membership, the Coordinator only since ADR-022;
+/// the church Admin role is retired). Presentation only; the database checks
+/// the same thing on every call.
 final canReviewMembershipsProvider = Provider<bool>((ref) {
   final roles = ref.watch(myChurchRolesProvider).value ?? const {};
-  return roles.contains(ChurchRole.admin) ||
-      roles.contains(ChurchRole.coordinator);
+  return roles.contains(ChurchRole.coordinator);
 });

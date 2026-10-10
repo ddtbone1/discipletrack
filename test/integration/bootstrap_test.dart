@@ -47,37 +47,34 @@ void main() {
       },
     );
 
-    test(
-      'the initial user holds an ACTIVE, onboarded membership with ADMIN and '
-      'COORDINATOR, and no approver of their own',
-      () async {
-        final membership = await service
-            .from('church_memberships')
-            .select(
-              'id, status, joined_at, approved_by, approved_at, '
-              'onboarding_completed_at',
-            )
-            .eq('church_id', seededChurchId)
-            .eq('user_id', seededAdminUserId)
-            .single();
-        expect(membership['status'], 'ACTIVE');
-        expect(membership['joined_at'], isNotNull);
-        expect(membership['approved_by'], isNull);
-        expect(membership['approved_at'], isNull);
-        expect(
-          membership['onboarding_completed_at'],
-          isNotNull,
-          reason: 'the founder set up the church: no welcome (Migration 018)',
-        );
+    test('the initial user holds an ACTIVE, onboarded membership with '
+        'COORDINATOR only (ADR-022), and no approver of their own', () async {
+      final membership = await service
+          .from('church_memberships')
+          .select(
+            'id, status, joined_at, approved_by, approved_at, '
+            'onboarding_completed_at',
+          )
+          .eq('church_id', seededChurchId)
+          .eq('user_id', seededAdminUserId)
+          .single();
+      expect(membership['status'], 'ACTIVE');
+      expect(membership['joined_at'], isNotNull);
+      expect(membership['approved_by'], isNull);
+      expect(membership['approved_at'], isNull);
+      expect(
+        membership['onboarding_completed_at'],
+        isNotNull,
+        reason: 'the founder set up the church: no welcome (Migration 018)',
+      );
 
-        final roles = await service
-            .from('church_role_assignments')
-            .select('role, ended_at')
-            .eq('church_membership_id', membership['id'] as String);
-        expect(roles.map((r) => r['role']).toSet(), {'ADMIN', 'COORDINATOR'});
-        expect(roles.every((r) => r['ended_at'] == null), isTrue);
-      },
-    );
+      final roles = await service
+          .from('church_role_assignments')
+          .select('role, ended_at')
+          .eq('church_membership_id', membership['id'] as String);
+      expect(roles.map((r) => r['role']).toSet(), {'COORDINATOR'});
+      expect(roles.every((r) => r['ended_at'] == null), isTrue);
+    });
 
     test('one ACTIVE curriculum with ten lessons of four meetings', () async {
       final curricula = await service

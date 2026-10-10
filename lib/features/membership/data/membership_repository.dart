@@ -37,7 +37,11 @@ enum JoinRequestOutcome {
   /// controlled reactivation or reinstatement from there, neither of which the
   /// applicant can trigger.
   notRequestable,
-  invalidCode;
+  invalidCode,
+
+  /// The person already has a membership in another church. One church per
+  /// person is an MVP limitation (ADR-022 decision 9).
+  inAnotherChurch;
 
   static JoinRequestOutcome fromDb(String value) => switch (value) {
     'REQUESTED' => JoinRequestOutcome.requested,
@@ -45,6 +49,7 @@ enum JoinRequestOutcome {
     'ALREADY_ACTIVE' => JoinRequestOutcome.alreadyActive,
     'NOT_REQUESTABLE' => JoinRequestOutcome.notRequestable,
     'INVALID_CODE' => JoinRequestOutcome.invalidCode,
+    'IN_ANOTHER_CHURCH' => JoinRequestOutcome.inAnotherChurch,
     _ => throw ArgumentError('Unknown request_join_church outcome: $value'),
   };
 }
@@ -116,15 +121,36 @@ class MembershipRepository {
   }
 
   /// The caller's church. Only `id, name, status` are readable by clients, and
-  /// only for a church the caller has a PENDING or ACTIVE membership in.
+  /// only for a church the caller has a PENDING or ACTIVE membership in. The
+  /// status is read whatever it is, so a SUSPENDED or ARCHIVED church can be
+  /// explained (ADR-022 decision 14).
   Future<ChurchSummary?> fetchChurch(String churchId) async {
     return _guard('Could not load your church.', () async {
       final row = await _client
           .from('churches')
-          .select('id, name')
+          .select('id, name, status')
           .eq('id', churchId)
           .maybeSingle();
       return row == null ? null : ChurchSummary.fromMap(row);
+    });
+  }
+
+  /// `get_church_join_code()`: the church's current join code, read-only, for
+  /// its active Coordinator while the church is ACTIVE (ADR-022 decision 10a).
+  /// Anyone else is refused by the database.
+  Future<ChurchJoinCode> fetchJoinCode(String churchId) async {
+    return _guard('Could not load the join code.', () async {
+      final rows = await _client.rpc<List<dynamic>>(
+        'get_church_join_code',
+        params: {'p_church_id': churchId},
+      );
+      final row = rows.single as Map<String, dynamic>;
+      return ChurchJoinCode(
+        code: row['join_code'] as String,
+        setAt: row['join_code_updated_at'] == null
+            ? null
+            : DateTime.parse(row['join_code_updated_at'] as String),
+      );
     });
   }
 

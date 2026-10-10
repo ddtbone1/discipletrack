@@ -103,12 +103,10 @@ void main() {
 
     plain = await createActiveMember(church.churchId, fullName: 'Plain');
     adminOnly = await createActiveMember(church.churchId, fullName: 'Admin');
-    await service.from('church_role_assignments').insert({
-      'church_membership_id': adminOnly.membershipId,
-      'role': 'ADMIN',
-      'assigned_by': church.approver.userId,
-      'started_at': daysAgo(1),
-    });
+    // A former Admin: the role is retired and its rows ended (ADR-022).
+    await service
+        .from('church_role_assignments')
+        .insert(formerAdminRow(adminOnly.membershipId, church.approver.userId));
     pending = await createUser(fullName: 'Pending Person', tag: 'ds-pend');
     await seedMembership(church.churchId, pending.userId, 'PENDING');
 

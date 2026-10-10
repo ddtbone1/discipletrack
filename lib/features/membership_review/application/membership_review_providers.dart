@@ -11,7 +11,7 @@ import '../domain/membership_request.dart';
 final pendingMembershipRequestsProvider =
     FutureProvider<List<MembershipRequest>>((ref) async {
       final membership = ref.watch(myMembershipProvider).value;
-      if (membership == null || !membership.status.grantsChurchAccess) {
+      if (membership == null || !ref.watch(hasChurchAccessProvider)) {
         return const [];
       }
       return ref

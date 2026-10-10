@@ -93,7 +93,7 @@ void main() {
       final roles = await church.approver.client
           .from('church_role_assignments')
           .select('role');
-      expect(roles.map((r) => r['role']).toSet(), {'ADMIN', 'COORDINATOR'});
+      expect(roles.map((r) => r['role']).toSet(), {'COORDINATOR'});
     });
   });
 
@@ -146,10 +146,9 @@ void main() {
       },
     );
 
-    test('a Coordinator without ADMIN may also approve', () async {
+    test('a Coordinator of another church approves in their own', () async {
       final coordinatorChurch = await seedChurch(
         name: 'Coordinator Only Church',
-        approverRoles: const {'COORDINATOR'},
       );
       addTearDown(() => deleteChurch(coordinatorChurch));
 
@@ -223,20 +222,28 @@ void main() {
         addTearDown(() => deleteUser(u.userId));
         final id = await membershipIdOf(u.userId);
 
-        // Suspend the approver's own membership, then restore it afterwards.
+        // A second Coordinator whose membership is INACTIVE. The church's
+        // only Coordinator could not be made INACTIVE at all: an ACTIVE
+        // church keeps an active Coordinator (ADR-022).
+        final second = await createActiveMember(
+          church.churchId,
+          fullName: 'Second Coordinator',
+          tag: 'inact-coord',
+        );
+        addTearDown(() => deleteUser(second.user.userId));
+        await service.from('church_role_assignments').insert({
+          'church_membership_id': second.membershipId,
+          'role': 'COORDINATOR',
+          'assigned_by': church.approver.userId,
+          'started_at': DateTime.now().toUtc().toIso8601String(),
+        });
         await service
             .from('church_memberships')
             .update({'status': 'INACTIVE'})
-            .eq('id', church.approverMembershipId);
-        addTearDown(
-          () => service
-              .from('church_memberships')
-              .update({'status': 'ACTIVE'})
-              .eq('id', church.approverMembershipId),
-        );
+            .eq('id', second.membershipId);
 
         await expectLater(
-          church.approver.client.rpc<List<dynamic>>(
+          second.user.client.rpc<List<dynamic>>(
             'approve_church_membership',
             params: {'p_membership_id': id},
           ),

@@ -10,6 +10,8 @@ import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_state.dart';
+import '../../discipleship/application/discipleship_providers.dart';
+import '../../ministry/application/ministry_providers.dart';
 import '../application/curriculum_providers.dart';
 import '../data/curriculum_repository.dart';
 import '../domain/lesson_content.dart';
@@ -17,20 +19,51 @@ import '../domain/lesson_content.dart';
 /// The ten lessons as cards over the book's cover photos (ADR-019).
 ///
 /// Which lessons open is the database's answer, in the context of
-/// [forMembershipId] or of the reader: a Disciple opens completed lessons
-/// and the current one, a Discipler opens all. The rest show a lock.
+/// [forMembershipId] or of the reader (ADR-023): in their own context
+/// everyone opens their own journey (completed lessons and the current one);
+/// in a currently assigned Disciple's context a Discipler opens all ten; the
+/// Coordinator opens all. The rest show a lock.
+///
+/// [oversight] is the whole book (Routes.curriculum): the Coordinator's
+/// Curriculum, and a Discipler's own Lessons (ADR-024). It is kept
+/// apart from My Journey: its lessons open with both tiers.
 class LessonIndexPage extends ConsumerWidget {
-  const LessonIndexPage({this.forMembershipId, super.key});
+  const LessonIndexPage({
+    this.forMembershipId,
+    this.oversight = false,
+    super.key,
+  });
 
   final String? forMembershipId;
+  final bool oversight;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final lessons = ref.watch(lessonAccessProvider(forMembershipId));
+    // The reader's own view is their own journey: nothing ahead of it opens,
+    // whatever else the reader may read elsewhere (ADR-023 decision 10).
+    final reached = forMembershipId == null && !oversight
+        ? ref.watch(myJourneyProvider).value?.reachedLessonIds
+        : null;
+    LessonAccess shown(LessonAccess l) =>
+        reached == null || reached.contains(l.lessonId) || !l.isOpen
+        ? l
+        : LessonAccess(
+            lessonId: l.lessonId,
+            number: l.number,
+            title: l.title,
+            discipleTier: false,
+            disciplerTier: false,
+          );
     final covers = ref.watch(lessonCoversProvider).value ?? const {};
 
     return AppScaffold(
-      title: 'Lessons',
+      // "Curriculum" is the Coordinator's word for the whole book; a
+      // Discipler or Leader reading the same view calls it Lessons (user,
+      // Phase 4 review).
+      title: oversight && ref.watch(isCoordinatorProvider)
+          ? 'Curriculum'
+          : 'Lessons',
       showBackButton: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -61,7 +94,7 @@ class LessonIndexPage extends ConsumerWidget {
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      for (final l in all) ...[
+                      for (final l in all.map(shown)) ...[
                         LessonCoverCard(
                           lesson: l,
                           cover: covers[l.lessonId],
@@ -70,6 +103,7 @@ class LessonIndexPage extends ConsumerWidget {
                                   Routes.lessonFor(
                                     l.lessonId,
                                     forMembershipId: forMembershipId,
+                                    oversight: oversight,
                                   ),
                                 )
                               : null,
